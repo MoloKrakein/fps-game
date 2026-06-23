@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://df68lxky3tvad"]
 
 [ext_resource type="Script" uid="uid://s7g5b6tvn04c" path="res://Scenes/Player/weapon_manager.gd" id="1_uvnfx"]
+[ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Scripts/UI/reticle.gd" id="2_a3d8c"]
 
 [sub_resource type="GDScript" id="GDScript_o08ba"]
 resource_name = "player"
@@ -31,6 +32,7 @@ func _input(event):
 	if event.is_action_pressed(\"ui_cancel\"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	if event.is_action_pressed(\"combat_fire\"):
+		print(\"Shooting !\")
 		weapon_manager.shoot()
 func _unhandled_input(event):
 	# Only look around if the mouse is currently captured!
@@ -93,4 +95,29 @@ script = ExtResource("1_uvnfx")
 
 [node name="RayCast3D" type="RayCast3D" parent="Head/Cam/WeaponManager" unique_id=1417996003]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.028853059, -0.53812146)
+visibility_parent = NodePath("../../../../Mesh")
 target_position = Vector3(0, -10, 0)
+
+[node name="UI" type="Control" parent="." unique_id=533540372]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Reticle" type="CenterContainer" parent="UI" unique_id=1182719863]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_a3d8c")
