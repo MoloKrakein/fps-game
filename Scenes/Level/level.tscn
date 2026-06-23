@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://lt2yl8oj8u0u"]
+
+[ext_resource type="PackedScene" uid="uid://df68lxky3tvad" path="res://Scenes/Player/player.tscn" id="1_iheil"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_vx3u4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0cluu"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o08ba"]
+size = Vector3(60, 2, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iheil"]
+diffuse_mode = 3
+albedo_color = Color(0, 0.484868, 0.9743056, 0.6431373)
+metallic = 0.44
+metallic_specular = 0.83
+emission = Color(0.07453669, 0.37841022, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_o08ba"]
+material = SubResource("StandardMaterial3D_iheil")
+size = Vector3(60, 2, 60)
+
+[node name="Level" type="Node3D" unique_id=1955579441]
+
+[node name="Objects" type="Node3D" parent="." unique_id=2098295443]
+
+[node name="Box" type="RigidBody3D" parent="Objects" unique_id=797960451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9020143, 4.4907575, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Objects/Box" unique_id=482075061]
+mesh = SubResource("BoxMesh_vx3u4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Box" unique_id=1976577429]
+shape = SubResource("BoxShape3D_0cluu")
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=1250537684]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Ground" unique_id=2024189159]
+transform = Transform3D(1, 0, 0, 0, -0.3089494, 0.9510785, 0, -0.9510785, -0.3089494, 0, 11.804411, 0)
+light_energy = 3.059
+shadow_enabled = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=857026289]
+shape = SubResource("BoxShape3D_o08ba")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=2099808845]
+mesh = SubResource("BoxMesh_o08ba")
+
+[node name="Player" parent="." unique_id=1796224466 instance=ExtResource("1_iheil")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.789719, 0)
