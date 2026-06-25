@@ -4,6 +4,12 @@
 [ext_resource type="Script" uid="uid://cpa8hpwwdko5m" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
 [ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Scripts/UI/reticle.gd" id="2_a3d8c"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
+[ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
+[ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -26,8 +32,9 @@ player_controller = NodePath("..")
 component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.58181244, -0.4000216)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.58181244, -0.36076748)
 fov = 90.0
+near = 0.002
 
 [node name="UI" type="Control" parent="." unique_id=533540372]
 layout_mode = 3
@@ -57,3 +64,66 @@ script = ExtResource("2_a3d8c")
 
 [node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
 script = ExtResource("2_xpcdj")
+
+[node name="StateChart" type="Node" parent="." unique_id=596134014]
+script = ExtResource("5_jhyir")
+metadata/_custom_type_script = "uid://couw105c3bde4"
+
+[node name="Root" type="Node" parent="StateChart" unique_id=895260290]
+script = ExtResource("6_74mp2")
+metadata/_custom_type_script = "uid://c1vp0ojjvaby1"
+
+[node name="Movement" type="Node" parent="StateChart/Root" unique_id=971743674]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Grounded")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Grounded" type="Node" parent="StateChart/Root/Movement" unique_id=511585891]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Idle")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Idle" type="Node" parent="StateChart/Root/Movement/Grounded" unique_id=606773680]
+script = ExtResource("8_06tpx")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="OnMoving" type="Node" parent="StateChart/Root/Movement/Grounded/Idle" unique_id=106582483]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../Moving")
+event = &"onMoving"
+delay_in_seconds = "0.0"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Moving" type="Node" parent="StateChart/Root/Movement/Grounded" unique_id=963843281]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Walking")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Walking" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=371987094]
+script = ExtResource("8_06tpx")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="Sprinting" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=329249352]
+script = ExtResource("8_06tpx")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="Airborne" type="Node" parent="StateChart/Root/Movement" unique_id=1671367421]
+script = ExtResource("7_oikmp")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="StateMachine" type="Node" parent="." unique_id=985945145]
+script = ExtResource("10_dey5f")
+
+[node name="MovementState" type="Node" parent="StateMachine" unique_id=1012520038]
+
+[node name="GroundedState" type="Node" parent="StateMachine" unique_id=692606877]
+
+[node name="IdleState" type="Node" parent="StateMachine/GroundedState" unique_id=1462120889]
+
+[node name="MovingState" type="Node" parent="StateMachine/GroundedState" unique_id=1751751381]
+
+[node name="WalkingState" type="Node" parent="StateMachine/GroundedState/MovingState" unique_id=1515019042]
+
+[node name="RunningState" type="Node" parent="StateMachine/GroundedState/MovingState" unique_id=1465574720]
+
+[node name="AirborneState" type="Node" parent="StateMachine" unique_id=468989558]

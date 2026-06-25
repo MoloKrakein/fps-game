@@ -81,3 +81,4 @@ environment = SubResource("Environment_m0nuh")
 [node name="Player" parent="." unique_id=1796224466 instance=ExtResource("1_iheil")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.789719, 0)
 speed = 3.0
+deceleration = 15.0
