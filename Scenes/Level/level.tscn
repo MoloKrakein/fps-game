@@ -26,17 +26,19 @@ emission = Color(0.07453669, 0.37841022, 0, 1)
 material = SubResource("StandardMaterial3D_iheil")
 size = Vector3(60, 2, 60)
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_halmm"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pb7t3"]
+sky_top_color = Color(0.26657414, 0.40034875, 0.8707289, 1)
+sky_horizon_color = Color(0.68443304, 0.6688077, 0.41353306, 1)
+ground_bottom_color = Color(0, 0, 0, 1)
+ground_horizon_color = Color(0.69077235, 0.66155094, 0.4689085, 1)
+sun_angle_max = 67.09
 
-[sub_resource type="Sky" id="Sky_7emvt"]
-sky_material = SubResource("ProceduralSkyMaterial_halmm")
+[sub_resource type="Sky" id="Sky_3f2qm"]
+sky_material = SubResource("ProceduralSkyMaterial_pb7t3")
 
-[sub_resource type="Environment" id="Environment_o08ba"]
+[sub_resource type="Environment" id="Environment_m0nuh"]
 background_mode = 2
-background_color = Color(0.72787535, 0.668979, 0.89564854, 1)
-background_energy_multiplier = 0.8
-sky = SubResource("Sky_7emvt")
-sky_custom_fov = 42.9
+sky = SubResource("Sky_3f2qm")
 
 [node name="Level" type="Node3D" unique_id=1955579441]
 
@@ -74,7 +76,8 @@ shape = SubResource("BoxShape3D_o08ba")
 mesh = SubResource("BoxMesh_o08ba")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=613677392]
-environment = SubResource("Environment_o08ba")
+environment = SubResource("Environment_m0nuh")
 
 [node name="Player" parent="." unique_id=1796224466 instance=ExtResource("1_iheil")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.789719, 0)
+speed = 3.0

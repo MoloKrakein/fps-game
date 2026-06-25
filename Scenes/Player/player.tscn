@@ -11,6 +11,7 @@
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466]
 script = ExtResource("1_mtuoh")
+speed = 100.0
 
 [node name="Collider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
@@ -26,6 +27,7 @@ component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.58181244, -0.4000216)
+fov = 90.0
 
 [node name="UI" type="Control" parent="." unique_id=533540372]
 layout_mode = 3
