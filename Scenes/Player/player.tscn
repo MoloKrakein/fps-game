@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://kxvoo2aa83f8" path="res://Scenes/Player/PlayerController.gd" id="1_mtuoh"]
 [ext_resource type="Script" uid="uid://cpa8hpwwdko5m" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
 [ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Scripts/UI/reticle.gd" id="2_a3d8c"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
@@ -10,6 +11,7 @@
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
 [ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
+[ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Scripts/Player/States/idle_state.gd" id="11_74mp2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -21,6 +23,16 @@ speed = 100.0
 
 [node name="Collider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
+
+[node name="StateChartDebugger" parent="Collider" unique_id=854209845 instance=ExtResource("2_oikmp")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 399.0
+offset_bottom = 241.0
+grow_horizontal = 1
+grow_vertical = 1
+initial_node_to_watch = NodePath("../../StateChart")
 
 [node name="Mesh" type="MeshInstance3D" parent="." unique_id=1636070211]
 mesh = SubResource("CapsuleMesh_o08ba")
@@ -59,11 +71,6 @@ offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_a3d8c")
-
-[node name="Component" type="Node" parent="." unique_id=2093724721]
-
-[node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
-script = ExtResource("2_xpcdj")
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")
@@ -111,19 +118,28 @@ metadata/_custom_type_script = "uid://cytafq8i1y8qm"
 script = ExtResource("7_oikmp")
 metadata/_custom_type_script = "uid://jk2jm1g6q853"
 
-[node name="StateMachine" type="Node" parent="." unique_id=985945145]
+[node name="Component" type="Node" parent="." unique_id=2093724721]
+
+[node name="StateMachine" type="Node" parent="Component" unique_id=985945145 node_paths=PackedStringArray("player_controller")]
 script = ExtResource("10_dey5f")
+player_controller = NodePath("../..")
 
-[node name="MovementState" type="Node" parent="StateMachine" unique_id=1012520038]
+[node name="MovementState" type="Node" parent="Component/StateMachine" unique_id=1012520038]
 
-[node name="GroundedState" type="Node" parent="StateMachine" unique_id=692606877]
+[node name="GroundedState" type="Node" parent="Component/StateMachine" unique_id=692606877]
 
-[node name="IdleState" type="Node" parent="StateMachine/GroundedState" unique_id=1462120889]
+[node name="IdleState" type="Node" parent="Component/StateMachine/GroundedState" unique_id=1462120889]
+script = ExtResource("11_74mp2")
 
-[node name="MovingState" type="Node" parent="StateMachine/GroundedState" unique_id=1751751381]
+[node name="MovingState" type="Node" parent="Component/StateMachine/GroundedState" unique_id=1751751381]
 
-[node name="WalkingState" type="Node" parent="StateMachine/GroundedState/MovingState" unique_id=1515019042]
+[node name="WalkingState" type="Node" parent="Component/StateMachine/GroundedState/MovingState" unique_id=1515019042]
 
-[node name="RunningState" type="Node" parent="StateMachine/GroundedState/MovingState" unique_id=1465574720]
+[node name="RunningState" type="Node" parent="Component/StateMachine/GroundedState/MovingState" unique_id=1465574720]
 
-[node name="AirborneState" type="Node" parent="StateMachine" unique_id=468989558]
+[node name="AirborneState" type="Node" parent="Component/StateMachine" unique_id=468989558]
+
+[node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
+script = ExtResource("2_xpcdj")
+
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="Component/StateMachine/GroundedState/IdleState" method="_on_idle_state_physics_processing"]

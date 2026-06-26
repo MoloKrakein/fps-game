@@ -2,9 +2,16 @@ class_name PlayerController extends CharacterBody3D
 
 var _input_dir: Vector2 = Vector2.ZERO
 var _movement_velocity: Vector3 = Vector3.ZERO
+@export var debug: bool = false
+@export_category("References")
+@export var camera : CameraController
+@export var state_chart : StateChart
+# @export standing_col:CollisionShape3D
+@export_category("Movement")
 @export var speed: float = 0.1
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
+
 
 
 func _physics_process(delta: float) -> void:
@@ -30,7 +37,10 @@ func _physics_process(delta: float) -> void:
 
 	velocity = _movement_velocity
 
-	print("Velocity: ", velocity)
+	if debug:
+		print("Input Direction: ", _input_dir)
+		print("Current Velocity: ", current_velocity)
+		print("Movement Velocity: ", _movement_velocity)
 
 	move_and_slide()
 
