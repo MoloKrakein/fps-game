@@ -13,6 +13,8 @@
 [ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
 [ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Scripts/Player/States/idle_state.gd" id="11_74mp2"]
 [ext_resource type="Script" uid="uid://1kn1bg1umx82" path="res://_Scripts/Player/States/moving_state.gd" id="12_06tpx"]
+[ext_resource type="Script" uid="uid://dotft84ps0jwd" path="res://_Scripts/Player/States/walking_state.gd" id="13_dey5f"]
+[ext_resource type="Script" uid="uid://b0o0vic4fjuvl" path="res://_Scripts/Player/States/running_state.gd" id="14_r5xpd"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -162,8 +164,10 @@ script = ExtResource("11_74mp2")
 script = ExtResource("12_06tpx")
 
 [node name="WalkingState" type="Node" parent="Component/StateMachine/GroundedState/MovingState" unique_id=1515019042]
+script = ExtResource("13_dey5f")
 
 [node name="RunningState" type="Node" parent="Component/StateMachine/GroundedState/MovingState" unique_id=1465574720]
+script = ExtResource("14_r5xpd")
 
 [node name="AirborneState" type="Node" parent="Component/StateMachine" unique_id=468989558]
 
@@ -172,3 +176,5 @@ script = ExtResource("2_xpcdj")
 
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="Component/StateMachine/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="Component/StateMachine/GroundedState/MovingState" method="_on_moving_state_physics_processing"]
+[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="Component/StateMachine/GroundedState/MovingState/WalkingState" method="_on_walking_state_processing"]
+[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="Component/StateMachine/GroundedState/MovingState/RunningState" method="_on_sprinting_state_processing"]
