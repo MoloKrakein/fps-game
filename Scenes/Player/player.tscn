@@ -12,13 +12,16 @@
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
 [ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
 [ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Scripts/Player/States/idle_state.gd" id="11_74mp2"]
+[ext_resource type="Script" uid="uid://1kn1bg1umx82" path="res://_Scripts/Player/States/moving_state.gd" id="12_06tpx"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_o08ba"]
 
-[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466]
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart")]
 script = ExtResource("1_mtuoh")
+camera = NodePath("CameraController")
+state_chart = NodePath("StateChart")
 speed = 100.0
 
 [node name="Collider" type="CollisionShape3D" parent="." unique_id=1617641562]
@@ -114,6 +117,30 @@ metadata/_custom_type_script = "uid://cytafq8i1y8qm"
 script = ExtResource("8_06tpx")
 metadata/_custom_type_script = "uid://cytafq8i1y8qm"
 
+[node name="OnIdle" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=1250493170]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../Idle")
+event = &"onIdle"
+delay_in_seconds = "0.0"
+
+[node name="OnWalking" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=910881412]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Walking")
+event = &"onWalking"
+delay_in_seconds = "0.0"
+
+[node name="OnSprinting" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=96507387]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Sprinting")
+event = &"onSprinting"
+delay_in_seconds = "0.0"
+
+[node name="OnAirborne" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=1805463402]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../../Airborne")
+event = &"onAirborne"
+delay_in_seconds = "0.0"
+
 [node name="Airborne" type="Node" parent="StateChart/Root/Movement" unique_id=1671367421]
 script = ExtResource("7_oikmp")
 metadata/_custom_type_script = "uid://jk2jm1g6q853"
@@ -132,6 +159,7 @@ player_controller = NodePath("../..")
 script = ExtResource("11_74mp2")
 
 [node name="MovingState" type="Node" parent="Component/StateMachine/GroundedState" unique_id=1751751381]
+script = ExtResource("12_06tpx")
 
 [node name="WalkingState" type="Node" parent="Component/StateMachine/GroundedState/MovingState" unique_id=1515019042]
 
@@ -143,3 +171,4 @@ script = ExtResource("11_74mp2")
 script = ExtResource("2_xpcdj")
 
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="Component/StateMachine/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="Component/StateMachine/GroundedState/MovingState" method="_on_moving_state_physics_processing"]

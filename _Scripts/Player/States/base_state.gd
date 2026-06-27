@@ -5,17 +5,32 @@ class_name PlayerState extends Node
 var player_controller: PlayerController
 
 func _ready() -> void:
-    # if %StateMachine and %StateMachine is PlayerStateMachine:
-    #     player_controller = %StateMachine.player_controller
-    #     print("PlayerState: PlayerController reference set successfully.")
-    # else:
-    #     print("PlayerState: PlayerController reference not found. Ensure this state is a child of PlayerStateMachine.")
+    # Defer so the full scene tree is ready before we search
+    call_deferred("_setup_references")
 
-    # get state machine reference
-    var state_machine = get_parent()
-    if state_machine and state_machine is PlayerStateMachine:
-        player_controller = state_machine.player_controller
-        print("PlayerState: PlayerController reference set successfully.")
+func _setup_references() -> void:
+    # Walk up the tree manually instead of relying on groups
+    var sm = get_node_or_null("/root/PlayerController/Component/StateMachine")
+    if sm and sm is PlayerStateMachine:
+        player_controller = sm.player_controller
+        if debug:
+            print("PlayerState [%s]: Got player_controller = %s" % [name, player_controller])
     else:
-        print("PlayerState: PlayerController reference not found. Ensure this state is a child of PlayerStateMachine.")
+        # Fallback: search the whole tree
+        var root = get_tree().root
+        var found = _find_state_machine(root)
+        if found:
+            player_controller = found.player_controller
+            if debug:
+                print("PlayerState [%s]: Got player_controller via fallback = %s" % [name, player_controller])
+        else:
+            printerr("PlayerState [%s]: FAILED to find PlayerStateMachine anywhere in tree." % name)
 
+func _find_state_machine(node: Node) -> PlayerStateMachine:
+    if node is PlayerStateMachine:
+        return node
+    for child in node.get_children():
+        var result = _find_state_machine(child)
+        if result:
+            return result
+    return null
