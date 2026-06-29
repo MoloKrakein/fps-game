@@ -1,17 +1,22 @@
 class_name PlayerController extends CharacterBody3D
 
-var _input_dir: Vector2 = Vector2.ZERO
-var _movement_velocity: Vector3 = Vector3.ZERO
+
 @export var debug: bool = false
 @export_category("References")
 @export var camera : CameraController
 @export var state_chart : StateChart
 # @export standing_col:CollisionShape3D
 @export_category("Movement")
-@export var speed: float = 0.1
+# @export var speed: float = 0.1
+@export var default_speed: float = 0.1
+@export var sprint_speed: float = 0.5
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
 
+var _input_dir: Vector2 = Vector2.ZERO
+var _movement_velocity: Vector3 = Vector3.ZERO
+var sprint_modifier: float = 0.0
+var speed : float = 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -31,7 +36,9 @@ func _physics_process(delta: float) -> void:
 	else:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
 
-	
+
+	var speed_modifier: float = sprint_modifier
+	speed = default_speed + speed_modifier
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
@@ -45,10 +52,14 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
-
 func update_rotation(rotation_input)-> void:
 	global_transform.basis = Basis.from_euler(rotation_input)
 
+func sprint() -> void:
+	sprint_modifier = sprint_speed
+
+func walk() -> void:
+	sprint_modifier = 0.0
 
 
 # const SPEED = 5.0

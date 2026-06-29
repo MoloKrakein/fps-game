@@ -24,7 +24,8 @@
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
-speed = 100.0
+default_speed = 4.0
+sprint_speed = 6.0
 
 [node name="Collider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
@@ -44,7 +45,6 @@ mesh = SubResource("CapsuleMesh_o08ba")
 
 [node name="CameraController" type="Node3D" parent="." unique_id=642708642 node_paths=PackedStringArray("player_controller", "component_mouse_capture")]
 script = ExtResource("1_xpcdj")
-debug = true
 player_controller = NodePath("..")
 component_mouse_capture = NodePath("../Component/MouseCapture")
 
@@ -176,5 +176,7 @@ script = ExtResource("2_xpcdj")
 
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="Component/StateMachine/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="Component/StateMachine/GroundedState/MovingState" method="_on_moving_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="Component/StateMachine/GroundedState/MovingState/WalkingState" method="_on_walking_state_entered"]
 [connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="Component/StateMachine/GroundedState/MovingState/WalkingState" method="_on_walking_state_processing"]
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="Component/StateMachine/GroundedState/MovingState/RunningState" method="_on_sprinting_state_entered"]
 [connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="Component/StateMachine/GroundedState/MovingState/RunningState" method="_on_sprinting_state_processing"]
