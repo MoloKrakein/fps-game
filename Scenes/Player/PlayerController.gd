@@ -10,13 +10,24 @@ class_name PlayerController extends CharacterBody3D
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1
 @export var sprint_speed: float = 0.5
+@export var crouch_speed: float = -5.0
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
+# @export_category("Stance")
+
+@export_category("Settings")
+@export var isToggleCrouch: bool = false
+@export var isToggleSprint: bool = false
 
 var _input_dir: Vector2 = Vector2.ZERO
 var _movement_velocity: Vector3 = Vector3.ZERO
 var sprint_modifier: float = 0.0
 var speed : float = 0.0
+var crouch_modifier: float = 0.0
+
+# settings
+var is_crouching: bool = false
+var is_sprinting: bool = false
 
 
 func _physics_process(delta: float) -> void:
@@ -31,14 +42,15 @@ func _physics_process(delta: float) -> void:
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
 	var direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
 
+	var speed_modifier: float = sprint_modifier + crouch_modifier
+	speed = default_speed + speed_modifier
+
 	if direction != Vector3.ZERO:
-		current_velocity = lerp(current_velocity, Vector2(direction.x, direction.z)*speed, acceleration * delta)
+		current_velocity = lerp(current_velocity, Vector2(direction.x, direction.z)* speed, acceleration * delta)
 	else:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
 
-
-	var speed_modifier: float = sprint_modifier
-	speed = default_speed + speed_modifier
+	
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
@@ -57,9 +69,19 @@ func update_rotation(rotation_input)-> void:
 
 func sprint() -> void:
 	sprint_modifier = sprint_speed
+	is_sprinting = true
 
 func walk() -> void:
 	sprint_modifier = 0.0
+	is_sprinting = false
+
+func crouch() -> void:
+	crouch_modifier = crouch_speed
+	is_crouching = true
+
+func stand() -> void:
+	crouch_modifier = 0.0
+	is_crouching = false
 
 
 # const SPEED = 5.0
