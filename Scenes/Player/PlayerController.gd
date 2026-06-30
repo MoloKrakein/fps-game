@@ -38,12 +38,13 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
+	var speed_modifier: float = sprint_modifier + crouch_modifier
+	speed = default_speed + speed_modifier
+
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
 	var direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
 
-	var speed_modifier: float = sprint_modifier + crouch_modifier
-	speed = default_speed + speed_modifier
 
 	if direction != Vector3.ZERO:
 		current_velocity = lerp(current_velocity, Vector2(direction.x, direction.z)* speed, acceleration * delta)
@@ -57,9 +58,16 @@ func _physics_process(delta: float) -> void:
 	velocity = _movement_velocity
 
 	if debug:
+		print("================================")
 		print("Input Direction: ", _input_dir)
 		print("Current Velocity: ", current_velocity)
 		print("Movement Velocity: ", _movement_velocity)
+		print("================================")
+		print("Speed: ", speed)
+		print("Sprint Modifier: ", sprint_modifier)
+		print("Crouch Modifier: ", crouch_modifier)
+		# print("Is Sprinting: ", is_sprinting)
+		# print("Is Crouching: ", is_crouching)
 
 	move_and_slide()
 
@@ -69,19 +77,32 @@ func update_rotation(rotation_input)-> void:
 
 func sprint() -> void:
 	sprint_modifier = sprint_speed
-	is_sprinting = true
+	if debug:
+		print("Changed sprint modifier to: ", sprint_modifier)
+	# is_sprinting = true
 
 func walk() -> void:
 	sprint_modifier = 0.0
-	is_sprinting = false
-
-func crouch() -> void:
-	crouch_modifier = crouch_speed
-	is_crouching = true
+	if debug:
+		print("Changed sprint modifier to: ", sprint_modifier)
+	# is_sprinting = false
 
 func stand() -> void:
 	crouch_modifier = 0.0
-	is_crouching = false
+	if debug:
+		print("Changed crouch modifier to: ", crouch_modifier)
+	# is_crouching = false
+
+func test() -> void:
+	if debug:
+		print("Test function called")
+
+func crouch() -> void:
+	crouch_modifier = crouch_speed
+	if debug:
+		print("Changed crouch modifier to: ", crouch_modifier)
+	# is_crouching = true
+
 
 
 # const SPEED = 5.0
