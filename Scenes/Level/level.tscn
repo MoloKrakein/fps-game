@@ -26,6 +26,12 @@ emission = Color(0.07453669, 0.37841022, 0, 1)
 material = SubResource("StandardMaterial3D_iheil")
 size = Vector3(60, 2, 60)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_vx3u4"]
+size = Vector3(9.465271, 0.38134766, 9.830933)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0cluu"]
+size = Vector3(9.465271, 0.38134766, 9.830933)
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pb7t3"]
 sky_top_color = Color(0.26657414, 0.40034875, 0.8707289, 1)
 sky_horizon_color = Color(0.68443304, 0.6688077, 0.41353306, 1)
@@ -69,16 +75,26 @@ transform = Transform3D(1, 0, 0, 0, -0.3089494, 0.9510785, 0, -0.9510785, -0.308
 light_energy = 3.059
 shadow_enabled = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=857026289]
+[node name="Floor" type="CollisionShape3D" parent="Ground" unique_id=857026289]
 shape = SubResource("BoxShape3D_o08ba")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=2099808845]
+[node name="FloorMesh" type="MeshInstance3D" parent="Ground/Floor" unique_id=2099808845]
 mesh = SubResource("BoxMesh_o08ba")
+
+[node name="Obstacle" type="CollisionShape3D" parent="Ground" unique_id=833145743]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5683231, 6.656738)
+shape = SubResource("BoxShape3D_vx3u4")
+
+[node name="ObstacleMesh" type="MeshInstance3D" parent="Ground/Obstacle" unique_id=360436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30932617, 0)
+mesh = SubResource("BoxMesh_0cluu")
+
+[node name="StaticObstacle" type="Node3D" parent="Ground" unique_id=1020162574]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1015882, 6.656738)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=613677392]
 environment = SubResource("Environment_m0nuh")
 
 [node name="Player" parent="." unique_id=1796224466 instance=ExtResource("1_iheil")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.789719, 0)
-speed = 3.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0562983, 0)
 deceleration = 15.0

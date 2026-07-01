@@ -20,21 +20,24 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_ks1b7"]
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_o08ba"]
 
-[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart")]
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col")]
 process_priority = -9
 script = ExtResource("1_mtuoh")
-debug = true
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
+standing_col = NodePath("StandCollider")
+crouching_col = NodePath("CrouchCollider")
 default_speed = 6.0
-sprint_speed = 6.0
+sprint_speed = 3.0
 
-[node name="Collider" type="CollisionShape3D" parent="." unique_id=1617641562]
+[node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
 
-[node name="StateChartDebugger" parent="Collider" unique_id=854209845 instance=ExtResource("2_oikmp")]
+[node name="StateChartDebugger" parent="StandCollider" unique_id=854209845 instance=ExtResource("2_oikmp")]
 anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
@@ -43,6 +46,10 @@ offset_bottom = 241.0
 grow_horizontal = 1
 grow_vertical = 1
 initial_node_to_watch = NodePath("../../StateChart")
+
+[node name="CrouchCollider" type="CollisionShape3D" parent="." unique_id=1751202798]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("SphereShape3D_ks1b7")
 
 [node name="Mesh" type="MeshInstance3D" parent="." unique_id=1636070211]
 mesh = SubResource("CapsuleMesh_o08ba")

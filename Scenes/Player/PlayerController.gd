@@ -5,6 +5,8 @@ class_name PlayerController extends CharacterBody3D
 @export_category("References")
 @export var camera : CameraController
 @export var state_chart : StateChart
+@export var standing_col: CollisionShape3D
+@export var crouching_col: CollisionShape3D
 # @export standing_col:CollisionShape3D
 @export_category("Movement")
 # @export var speed: float = 0.1
@@ -89,16 +91,16 @@ func walk() -> void:
 
 func stand() -> void:
 	crouch_modifier = 0.0
+	standing_col.disabled = false
+	crouching_col.disabled = true
 	if debug:
 		print("Changed crouch modifier to: ", crouch_modifier)
 	# is_crouching = false
 
-func test() -> void:
-	if debug:
-		print("Test function called")
-
 func crouch() -> void:
 	crouch_modifier = crouch_speed
+	crouching_col.disabled = false
+	standing_col.disabled = true
 	if debug:
 		print("Changed crouch modifier to: ", crouch_modifier)
 	# is_crouching = true
