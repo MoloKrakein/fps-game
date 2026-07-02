@@ -11,8 +11,11 @@ class_name CameraController extends Node3D
 @export_group("Camera Other Settings")
 @export var is_Vertical_inverted: bool = false
 @export var is_Horizontal_inverted: bool = false
+@export var crouch_offset: float = 0.0
+@export var crouch_speed: float = 3.0
 
 var _rotation: Vector3
+const DEFAULT_HEIGHT: float = 0.5
 
 func update_camera_rotation(input: Vector2) -> void:
 	_rotation.x += input.y * (1 if is_Vertical_inverted else -1)
@@ -34,4 +37,6 @@ func _process(delta: float) -> void:
 		update_camera_rotation(component_mouse_capture._mouse_input)
 
 func update_camera_height(delta: float, direction: int) -> void:
-	pass
+	if position.y >= crouch_offset and position.y <= DEFAULT_HEIGHT:
+		position.y = clamp(position.y + (crouch_speed * direction) * delta, crouch_offset, DEFAULT_HEIGHT)
+		
