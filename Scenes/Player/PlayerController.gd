@@ -7,7 +7,7 @@ class_name PlayerController extends CharacterBody3D
 @export var state_chart : StateChart
 @export var standing_col: CollisionShape3D
 @export var crouching_col: CollisionShape3D
-# @export standing_col:CollisionShape3D
+@export var crouch_check: ShapeCast3D
 @export_category("Movement")
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1

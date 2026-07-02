@@ -24,13 +24,16 @@
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_o08ba"]
 
-[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col")]
+[sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
+
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check")]
 process_priority = -9
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
 standing_col = NodePath("StandCollider")
 crouching_col = NodePath("CrouchCollider")
+crouch_check = NodePath("CrouchCheck")
 default_speed = 6.0
 sprint_speed = 3.0
 
@@ -53,6 +56,11 @@ shape = SubResource("SphereShape3D_ks1b7")
 
 [node name="Mesh" type="MeshInstance3D" parent="." unique_id=1636070211]
 mesh = SubResource("CapsuleMesh_o08ba")
+
+[node name="CrouchCheck" type="ShapeCast3D" parent="." unique_id=1790915549]
+transform = Transform3D(0.9999619, 0, -0.008726535, 0, 1, 0, 0.008726535, 0, 0.9999619, 0, 0, 0)
+shape = SubResource("SphereShape3D_o08ba")
+target_position = Vector3(0, 0.5, 0)
 
 [node name="CameraController" type="Node3D" parent="." unique_id=642708642 node_paths=PackedStringArray("player_controller", "component_mouse_capture")]
 script = ExtResource("1_xpcdj")
