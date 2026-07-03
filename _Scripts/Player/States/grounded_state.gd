@@ -7,3 +7,7 @@ func _on_grounded_state_physics_processing(delta: float) -> void:
 		player_controller.jump()
 		player_controller.state_chart.send_event("onAirborne")
 
+
+	if not player_controller.is_on_floor():
+		player_controller.state_chart.send_event("onAirborne")
+
