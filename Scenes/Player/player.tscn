@@ -12,10 +12,12 @@
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
 [ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
 [ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Scripts/Player/States/idle_state.gd" id="11_74mp2"]
+[ext_resource type="Script" uid="uid://ck7gkkw5mi2wp" path="res://_Scripts/Player/States/grounded_state.gd" id="11_hnuln"]
 [ext_resource type="Script" uid="uid://1kn1bg1umx82" path="res://_Scripts/Player/States/moving_state.gd" id="12_06tpx"]
 [ext_resource type="Script" uid="uid://dotft84ps0jwd" path="res://_Scripts/Player/States/walking_state.gd" id="13_dey5f"]
 [ext_resource type="Script" uid="uid://b0o0vic4fjuvl" path="res://_Scripts/Player/States/running_state.gd" id="14_r5xpd"]
 [ext_resource type="Script" uid="uid://b481b5psp66d5" path="res://_Scripts/Player/States/standing_state.gd" id="15_ks1b7"]
+[ext_resource type="Script" uid="uid://dyukor5w2gr3g" path="res://_Scripts/Player/States/airborne_state.gd" id="16_aqm4k"]
 [ext_resource type="Script" uid="uid://6mv42ee0wqh8" path="res://_Scripts/Player/States/crouching_state.gd" id="16_hnuln"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
@@ -44,8 +46,8 @@ shape = SubResource("CapsuleShape3D_o08ba")
 anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
-offset_right = 399.0
-offset_bottom = 241.0
+offset_right = 485.0
+offset_bottom = 497.0
 grow_horizontal = 1
 grow_vertical = 1
 initial_node_to_watch = NodePath("../../StateChart")
@@ -138,6 +140,9 @@ metadata/_custom_type_script = "uid://cytafq8i1y8qm"
 script = ExtResource("8_06tpx")
 metadata/_custom_type_script = "uid://cytafq8i1y8qm"
 
+[node name="Sliding" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=1543187386]
+script = ExtResource("8_06tpx")
+
 [node name="OnIdle" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=1250493170]
 script = ExtResource("9_7g0yx")
 to = NodePath("../../Idle")
@@ -164,7 +169,17 @@ delay_in_seconds = "0.0"
 
 [node name="Airborne" type="Node" parent="StateChart/Root/Movement" unique_id=1671367421]
 script = ExtResource("7_oikmp")
+initial_state = NodePath("Jumping")
 metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Jumping" type="Node" parent="StateChart/Root/Movement/Airborne" unique_id=239388086]
+script = ExtResource("8_06tpx")
+
+[node name="OnGrounded" type="Node" parent="StateChart/Root/Movement/Airborne" unique_id=935858291]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../Grounded")
+event = &"onGrounded"
+delay_in_seconds = "0.0"
 
 [node name="Stance" type="Node" parent="StateChart/Root" unique_id=628390868]
 script = ExtResource("7_oikmp")
@@ -194,11 +209,13 @@ delay_in_seconds = "0.0"
 
 [node name="StateMachine" type="Node" parent="Component" unique_id=985945145 node_paths=PackedStringArray("player_controller")]
 script = ExtResource("10_dey5f")
+debug = true
 player_controller = NodePath("../..")
 
 [node name="MovementState" type="Node" parent="Component/StateMachine" unique_id=1012520038]
 
 [node name="GroundedState" type="Node" parent="Component/StateMachine/MovementState" unique_id=692606877]
+script = ExtResource("11_hnuln")
 
 [node name="IdleState" type="Node" parent="Component/StateMachine/MovementState/GroundedState" unique_id=1462120889]
 script = ExtResource("11_74mp2")
@@ -213,6 +230,9 @@ script = ExtResource("13_dey5f")
 script = ExtResource("14_r5xpd")
 
 [node name="AirborneState" type="Node" parent="Component/StateMachine/MovementState" unique_id=468989558]
+script = ExtResource("16_aqm4k")
+
+[node name="JumpingState" type="Node" parent="Component/StateMachine/MovementState/AirborneState" unique_id=150216897]
 
 [node name="StanceState" type="Node" parent="Component/StateMachine" unique_id=1959543440]
 
@@ -225,12 +245,14 @@ script = ExtResource("16_hnuln")
 [node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
 script = ExtResource("2_xpcdj")
 
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="Component/StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="Component/StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="Component/StateMachine/MovementState/GroundedState/MovingState" method="_on_moving_state_physics_processing"]
 [connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="Component/StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_entered"]
 [connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="Component/StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_processing"]
 [connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="Component/StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_entered"]
 [connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="Component/StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Airborne" to="Component/StateMachine/MovementState/AirborneState" method="_on_airborne_state_physics_processing"]
 [connection signal="state_entered" from="StateChart/Root/Stance/Standing" to="Component/StateMachine/StanceState/StandingState" method="_on_standing_state_entered"]
 [connection signal="state_physics_processing" from="StateChart/Root/Stance/Standing" to="Component/StateMachine/StanceState/StandingState" method="_on_standing_state_physics_processing"]
 [connection signal="state_entered" from="StateChart/Root/Stance/Crouching" to="Component/StateMachine/StanceState/CrouchingState" method="_on_crouching_state_entered"]

@@ -15,7 +15,9 @@ class_name PlayerController extends CharacterBody3D
 @export var crouch_speed: float = -5.0
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
-# @export_category("Stance")
+
+@export_category("Jumping")
+@export var jump_velocity: float = 4.5
 
 @export_category("Settings")
 @export var isToggleCrouch: bool = false
@@ -105,7 +107,9 @@ func crouch() -> void:
 		print("Changed crouch modifier to: ", crouch_modifier)
 	is_crouching = true
 
-# func
+func jump() -> void:
+	# if is_on_floor():
+	velocity.y = jump_velocity
 
 
 

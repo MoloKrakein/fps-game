@@ -16,3 +16,9 @@ func _inject_references(node: Node) -> void:
             child.player_controller = player_controller
             print("  -> Injected into ", child.name, " = ", player_controller)
         _inject_references(child)
+
+func _process(delta: float) -> void:
+    if player_controller.debug or debug:
+        player_controller.state_chart.set_expression_property("Velocity", player_controller.velocity)
+        player_controller.state_chart.set_expression_property("Player Hitting Head", player_controller.crouch_check.is_colliding())
+        
