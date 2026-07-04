@@ -98,3 +98,5 @@ environment = SubResource("Environment_m0nuh")
 [node name="Player" parent="." unique_id=1796224466 instance=ExtResource("1_iheil")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0562983, 0)
 deceleration = 15.0
+slide_duration = 0.5
+slide_power = 8.0

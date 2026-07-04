@@ -15,5 +15,8 @@ func _on_sprinting_state_processing(delta: float) -> void:
         if not Input.is_action_pressed("move_sprint"):
             player_controller.state_chart.send_event("onWalking")
 
+    if Input.is_action_just_pressed("move_crouch") and player_controller.is_on_floor():
+        player_controller.state_chart.send_event("onSliding")
+        
 func _on_sprinting_state_entered() -> void:
     player_controller.sprint()

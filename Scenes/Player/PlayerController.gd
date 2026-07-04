@@ -19,6 +19,10 @@ class_name PlayerController extends CharacterBody3D
 @export_category("Jumping")
 @export var jump_velocity: float = 4.5
 
+@export_category("Sliding")
+@export var slide_duration: float = 1.0
+@export var slide_power: float = 10.0
+
 @export_category("Settings")
 @export var isToggleCrouch: bool = false
 @export var isToggleSprint: bool = false
@@ -28,11 +32,13 @@ var _movement_velocity: Vector3 = Vector3.ZERO
 var sprint_modifier: float = 0.0
 var speed : float = 0.0
 var crouch_modifier: float = 0.0
+var _slide_direction: Vector3 = Vector3.ZERO
+var slide_modifier: float = 0.0
 
 # settings
 var is_crouching: bool = false
 var is_sprinting: bool = false
-
+var is_sliding: bool = false
 
 func _physics_process(delta: float) -> void:
 	
@@ -43,7 +49,7 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 
 	var speed_modifier: float = sprint_modifier + crouch_modifier
-	speed = default_speed + speed_modifier
+	speed = default_speed + speed_modifier + slide_modifier
 
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
@@ -61,15 +67,15 @@ func _physics_process(delta: float) -> void:
 
 	velocity = _movement_velocity
 
-	if debug:
-		print("================================")
-		print("Input Direction: ", _input_dir)
-		print("Current Velocity: ", current_velocity)
-		print("Movement Velocity: ", _movement_velocity)
-		print("================================")
-		print("Speed: ", speed)
-		print("Sprint Modifier: ", sprint_modifier)
-		print("Crouch Modifier: ", crouch_modifier)
+	# if debug:
+		# print("================================")
+		# print("Input Direction: ", _input_dir)
+		# print("Current Velocity: ", current_velocity)
+		# print("Movement Velocity: ", _movement_velocity)
+		# print("================================")
+		# print("Speed: ", speed)
+		# print("Sprint Modifier: ", sprint_modifier)
+		# print("Crouch Modifier: ", crouch_modifier)
 		# print("Is Sprinting: ", is_sprinting)
 		# print("Is Crouching: ", is_crouching)
 
@@ -111,6 +117,18 @@ func jump() -> void:
 	# if is_on_floor():
 	velocity.y = jump_velocity
 
+func start_slide() -> void:
+	is_sliding = true
+	_slide_direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
+	# gradually decrease slide_modifier over time in _physics_process or a separate function
+	slide_modifier = slide_power
+
+
+
+
+func end_slide() -> void:
+	is_sliding = false
+	_slide_direction = Vector3.ZERO
 
 
 
