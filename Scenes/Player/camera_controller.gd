@@ -37,6 +37,17 @@ func _process(delta: float) -> void:
 		update_camera_rotation(component_mouse_capture._mouse_input)
 
 func update_camera_height(delta: float, direction: int) -> void:
-	if position.y >= crouch_offset and position.y <= DEFAULT_HEIGHT:
-		position.y = clamp(position.y + (crouch_speed * direction) * delta, crouch_offset, DEFAULT_HEIGHT)
+	# if position.y >= crouch_offset and position.y <= DEFAULT_HEIGHT:
+	# 	position.y = clamp(position.y + (crouch_speed * direction) * delta, crouch_offset, DEFAULT_HEIGHT)
+
+	# lower the camera to crouch offset
+	if direction < 0:
+		if position.y > crouch_offset:
+			position.y = clamp(max(position.y + (crouch_speed * direction) * delta, crouch_offset), crouch_offset, DEFAULT_HEIGHT)
+		# print("Camera Lowering: ", position.y)
+	# raise the camera to default height
+	elif direction > 0:
+		if position.y < DEFAULT_HEIGHT:
+			position.y = clamp(min(position.y + (crouch_speed * direction) * delta, DEFAULT_HEIGHT), crouch_offset, DEFAULT_HEIGHT)
+		# print("Camera Raising: ", position.y)
 		

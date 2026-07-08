@@ -12,6 +12,14 @@ size = Vector3(1, 4, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_1ov45"]
 size = Vector3(1, 4, 1)
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_iheil"]
+friction = 0.25
+bounce = 0.24
+
+[sub_resource type="SphereMesh" id="SphereMesh_o08ba"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_vx3u4"]
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_o08ba"]
 size = Vector3(60, 2, 60)
 
@@ -67,6 +75,17 @@ mesh = SubResource("BoxMesh_iheil")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Box2" unique_id=481103239]
 shape = SubResource("BoxShape3D_1ov45")
+
+[node name="Ball1" type="RigidBody3D" parent="Objects" unique_id=1382840748]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9964113, 8.2401285, 0)
+mass = 0.259
+physics_material_override = SubResource("PhysicsMaterial_iheil")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Objects/Ball1" unique_id=2145598466]
+mesh = SubResource("SphereMesh_o08ba")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Ball1" unique_id=1525693035]
+shape = SubResource("SphereShape3D_vx3u4")
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=1250537684]
 

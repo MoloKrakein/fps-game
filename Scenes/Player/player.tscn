@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Scripts/UI/reticle.gd" id="2_a3d8c"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
+[ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Scripts/Player/components/interaction_raycast.gd" id="4_h8ma5"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
@@ -29,7 +30,7 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
-[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check")]
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check", "interaction_raycast")]
 process_priority = -9
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
@@ -37,9 +38,12 @@ state_chart = NodePath("StateChart")
 standing_col = NodePath("StandCollider")
 crouching_col = NodePath("CrouchCollider")
 crouch_check = NodePath("CrouchCheck")
+interaction_raycast = NodePath("CameraController/Cam/InteractionRaycast")
 default_speed = 6.0
 sprint_speed = 3.0
-slide_duration = 9.0
+slide_duration = 4.0
+slide_power = 15.0
+slide_cooldown = 1.6
 
 [node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
@@ -67,16 +71,23 @@ shape = SubResource("SphereShape3D_o08ba")
 target_position = Vector3(0, 0.5, 0)
 
 [node name="CameraController" type="Node3D" parent="." unique_id=642708642 node_paths=PackedStringArray("player_controller", "component_mouse_capture")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.613845, 0)
 script = ExtResource("1_xpcdj")
 player_controller = NodePath("..")
 component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.58181244, -0.36076748)
 fov = 90.0
-near = 0.002
+near = 0.001
+
+[node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
+transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)
+debug_shape_custom_color = Color(0.9588106, 0, 0.51712954, 1)
+debug_shape_thickness = 5
+script = ExtResource("4_h8ma5")
 
 [node name="UI" type="Control" parent="." unique_id=533540372]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

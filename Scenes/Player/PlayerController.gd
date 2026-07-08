@@ -8,6 +8,7 @@ class_name PlayerController extends CharacterBody3D
 @export var standing_col: CollisionShape3D
 @export var crouching_col: CollisionShape3D
 @export var crouch_check: ShapeCast3D
+@export var interaction_raycast: RayCast3D
 @export_category("Movement")
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1
@@ -16,12 +17,15 @@ class_name PlayerController extends CharacterBody3D
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
 
+
+
 @export_category("Jumping")
 @export var jump_velocity: float = 4.5
 
 @export_category("Sliding")
 @export var slide_duration: float = 1.0
 @export var slide_power: float = 10.0
+@export var slide_cooldown: float = 1.0
 
 @export_category("Settings")
 @export var isToggleCrouch: bool = false
@@ -34,6 +38,7 @@ var speed : float = 0.0
 var crouch_modifier: float = 0.0
 var _slide_direction: Vector3 = Vector3.ZERO
 var slide_modifier: float = 0.0
+
 
 # settings
 var is_crouching: bool = false
@@ -120,8 +125,8 @@ func jump() -> void:
 func start_slide() -> void:
 	is_sliding = true
 	_slide_direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
-	# gradually decrease slide_modifier over time in _physics_process or a separate function
 	slide_modifier = slide_power
+	
 
 
 
