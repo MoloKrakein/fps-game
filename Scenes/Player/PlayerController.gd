@@ -26,6 +26,7 @@ class_name PlayerController extends CharacterBody3D
 @export var slide_duration: float = 1.0
 @export var slide_power: float = 10.0
 @export var slide_cooldown: float = 1.0
+@export var min_slide_momentum: float = 4.0
 
 @export_category("Settings")
 @export var isToggleCrouch: bool = false
@@ -38,7 +39,7 @@ var speed : float = 0.0
 var crouch_modifier: float = 0.0
 var _slide_direction: Vector3 = Vector3.ZERO
 var slide_modifier: float = 0.0
-
+var _current_slide_cooldown: float = 0.0
 
 # settings
 var is_crouching: bool = false
@@ -49,6 +50,9 @@ func _physics_process(delta: float) -> void:
 	
 	# var acceleration = 
 	# var deceleration = speed * delta
+	
+	if _current_slide_cooldown > 0.0:
+		_current_slide_cooldown -= delta
 	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -127,13 +131,21 @@ func start_slide() -> void:
 	_slide_direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
 	slide_modifier = slide_power
 	
-
-
-
+func can_slide() -> bool:
+	if _current_slide_cooldown > 0.0:
+		return false
+	if not is_on_floor():
+		return false
+	# check momentum
+	var horizontal_velocity = Vector2(velocity.x, velocity.z)
+	if horizontal_velocity.length() < min_slide_momentum:
+		return false
+	return true
 
 func end_slide() -> void:
 	is_sliding = false
 	_slide_direction = Vector3.ZERO
+	_current_slide_cooldown = slide_cooldown
 
 
 
