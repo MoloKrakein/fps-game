@@ -20,6 +20,7 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+	
 
 func _draw() -> void:
 	# draw_circle(Vector2.ZERO, DOT_RADIUS, DOT_COLOR)

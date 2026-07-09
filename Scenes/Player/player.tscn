@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Scripts/UI/reticle.gd" id="2_a3d8c"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
+[ext_resource type="Script" uid="uid://dly6myqcou03q" path="res://_Scripts/Player/cam_effects.gd" id="4_eksi1"]
 [ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Scripts/Player/components/interaction_raycast.gd" id="4_h8ma5"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
@@ -30,7 +31,7 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
-[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check", "interaction_raycast")]
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects")]
 process_priority = -9
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
@@ -39,8 +40,10 @@ standing_col = NodePath("StandCollider")
 crouching_col = NodePath("CrouchCollider")
 crouch_check = NodePath("CrouchCheck")
 interaction_raycast = NodePath("CameraController/Cam/InteractionRaycast")
+cam_effects = NodePath("CameraController/Cam")
 default_speed = 6.0
 sprint_speed = 3.0
+jump_velocity = 4.3
 slide_duration = 4.0
 slide_power = 15.0
 slide_cooldown = 1.6
@@ -76,9 +79,12 @@ script = ExtResource("1_xpcdj")
 player_controller = NodePath("..")
 component_mouse_capture = NodePath("../Component/MouseCapture")
 
-[node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113]
+[node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
 fov = 90.0
 near = 0.001
+script = ExtResource("4_eksi1")
+player = NodePath("../..")
+max_roll = 1.5
 
 [node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
 transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)

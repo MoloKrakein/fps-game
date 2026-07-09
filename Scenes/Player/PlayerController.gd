@@ -9,6 +9,7 @@ class_name PlayerController extends CharacterBody3D
 @export var crouching_col: CollisionShape3D
 @export var crouch_check: ShapeCast3D
 @export var interaction_raycast: RayCast3D
+@export var cam_effects: CamEffects
 @export_category("Movement")
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1
@@ -16,8 +17,6 @@ class_name PlayerController extends CharacterBody3D
 @export var crouch_speed: float = -5.0
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
-
-
 
 @export_category("Jumping")
 @export var jump_velocity: float = 4.5
@@ -40,6 +39,7 @@ var crouch_modifier: float = 0.0
 var _slide_direction: Vector3 = Vector3.ZERO
 var slide_modifier: float = 0.0
 var _current_slide_cooldown: float = 0.0
+var _current_max_velocity: float = 0.0
 
 # settings
 var is_crouching: bool = false
@@ -75,6 +75,10 @@ func _physics_process(delta: float) -> void:
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
 	velocity = _movement_velocity
+
+	# get max velocity for debugging purposes
+	if _movement_velocity.length() > _current_max_velocity:
+		_current_max_velocity = _movement_velocity.length()
 
 	# if debug:
 		# print("================================")

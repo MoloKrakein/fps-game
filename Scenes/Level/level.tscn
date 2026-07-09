@@ -13,8 +13,7 @@ size = Vector3(1, 4, 1)
 size = Vector3(1, 4, 1)
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_iheil"]
-friction = 0.25
-bounce = 0.24
+bounce = 1.0
 
 [sub_resource type="SphereMesh" id="SphereMesh_o08ba"]
 
