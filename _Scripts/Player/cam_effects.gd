@@ -7,6 +7,10 @@ class_name CamEffects extends Camera3D
 @export_category("Effects")
 @export var enable_tilt: bool = true
 @export var enable_fall_kick: bool = true
+@export var enable_damage_kick: bool = true
+@export var enable_weapon_recoil_kick: bool = true
+@export var enable_screen_shake: bool = true
+@export var enable_headbob: bool = true
 
 
 @export_category("Kick & Recoil settings")
@@ -17,9 +21,32 @@ class_name CamEffects extends Camera3D
 @export var max_roll: float = 2.5
 @export_group("Fall Kick Settings")
 @export var fall_time: float = 0.3 
+@export_group("Damage Kick Settings")
+@export var dmg_time: float = 0.3
+@export_group("Weapon Recoil Settings")
+@export var weapon_decay: float = 0.5
+@export_subgroup("Headbob Settings")
+@export_range(0.0, 1.0,0.001) var headbob_pitch: float = 0.05
+@export_range(0.0, 1.0,0.001) var headbob_roll: float = 0.025
+@export_range(0.0, 0.4,0.001) var headbob_up: float = 0.005
+@export_range(3.0, 8.0, 0.1) var headbob_frequency: float = 6.0
 
 var _fall_value: float = 0.0
 var _fall_timer: float = 0.0
+
+var _dmg_value: float = 0.0
+var _dmg_roll_value: float = 0.0
+var _dmg_timer: float = 0.0
+
+
+var _weapon_kick_angle: Vector3 = Vector3.ZERO
+
+var _step_timer: float = 0.0
+
+var _screen_shake_tween: Tween = null
+const MIN_SHAKE_INTENSITY: float = 0.05
+const MAX_SHAKE_INTENSITY: float = 0.5
+
 
 
 func _process(delta: float) -> void:
@@ -33,15 +60,25 @@ func calculate_view_offset(delta):
         return
 
     _fall_timer -= delta
-
+    _dmg_timer -= delta
     
     var velocity = player.velocity
 
+    # Headbob effect
+    var speed = Vector2(velocity.x, velocity.z).length()
+    if speed > 0.1 and player.is_on_floor():
+        _step_timer += delta * (speed / headbob_frequency)
+        _step_timer = fmod(_step_timer, 1.0)
+    else:
+        _step_timer = 0.0
+    
+    var headbob_sin = sin(_step_timer * 2.0 * PI) * 0.5
 
     var angles = Vector3.ZERO
     var offset = Vector3.ZERO
 
 
+    # tilt camera based on player movement
     if enable_tilt:
         var forward = global_transform.basis.z
         var right = global_transform.basis.x
@@ -54,16 +91,76 @@ func calculate_view_offset(delta):
         var right_tilt = clampf(right_dot * deg_to_rad(run_roll), deg_to_rad(-max_roll), deg_to_rad(max_roll))
         angles.z = right_tilt
 
+    # apply fall kick effect
     if enable_fall_kick:
         var fall_ratio = max(0.0, _fall_timer / fall_time)
         var fall_kick_amount = fall_ratio * _fall_value
         angles.x -= fall_kick_amount
         offset.y -= fall_kick_amount
 
+    # apply damage kick effect
+    if enable_damage_kick:
+        var dmg_ratio = max(0.0, _dmg_timer / dmg_time)
+        angles.x -= dmg_ratio * _dmg_value
+        angles.z += dmg_ratio * _dmg_roll_value
+
+    # apply weapon recoil effect
+    if enable_weapon_recoil_kick:
+        _weapon_kick_angle = _weapon_kick_angle.move_toward(Vector3.ZERO, weapon_decay * delta)
+        angles += _weapon_kick_angle
+
+
+    # apply headbob effect
+    if enable_headbob:
+        var headbob_pitch_delta = headbob_sin * deg_to_rad(headbob_pitch) * speed
+        angles.x -= headbob_pitch_delta
+
+        var headbob_roll_delta = headbob_sin * deg_to_rad(headbob_roll) * speed
+        angles.z -= headbob_roll_delta
+
+        var headbob_height = headbob_sin * speed * headbob_up
+        offset.y += headbob_height
+
+        
     position = offset
     rotation = angles
 
 
+# fall
 func add_fall_kick(amount: float) -> void:
     _fall_value = deg_to_rad(amount)
     _fall_timer = fall_time
+
+# damage kick
+func add_damage_kick(pitch_amount: float, roll_amount: float, source: Vector3) -> void:
+    var forward = global_transform.basis.z
+    var right = global_transform.basis.x
+    var source_dir = (source - global_transform.origin).normalized()
+    var forward_dot = source_dir.dot(forward)
+    var right_dot = source_dir.dot(right)
+    _dmg_value = deg_to_rad(pitch_amount) * forward_dot
+    _dmg_roll_value = deg_to_rad(roll_amount) * right_dot
+    _dmg_timer = dmg_time
+
+# weapon recoil
+func add_weapon_recoil(pitch: float, yaw: float, roll: float) -> void:
+    _weapon_kick_angle.x += deg_to_rad(pitch)
+    _weapon_kick_angle.y += deg_to_rad(randf_range(-yaw, yaw))
+    _weapon_kick_angle.z += deg_to_rad(randf_range(-roll, roll))
+
+
+# screen shake
+func add_screen_shake(intensity: float, duration: float) -> void:
+    if _screen_shake_tween:
+        _screen_shake_tween.kill()
+
+
+    _screen_shake_tween = create_tween()
+    _screen_shake_tween.tween_method(update_screen_shake.bind(intensity), 0.0, 1.0,duration).set_ease(Tween.EASE_OUT)
+
+
+func update_screen_shake(alpha:float, amount: float) -> void:
+    amount = remap(amount, 0.0, 1.0, MIN_SHAKE_INTENSITY, MAX_SHAKE_INTENSITY)
+    var curr_shake_amount = amount * (1.0 - alpha)
+    h_offset = randf_range(-curr_shake_amount, curr_shake_amount)
+    v_offset = randf_range(-curr_shake_amount, curr_shake_amount)

@@ -20,6 +20,7 @@ class_name PlayerController extends CharacterBody3D
 
 @export_category("Jumping")
 @export var jump_velocity: float = 4.5
+@export var fall_velocity_threshold: float = -5.0
 
 @export_category("Sliding")
 @export var slide_duration: float = 1.0
@@ -40,6 +41,7 @@ var _slide_direction: Vector3 = Vector3.ZERO
 var slide_modifier: float = 0.0
 var _current_slide_cooldown: float = 0.0
 var _current_max_velocity: float = 0.0
+var current_fall_velocity: float = 0.0
 
 # settings
 var is_crouching: bool = false
@@ -48,6 +50,7 @@ var is_sliding: bool = false
 
 func _physics_process(delta: float) -> void:
 	
+#region Physics Process
 	# var acceleration = 
 	# var deceleration = speed * delta
 	
@@ -93,7 +96,10 @@ func _physics_process(delta: float) -> void:
 		# print("Is Crouching: ", is_crouching)
 
 	move_and_slide()
+#endregion
 
+
+#region Movement Functions
 
 func update_rotation(rotation_input)-> void:
 	global_transform.basis = Basis.from_euler(rotation_input)
@@ -129,6 +135,9 @@ func crouch() -> void:
 func jump() -> void:
 	# if is_on_floor():
 	velocity.y = jump_velocity
+#endregion
+
+#region Slide
 
 func start_slide() -> void:
 	is_sliding = true
@@ -151,5 +160,14 @@ func end_slide() -> void:
 	_slide_direction = Vector3.ZERO
 	_current_slide_cooldown = slide_cooldown
 
+#endregion
 
-
+#region Fall logic
+func check_fall_speed() -> bool:
+	if current_fall_velocity < fall_velocity_threshold:
+		current_fall_velocity = 0.0
+		return true
+	else:
+		current_fall_velocity = velocity.y
+		return false
+#endregion
