@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://dyukor5w2gr3g" path="res://_Scripts/Player/States/airborne_state.gd" id="16_aqm4k"]
 [ext_resource type="Script" uid="uid://6mv42ee0wqh8" path="res://_Scripts/Player/States/crouching_state.gd" id="16_hnuln"]
 [ext_resource type="Script" uid="uid://guhkdu35mp0" path="res://_Scripts/Player/States/sliding_state.gd" id="19_rcvs5"]
+[ext_resource type="Script" uid="uid://gwkuothaiqkm" path="res://Scenes/Player/step_handler.gd" id="23_jincj"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -31,7 +32,7 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
-[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects")]
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "step_handler")]
 process_priority = -9
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
@@ -41,6 +42,7 @@ crouching_col = NodePath("CrouchCollider")
 crouch_check = NodePath("CrouchCheck")
 interaction_raycast = NodePath("CameraController/Cam/InteractionRaycast")
 cam_effects = NodePath("CameraController/Cam")
+step_handler = NodePath("Component/StepHandler")
 default_speed = 6.0
 sprint_speed = 3.0
 jump_velocity = 4.3
@@ -235,61 +237,64 @@ script = ExtResource("9_7g0yx")
 to = NodePath("../Crouching")
 delay_in_seconds = "0.8"
 
-[node name="Component" type="Node" parent="." unique_id=2093724721]
-
-[node name="StateMachine" type="Node" parent="Component" unique_id=985945145 node_paths=PackedStringArray("player_controller")]
+[node name="StateMachine" type="Node" parent="." unique_id=985945145 node_paths=PackedStringArray("player_controller")]
 script = ExtResource("10_dey5f")
 debug = true
-player_controller = NodePath("../..")
+player_controller = NodePath("..")
 
-[node name="MovementState" type="Node" parent="Component/StateMachine" unique_id=1012520038]
+[node name="MovementState" type="Node" parent="StateMachine" unique_id=1012520038]
 
-[node name="GroundedState" type="Node" parent="Component/StateMachine/MovementState" unique_id=692606877]
+[node name="GroundedState" type="Node" parent="StateMachine/MovementState" unique_id=692606877]
 script = ExtResource("11_hnuln")
 
-[node name="IdleState" type="Node" parent="Component/StateMachine/MovementState/GroundedState" unique_id=1462120889]
+[node name="IdleState" type="Node" parent="StateMachine/MovementState/GroundedState" unique_id=1462120889]
 script = ExtResource("11_74mp2")
 
-[node name="MovingState" type="Node" parent="Component/StateMachine/MovementState/GroundedState" unique_id=1751751381]
+[node name="MovingState" type="Node" parent="StateMachine/MovementState/GroundedState" unique_id=1751751381]
 script = ExtResource("12_06tpx")
 
-[node name="WalkingState" type="Node" parent="Component/StateMachine/MovementState/GroundedState/MovingState" unique_id=1515019042]
+[node name="WalkingState" type="Node" parent="StateMachine/MovementState/GroundedState/MovingState" unique_id=1515019042]
 script = ExtResource("13_dey5f")
 
-[node name="RunningState" type="Node" parent="Component/StateMachine/MovementState/GroundedState/MovingState" unique_id=1465574720]
+[node name="RunningState" type="Node" parent="StateMachine/MovementState/GroundedState/MovingState" unique_id=1465574720]
 script = ExtResource("14_r5xpd")
 
-[node name="AirborneState" type="Node" parent="Component/StateMachine/MovementState" unique_id=468989558]
+[node name="AirborneState" type="Node" parent="StateMachine/MovementState" unique_id=468989558]
 script = ExtResource("16_aqm4k")
 
-[node name="JumpingState" type="Node" parent="Component/StateMachine/MovementState/AirborneState" unique_id=150216897]
+[node name="JumpingState" type="Node" parent="StateMachine/MovementState/AirborneState" unique_id=150216897]
 
-[node name="StanceState" type="Node" parent="Component/StateMachine" unique_id=1959543440]
+[node name="StanceState" type="Node" parent="StateMachine" unique_id=1959543440]
 
-[node name="StandingState" type="Node" parent="Component/StateMachine/StanceState" unique_id=1406277482]
+[node name="StandingState" type="Node" parent="StateMachine/StanceState" unique_id=1406277482]
 script = ExtResource("15_ks1b7")
 
-[node name="CrouchingState" type="Node" parent="Component/StateMachine/StanceState" unique_id=651418231]
+[node name="CrouchingState" type="Node" parent="StateMachine/StanceState" unique_id=651418231]
 script = ExtResource("16_hnuln")
 
-[node name="SlidingState" type="Node" parent="Component/StateMachine/StanceState" unique_id=1351751666]
+[node name="SlidingState" type="Node" parent="StateMachine/StanceState" unique_id=1351751666]
 script = ExtResource("19_rcvs5")
+
+[node name="Component" type="Node" parent="." unique_id=2093724721]
 
 [node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
 script = ExtResource("2_xpcdj")
 
-[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="Component/StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
-[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="Component/StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
-[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="Component/StateMachine/MovementState/GroundedState/MovingState" method="_on_moving_state_physics_processing"]
-[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="Component/StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_entered"]
-[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="Component/StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_processing"]
-[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="Component/StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_entered"]
-[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="Component/StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_processing"]
-[connection signal="state_physics_processing" from="StateChart/Root/Movement/Airborne" to="Component/StateMachine/MovementState/AirborneState" method="_on_airborne_state_physics_processing"]
-[connection signal="state_entered" from="StateChart/Root/Stance/Standing" to="Component/StateMachine/StanceState/StandingState" method="_on_standing_state_entered"]
-[connection signal="state_physics_processing" from="StateChart/Root/Stance/Standing" to="Component/StateMachine/StanceState/StandingState" method="_on_standing_state_physics_processing"]
-[connection signal="state_entered" from="StateChart/Root/Stance/Crouching" to="Component/StateMachine/StanceState/CrouchingState" method="_on_crouching_state_entered"]
-[connection signal="state_physics_processing" from="StateChart/Root/Stance/Crouching" to="Component/StateMachine/StanceState/CrouchingState" method="_on_crouching_state_physics_processing"]
-[connection signal="state_entered" from="StateChart/Root/Stance/Sliding" to="Component/StateMachine/StanceState/SlidingState" method="_on_sliding_state_entered"]
-[connection signal="state_exited" from="StateChart/Root/Stance/Sliding" to="Component/StateMachine/StanceState/SlidingState" method="_on_sliding_state_exited"]
-[connection signal="state_physics_processing" from="StateChart/Root/Stance/Sliding" to="Component/StateMachine/StanceState/SlidingState" method="_on_sliding_state_physics_processing"]
+[node name="StepHandler" type="Node" parent="Component" unique_id=1782951827]
+script = ExtResource("23_jincj")
+
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="StateMachine/MovementState/GroundedState/MovingState" method="_on_moving_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_entered"]
+[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_processing"]
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_entered"]
+[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Airborne" to="StateMachine/MovementState/AirborneState" method="_on_airborne_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Standing" to="StateMachine/StanceState/StandingState" method="_on_standing_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Standing" to="StateMachine/StanceState/StandingState" method="_on_standing_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Crouching" to="StateMachine/StanceState/CrouchingState" method="_on_crouching_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Crouching" to="StateMachine/StanceState/CrouchingState" method="_on_crouching_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_entered"]
+[connection signal="state_exited" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_exited"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_physics_processing"]

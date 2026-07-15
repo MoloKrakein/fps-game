@@ -10,6 +10,7 @@ class_name PlayerController extends CharacterBody3D
 @export var crouch_check: ShapeCast3D
 @export var interaction_raycast: RayCast3D
 @export var cam_effects: CamEffects
+@export var step_handler: StepHandlerComponent
 @export_category("Movement")
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1
@@ -83,18 +84,7 @@ func _physics_process(delta: float) -> void:
 	if _movement_velocity.length() > _current_max_velocity:
 		_current_max_velocity = _movement_velocity.length()
 
-	# if debug:
-		# print("================================")
-		# print("Input Direction: ", _input_dir)
-		# print("Current Velocity: ", current_velocity)
-		# print("Movement Velocity: ", _movement_velocity)
-		# print("================================")
-		# print("Speed: ", speed)
-		# print("Sprint Modifier: ", sprint_modifier)
-		# print("Crouch Modifier: ", crouch_modifier)
-		# print("Is Sprinting: ", is_sprinting)
-		# print("Is Crouching: ", is_crouching)
-
+	step_handler.handle_step()
 	move_and_slide()
 #endregion
 
