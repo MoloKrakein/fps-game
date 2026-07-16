@@ -11,6 +11,8 @@ class_name StepHandlerComponent extends Node
 
 var step_status: String = "No Step Detected"
 const FEET_ADJUST_HEIGHT: float = 0.05
+const MIN_MOVEMENT_LENGTH: float = 0.1
+const MIN_DOT_VALUE: float = 0.5
 
 func handle_step() -> void:
 	if player == null:
@@ -39,6 +41,10 @@ func handle_step_climb(collision: KinematicCollision3D) -> bool:
 	step_status = "Step Climb Logic Not Implemented"
 
 	if not _is_vertical_surface(collision):
+		return false
+
+	if not _is_valid_step_direction(collision):
+		step_status = "Invalid Step Direction"
 		return false
 
 	var measured_height = _measure_step_height(collision)
@@ -119,3 +125,14 @@ func _get_shape_half_height(shape: Shape3D) -> float:
 
 func _is_valid_step_height(height: float) -> bool:
 	return height > 0 and height <= max_step_height
+
+func _is_valid_step_direction(collision: KinematicCollision3D) -> bool:
+	var collision_normal = collision.get_normal()
+	var input_dir = player.get_input_dir()
+	var movement_dir = player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)
+	if movement_dir.length() > MIN_MOVEMENT_LENGTH:
+		movement_dir = movement_dir.normalized()
+		var dot = movement_dir.dot(-collision_normal)
+		return dot > MIN_DOT_VALUE
+	return false
+

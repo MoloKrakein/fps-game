@@ -74,7 +74,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
 
-	
+	if is_on_floor():
+		step_handler.handle_step()
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
@@ -90,6 +91,9 @@ func _physics_process(delta: float) -> void:
 
 
 #region Movement Functions
+func get_input_dir() -> Vector2:
+	return _input_dir
+
 
 func update_rotation(rotation_input)-> void:
 	global_transform.basis = Basis.from_euler(rotation_input)
