@@ -3,9 +3,10 @@ class_name StepHandlerComponent extends Node
 @export_category("references")
 @export var player: PlayerController
 @export_category("Step Settings")
-@export var surface_threshold: float = 0.3
-@export var max_step_height: float = 0.35
-@export var step_probe_distance: float = 0.25
+@export_range(0.0, 1.0, 0.01) var surface_threshold: float = 0.3 # Higher values only treat more horizontal surfaces as steps; lower values treat more walls as steps.
+@export_range(0.0, 2.0, 0.01) var max_step_height: float = 0.35 # Maximum step height the player can climb in world units.
+@export_range(0.0, 1.0, 0.01) var step_probe_distance: float = 0.25 # How far forward the step probe checks for the top of the step.
+@export_range(0.0, 0.2, 0.01) var step_forward_clearance: float = 0.06 # Small forward nudge after stepping up so the player clears the stair edge.
 
 
 var step_status: String = "No Step Detected"
@@ -42,10 +43,13 @@ func handle_step_climb(collision: KinematicCollision3D) -> bool:
 
 	var measured_height = _measure_step_height(collision)
 	if not _is_valid_step_height(measured_height):
-		step_status = "Step Height: " + str(measured_height) + " (Too High)"
+		step_status = "Step Height: " + str(measured_height) + " / Limit: " + str(max_step_height) + " (Too High)"
 		return false
 
 	player.global_position.y += measured_height
+	var forward = _get_step_forward_vector(collision)
+	if forward != Vector3.ZERO:
+		player.global_position += forward * step_forward_clearance
 	player.velocity.y = 0.0
 	step_status = "Step Height: " + str(measured_height)
 	return true
@@ -73,6 +77,17 @@ func _measure_step_height(collision: KinematicCollision3D) -> float:
 	if result and result.normal.y >= surface_threshold:
 		return result.position.y - player_feet_pos.y
 	return 0.0
+
+func _get_step_forward_vector(collision: KinematicCollision3D) -> Vector3:
+	var horizontal_velocity = Vector3(player.velocity.x, 0.0, player.velocity.z)
+	if horizontal_velocity.length() > 0.0:
+		return horizontal_velocity.normalized()
+
+	var normal = collision.get_normal().slide(Vector3.UP)
+	if normal.length() > 0.0:
+		return -normal.normalized()
+
+	return Vector3.ZERO
 
 func _get_player_feet_pos() -> Vector3:
 	var feet_pos = player.global_position

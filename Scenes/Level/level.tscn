@@ -121,6 +121,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2722368, 12.457725)
 shape = SubResource("BoxShape3D_iheil")
 
 [node name="ObstacleMesh" type="MeshInstance3D" parent="Static/Ground/Stairs/Obstacle3" unique_id=120344071]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2815442, 0)
 mesh = SubResource("BoxMesh_1ov45")
 
 [node name="Obstacle2" type="CollisionShape3D" parent="Static/Ground/Stairs" unique_id=1528501370]
@@ -128,6 +129,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.616889, 11.87444)
 shape = SubResource("BoxShape3D_iheil")
 
 [node name="ObstacleMesh" type="MeshInstance3D" parent="Static/Ground/Stairs/Obstacle2" unique_id=878113977]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2891369, 0)
 mesh = SubResource("BoxMesh_1ov45")
 
 [node name="Obstacle4" type="CollisionShape3D" parent="Static/Ground/Stairs" unique_id=1217043441]
@@ -135,6 +137,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9209948, 13.030821)
 shape = SubResource("BoxShape3D_iheil")
 
 [node name="ObstacleMesh" type="MeshInstance3D" parent="Static/Ground/Stairs/Obstacle4" unique_id=385536513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17034626, 0)
 mesh = SubResource("BoxMesh_1ov45")
 
 [node name="Obstacle5" type="CollisionShape3D" parent="Static/Ground/Stairs" unique_id=402984232]
@@ -142,6 +145,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5277274, 13.621391)
 shape = SubResource("BoxShape3D_iheil")
 
 [node name="ObstacleMesh" type="MeshInstance3D" parent="Static/Ground/Stairs/Obstacle5" unique_id=379773606]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.10511112, 0)
 mesh = SubResource("BoxMesh_1ov45")
 
 [node name="Obstacle6" type="CollisionShape3D" parent="Static/Ground/Stairs" unique_id=426993999]
