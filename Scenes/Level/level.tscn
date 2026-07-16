@@ -65,6 +65,11 @@ sky_material = SubResource("ProceduralSkyMaterial_pb7t3")
 [sub_resource type="Environment" id="Environment_m0nuh"]
 background_mode = 2
 sky = SubResource("Sky_3f2qm")
+glow_enabled = true
+glow_intensity = 1.5
+glow_strength = 0.76
+glow_blend_mode = 0
+glow_hdr_threshold = 0.96
 
 [node name="Level" type="Node3D" unique_id=1955579441]
 

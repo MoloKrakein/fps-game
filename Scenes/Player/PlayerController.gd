@@ -132,6 +132,8 @@ func jump() -> void:
 func start_slide() -> void:
 	is_sliding = true
 	_slide_direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
+	standing_col.disabled = true
+	crouching_col.disabled = false
 	slide_modifier = slide_power
 	
 func can_slide() -> bool:
@@ -147,6 +149,8 @@ func can_slide() -> bool:
 
 func end_slide() -> void:
 	is_sliding = false
+	standing_col.disabled = false
+	crouching_col.disabled = true
 	_slide_direction = Vector3.ZERO
 	_current_slide_cooldown = slide_cooldown
 

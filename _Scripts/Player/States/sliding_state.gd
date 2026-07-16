@@ -5,6 +5,7 @@ var _slide_timer:float = 0.0
 func _on_sliding_state_entered() -> void:
     _slide_timer = player_controller.slide_duration
     # We removed the local cooldown variable here. The controller handles it now.
+    # player_controller.crouch()
     player_controller.start_slide()
 
 func _on_sliding_state_physics_processing(delta: float) -> void:
