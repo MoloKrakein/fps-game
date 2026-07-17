@@ -58,6 +58,8 @@ func _physics_process(delta: float) -> void:
 	# var acceleration = 
 	# var deceleration = speed * delta
 	
+	# player dirrection
+
 	if _current_slide_cooldown > 0.0:
 		_current_slide_cooldown -= delta
 	
@@ -172,3 +174,4 @@ func check_fall_speed() -> bool:
 		current_fall_velocity = velocity.y
 		return false
 #endregion
+
