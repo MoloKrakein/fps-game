@@ -44,6 +44,7 @@ var _current_slide_cooldown: float = 0.0
 var _current_max_velocity: float = 0.0
 var current_fall_velocity: float = 0.0
 var previous_velocity: Vector3 = Vector3.ZERO
+var current_player_rotation: float = 0.0
 
 # settings
 var is_crouching: bool = false
@@ -73,6 +74,7 @@ func _physics_process(delta: float) -> void:
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
 	var direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
 
+	current_player_rotation = _input_dir.angle()
 
 	if direction != Vector3.ZERO:
 		current_velocity = lerp(current_velocity, Vector2(direction.x, direction.z)* speed, acceleration * delta)

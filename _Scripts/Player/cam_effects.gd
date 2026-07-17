@@ -32,9 +32,10 @@ class_name CamEffects extends Camera3D
 @export_range(0.0, 0.4,0.001) var headbob_up: float = 0.005
 @export_range(3.0, 8.0, 0.1) var headbob_frequency: float = 6.0
 @export_group("Slide Settings")
-@export var slide_pitch: float = 0.1
-@export var slide_roll: float = 0.25
-@export var slide_time: float = 0.3
+@export var slide_pitch: float = 1.5 # Degrees to tilt up/down
+@export var slide_roll: float = 3.0  # Degrees to tilt left/right
+@export var slide_fov: float = 105.0 
+@export var fov_transition_speed: float = 8.0
 
 var _fall_value: float = 0.0
 var _fall_timer: float = 0.0
@@ -48,11 +49,16 @@ var _weapon_kick_angle: Vector3 = Vector3.ZERO
 
 var _step_timer: float = 0.0
 
+var _base_fov: float = 90.0
+var _target_slide_roll: float = 0.0
+var _target_slide_pitch: float = 0.0
+
 var _screen_shake_tween: Tween = null
 const MIN_SHAKE_INTENSITY: float = 0.05
 const MAX_SHAKE_INTENSITY: float = 0.5
 
-
+func _ready() -> void:
+	_base_fov = fov
 
 func _process(delta: float) -> void:
 	calculate_view_offset(delta)
@@ -129,7 +135,28 @@ func calculate_view_offset(delta):
 		var headbob_height = headbob_sin * speed * headbob_up
 		offset.y += headbob_height
 
-		
+	# apply slide effect
+	if enable_slide_effect:
+		if player.is_sliding:
+			fov = lerp(fov, slide_fov, delta * fov_transition_speed)
+
+			var cam_forward = -global_transform.basis.z
+			var cam_right = global_transform.basis.x
+
+			var sideway_intensity = player._slide_direction.dot(cam_right)
+			var forward_intensity = player._slide_direction.dot(cam_forward)
+
+			_target_slide_roll =  sideway_intensity * deg_to_rad(slide_roll)
+			_target_slide_pitch = forward_intensity * deg_to_rad(slide_pitch)
+		else:
+			fov = lerp(fov, _base_fov, delta * fov_transition_speed)
+			_target_slide_roll = lerp(_target_slide_roll, 0.0, delta * fov_transition_speed)
+			_target_slide_pitch = lerp(_target_slide_pitch, 0.0, delta * fov_transition_speed)
+
+			angles.z += _target_slide_roll
+			angles.x += _target_slide_pitch
+
+
 	position = offset
 	rotation = angles
 
@@ -174,24 +201,3 @@ func update_screen_shake(alpha:float, amount: float) -> void:
 	v_offset = randf_range(-curr_shake_amount, curr_shake_amount)
 
 
-func slide_movement_effect(delta: float, intensity: float, direction: Vector3) -> void:
-	if not enable_slide_effect:
-		return
-
-	# use time-based oscillation for slide effect
-	var oscillation = sin(delta / 100.0) * intensity
-	var sliding_pitch = deg_to_rad(slide_pitch) * oscillation + deg_to_rad(slide_pitch) * direction.dot(direction)
-	rotation.x += sliding_pitch
-
-
-func slide_fov_effect(intensity: float, duration: float) -> void:
-	var original_fov = fov
-	if not enable_slide_effect:
-		return
-
-	var fov_change = deg_to_rad(slide_pitch) * intensity
-	fov += fov_change
-
-	if duration > 0.0:
-		var tween = create_tween()
-		tween.tween_property(self, "fov", original_fov, duration).set_ease(Tween.EASE_OUT)

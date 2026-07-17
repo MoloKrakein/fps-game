@@ -20,10 +20,11 @@ func _inject_references(node: Node) -> void:
 func _process(delta: float) -> void:
 	if player_controller.debug or debug:
 		player_controller.state_chart.set_expression_property("Velocity", player_controller.velocity)
-		player_controller.state_chart.set_expression_property("Player Hitting Head", player_controller.crouch_check.is_colliding())
+		# player_controller.state_chart.set_expression_property("Player Hitting Head", player_controller.crouch_check.is_colliding())
 		player_controller.state_chart.set_expression_property("Is Sliding?", player_controller.is_sliding)
 		player_controller.state_chart.set_expression_property("Slide Power :", player_controller.slide_modifier)
 		player_controller.state_chart.set_expression_property("Looking At :", player_controller.interaction_raycast.current_object)
 		player_controller.state_chart.set_expression_property("Max Velocity", player_controller._current_max_velocity)
-		player_controller.state_chart.set_expression_property("Step Status", player_controller.step_handler.step_status)
+		# player_controller.state_chart.set_expression_property("Step Status", player_controller.step_handler.step_status)
+		player_controller.state_chart.set_expression_property("Camera Rotation", player_controller.cam_effects.rotation)
 		

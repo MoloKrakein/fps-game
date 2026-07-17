@@ -87,6 +87,9 @@ near = 0.001
 script = ExtResource("4_eksi1")
 player = NodePath("../..")
 max_roll = 1.5
+slide_pitch = 40000.0
+slide_roll = 3000.0
+slide_fov = 135.0
 
 [node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
 transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)
