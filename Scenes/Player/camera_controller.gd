@@ -64,6 +64,9 @@ func update_camera_height(delta: float, direction: int) -> void:
 	# if position.y >= crouch_offset and position.y <= DEFAULT_HEIGHT:
 	# 	position.y = clamp(position.y + (crouch_speed * direction) * delta, crouch_offset, DEFAULT_HEIGHT)
 
+	if offset_height >= crouch_offset and offset_height <= DEFAULT_HEIGHT:
+		offset_height = clamp(offset_height + (crouch_speed * direction) * delta, crouch_offset, DEFAULT_HEIGHT)
+
 	# lower the camera to crouch offset
 	if direction < 0:
 		if position.y > crouch_offset:
