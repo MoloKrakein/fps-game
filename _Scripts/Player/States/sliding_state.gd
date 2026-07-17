@@ -6,11 +6,14 @@ func _on_sliding_state_entered() -> void:
     _slide_timer = player_controller.slide_duration
     # We removed the local cooldown variable here. The controller handles it now.
     # player_controller.crouch()
+    player_controller.cam_effects.slide_effect(0.0, -1)
     player_controller.start_slide()
 
 func _on_sliding_state_physics_processing(delta: float) -> void:
     _slide_timer -= delta
     player_controller.camera.update_camera_height(delta, -2)
+    player_controller.cam_effects.slide_effect(delta, -1)
+
     # gradually decrease slide_modifier over time
     player_controller.slide_modifier = player_controller.slide_power * (_slide_timer / player_controller.slide_duration) 
     
@@ -21,3 +24,4 @@ func _on_sliding_state_physics_processing(delta: float) -> void:
 
 func _on_sliding_state_exited() -> void:
     player_controller.end_slide()
+    player_controller.cam_effects.slide_effect(0.0, 1)

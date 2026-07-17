@@ -11,6 +11,7 @@ class_name CamEffects extends Camera3D
 @export var enable_weapon_recoil_kick: bool = true
 @export var enable_screen_shake: bool = true
 @export var enable_headbob: bool = true
+@export var enable_slide_effect: bool = true
 
 
 @export_category("Kick & Recoil settings")
@@ -30,6 +31,10 @@ class_name CamEffects extends Camera3D
 @export_range(0.0, 1.0,0.001) var headbob_roll: float = 0.025
 @export_range(0.0, 0.4,0.001) var headbob_up: float = 0.005
 @export_range(3.0, 8.0, 0.1) var headbob_frequency: float = 6.0
+@export_group("Slide Settings")
+@export var slide_pitch: float = 0.1
+@export var slide_roll: float = 0.25
+@export var slide_time: float = 0.3
 
 var _fall_value: float = 0.0
 var _fall_timer: float = 0.0
@@ -164,3 +169,19 @@ func update_screen_shake(alpha:float, amount: float) -> void:
     var curr_shake_amount = amount * (1.0 - alpha)
     h_offset = randf_range(-curr_shake_amount, curr_shake_amount)
     v_offset = randf_range(-curr_shake_amount, curr_shake_amount)
+
+func slide_effect(delta: float, direction: int) -> void:
+    if not enable_slide_effect:
+        return
+
+    var slide_pitch_delta = deg_to_rad(slide_pitch) * direction
+    var slide_roll_delta = deg_to_rad(slide_roll) * direction
+    # print("Slide Effect: ", rotation)
+
+    rotation.x += slide_pitch_delta * delta / slide_time
+    rotation.z += slide_roll_delta * delta / slide_time
+
+    # change FOV during slide effect
+    # var target_fov = 70.0 + (direction * 10.0)
+    # fov = lerp(fov, target_fov, delta / slide_time)
+    # print("Slide Effect: ", rotation, " FOV: ", fov)
