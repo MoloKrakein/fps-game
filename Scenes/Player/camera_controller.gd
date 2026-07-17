@@ -26,8 +26,8 @@ var _step_smoothing: bool = false
 var offset_height: float = 0.0
 
 func _ready() -> void:
-	_rotation = Vector3.ZERO
-	# offset_height
+	_rotation = player_controller.rotation
+	offset_height = DEFAULT_HEIGHT
 
 func update_camera_rotation(input: Vector2) -> void:
 	_rotation.x += input.y * (1 if is_Vertical_inverted else -1)
@@ -47,9 +47,18 @@ func update_camera_rotation(input: Vector2) -> void:
 func _process(delta: float) -> void:
 	if component_mouse_capture._mouse_input != Vector2.ZERO:
 		update_camera_rotation(component_mouse_capture._mouse_input)
+	
+	if _step_smoothing:
+		_target_h = lerp(_target_h, 0.0, step_speed * delta)
+		if abs(_target_h) < 0.01:
+			_target_h = 0.0
+			_step_smoothing = false
+
+		position.y = offset_height + _target_h
 
 func smooth_step(height_change: float) -> void:
 	_target_h -= height_change
+	_step_smoothing = true
 
 func update_camera_height(delta: float, direction: int) -> void:
 	# if position.y >= crouch_offset and position.y <= DEFAULT_HEIGHT:

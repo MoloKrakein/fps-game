@@ -39,24 +39,43 @@ func _is_vertical_surface(collision: KinematicCollision3D) -> bool:
 func handle_step_climb(collision: KinematicCollision3D) -> bool:
 	step_status = "Step Climb Logic Not Implemented"
 
-	if not _is_vertical_surface(collision):
-		return false
-
 	if not _is_valid_step_direction(collision):
 		step_status = "Invalid Step Direction"
 		return false
-
-	var measured_height = _measure_step_height(collision)
-	if not _is_valid_step_height(measured_height):
-		step_status = "Step Height: " + str(measured_height) + " / Limit: " + str(max_step_height) + " (Too High)"
+	
+	if not _is_vertical_surface(collision):
+		step_status = "Not Vertical Surface"
 		return false
 
-	player.global_position.y += measured_height
-	var forward = _get_step_forward_vector(collision)
-	if forward != Vector3.ZERO:
-		player.global_position += forward * step_forward_clearance
-	player.velocity.y = 0.0
-	step_status = "Step Height: " + str(measured_height)
+	for i in player.get_slide_collision_count():
+		var col = player.get_slide_collision(i)
+		if _is_vertical_surface(collision):
+			var measured_height = _measure_step_height(collision)
+			
+			if measured_height > MIN_MOVEMENT_LENGTH and measured_height and _is_valid_step_direction(col):
+				player.global_position.y += measured_height
+				player.velocity = player.previous_velocity
+				player.camera.smooth_step(measured_height)
+				step_status = "Step Height: " + str(measured_height)
+
+	# if not _is_vertical_surface(collision):
+	# 	return false
+
+	# if not _is_valid_step_direction(collision):
+	# 	step_status = "Invalid Step Direction"
+	# 	return false
+
+	# var measured_height = _measure_step_height(collision)
+	# if not _is_valid_step_height(measured_height):
+	# 	step_status = str(measured_height) + " / Limit: " + str(max_step_height) + " (Too High)"
+	# 	return false
+
+	# player.global_position.y += measured_height
+	# var forward = _get_step_forward_vector(collision)
+	# if forward != Vector3.ZERO:
+	# 	player.global_position += forward * step_forward_clearance
+	# player.velocity.y = 0.0
+	# step_status = "Step Height: " + str(measured_height)
 	return true
 
 func _measure_step_height(collision: KinematicCollision3D) -> float:

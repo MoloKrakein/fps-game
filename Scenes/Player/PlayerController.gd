@@ -43,6 +43,7 @@ var slide_modifier: float = 0.0
 var _current_slide_cooldown: float = 0.0
 var _current_max_velocity: float = 0.0
 var current_fall_velocity: float = 0.0
+var previous_velocity: Vector3 = Vector3.ZERO
 
 # settings
 var is_crouching: bool = false
@@ -53,6 +54,7 @@ var is_sliding: bool = false
 func _physics_process(delta: float) -> void:
 	
 #region Physics Process
+	previous_velocity = velocity
 	# var acceleration = 
 	# var deceleration = speed * delta
 	
