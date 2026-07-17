@@ -49,6 +49,7 @@ var is_crouching: bool = false
 var is_sprinting: bool = false
 var is_sliding: bool = false
 
+
 func _physics_process(delta: float) -> void:
 	
 #region Physics Process

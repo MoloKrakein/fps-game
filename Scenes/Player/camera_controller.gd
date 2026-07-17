@@ -17,6 +17,18 @@ class_name CameraController extends Node3D
 var _rotation: Vector3
 const DEFAULT_HEIGHT: float = 0.5
 
+
+@export_group("Step Smoothing")
+@export var step_speed: float = 8.0
+var _target_h: float = 0.0
+var _step_smoothing: bool = false
+
+var offset_height: float = 0.0
+
+func _ready() -> void:
+	_rotation = Vector3.ZERO
+	# offset_height
+
 func update_camera_rotation(input: Vector2) -> void:
 	_rotation.x += input.y * (1 if is_Vertical_inverted else -1)
 	_rotation.y += input.x * (1 if is_Horizontal_inverted else -1)
@@ -35,6 +47,9 @@ func update_camera_rotation(input: Vector2) -> void:
 func _process(delta: float) -> void:
 	if component_mouse_capture._mouse_input != Vector2.ZERO:
 		update_camera_rotation(component_mouse_capture._mouse_input)
+
+func smooth_step(height_change: float) -> void:
+	_target_h -= height_change
 
 func update_camera_height(delta: float, direction: int) -> void:
 	# if position.y >= crouch_offset and position.y <= DEFAULT_HEIGHT:

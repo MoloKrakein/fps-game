@@ -23,7 +23,6 @@ func handle_step() -> void:
 		if _is_vertical_surface(collision) and handle_step_climb(collision):
 			break
 
-
 func _check_collision_normal(collision: KinematicCollision3D) -> bool:
 	var normal = collision.get_normal()
 	if abs(normal.y) > surface_threshold:
@@ -62,27 +61,44 @@ func handle_step_climb(collision: KinematicCollision3D) -> bool:
 
 func _measure_step_height(collision: KinematicCollision3D) -> float:
 	var space_state = player.get_world_3d().direct_space_state
-	var horizontal_velocity = Vector3(player.velocity.x, 0.0, player.velocity.z)
-	if horizontal_velocity.length() == 0.0:
-		horizontal_velocity = Vector3(-collision.get_normal().x, 0.0, -collision.get_normal().z)
+	var collision_point = collision.get_position()
 
-	if horizontal_velocity.length() == 0.0:
-		return 0.0
-
-	var forward = horizontal_velocity.normalized()
 	var player_feet_pos = _get_player_feet_pos()
-	var probe_pos = player_feet_pos + forward * step_probe_distance
-	var ray_start = probe_pos + Vector3.UP * max_step_height
-	var ray_end = probe_pos + Vector3.DOWN * (max_step_height * 2.0)
+	var player_head_y =  player.global_position.y + (player.standing_col.shape.height / 2.0)
+
+	var ray_start = Vector3(collision_point.x, player_head_y, collision_point.z)
+	var ray_end = Vector3(collision_point.x, player_feet_pos.y, collision_point.z)
 
 	var query = PhysicsRayQueryParameters3D.create(ray_start, ray_end)
 	query.collision_mask = player.collision_mask
 	query.exclude = [player.get_rid()]
 
 	var result = space_state.intersect_ray(query)
-	if result and result.normal.y >= surface_threshold:
+	if result:
 		return result.position.y - player_feet_pos.y
+
 	return 0.0
+	# var horizontal_velocity = Vector3(player.velocity.x, 0.0, player.velocity.z)
+	# if horizontal_velocity.length() == 0.0:
+	# 	horizontal_velocity = Vector3(-collision.get_normal().x, 0.0, -collision.get_normal().z)
+
+	# if horizontal_velocity.length() == 0.0:
+	# 	return 0.0
+
+	# var forward = horizontal_velocity.normalized()
+	# var player_feet_pos = _get_player_feet_pos()
+	# var probe_pos = player_feet_pos + forward * step_probe_distance
+	# var ray_start = probe_pos + Vector3.UP * max_step_height
+	# var ray_end = probe_pos + Vector3.DOWN * (max_step_height * 2.0)
+
+	# var query = PhysicsRayQueryParameters3D.create(ray_start, ray_end)
+	# query.collision_mask = player.collision_mask
+	# query.exclude = [player.get_rid()]
+
+	# var result = space_state.intersect_ray(query)
+	# if result and result.normal.y >= surface_threshold:
+	# 	return result.position.y - player_feet_pos.y
+	# return 0.0
 
 func _get_step_forward_vector(collision: KinematicCollision3D) -> Vector3:
 	var horizontal_velocity = Vector3(player.velocity.x, 0.0, player.velocity.z)
