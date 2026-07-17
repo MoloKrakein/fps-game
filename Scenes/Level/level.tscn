@@ -52,6 +52,12 @@ data = PackedVector3Array(2.5, 1.5, 0.5, 2.5, -1.5, 0.5, -2.5, -1.5, 0.5, 2.5, 1
 left_to_right = 1.0
 size = Vector3(5, 3, 1)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
+size = Vector3(0.45703125, 6.1273193, 6.203003)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bhunq"]
+size = Vector3(1, 6.127, 6.203)
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pb7t3"]
 sky_top_color = Color(0.26657414, 0.40034875, 0.8707289, 1)
 sky_horizon_color = Color(0.68443304, 0.6688077, 0.41353306, 1)
@@ -168,12 +174,19 @@ shape = SubResource("BoxShape3D_vx3u4")
 [node name="ObstacleMesh" type="MeshInstance3D" parent="Static/Ground/Obstacle" unique_id=360436]
 mesh = SubResource("BoxMesh_0cluu")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Static/Ground" unique_id=206721047]
+[node name="Slope" type="CollisionShape3D" parent="Static/Ground" unique_id=206721047]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.571672, 2.518139, 13.699665)
 shape = SubResource("ConcavePolygonShape3D_iheil")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Static/Ground/CollisionShape3D" unique_id=1360328620]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Static/Ground/Slope" unique_id=1360328620]
 mesh = SubResource("PrismMesh_riqys")
+
+[node name="Wall" type="CollisionShape3D" parent="Static/Ground" unique_id=915779701]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.588302, 4.1268506, -1.4824829)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Static/Ground/Wall" unique_id=1938649549]
+mesh = SubResource("BoxMesh_bhunq")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=613677392]
 environment = SubResource("Environment_m0nuh")

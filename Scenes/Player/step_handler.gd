@@ -47,6 +47,10 @@ func handle_step_climb(collision: KinematicCollision3D) -> bool:
 		step_status = "Not Vertical Surface"
 		return false
 
+	if not _is_valid_step_height(_measure_step_height(collision)):
+		step_status = "Step Height Too High"
+		return false
+
 	for i in player.get_slide_collision_count():
 		var col = player.get_slide_collision(i)
 		if _is_vertical_surface(collision):
@@ -94,8 +98,8 @@ func _measure_step_height(collision: KinematicCollision3D) -> float:
 
 	var result = space_state.intersect_ray(query)
 	if result:
+		# print("Step Height: ", result.position.y - player_feet_pos.y)
 		return result.position.y - player_feet_pos.y
-
 	return 0.0
 	# var horizontal_velocity = Vector3(player.velocity.x, 0.0, player.velocity.z)
 	# if horizontal_velocity.length() == 0.0:
@@ -159,7 +163,7 @@ func _get_shape_half_height(shape: Shape3D) -> float:
 	return 0.0
 
 func _is_valid_step_height(height: float) -> bool:
-	return height > 0 and height <= max_step_height
+	return height > 0.0 and height <= max_step_height
 
 func _is_valid_step_direction(collision: KinematicCollision3D) -> bool:
 	var collision_normal = collision.get_normal()
