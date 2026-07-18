@@ -146,6 +146,8 @@ func start_slide() -> void:
 	standing_col.disabled = true
 	crouching_col.disabled = false
 	slide_modifier = slide_power
+
+	cam_effects._animate_fov(cam_effects.slide_fov, 0.3)
 	
 func can_slide() -> bool:
 	if _current_slide_cooldown > 0.0:
@@ -165,6 +167,7 @@ func end_slide() -> void:
 	_slide_direction = Vector3.ZERO
 	_current_slide_cooldown = slide_cooldown
 
+	cam_effects._animate_fov(cam_effects._base_fov, 0.5)
 #endregion
 
 #region Fall logic
