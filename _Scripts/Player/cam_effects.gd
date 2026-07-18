@@ -154,7 +154,7 @@ func calculate_view_offset(delta):
 	# apply slide effect
 	if enable_slide_effect:
 		if player.is_sliding:
-			# fov = lerp(fov, slide_fov, delta * fov_transition_speed)
+			fov = lerp(fov, slide_fov, delta * fov_transition_speed)
 
 			var cam_forward = -global_transform.basis.z
 			var cam_right = global_transform.basis.x
@@ -165,7 +165,7 @@ func calculate_view_offset(delta):
 			_target_slide_roll =  sideway_intensity * deg_to_rad(slide_roll)
 			_target_slide_pitch = forward_intensity * deg_to_rad(slide_pitch)
 		else:
-			# fov = lerp(fov, _base_fov, delta * fov_transition_speed)
+			fov = lerp(fov, _base_fov, delta * fov_transition_speed)
 			_target_slide_roll = lerp(_target_slide_roll, 0.0, delta * fov_transition_speed)
 			_target_slide_pitch = lerp(_target_slide_pitch, 0.0, delta * fov_transition_speed)
 
