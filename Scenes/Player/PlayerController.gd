@@ -142,7 +142,7 @@ func jump() -> void:
 
 func start_slide() -> void:
 	is_sliding = true
-	_slide_direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
+	_slide_direction = Vector3(velocity.x, 0, velocity.z).normalized()
 	standing_col.disabled = true
 	crouching_col.disabled = false
 	slide_modifier = slide_power

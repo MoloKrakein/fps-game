@@ -53,6 +53,9 @@ var _base_fov: float = 90.0
 var _target_slide_roll: float = 0.0
 var _target_slide_pitch: float = 0.0
 
+var _current_run_pitch: float = 0.0
+var _current_run_roll: float = 0.0
+
 var _screen_shake_tween: Tween = null
 const MIN_SHAKE_INTENSITY: float = 0.05
 const MAX_SHAKE_INTENSITY: float = 0.5
@@ -94,16 +97,28 @@ func calculate_view_offset(delta):
 
 	# tilt camera based on player movement
 	if enable_tilt:
-		var forward = global_transform.basis.z
-		var right = global_transform.basis.x
+		var target_run_pitch: float= 0.0
+		var target_run_roll: float = 0.0
 
-		var forward_dot = velocity.dot(forward)
-		var forward_tilt = clampf(forward_dot * deg_to_rad(run_pitch), deg_to_rad(-max_pitch), deg_to_rad(max_pitch))
-		angles.x = forward_tilt
+		if not player.is_sliding:
+			var forward = global_transform.basis.z
+			var right = global_transform.basis.x
 
-		var right_dot = velocity.dot(right)
-		var right_tilt = clampf(right_dot * deg_to_rad(run_roll), deg_to_rad(-max_roll), deg_to_rad(max_roll))
-		angles.z = right_tilt
+			var forward_dot = velocity.dot(forward)
+			var forward_tilt = clampf(forward_dot * deg_to_rad(run_pitch), deg_to_rad(-max_pitch), deg_to_rad(max_pitch))
+
+			var right_dot = velocity.dot(right)
+			var right_tilt = clampf(right_dot * deg_to_rad(run_roll), deg_to_rad(-max_roll), deg_to_rad(max_roll))
+
+			target_run_pitch = forward_tilt
+			target_run_roll = right_tilt
+
+		
+		_current_run_pitch = lerp(_current_run_pitch, target_run_pitch, delta * 10.0)
+		_current_run_roll = lerp(_current_run_roll, target_run_roll, delta * 10.0)
+
+		angles.z = _current_run_roll
+		angles.x = _current_run_pitch
 
 	# apply fall kick effect
 	if enable_fall_kick:
@@ -153,9 +168,8 @@ func calculate_view_offset(delta):
 			_target_slide_roll = lerp(_target_slide_roll, 0.0, delta * fov_transition_speed)
 			_target_slide_pitch = lerp(_target_slide_pitch, 0.0, delta * fov_transition_speed)
 
-			angles.z += _target_slide_roll
-			angles.x += _target_slide_pitch
-
+		angles.z += _target_slide_roll
+		angles.x += _target_slide_pitch
 
 	position = offset
 	rotation = angles
