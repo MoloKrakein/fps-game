@@ -25,13 +25,14 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg")
+enabled=PackedStringArray("res://addons/at-icons/plugin.cfg", "res://addons/fancy_folder_colors/plugin.cfg", "res://addons/func_godot/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg")
 
 [file_customization]
 
 folder_colors={
 "res://Scenes/Player/": "teal",
-"res://_Scripts/": "green"
+"res://_Scripts/": "green",
+"res://trenchbroom/": "red"
 }
 
 [input]
