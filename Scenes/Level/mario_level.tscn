@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://b7usce83q8lxa"]
+
+[ext_resource type="PackedScene" uid="uid://csge5jvyhlbnm" path="res://Scenes/Level/obj/mario_lvl/block.tscn" id="1_8uab8"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o08ba"]
+size = Vector3(6.8789063, 1, 64.26367)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vx3u4"]
+size = Vector3(6.8789063, 1, 64.26367)
+
+[node name="MarioLevel" type="Node3D" unique_id=1395727598]
+
+[node name="Static" type="Node3D" parent="." unique_id=1928749136]
+
+[node name="BaseFloor" type="Node3D" parent="Static" unique_id=1215573539]
+
+[node name="Part1" type="StaticBody3D" parent="Static/BaseFloor" unique_id=1408091511]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Static/BaseFloor/Part1" unique_id=1502867042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -32.212776)
+shape = SubResource("BoxShape3D_o08ba")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Static/BaseFloor/Part1/CollisionShape3D" unique_id=1892845475]
+mesh = SubResource("BoxMesh_vx3u4")
+
+[node name="Obstacle" type="Node3D" parent="Static" unique_id=1335277716]
+
+[node name="Block" parent="Static/Obstacle" unique_id=1784356604 instance=ExtResource("1_8uab8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.590208, -9.018505)
