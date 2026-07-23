@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://lt2yl8oj8u0u"]
 
+[ext_resource type="PackedScene" uid="uid://bsfs2f2x3tcm7" path="res://Assets/Map/tower.blend" id="1_1ov45"]
 [ext_resource type="PackedScene" uid="uid://df68lxky3tvad" path="res://Scenes/Player/player.tscn" id="1_iheil"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_vx3u4"]
@@ -119,10 +120,15 @@ transform = Transform3D(1, 0, 0, 0, -0.3089494, 0.9510785, 0, -0.9510785, -0.308
 light_energy = 3.059
 shadow_enabled = true
 
+[node name="tower" parent="Static/Ground" unique_id=1351903201 instance=ExtResource("1_1ov45")]
+transform = Transform3D(3.7339022, 0, 0, 0, 1, 0, 0, 0, 4.9143443, 0, -31.609776, 0)
+
 [node name="Floor" type="CollisionShape3D" parent="Static/Ground" unique_id=857026289]
+visible = false
 shape = SubResource("BoxShape3D_o08ba")
 
 [node name="FloorMesh" type="MeshInstance3D" parent="Static/Ground/Floor" unique_id=2099808845]
+visible = false
 mesh = SubResource("BoxMesh_o08ba")
 
 [node name="Stairs" type="StaticBody3D" parent="Static/Ground" unique_id=1595465064]
