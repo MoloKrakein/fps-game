@@ -1,12 +1,33 @@
 [gd_scene format=3 uid="uid://b7usce83q8lxa"]
 
 [ext_resource type="PackedScene" uid="uid://csge5jvyhlbnm" path="res://Scenes/Level/obj/mario_lvl/block.tscn" id="1_8uab8"]
+[ext_resource type="Texture2D" uid="uid://caekdxhteqbbj" path="res://Art/brick.png" id="1_lhgg4"]
+[ext_resource type="PackedScene" uid="uid://df68lxky3tvad" path="res://Scenes/Player/player.tscn" id="3_rtba4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_o08ba"]
 size = Vector3(6.8789063, 1, 64.26367)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0w3jw"]
+albedo_texture = ExtResource("1_lhgg4")
+uv1_triplanar = true
+uv1_triplanar_sharpness = 7.5988507
+
 [sub_resource type="BoxMesh" id="BoxMesh_vx3u4"]
+material = SubResource("StandardMaterial3D_0w3jw")
 size = Vector3(6.8789063, 1, 64.26367)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6bors"]
+
+[sub_resource type="Sky" id="Sky_vx3u4"]
+sky_material = SubResource("ProceduralSkyMaterial_6bors")
+
+[sub_resource type="Environment" id="Environment_o08ba"]
+background_mode = 2
+sky = SubResource("Sky_vx3u4")
+glow_enabled = true
+glow_normalized = true
+glow_intensity = 1.61
+glow_bloom = 0.25
 
 [node name="MarioLevel" type="Node3D" unique_id=1395727598]
 
@@ -27,3 +48,21 @@ mesh = SubResource("BoxMesh_vx3u4")
 
 [node name="Block" parent="Static/Obstacle" unique_id=1784356604 instance=ExtResource("1_8uab8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.590208, -9.018505)
+
+[node name="PlayerController" parent="." unique_id=1796224466 instance=ExtResource("3_rtba4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6432147, -1.6801145)
+deceleration = 155.0
+slide_duration = 0.5
+slide_power = 15.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=991428869]
+transform = Transform3D(1, 0, 0, 0, 0.7875338, 0.61627144, 0, -0.61627144, 0.7875338, 0, 7.311165, 0)
+light_energy = 0.954
+light_indirect_energy = 3.235
+light_volumetric_fog_energy = 2.022
+shadow_enabled = true
+shadow_bias = 0.6
+sky_mode = 1
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1552593935]
+environment = SubResource("Environment_o08ba")

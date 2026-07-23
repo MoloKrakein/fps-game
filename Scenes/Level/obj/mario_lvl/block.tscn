@@ -1,8 +1,16 @@
 [gd_scene format=3 uid="uid://csge5jvyhlbnm"]
 
+[ext_resource type="Texture2D" uid="uid://caekdxhteqbbj" path="res://Art/brick.png" id="1_t4xrm"]
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_vx3u4"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m2s38"]
+albedo_texture = ExtResource("1_t4xrm")
+uv1_scale = Vector3(14.763, 14.763, 14.763)
+
 [sub_resource type="BoxMesh" id="BoxMesh_nk05f"]
+lightmap_size_hint = Vector2i(22, 33)
+material = SubResource("StandardMaterial3D_m2s38")
 
 [node name="Block" type="Node3D" unique_id=1784356604]
 
