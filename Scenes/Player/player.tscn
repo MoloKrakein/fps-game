@@ -43,11 +43,9 @@ crouch_check = NodePath("CrouchCheck")
 interaction_raycast = NodePath("CameraController/Cam/InteractionRaycast")
 cam_effects = NodePath("CameraController/Cam")
 step_handler = NodePath("Component/StepHandler")
-default_speed = 6.0
-sprint_speed = 3.0
+default_speed = 3.0
+sprint_speed = 4.0
 jump_velocity = 3.5
-slide_duration = 40.0
-slide_power = 115.0
 slide_cooldown = 1.6
 
 [node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]

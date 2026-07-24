@@ -72,7 +72,11 @@ func _physics_process(delta: float) -> void:
 
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
-	var direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
+	var direction: Vector3
+	if is_sliding:
+		direction = _slide_direction
+	else:
+		direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
 
 	current_player_rotation = _input_dir.angle()
 
@@ -146,8 +150,10 @@ func start_slide() -> void:
 	standing_col.disabled = true
 	crouching_col.disabled = false
 	slide_modifier = slide_power
+	# disable wasd movement input while sliding
+	disable_movement()
 
-	# cam_effects._animate_fov(cam_effects.slide_fov, 0.3)
+
 	
 func can_slide() -> bool:
 	if _current_slide_cooldown > 0.0:
@@ -180,3 +186,9 @@ func check_fall_speed() -> bool:
 		return false
 #endregion
 
+func disable_movement() -> void:
+	_input_dir = Vector2.ZERO
+
+func enable_movement() -> void:
+	# nothing to do here for now, but this function can be used to re-enable movement if needed
+	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")

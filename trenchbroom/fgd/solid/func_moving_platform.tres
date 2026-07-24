@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="FuncGodotFGDSolidClass" format=3 uid="uid://d0hsap1dciurn"]
+
+[ext_resource type="Script" uid="uid://5cow84q03m6a" path="res://addons/func_godot/src/fgd/func_godot_fgd_solid_class.gd" id="1_kbho3"]
+[ext_resource type="Script" uid="uid://ctcfhrw2wgfui" path="res://_Scripts/Env/moving_platform.gd" id="2_adkcc"]
+
+[resource]
+script = ExtResource("1_kbho3")
+script_class = ExtResource("2_adkcc")
+classname = "movement_movingplatform"
+description = "platform that moving
+"
+class_properties = Dictionary[String, Variant]({
+"end_position": Vector3(0, 0, 0),
+"move_direction": Vector3(0, 0, 0),
+"move_speed": 0.0,
+"start_position": Vector3(0, 0, 0),
+"wait_time": 0.0
+})
+node_class = "AnimatableBody3D"
+metadata/_custom_type_script = "uid://5cow84q03m6a"

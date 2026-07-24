@@ -31,3 +31,12 @@
 @SolidClass color(204 204 204) base(Phong, VertexMergeDistance, CullInteriorFaces) = func_detail_illusionary : "Static geometry with no collision. Builds a Node3D with a MeshInstance3D. Does not occlude other VisualInstance3D nodes." []
 
 @SolidClass color(204 204 204) base(Phong, VertexMergeDistance, CullInteriorFaces) = func_illusionary : "Static geometry with no collision. Builds a Node3D with a MeshInstance3D and an Occluder3D to aid in render culling of other VisualInstance3D nodes." []
+@SolidClass color(204 204 204) = movement_movingplatform : "platform that moving
+" 
+[
+	move_speed(float) : "" : "0.0"
+	wait_time(float) : "" : "0.0"
+	start_position(string) : "" : "0.0 0.0 0.0"
+	end_position(string) : "" : "0.0 0.0 0.0"
+	move_direction(string) : "" : "0.0 0.0 0.0"
+]
