@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://d0547qfi2hk3r"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_o08ba"]
+size = Vector3(1, 1, 5.1365967)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vx3u4"]
+size = Vector3(1, 2.0807495, 1)
+
+[node name="PistolModel" type="Node3D" unique_id=1425760719]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=598771468]
+transform = Transform3D(0.342, 0, 0, 0, 0.342, 0, 0, 0, 0.342, 0, 0, 0)
+layers = 2
+mesh = SubResource("BoxMesh_o08ba")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=364735078]
+transform = Transform3D(0.342, 0, 0, 0, 0.342, 0, 0, 0, 0.342, 0, -0.5187572, 0.7113452)
+layers = 2
+mesh = SubResource("BoxMesh_vx3u4")

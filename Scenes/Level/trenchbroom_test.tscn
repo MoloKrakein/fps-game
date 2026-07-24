@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cwu5cf7a0awcd" path="res://addons/func_godot/src/map/func_godot_map.gd" id="1_rily4"]
 [ext_resource type="Resource" uid="uid://cs4pi5hlldpfj" path="res://trenchbroom/fps_game_map_setting_fgd.tres" id="2_53ep7"]
 [ext_resource type="Material" uid="uid://d3cs3ij4o45q" path="res://trenchbroom/textures/textures.tres" id="3_53ep7"]
-[ext_resource type="Script" uid="uid://ctcfhrw2wgfui" path="res://_Scripts/Env/moving_platform.gd" id="4_7qka3"]
+[ext_resource type="Script" uid="uid://ctcfhrw2wgfui" path="res://_Assets/Env/moving_platform.gd" id="4_7qka3"]
 [ext_resource type="Material" uid="uid://djafcqpfc375v" path="res://trenchbroom/textures/concrete_2_Bl.tres" id="5_kx581"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_7qka3"]

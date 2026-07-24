@@ -2,27 +2,29 @@
 
 [ext_resource type="Script" uid="uid://kxvoo2aa83f8" path="res://Scenes/Player/PlayerController.gd" id="1_mtuoh"]
 [ext_resource type="Script" uid="uid://cpa8hpwwdko5m" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
-[ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Scripts/UI/reticle.gd" id="2_a3d8c"]
+[ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Assets/UI/reticle.gd" id="2_a3d8c"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
-[ext_resource type="Script" uid="uid://dly6myqcou03q" path="res://_Scripts/Player/cam_effects.gd" id="4_eksi1"]
-[ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Scripts/Player/components/interaction_raycast.gd" id="4_h8ma5"]
+[ext_resource type="Script" uid="uid://dly6myqcou03q" path="res://_Assets/Player/cam_effects.gd" id="4_eksi1"]
+[ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Assets/Player/components/interaction_raycast.gd" id="4_h8ma5"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
 [ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
-[ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Scripts/Player/States/idle_state.gd" id="11_74mp2"]
-[ext_resource type="Script" uid="uid://ck7gkkw5mi2wp" path="res://_Scripts/Player/States/grounded_state.gd" id="11_hnuln"]
-[ext_resource type="Script" uid="uid://1kn1bg1umx82" path="res://_Scripts/Player/States/moving_state.gd" id="12_06tpx"]
-[ext_resource type="Script" uid="uid://dotft84ps0jwd" path="res://_Scripts/Player/States/walking_state.gd" id="13_dey5f"]
-[ext_resource type="Script" uid="uid://b0o0vic4fjuvl" path="res://_Scripts/Player/States/running_state.gd" id="14_r5xpd"]
-[ext_resource type="Script" uid="uid://b481b5psp66d5" path="res://_Scripts/Player/States/standing_state.gd" id="15_ks1b7"]
-[ext_resource type="Script" uid="uid://dyukor5w2gr3g" path="res://_Scripts/Player/States/airborne_state.gd" id="16_aqm4k"]
-[ext_resource type="Script" uid="uid://6mv42ee0wqh8" path="res://_Scripts/Player/States/crouching_state.gd" id="16_hnuln"]
-[ext_resource type="Script" uid="uid://guhkdu35mp0" path="res://_Scripts/Player/States/sliding_state.gd" id="19_rcvs5"]
+[ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Assets/Player/States/idle_state.gd" id="11_74mp2"]
+[ext_resource type="Script" uid="uid://ck7gkkw5mi2wp" path="res://_Assets/Player/States/grounded_state.gd" id="11_hnuln"]
+[ext_resource type="Script" uid="uid://1kn1bg1umx82" path="res://_Assets/Player/States/moving_state.gd" id="12_06tpx"]
+[ext_resource type="Script" uid="uid://dotft84ps0jwd" path="res://_Assets/Player/States/walking_state.gd" id="13_dey5f"]
+[ext_resource type="Script" uid="uid://b0o0vic4fjuvl" path="res://_Assets/Player/States/running_state.gd" id="14_r5xpd"]
+[ext_resource type="Script" uid="uid://b481b5psp66d5" path="res://_Assets/Player/States/standing_state.gd" id="15_ks1b7"]
+[ext_resource type="Script" uid="uid://dyukor5w2gr3g" path="res://_Assets/Player/States/airborne_state.gd" id="16_aqm4k"]
+[ext_resource type="Script" uid="uid://6mv42ee0wqh8" path="res://_Assets/Player/States/crouching_state.gd" id="16_hnuln"]
+[ext_resource type="Script" uid="uid://guhkdu35mp0" path="res://_Assets/Player/States/sliding_state.gd" id="19_rcvs5"]
 [ext_resource type="Script" uid="uid://gwkuothaiqkm" path="res://Scenes/Player/step_handler.gd" id="23_jincj"]
+[ext_resource type="Script" uid="uid://bdvwooe4dfsx0" path="res://_Assets/Weapon/Scripts/weapon_controller.gd" id="24_qr1w5"]
+[ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="25_ythyg"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -66,6 +68,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("SphereShape3D_ks1b7")
 
 [node name="Mesh" type="MeshInstance3D" parent="." unique_id=1636070211]
+visible = false
 mesh = SubResource("CapsuleMesh_o08ba")
 
 [node name="CrouchCheck" type="ShapeCast3D" parent="." unique_id=1790915549]
@@ -81,7 +84,6 @@ component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
 fov = 90.0
-near = 0.001
 script = ExtResource("4_eksi1")
 player = NodePath("../..")
 max_roll = 1.5
@@ -286,6 +288,11 @@ script = ExtResource("23_jincj")
 player = NodePath("../..")
 surface_threshold = 0.36
 max_step_height = 0.47
+
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent")]
+script = ExtResource("24_qr1w5")
+current_weapon = ExtResource("25_ythyg")
+weapon_model_parent = NodePath("../../CameraController/Cam")
 
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]

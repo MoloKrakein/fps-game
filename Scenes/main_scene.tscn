@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://hwk6pn368wgi"]
 
-[ext_resource type="Script" uid="uid://crlytgfbv16cg" path="res://_Scripts/Managers/GameManager/game_manager.gd" id="1_jv6wh"]
+[ext_resource type="Script" uid="uid://crlytgfbv16cg" path="res://_Assets/Managers/GameManager/game_manager.gd" id="1_jv6wh"]
 [ext_resource type="PackedScene" uid="uid://boarmlj6juypt" path="res://Scenes/UI/UserInterface_Scene.tscn" id="2_jv6wh"]
 [ext_resource type="PackedScene" uid="uid://df68lxky3tvad" path="res://Scenes/Player/player.tscn" id="2_x6ack"]
 [ext_resource type="PackedScene" uid="uid://ddk12wbbbxwfx" path="res://Scenes/Level/trenchbroom_test.tscn" id="3_iacmt"]
@@ -17,6 +17,7 @@ is_debug_mode = true
 
 [node name="PlayerController" parent="CurrentLevel" unique_id=1796224466 instance=ExtResource("2_x6ack")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3392935, 0)
+default_speed = 6.0
 
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]
 

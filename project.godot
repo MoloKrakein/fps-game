@@ -31,7 +31,7 @@ enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addon
 
 folder_colors={
 "res://Scenes/Player/": "teal",
-"res://_Scripts/": "green",
+"res://_Assets/": "green",
 "res://trenchbroom/": "red"
 }
 

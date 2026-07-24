@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://boarmlj6juypt"]
 
-[ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Scripts/UI/reticle.gd" id="1_g8q8s"]
+[ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Assets/UI/reticle.gd" id="1_g8q8s"]
 
 [node name="UserInterface" type="CanvasLayer" unique_id=2116638828]
 
