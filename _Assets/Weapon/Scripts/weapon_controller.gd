@@ -26,9 +26,11 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 
 
 func can_fire() -> bool:
+    print("Checking if can fire: current_ammo = ", current_ammo)
     return current_ammo > 0
 
 func fire_weapon() -> void:
+    print("Attempting to fire weapon: %s, Current ammo: %d" % [current_weapon.weapon_name, current_ammo])
     if can_fire():
         current_ammo -= 1
         print("Fired weapon: %s, Remaining ammo: %d" % [current_weapon.weapon_name, current_ammo])

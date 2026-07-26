@@ -246,7 +246,6 @@ delay_in_seconds = "0.8"
 
 [node name="StateMachine" type="Node" parent="." unique_id=985945145 node_paths=PackedStringArray("player_controller")]
 script = ExtResource("10_dey5f")
-debug = true
 player_controller = NodePath("..")
 
 [node name="MovementState" type="Node" parent="StateMachine" unique_id=1012520038]
@@ -319,6 +318,7 @@ delay_in_seconds = "0.0"
 
 [node name="WeaponStateMachine" type="Node" parent="." unique_id=1692042775 node_paths=PackedStringArray("weapon_controller")]
 script = ExtResource("22_2ahak")
+debug = true
 weapon_controller = NodePath("../Component/WeaponController")
 
 [node name="IdleState" type="Node" parent="WeaponStateMachine" unique_id=637678654]

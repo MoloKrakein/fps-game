@@ -7,7 +7,8 @@ func _on_idle_state_state_physics_processing(delta: float) -> void:
 		return
 
 	if Input.is_action_just_pressed("combat_fire") and weapon_controller.can_fire():
-		weapon_controller.weapon_state_chart.send_event("onFire")
+		# print("Firing weapon: %s" % weapon_controller.current_weapon.weapon_name)
+		weapon_controller.weapon_state_chart.send_event("onFiring")
 
 
 	if weapon_controller.current_ammo <= 0:

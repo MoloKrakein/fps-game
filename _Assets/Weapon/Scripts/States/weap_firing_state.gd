@@ -4,7 +4,6 @@ func _on_firing_state_state_physics_processing(delta: float) -> void:
 	# pass # Replace with function body.
 	if not weapon_controller:
 		return
-	
 	weapon_controller.fire_weapon()
 
 func _on_firing_state_state_entered() -> void:
