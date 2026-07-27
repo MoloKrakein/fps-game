@@ -1,8 +1,9 @@
 extends WeaponState
 
 func _on_firing_state_state_entered() -> void:
-	# Keep this completely empty. Do not send events here!
-	pass
+	if not weapon_controller:
+		return
+	weapon_controller.reset_trigger()
 
 func _on_firing_state_state_physics_processing(delta: float) -> void:
 	if not weapon_controller:
@@ -18,4 +19,6 @@ func _on_firing_state_state_physics_processing(delta: float) -> void:
 
 	# If the player lets go of the trigger, return to Idle
 	if not Input.is_action_pressed("combat_fire"):
-		weapon_controller.weapon_state_chart.send_event("onIdle")
+		
+		if not weapon_controller.is_burst_fire():
+			weapon_controller.weapon_state_chart.send_event("onIdle")

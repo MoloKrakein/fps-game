@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://bapkv2n0l0a1q"
+path="res://.godot/imported/dirt.aseprite-e02a6937a7b5a7be3ad41f633ed77cc5.res"
+
+[deps]
+
+source_file="res://Art/dirt.aseprite"
+dest_files=["res://.godot/imported/dirt.aseprite-e02a6937a7b5a7be3ad41f633ed77cc5.res"]
+
+[params]
+

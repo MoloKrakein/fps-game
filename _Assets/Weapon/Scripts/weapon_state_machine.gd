@@ -21,3 +21,4 @@ func _process(delta: float) -> void:
     if weapon_controller or debug:
         weapon_controller.weapon_state_chart.set_expression_property("Current Ammo", weapon_controller.current_ammo)
         weapon_controller.weapon_state_chart.set_expression_property("Can Fire", weapon_controller.can_fire())
+        weapon_controller.weapon_state_chart.set_expression_property("Fire Mode", weapon_controller.current_fire_mode)
