@@ -1,10 +1,16 @@
 extends WeaponState
 
 
-func _on_idle_state_state_physics_processing(delta: float) -> void:
+func _on_idle_state_state_physics_processing(_delta: float) -> void:
 	# pass # Replace with function body.
 	if not weapon_controller:
 		return
+
+	if Input.is_action_just_pressed("combat_fire"):
+		weapon_controller.start_trigger()
+
+	if Input.is_action_just_released("combat_fire"):
+		weapon_controller.stop_trigger()
 
 	if Input.is_action_pressed("combat_fire") and weapon_controller.can_fire():
 		# print("Firing weapon: %s" % weapon_controller.current_weapon.weapon_name)

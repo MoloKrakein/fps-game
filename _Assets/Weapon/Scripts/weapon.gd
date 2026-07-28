@@ -26,7 +26,10 @@ enum WeaponAmmoType {
 @export var weapon_type: WeaponType = WeaponType.PISTOL
 @export var damage: float = 10.0
 @export var max_ammo: int = 7
-@export var fire_rate: float = 0.1
+@export_group("Fire Control")
+@export var fire_rate_rpm: float = 600.0
+@export var fire_rate: float = 0.1 # Legacy seconds-per-shot fallback.
+@export var burst_shot_count: int = 3
 @export var recoil: float = 1.0
 @export var shoot_range: float = 100.0
 @export var accuracy: float = 1.0

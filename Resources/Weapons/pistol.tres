@@ -6,9 +6,7 @@
 [resource]
 script = ExtResource("1_0sgi0")
 max_ammo = 99
-fire_rate = 0.4
-fire_mode = 2
-has_burst_mode = true
+fire_rate_rpm = 100.0
 weapon_model = ExtResource("2_kmy37")
 weapon_position = Vector3(0.379, -0.32, -0.625)
 weapon_scale = Vector3(0.23, 0.23, 0.23)
