@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dmtcalmo4sedy"]
+
+[ext_resource type="Texture2D" uid="uid://bnhojh1uj03p6" path="res://trenchbroom/textures/backroom-ass-wallpaper.png" id="1_0dntn"]
+
+[resource]
+albedo_texture = ExtResource("1_0dntn")
+metallic_specular = 0.0
+texture_filter = 2

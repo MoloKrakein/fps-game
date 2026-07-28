@@ -1,13 +1,17 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://btxu4nilsejs6"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_0sgi0"]
+[ext_resource type="PackedScene" uid="uid://dfxfk056sjvi1" path="res://Art/Assets/Weapon/Projectile/projectile_model.tscn" id="1_rsge2"]
 [ext_resource type="PackedScene" uid="uid://d0547qfi2hk3r" path="res://Art/Assets/Weapon/Pistol/pistol_model.tscn" id="2_kmy37"]
 
 [resource]
 script = ExtResource("1_0sgi0")
 max_ammo = 99
-fire_rate_rpm = 100.0
+is_hitscan = false
+fire_rate_rpm = 800.0
+fire_mode = 1
 weapon_model = ExtResource("2_kmy37")
+projectile_scene = ExtResource("1_rsge2")
 weapon_position = Vector3(0.379, -0.32, -0.625)
 weapon_scale = Vector3(0.23, 0.23, 0.23)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

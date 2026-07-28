@@ -95,6 +95,9 @@ slide_pitch = 4.5
 slide_roll = 6.0
 slide_fov = 125.0
 
+[node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5676575)
+
 [node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
 transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)
 debug_shape_custom_color = Color(0.9588106, 0, 0.51712954, 1)
@@ -341,11 +344,12 @@ player = NodePath("../..")
 surface_threshold = 0.36
 max_step_height = 1.2
 
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart")]
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("25_ythyg")
 weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
+shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]

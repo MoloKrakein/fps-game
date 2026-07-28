@@ -26,6 +26,9 @@ enum WeaponAmmoType {
 @export var weapon_type: WeaponType = WeaponType.PISTOL
 @export var damage: float = 10.0
 @export var max_ammo: int = 7
+# @export var ammo_per_clip: int = 7 #for future use, if we want to implement a reload system with clips
+@export var is_hitscan: bool = true
+
 @export_group("Fire Control")
 @export var fire_rate_rpm: float = 600.0
 @export var fire_rate: float = 0.1 # Legacy seconds-per-shot fallback.
@@ -38,12 +41,15 @@ enum WeaponAmmoType {
 @export var can_change_fire_mode: bool = false
 @export var has_burst_mode: bool = false
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
+@export var projectile_speed: float = 50.0
 
 
 @export_category("Weapon Model")
+@export_group("Model Setting")
 @export var weapon_model: PackedScene
-@export var weapon_position: Vector3 = Vector3(0.2, -0.2, -0.3)
+@export var projectile_scene: PackedScene
 @export_group("Other Model Setting")
+@export var weapon_position: Vector3 = Vector3(0.2, -0.2, -0.3)
 @export var weapon_rotation: Vector3 = Vector3(0, 0, 0)
 @export var weapon_scale: Vector3 = Vector3(1, 1, 1)
 
