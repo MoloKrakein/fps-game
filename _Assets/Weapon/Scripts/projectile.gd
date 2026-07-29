@@ -18,6 +18,8 @@ func _physics_process(delta: float) -> void:
 	var end_position = start_position + velocity * delta
 
 	var query = PhysicsRayQueryParameters3D.create(start_position, end_position)
+	query.exclude = [self]  # Exclude the projectile itself from the raycast
+	query.collision_mask = 1  # Set the collision mask to detect only relevant layers
 	var result = space_state.intersect_ray(query)
 
 	if result:
@@ -48,7 +50,7 @@ func _spawn_impact_effect(hit_position: Vector3) -> void:
 	marker.mesh = ball
 
 	var material = StandardMaterial3D.new()
-	material.albedo_color = Color.CYAN # Red color
+	material.albedo_color = Color.CYAN 
 	marker.set_surface_override_material(0,material)
 
 	get_tree().current_scene.add_child(marker)
