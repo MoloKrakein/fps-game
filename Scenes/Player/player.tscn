@@ -291,36 +291,50 @@ script = ExtResource("19_rcvs5")
 script = ExtResource("5_jhyir")
 metadata/_custom_type_script = "uid://couw105c3bde4"
 
-[node name="Root" type="Node" parent="WeaponStateChart" unique_id=648473644]
+[node name="Root" type="Node" parent="WeaponStateChart" unique_id=516963180]
+script = ExtResource("6_74mp2")
+metadata/_custom_type_script = "uid://c1vp0ojjvaby1"
+
+[node name="Trigger" type="Node" parent="WeaponStateChart/Root" unique_id=648473644]
 script = ExtResource("7_oikmp")
 initial_state = NodePath("IdleState")
 
-[node name="IdleState" type="Node" parent="WeaponStateChart/Root" unique_id=2069809072]
+[node name="IdleState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=2069809072]
 script = ExtResource("8_06tpx")
 
-[node name="FiringState" type="Node" parent="WeaponStateChart/Root" unique_id=1790034271]
+[node name="FiringState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1790034271]
 script = ExtResource("8_06tpx")
 
-[node name="EmptyState" type="Node" parent="WeaponStateChart/Root" unique_id=1258316839]
+[node name="EmptyState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1258316839]
 script = ExtResource("8_06tpx")
 
-[node name="OnIdle" type="Node" parent="WeaponStateChart/Root" unique_id=1258442477]
+[node name="OnIdle" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1258442477]
 script = ExtResource("9_7g0yx")
 to = NodePath("../IdleState")
 event = &"onIdle"
 delay_in_seconds = "0.0"
 
-[node name="OnFiring" type="Node" parent="WeaponStateChart/Root" unique_id=1563891002]
+[node name="OnFiring" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1563891002]
 script = ExtResource("9_7g0yx")
 to = NodePath("../FiringState")
 event = &"onFiring"
 delay_in_seconds = "0.0"
 
-[node name="OnEmpty" type="Node" parent="WeaponStateChart/Root" unique_id=899367234]
+[node name="OnEmpty" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=899367234]
 script = ExtResource("9_7g0yx")
 to = NodePath("../EmptyState")
 event = &"onEmpty"
 delay_in_seconds = "0.0"
+
+[node name="Sight" type="Node" parent="WeaponStateChart/Root" unique_id=243993872]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("HipfireState")
+
+[node name="HipfireState" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=130068624]
+script = ExtResource("8_06tpx")
+
+[node name="ADSstate" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=678955881]
+script = ExtResource("8_06tpx")
 
 [node name="WeaponStateMachine" type="Node" parent="." unique_id=1692042775 node_paths=PackedStringArray("weapon_controller")]
 script = ExtResource("22_2ahak")
@@ -369,8 +383,8 @@ shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 [connection signal="state_entered" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_entered"]
 [connection signal="state_exited" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_exited"]
 [connection signal="state_physics_processing" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_physics_processing"]
-[connection signal="state_physics_processing" from="WeaponStateChart/Root/IdleState" to="WeaponStateMachine/IdleState" method="_on_idle_state_state_physics_processing"]
-[connection signal="state_entered" from="WeaponStateChart/Root/FiringState" to="WeaponStateMachine/FiringState" method="_on_firing_state_state_entered"]
-[connection signal="state_physics_processing" from="WeaponStateChart/Root/FiringState" to="WeaponStateMachine/FiringState" method="_on_firing_state_state_physics_processing"]
-[connection signal="state_entered" from="WeaponStateChart/Root/EmptyState" to="WeaponStateMachine/EmptyState" method="_on_empty_state_state_entered"]
-[connection signal="state_physics_processing" from="WeaponStateChart/Root/EmptyState" to="WeaponStateMachine/EmptyState" method="_on_empty_state_state_physics_processing"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/IdleState" to="WeaponStateMachine/IdleState" method="_on_idle_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/FiringState" method="_on_firing_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/FiringState" method="_on_firing_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/EmptyState" method="_on_empty_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/EmptyState" method="_on_empty_state_state_physics_processing"]
