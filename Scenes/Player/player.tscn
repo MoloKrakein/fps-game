@@ -342,6 +342,12 @@ to = NodePath("../../AimingState")
 event = &"onAiming"
 delay_in_seconds = "0.0"
 
+[node name="OnCanted" type="Node" parent="WeaponStateChart/Root/Sight/HipfireState" unique_id=1337344600]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../AimingState/CantedAimState")
+event = &"onCanted"
+delay_in_seconds = "0.0"
+
 [node name="AimingState" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=138704057]
 script = ExtResource("7_oikmp")
 initial_state = NodePath("AimDownState")
@@ -362,12 +368,6 @@ delay_in_seconds = "0.0"
 script = ExtResource("9_7g0yx")
 to = NodePath("../../HipfireState")
 event = &"onHipfire"
-delay_in_seconds = "0.0"
-
-[node name="OnCanted" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=1337344600]
-script = ExtResource("9_7g0yx")
-to = NodePath("../CantedAimState")
-event = &"onCanted"
 delay_in_seconds = "0.0"
 
 [node name="WeaponStateMachine" type="Node" parent="." unique_id=1692042775 node_paths=PackedStringArray("weapon_controller")]
@@ -410,11 +410,12 @@ player = NodePath("../..")
 surface_threshold = 0.36
 max_step_height = 1.2
 
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position")]
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("25_ythyg")
 weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
+reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]

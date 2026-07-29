@@ -4,6 +4,7 @@ class_name WeaponController extends Node
 @export var weapon_model_parent: Node3D
 @export var weapon_state_chart: StateChart
 # @export var camera: Camera3D
+@export var reticle: Control
 @export var shoot_position: Node3D
 @export var shoot_position_offset: Vector3 = Vector3(0, 0, 0)
 
@@ -218,10 +219,13 @@ func aim_hipfire() -> void:
 	# print("Aiming hipfire")
 	current_weapon_model.position = current_weapon.weapon_position
 	current_weapon_model.rotation = current_weapon.weapon_rotation
+	reticle.visible = true
 
 func aim_ads() -> void:
 	current_weapon_model.position = current_weapon.aim_ADS_position
 	current_weapon_model.rotation = current_weapon.aim_ADS_rotation
+	reticle.visible = false
+
 func aim_canted() -> void:
 	current_weapon_model.position = current_weapon.canted_sight_position
 	current_weapon_model.rotation = current_weapon.canted_sight_rotation

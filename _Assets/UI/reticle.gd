@@ -98,3 +98,14 @@ func set_center_dot_radius(radius: float) -> void:
 	CENTER_DOT_RADIUS = radius
 	update_crosshair()
 
+# func hide_reticle() -> void:
+# 	# visible = false
+# 	#get parent node and hide it
+# 	if get_parent():
+# 		get_parent().visible = false
+
+# func show_reticle() -> void:
+# 	# visible = true
+# 	#get parent node and show it
+# 	if get_parent():
+# 		get_parent().visible = true
