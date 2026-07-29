@@ -1,15 +1,18 @@
 extends WeaponState
 
-
 func _on_aim_down_state_state_entered() -> void:
-	print("ADS State Entered")
 	if weapon_controller:
+		# print("ADS State Entered")
 		weapon_controller.aim_ads()
 
-
-
 func _on_aim_down_state_state_physics_processing(delta: float) -> void:
-	if not Input.is_action_pressed("combat_aim"):
+	if not weapon_controller:
+		return
+
+	# 1. Did they let go? Return to Hipfire. (Removed the 'not'!)
+	if Input.is_action_just_released("combat_aim"):
 		weapon_controller.weapon_state_chart.send_event("onHipfire")
-	# if Input.is_action_just_pressed("toggle_sight"):
-	# 	weapon_controller.weapon_state_chart.send_event("onToggleSight")
+		
+	# 2. Did they press Alt-Aim? Swap to Canted!
+	if Input.is_action_just_pressed("combat_alt_aim"):
+		weapon_controller.weapon_state_chart.send_event("onCanted")

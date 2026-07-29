@@ -12,8 +12,8 @@ var player: PlayerController
 var current_weapon_model: Node3D
 var current_ammo: int
 var fire_timer: float = 0.0
-var weapon_hipfire_position: Vector3 = Vector3(0, 0, 0)
-var weapon_hipfire_rotation: Vector3 = Vector3(0, 0, 0)
+# var weapon_hipfire_position: Vector3 = Vector3(0, 0, 0)
+# var weapon_hipfire_rotation: Vector3 = Vector3(0, 0, 0)
 
 # var hipfire_location: Vector3 = Vector3(0, 0, 0)
 # var hipfire_rotation: Vector3 = Vector3(0, 0, 0)
@@ -37,9 +37,8 @@ func _ready() -> void:
 		spawn_weapon_model(current_weapon)
 		current_ammo = current_weapon.max_ammo
 		current_fire_mode = current_weapon.fire_mode
-	weapon_hipfire_position = current_weapon.weapon_position
-	weapon_hipfire_rotation = current_weapon.weapon_rotation
 	player = get_parent() as PlayerController
+	print("hipfire position: ", current_weapon.weapon_position, " hipfire rotation: ", current_weapon.weapon_rotation)
 
 	
 
@@ -216,8 +215,10 @@ func _perform_projectile_fire() -> void:
 
 
 func aim_hipfire() -> void:
-	current_weapon_model.position = weapon_hipfire_position
-	current_weapon_model.rotation = weapon_hipfire_rotation
+	# print("Aiming hipfire")
+	current_weapon_model.position = current_weapon.weapon_position
+	current_weapon_model.rotation = current_weapon.weapon_rotation
+
 func aim_ads() -> void:
 	current_weapon_model.position = current_weapon.aim_ADS_position
 	current_weapon_model.rotation = current_weapon.aim_ADS_rotation
