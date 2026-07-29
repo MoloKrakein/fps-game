@@ -1,24 +1,24 @@
 class_name Weapon extends Resource
 
 enum WeaponType {
-    PISTOL,
-    RIFLE,
-    SMG,
-    SHOTGUN,
-    SNIPER,
-    HEAVY
+	PISTOL,
+	RIFLE,
+	SMG,
+	SHOTGUN,
+	SNIPER,
+	HEAVY
 }
 
 enum WeaponFireMode {
-    SEMI_AUTO,
-    FULL_AUTO,
-    BURST
+	SEMI_AUTO,
+	FULL_AUTO,
+	BURST
 }
 
 enum WeaponAmmoType {
-    LIGHT,
-    MEDIUM,
-    HEAVY
+	LIGHT,
+	MEDIUM,
+	HEAVY
 }
 
 @export_category("Weapon Stats")
@@ -43,13 +43,7 @@ enum WeaponAmmoType {
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
 @export var projectile_speed: float = 50.0
 
-const METERS_PER_WORLD_UNIT: float = 1.0
 
-func get_muzzle_velocity_mps() -> float:
-    return maxf(projectile_speed / METERS_PER_WORLD_UNIT, 0.0)
-
-func get_muzzle_velocity_kmh() -> float:
-    return get_muzzle_velocity_mps() * 3.6
 
 
 @export_category("Weapon Model")
@@ -61,3 +55,26 @@ func get_muzzle_velocity_kmh() -> float:
 @export var weapon_rotation: Vector3 = Vector3(0, 0, 0)
 @export var weapon_scale: Vector3 = Vector3(1, 1, 1)
 
+const METERS_PER_WORLD_UNIT: float = 1.0
+
+func get_muzzle_velocity_mps() -> float:
+	return maxf(projectile_speed / METERS_PER_WORLD_UNIT, 0.0)
+
+func get_muzzle_velocity_kmh() -> float:
+	return get_muzzle_velocity_mps() * 3.6
+
+func get_fire_rate_rpm() -> float:
+
+	if fire_rate_rpm > 0.0:
+		return fire_rate_rpm
+
+	if fire_rate > 0.0:
+		return 60.0 / fire_rate
+
+	return 0.0
+
+func get_fire_interval_seconds() -> float:
+	var rpm := get_fire_rate_rpm()
+	if rpm <= 0.0:
+		return 0.0
+	return 60.0 / rpm

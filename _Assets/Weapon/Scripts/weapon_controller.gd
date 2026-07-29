@@ -33,25 +33,7 @@ func _process(delta: float) -> void:
     if fire_timer > 0.0:
         fire_timer = maxf(fire_timer - delta, 0.0)
 
-func get_fire_rate_rpm() -> float:
-    if current_weapon == null:
-        return 0.0
 
-    if current_weapon.fire_rate_rpm > 0.0:
-        return current_weapon.fire_rate_rpm
-
-    if current_weapon.fire_rate > 0.0:
-        return 60.0 / current_weapon.fire_rate
-
-    return 0.0
-
-
-
-func get_fire_interval_seconds() -> float:
-    var rpm := get_fire_rate_rpm()
-    if rpm <= 0.0:
-        return 0.0
-    return 60.0 / rpm
 
 func get_burst_shot_count() -> int:
     if current_weapon == null:
@@ -131,7 +113,7 @@ func can_fire() -> bool:
 func fire_weapon() -> void:
     if can_fire():
         current_ammo -= 1
-        fire_timer = get_fire_interval_seconds()
+        fire_timer = current_weapon.get_fire_interval_seconds()
 
         match current_fire_mode:
             Weapon.WeaponFireMode.SEMI_AUTO:
