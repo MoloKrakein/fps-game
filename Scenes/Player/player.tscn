@@ -29,6 +29,10 @@
 [ext_resource type="Script" uid="uid://bdvwooe4dfsx0" path="res://_Assets/Weapon/Scripts/weapon_controller.gd" id="24_qr1w5"]
 [ext_resource type="Script" uid="uid://dwaido63afkrc" path="res://_Assets/Weapon/Scripts/States/weap_empty_state.gd" id="24_rukb4"]
 [ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="25_ythyg"]
+[ext_resource type="Script" uid="uid://fo18j0fu5t4e" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_hipfire_state.gd" id="26_fcwna"]
+[ext_resource type="Script" uid="uid://c4ugr8wbr6sn" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_ads_state.gd" id="27_1agin"]
+[ext_resource type="Script" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_aiming_state.gd" id="27_2jnj1"]
+[ext_resource type="Script" uid="uid://dm1430qubtqlq" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_canted_state.gd" id="28_2jnj1"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -333,22 +337,69 @@ initial_state = NodePath("HipfireState")
 [node name="HipfireState" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=130068624]
 script = ExtResource("8_06tpx")
 
-[node name="ADSstate" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=678955881]
+[node name="OnHipfire" type="Node" parent="WeaponStateChart/Root/Sight/HipfireState" unique_id=1278669015]
+script = ExtResource("9_7g0yx")
+to = NodePath("..")
+event = &"onHipfire"
+delay_in_seconds = "0.0"
+
+[node name="OnAiming" type="Node" parent="WeaponStateChart/Root/Sight/HipfireState" unique_id=118431218]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../AimingState")
+event = &"onAiming"
+delay_in_seconds = "0.0"
+
+[node name="AimingState" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=138704057]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("AimDownState")
+
+[node name="AimDownState" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=825454313]
 script = ExtResource("8_06tpx")
+
+[node name="CantedAimState" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=233984011]
+script = ExtResource("8_06tpx")
+
+[node name="OnADS" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=1579143707]
+script = ExtResource("9_7g0yx")
+to = NodePath("../AimDownState")
+event = &"onADS"
+delay_in_seconds = "0.0"
+
+[node name="OnCanted" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=1337344600]
+script = ExtResource("9_7g0yx")
+to = NodePath("../CantedAimState")
+event = &"onCanted"
+delay_in_seconds = "0.0"
 
 [node name="WeaponStateMachine" type="Node" parent="." unique_id=1692042775 node_paths=PackedStringArray("weapon_controller")]
 script = ExtResource("22_2ahak")
 debug = true
 weapon_controller = NodePath("../Component/WeaponController")
 
-[node name="IdleState" type="Node" parent="WeaponStateMachine" unique_id=637678654]
+[node name="Trigger" type="Node" parent="WeaponStateMachine" unique_id=2054061703]
+
+[node name="IdleState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=637678654]
 script = ExtResource("22_ur3l4")
 
-[node name="FiringState" type="Node" parent="WeaponStateMachine" unique_id=1734260946]
+[node name="FiringState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=1734260946]
 script = ExtResource("23_2ahak")
 
-[node name="EmptyState" type="Node" parent="WeaponStateMachine" unique_id=1112135551]
+[node name="EmptyState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=1112135551]
 script = ExtResource("24_rukb4")
+
+[node name="Sight" type="Node" parent="WeaponStateMachine" unique_id=1107421997]
+
+[node name="HipfireState" type="Node" parent="WeaponStateMachine/Sight" unique_id=1580461824]
+script = ExtResource("26_fcwna")
+
+[node name="AimingState" type="Node" parent="WeaponStateMachine/Sight" unique_id=533957520]
+script = ExtResource("27_2jnj1")
+
+[node name="ADSState" type="Node" parent="WeaponStateMachine/Sight/AimingState" unique_id=1323029264]
+script = ExtResource("27_1agin")
+
+[node name="CantedAimState" type="Node" parent="WeaponStateMachine/Sight/AimingState" unique_id=1531340813]
+script = ExtResource("28_2jnj1")
 
 [node name="Component" type="Node" parent="." unique_id=2093724721]
 
@@ -383,8 +434,12 @@ shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 [connection signal="state_entered" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_entered"]
 [connection signal="state_exited" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_exited"]
 [connection signal="state_physics_processing" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_physics_processing"]
-[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/IdleState" to="WeaponStateMachine/IdleState" method="_on_idle_state_state_physics_processing"]
-[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/FiringState" method="_on_firing_state_state_entered"]
-[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/FiringState" method="_on_firing_state_state_physics_processing"]
-[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/EmptyState" method="_on_empty_state_state_entered"]
-[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/EmptyState" method="_on_empty_state_state_physics_processing"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/IdleState" to="WeaponStateMachine/Trigger/IdleState" method="_on_idle_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/Trigger/FiringState" method="_on_firing_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/Trigger/FiringState" method="_on_firing_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/Trigger/EmptyState" method="_on_empty_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/Trigger/EmptyState" method="_on_empty_state_state_physics_processing"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/HipfireState" to="WeaponStateMachine/Sight/HipfireState" method="_on_hipfire_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/AimDownState" to="WeaponStateMachine/Sight/AimingState/ADSState" method="_on_aim_down_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/AimingState/AimDownState" to="WeaponStateMachine/Sight/AimingState/ADSState" method="_on_aim_down_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/CantedAimState" to="WeaponStateMachine/Sight/AimingState/CantedAimState" method="_on_canted_aim_state_state_entered"]

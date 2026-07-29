@@ -44,6 +44,17 @@ enum WeaponAmmoType {
 @export var projectile_speed: float = 50.0
 
 
+@export_category("Aiming")
+@export var aim_fov: float = 60.0
+@export var aim_sensitivity: float = 0.5
+@export var aim_sway: float = 0.5
+@export var aim_recoil_reduction: float = 0.5
+@export_group("Aiming Position")
+@export var aim_ADS_position: Vector3 = Vector3(0, 0, 0)
+@export var aim_ADS_rotation: Vector3 = Vector3(0, 0, 0)
+@export var canted_sight_fov: float = 70.0
+@export var canted_sight_position: Vector3 = Vector3(0, 0, 0)
+@export var canted_sight_rotation: Vector3 = Vector3(0, 0, 0)
 
 
 @export_category("Weapon Model")
@@ -54,6 +65,7 @@ enum WeaponAmmoType {
 @export var weapon_position: Vector3 = Vector3(0.2, -0.2, -0.3)
 @export var weapon_rotation: Vector3 = Vector3(0, 0, 0)
 @export var weapon_scale: Vector3 = Vector3(1, 1, 1)
+
 
 const METERS_PER_WORLD_UNIT: float = 1.0
 

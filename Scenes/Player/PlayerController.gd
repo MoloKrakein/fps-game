@@ -192,3 +192,6 @@ func disable_movement() -> void:
 func enable_movement() -> void:
 	# nothing to do here for now, but this function can be used to re-enable movement if needed
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+
+func _on_aiming_state_state_entered() -> void:
+	pass # Replace with function body.
