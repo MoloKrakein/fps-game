@@ -3,6 +3,9 @@
 [ext_resource type="Texture2D" uid="uid://b05yjr55kpde5" path="res://trenchbroom/textures/Wire Fence.png" id="1_ilvty"]
 
 [resource]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
 albedo_texture = ExtResource("1_ilvty")
 metallic_specular = 0.0
 texture_filter = 2

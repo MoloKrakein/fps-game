@@ -75,6 +75,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("SphereShape3D_ks1b7")
 
 [node name="Mesh" type="MeshInstance3D" parent="." unique_id=1636070211]
+visible = false
 mesh = SubResource("CapsuleMesh_o08ba")
 
 [node name="CrouchCheck" type="ShapeCast3D" parent="." unique_id=1790915549]
