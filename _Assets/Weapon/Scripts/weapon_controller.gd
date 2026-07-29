@@ -25,6 +25,8 @@ var fire_timer: float = 0.0
 # var canted_sight_location: Vector3 = Vector3(0, 0, 0)
 # var canted_sight_rotation: Vector3 = Vector3(0, 0, 0)
 
+var aim_tween: Tween
+const AIM_SPEED: float = 0.2
 
 var current_fire_mode: Weapon.WeaponFireMode
 var shots_fired_this_trigger: int = 0
@@ -217,15 +219,38 @@ func _perform_projectile_fire() -> void:
 
 func aim_hipfire() -> void:
 	# print("Aiming hipfire")
-	current_weapon_model.position = current_weapon.weapon_position
-	current_weapon_model.rotation = current_weapon.weapon_rotation
+	# current_weapon_model.position = current_weapon.weapon_position
+	# current_weapon_model.rotation = current_weapon.weapon_rotation
+	if current_weapon:
+		tween_weapon_to_position(current_weapon.weapon_position, current_weapon.weapon_rotation)
+
 	reticle.visible = true
 
 func aim_ads() -> void:
-	current_weapon_model.position = current_weapon.aim_ADS_position
-	current_weapon_model.rotation = current_weapon.aim_ADS_rotation
+	# current_weapon_model.position = current_weapon.aim_ADS_position
+	# current_weapon_model.rotation = current_weapon.aim_ADS_rotation
+	if current_weapon:
+		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
+		
 	reticle.visible = false
 
 func aim_canted() -> void:
 	current_weapon_model.position = current_weapon.canted_sight_position
 	current_weapon_model.rotation = current_weapon.canted_sight_rotation
+
+
+func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3) -> void:
+	if current_weapon_model == null:
+		return
+
+	if aim_tween:
+		aim_tween.kill()
+
+	aim_tween = create_tween()
+	aim_tween.set_trans(Tween.TRANS_SINE)
+	aim_tween.set_ease(Tween.EASE_IN_OUT)
+
+	aim_tween.set_parallel(true)
+
+	aim_tween.tween_property(current_weapon_model, "position", target_position, AIM_SPEED)
+	aim_tween.tween_property(current_weapon_model, "rotation", target_rotation, AIM_SPEED)
