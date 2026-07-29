@@ -45,6 +45,8 @@ func get_fire_rate_rpm() -> float:
 
     return 0.0
 
+
+
 func get_fire_interval_seconds() -> float:
     var rpm := get_fire_rate_rpm()
     if rpm <= 0.0:
@@ -209,7 +211,7 @@ func _perform_projectile_fire() -> void:
     projectile.global_position = shoot_position.global_position + shoot_position_offset
     
     var forward = -shoot_position.global_transform.basis.z
-    var projectile_velocity = forward * current_weapon.projectile_speed
+    var projectile_velocity = forward * current_weapon.get_muzzle_velocity_mps()
 
     projectile.look_at(projectile.global_position + forward, Vector3.UP)
     projectile.setup(projectile_velocity, current_weapon.damage)

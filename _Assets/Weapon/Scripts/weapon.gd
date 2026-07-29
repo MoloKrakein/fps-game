@@ -43,6 +43,14 @@ enum WeaponAmmoType {
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
 @export var projectile_speed: float = 50.0
 
+const METERS_PER_WORLD_UNIT: float = 1.0
+
+func get_muzzle_velocity_mps() -> float:
+    return maxf(projectile_speed / METERS_PER_WORLD_UNIT, 0.0)
+
+func get_muzzle_velocity_kmh() -> float:
+    return get_muzzle_velocity_mps() * 3.6
+
 
 @export_category("Weapon Model")
 @export_group("Model Setting")
