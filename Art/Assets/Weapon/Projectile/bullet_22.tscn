@@ -15,18 +15,20 @@ emission_on_uv2 = true
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_vx3u4"]
 material = SubResource("ORMMaterial3D_0cluu")
-height = 13.138672
+height = 8.166992
 
 [node name="22_bullet_projectile" unique_id=2127658052 node_paths=PackedStringArray("trail_effect") instance=ExtResource("1_tdwkw")]
-transform = Transform3D(-0.22, 0, 3.3219077e-08, 0, 0.22, 0, -3.3219077e-08, 0, -0.22, 0, 0, 0)
+transform = Transform3D(0.22, 0, -1.2938413e-07, 0, 0.22, 0, 1.2938413e-07, 0, 0.22, 0, 0, 0)
 script = ExtResource("2_b77m3")
 trail_effect = NodePath("MeshInstance3D")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="0" unique_id=439832937]
-transform = Transform3D(0.128, 0, 0, 0, 0, -0.128, 0, 0.18792862, 0, 0, 0, 0)
+transform = Transform3D(-0.1278467, 0.009195263, 0, 0, 0, -0.12800002, -0.0062629827, -0.18770352, 0, 0, 0, 0)
 shape = SubResource("ConvexPolygonShape3D_b77m3")
 
+[node name="Cylinder" parent="." index="1" unique_id=1874486029]
+transform = Transform3D(-0.1278467, 0.009195263, 0, 0, 0, -0.12800002, -0.0062629827, -0.18770352, 0, 0, 0, 0)
+
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." index="2" unique_id=921880052]
-transform = Transform3D(0.22, 3.3219077e-08, -3.3219077e-08, -3.3219077e-08, -9.616506e-09, -0.22, -3.3219077e-08, 0.22, -9.6165005e-09, -1.6261964e-07, 2.7253028e-08, -1.683995)
-visible = false
+transform = Transform3D(0.2767572, 4.1789193e-08, -4.178918e-08, -4.178918e-08, -1.2097441e-08, -0.2767572, -4.1789193e-08, 0.2767572, -1.2097433e-08, 1.8621065e-06, 5.115812e-08, 1.4070579)
 mesh = SubResource("CylinderMesh_vx3u4")

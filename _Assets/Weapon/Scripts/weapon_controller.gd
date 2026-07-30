@@ -28,6 +28,8 @@ var fire_timer: float = 0.0
 var aim_tween: Tween
 const AIM_SPEED: float = 0.2
 
+var accuracy_modifier: float = 1.0
+
 var current_fire_mode: Weapon.WeaponFireMode
 var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
@@ -150,7 +152,7 @@ func fire_weapon() -> void:
 			_perform_hitscan_fire()
 		else:
 			_perform_projectile_fire()
-		print("Fired weapon: %s, Remaining ammo: %d" % [current_weapon.weapon_name, current_ammo])
+		# print("Fired weapon: %s, Remaining ammo: %d" % [current_weapon.weapon_name, current_ammo])
 
 
 func _perform_hitscan_fire() -> void:
@@ -160,18 +162,27 @@ func _perform_hitscan_fire() -> void:
 
 	var space_state = shoot_position.get_world_3d().direct_space_state
 	var from = shoot_position.global_transform.origin + shoot_position_offset
+	
+	var accuracy_spread = (100 - current_weapon.accuracy) / 1000.0 
 	var forward = -shoot_position.global_transform.basis.z
-	var to = from + forward * current_weapon.shoot_range
+	
+	var acc_x = randf_range(-accuracy_spread, accuracy_spread)
+	var acc_y = randf_range(-accuracy_spread, accuracy_spread)
+	var direction = (forward + Vector3(acc_x, acc_y, 0)).normalized()
+
+	
+	var to = from + direction * current_weapon.shoot_range
+
 
 	var query = PhysicsRayQueryParameters3D.create(from, to)
 	var result = space_state.intersect_ray(query)
 
 	if result:
 		var hit_position = result.position
-		var hit_normal = result.normal
-		var hit_collider = result.collider
+		# var hit_normal = result.normal
+		# var hit_collider = result.collider
 
-		print("Hitscan hit at position: ", hit_position, " with normal: ", hit_normal, " on collider: ", hit_collider)
+		# print("Hitscan hit at position: ", hit_position, " with normal: ", hit_normal, " on collider: ", hit_collider)
 		_spawn_impact_effect(hit_position)
 	else:
 		print("Hitscan did not hit any target.")
@@ -209,27 +220,32 @@ func _perform_projectile_fire() -> void:
 	get_tree().current_scene.add_child(projectile)
 
 	projectile.global_position = shoot_position.global_position + shoot_position_offset
-	
 	var forward = -shoot_position.global_transform.basis.z
-	var projectile_velocity = forward * current_weapon.get_muzzle_velocity_mps()
+	
+	var accuracy_spread = (100 - current_weapon.accuracy) / 1000.0
+	var acc_x = randf_range(-accuracy_spread, accuracy_spread)
+	var acc_y = randf_range(-accuracy_spread, accuracy_spread)
+	var direction = forward + Vector3(acc_x, acc_y, 0) * shoot_position.global_transform.basis
 
-	projectile.look_at(projectile.global_position + forward, Vector3.UP)
+	var projectile_velocity = direction * current_weapon.get_muzzle_velocity_mps()
+
+
+	# make sure the projectile is facing the direction it is moving
+
+	projectile.look_at(projectile.global_position + direction, Vector3.UP)
 	projectile.setup(projectile_velocity, current_weapon.damage)
 
 
 func aim_hipfire() -> void:
-	# print("Aiming hipfire")
-	# current_weapon_model.position = current_weapon.weapon_position
-	# current_weapon_model.rotation = current_weapon.weapon_rotation
 	if current_weapon:
+		accuracy_modifier = 1.0
 		tween_weapon_to_position(current_weapon.weapon_position, current_weapon.weapon_rotation)
 
 	# _set_reticle_visible(true)
 
 func aim_ads() -> void:
-	# current_weapon_model.position = current_weapon.aim_ADS_position
-	# current_weapon_model.rotation = current_weapon.aim_ADS_rotation
 	if current_weapon:
+		accuracy_modifier = current_weapon.aim_accuracy_modifier
 		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
 		
 	# _set_reticle_visible(false)

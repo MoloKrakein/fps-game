@@ -2,7 +2,10 @@ class_name Projectile extends Area3D
 
 var velocity: Vector3
 var damage: float
+var trail_start_timer: Timer
+
 @export var trail_effect: MeshInstance3D
+@export var is_tracer: bool = false
 
 
 func _ready() -> void:
@@ -64,10 +67,21 @@ func _spawn_impact_effect(hit_position: Vector3) -> void:
 func _show_trail_effect() -> void:
 	if trail_effect:
 		var random_number = randi() % 2
-		if random_number == 0:
-			trail_effect.visible = true
+		if random_number == 0 or is_tracer:
+			# add wait timer to delay the visibility of the trail effect
+			trail_start_timer = Timer.new()
+			trail_start_timer.wait_time = 0.0289
+			trail_start_timer.one_shot = true
+			trail_start_timer.timeout.connect(func() -> void: trail_effect.visible = true)
+			add_child(trail_start_timer)
+			trail_start_timer.start()
+			trail_effect.visible = false
 		else:
 			trail_effect.visible = false
+
+func _enable_trail_effect() -> void:
+	if trail_effect:
+		trail_effect.visible = true
 	
 	
 		

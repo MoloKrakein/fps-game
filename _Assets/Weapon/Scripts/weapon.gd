@@ -35,7 +35,9 @@ enum WeaponAmmoType {
 @export var burst_shot_count: int = 3
 @export var recoil: float = 1.0
 @export var shoot_range: float = 100.0
-@export var accuracy: float = 1.0
+@export_range(0,100) var accuracy: float = 100
+@export_range(0, 1) var spread_angle: float = 0.0
+@export var pallet_count: int = 1
 @export var reload_time: float = 2.0
 @export var fire_mode: WeaponFireMode = WeaponFireMode.SEMI_AUTO
 @export var can_change_fire_mode: bool = false
@@ -48,6 +50,7 @@ enum WeaponAmmoType {
 @export_category("Aiming")
 @export var aim_fov: float = 60.0
 @export var aim_sensitivity: float = 0.5
+@export_range(0, 100) var aim_accuracy_modifier: float = 0.5 # higher value means more accurate when aiming down sights
 @export var aim_sway: float = 0.5
 @export var aim_recoil_reduction: float = 0.5
 @export_group("Aiming Position")
