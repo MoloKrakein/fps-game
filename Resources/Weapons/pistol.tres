@@ -8,9 +8,10 @@
 script = ExtResource("1_0sgi0")
 max_ammo = 99
 is_hitscan = false
-fire_rate_rpm = 800.0
-burst_shot_count = 2
-projectile_speed = 400.0
+projectile_speed = 320.0
+aim_ADS_position = Vector3(0, -0.05, -0.3)
+canted_sight_position = Vector3(0, -0.32, -0.625)
+canted_sight_rotation = Vector3(0, 0, 0.7889586)
 weapon_model = ExtResource("2_kmy37")
 projectile_scene = ExtResource("1_rsge2")
 weapon_position = Vector3(0.379, -0.32, -0.625)
