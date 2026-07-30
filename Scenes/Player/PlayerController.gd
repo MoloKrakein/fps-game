@@ -85,9 +85,6 @@ func _physics_process(delta: float) -> void:
 	else:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
 
-	if is_on_floor():
-		step_handler.handle_step()
-
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
 	velocity = _movement_velocity

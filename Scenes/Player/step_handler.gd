@@ -18,7 +18,7 @@ func handle_step() -> void:
 	if player == null:
 		return
 
-	for i in player.get_slide_collision_count():
+	for i in range(player.get_slide_collision_count()):
 		var collision = player.get_slide_collision(i)
 		if _is_vertical_surface(collision) and handle_step_climb(collision):
 			break
@@ -38,6 +38,12 @@ func _is_vertical_surface(collision: KinematicCollision3D) -> bool:
 
 func handle_step_climb(collision: KinematicCollision3D) -> bool:
 	step_status = "Step Climb Logic Not Implemented"
+	var player_feet_pos = _get_player_feet_pos()
+	var collision_point = collision.get_position()
+	var contact_height = collision.get_position().y - player_feet_pos.y
+	if contact_height > max_step_height + FEET_ADJUST_HEIGHT:
+		step_status = "Contact Too High"
+		return false
 
 	if not _is_valid_step_direction(collision):
 		step_status = "Invalid Step Direction"
@@ -47,20 +53,24 @@ func handle_step_climb(collision: KinematicCollision3D) -> bool:
 		step_status = "Not Vertical Surface"
 		return false
 
-	if not _is_valid_step_height(_measure_step_height(collision)):
+	var measured_height = _measure_step_height(collision)
+	if not _is_valid_step_height(measured_height):
 		step_status = "Step Height Too High"
 		return false
 
-	for i in player.get_slide_collision_count():
-		var col = player.get_slide_collision(i)
-		if _is_vertical_surface(collision):
-			var measured_height = _measure_step_height(collision)
-			
-			if measured_height > MIN_MOVEMENT_LENGTH and measured_height and _is_valid_step_direction(col):
-				player.global_position.y += measured_height
-				player.velocity = player.previous_velocity
-				player.camera.smooth_step(measured_height)
-				step_status = "Step Height: " + str(measured_height)
+	var forward = _get_step_forward_vector(collision)
+	if forward == Vector3.ZERO or not _has_step_landing_depth(collision_point, player_feet_pos, forward, measured_height):
+		step_status = "No Step Landing"
+		return false
+
+	if measured_height > MIN_MOVEMENT_LENGTH:
+		player.global_position.y += measured_height
+		if forward != Vector3.ZERO:
+			player.global_position += forward * step_forward_clearance
+		player.velocity = player.previous_velocity
+		player.velocity.y = 0.0
+		player.camera.smooth_step(measured_height)
+		step_status = "Step Height: " + str(measured_height)
 
 	# if not _is_vertical_surface(collision):
 	# 	return false
@@ -85,9 +95,11 @@ func handle_step_climb(collision: KinematicCollision3D) -> bool:
 func _measure_step_height(collision: KinematicCollision3D) -> float:
 	var space_state = player.get_world_3d().direct_space_state
 	var collision_point = collision.get_position()
-
 	var player_feet_pos = _get_player_feet_pos()
-	var player_head_y =  player.global_position.y + (player.standing_col.shape.height / 2.0)
+	var active_col = _get_active_collision_shape()
+	var player_head_y = player.global_position.y
+	if active_col != null:
+		player_head_y = active_col.global_position.y + _get_shape_half_height(active_col.shape)
 
 	var ray_start = Vector3(collision_point.x, player_head_y, collision_point.z)
 	var ray_end = Vector3(collision_point.x, player_feet_pos.y, collision_point.z)
@@ -97,31 +109,26 @@ func _measure_step_height(collision: KinematicCollision3D) -> float:
 	query.exclude = [player.get_rid()]
 
 	var result = space_state.intersect_ray(query)
-	if result:
-		# print("Step Height: ", result.position.y - player_feet_pos.y)
+	if result and result.normal.y >= surface_threshold:
 		return result.position.y - player_feet_pos.y
 	return 0.0
-	# var horizontal_velocity = Vector3(player.velocity.x, 0.0, player.velocity.z)
-	# if horizontal_velocity.length() == 0.0:
-	# 	horizontal_velocity = Vector3(-collision.get_normal().x, 0.0, -collision.get_normal().z)
 
-	# if horizontal_velocity.length() == 0.0:
-	# 	return 0.0
+func _has_step_landing_depth(collision_point: Vector3, player_feet_pos: Vector3, forward: Vector3, expected_height: float) -> bool:
+	var space_state = player.get_world_3d().direct_space_state
+	var probe_point = collision_point + forward * step_probe_distance
+	var ray_start = Vector3(probe_point.x, player.global_position.y + max_step_height, probe_point.z)
+	var ray_end = Vector3(probe_point.x, player_feet_pos.y, probe_point.z)
 
-	# var forward = horizontal_velocity.normalized()
-	# var player_feet_pos = _get_player_feet_pos()
-	# var probe_pos = player_feet_pos + forward * step_probe_distance
-	# var ray_start = probe_pos + Vector3.UP * max_step_height
-	# var ray_end = probe_pos + Vector3.DOWN * (max_step_height * 2.0)
+	var query = PhysicsRayQueryParameters3D.create(ray_start, ray_end)
+	query.collision_mask = player.collision_mask
+	query.exclude = [player.get_rid()]
 
-	# var query = PhysicsRayQueryParameters3D.create(ray_start, ray_end)
-	# query.collision_mask = player.collision_mask
-	# query.exclude = [player.get_rid()]
+	var result = space_state.intersect_ray(query)
+	if result and result.normal.y >= surface_threshold:
+		var landing_height = result.position.y - player_feet_pos.y
+		return absf(landing_height - expected_height) <= max_step_height
 
-	# var result = space_state.intersect_ray(query)
-	# if result and result.normal.y >= surface_threshold:
-	# 	return result.position.y - player_feet_pos.y
-	# return 0.0
+	return false
 
 func _get_step_forward_vector(collision: KinematicCollision3D) -> Vector3:
 	var horizontal_velocity = Vector3(player.velocity.x, 0.0, player.velocity.z)
