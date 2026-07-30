@@ -92,9 +92,11 @@ func _physics_process(delta: float) -> void:
 	# get max velocity for debugging purposes
 	if _movement_velocity.length() > _current_max_velocity:
 		_current_max_velocity = _movement_velocity.length()
+	
+	if step_handler != null:
+		step_handler.handle_step()
 
 	move_and_slide()
-	step_handler.handle_step()
 #endregion
 
 

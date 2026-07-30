@@ -2,11 +2,13 @@ class_name Projectile extends Area3D
 
 var velocity: Vector3
 var damage: float
+@export var trail_effect: MeshInstance3D
+
 
 func _ready() -> void:
 	# connect("body_entered", self, "_on_body_entered")
 	body_entered.connect(_on_body_entered)
-
+	_show_trail_effect()
 	get_tree().create_timer(5.0).timeout.connect(queue_free)
 
 
@@ -45,8 +47,8 @@ func _spawn_impact_effect(hit_position: Vector3) -> void:
 	# print("Spawn impact effect at position: ", hit_position, " with normal: ", hit_normal)
 	var marker = MeshInstance3D.new()
 	var ball = SphereMesh.new()
-	ball.radius = 1.5
-	ball.height = 1.5
+	ball.radius = 0.5
+	ball.height = 0.5
 	marker.mesh = ball
 
 	var material = StandardMaterial3D.new()
@@ -59,3 +61,13 @@ func _spawn_impact_effect(hit_position: Vector3) -> void:
 
 	get_tree().create_timer(0.5).timeout.connect(marker.queue_free)
 
+func _show_trail_effect() -> void:
+	if trail_effect:
+		var random_number = randi() % 2
+		if random_number == 0:
+			trail_effect.visible = true
+		else:
+			trail_effect.visible = false
+	
+	
+		

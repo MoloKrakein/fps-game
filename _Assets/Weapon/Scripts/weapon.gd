@@ -42,6 +42,7 @@ enum WeaponAmmoType {
 @export var has_burst_mode: bool = false
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
 @export var projectile_speed: float = 50.0
+# @export var is_projectile_tracer: bool = false
 
 
 @export_category("Aiming")

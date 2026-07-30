@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://btxu4nilsejs6"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_0sgi0"]
-[ext_resource type="PackedScene" uid="uid://dfxfk056sjvi1" path="res://Art/Assets/Weapon/Projectile/projectile_model.tscn" id="1_rsge2"]
+[ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="1_rsge2"]
 [ext_resource type="PackedScene" uid="uid://d0547qfi2hk3r" path="res://Art/Assets/Weapon/Pistol/pistol_model.tscn" id="2_kmy37"]
 
 [resource]

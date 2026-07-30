@@ -109,6 +109,10 @@ dev_reload={
 ]
 }
 
+[layer_names]
+
+3d_physics/layer_3="Wall"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
