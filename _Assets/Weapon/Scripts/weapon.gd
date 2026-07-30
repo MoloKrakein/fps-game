@@ -37,7 +37,7 @@ enum WeaponAmmoType {
 @export var shoot_range: float = 100.0
 @export_range(0,100) var accuracy: float = 100
 @export_range(0, 1) var spread_angle: float = 0.0
-@export var pallet_count: int = 1
+@export var pellet_count: int = 1
 @export var reload_time: float = 2.0
 @export var fire_mode: WeaponFireMode = WeaponFireMode.SEMI_AUTO
 @export var can_change_fire_mode: bool = false

@@ -164,28 +164,34 @@ func _perform_hitscan_fire() -> void:
 	var from = shoot_position.global_transform.origin + shoot_position_offset
 	
 	var accuracy_spread = (100 - current_weapon.accuracy) / 1000.0 
-	var forward = -shoot_position.global_transform.basis.z
-	
-	var acc_x = randf_range(-accuracy_spread, accuracy_spread)
-	var acc_y = randf_range(-accuracy_spread, accuracy_spread)
-	var direction = (forward + Vector3(acc_x, acc_y, 0)).normalized()
 
-	
-	var to = from + direction * current_weapon.shoot_range
+	for i in range(current_weapon.pellet_count):
+		var forward = -shoot_position.global_transform.basis.z
+		
+		var acc_x = randf_range(-accuracy_spread, accuracy_spread)
+		var acc_y = randf_range(-accuracy_spread, accuracy_spread)
+		var direction = (forward + Vector3(acc_x, acc_y, 0)).normalized()
+
+		if current_weapon.pellet_count > 1:
+			var spread_x = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
+			var spread_y = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
+			direction += Vector3(spread_x, spread_y, 0) * shoot_position.global_transform.basis
+		
+		var to = from + direction * current_weapon.shoot_range
 
 
-	var query = PhysicsRayQueryParameters3D.create(from, to)
-	var result = space_state.intersect_ray(query)
+		var query = PhysicsRayQueryParameters3D.create(from, to)
+		var result = space_state.intersect_ray(query)
 
-	if result:
-		var hit_position = result.position
-		# var hit_normal = result.normal
-		# var hit_collider = result.collider
+		if result:
+			var hit_position = result.position
+			# var hit_normal = result.normal
+			# var hit_collider = result.collider
 
-		# print("Hitscan hit at position: ", hit_position, " with normal: ", hit_normal, " on collider: ", hit_collider)
-		_spawn_impact_effect(hit_position)
-	else:
-		print("Hitscan did not hit any target.")
+			# print("Hitscan hit at position: ", hit_position, " with normal: ", hit_normal, " on collider: ", hit_collider)
+			_spawn_impact_effect(hit_position)
+		else:
+			print("Hitscan did not hit any target.")
 
 func _spawn_impact_effect(hit_position: Vector3) -> void:
 	# Placeholder for spawning impact effects (e.g., particles, decals)

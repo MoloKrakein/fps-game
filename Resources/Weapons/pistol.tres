@@ -7,8 +7,7 @@
 [resource]
 script = ExtResource("1_0sgi0")
 max_ammo = 999
-is_hitscan = false
-accuracy = 74.257
+accuracy = 78.218
 fire_mode = 1
 projectile_speed = 360.0
 aim_accuracy_modifier = 100.0
