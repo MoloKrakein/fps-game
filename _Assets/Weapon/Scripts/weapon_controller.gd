@@ -224,7 +224,7 @@ func aim_hipfire() -> void:
 	if current_weapon:
 		tween_weapon_to_position(current_weapon.weapon_position, current_weapon.weapon_rotation)
 
-	reticle.visible = true
+	# _set_reticle_visible(true)
 
 func aim_ads() -> void:
 	# current_weapon_model.position = current_weapon.aim_ADS_position
@@ -232,11 +232,26 @@ func aim_ads() -> void:
 	if current_weapon:
 		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
 		
-	reticle.visible = false
+	# _set_reticle_visible(false)
 
 func aim_canted() -> void:
-	current_weapon_model.position = current_weapon.canted_sight_position
-	current_weapon_model.rotation = current_weapon.canted_sight_rotation
+	if current_weapon:
+		var target_pos = current_weapon.aim_ADS_position
+		
+		# Calculate the 45-degree tilt
+		var target_rot = current_weapon.aim_ADS_rotation
+		target_rot.z += deg_to_rad(45) 
+		
+		tween_weapon_to_position(target_pos, target_rot)
+
+func _set_reticle_visible(is_visible: bool) -> void:
+	if reticle == null:
+		return
+
+	reticle.visible = is_visible
+	var reticle_parent := reticle.get_parent()
+	if reticle_parent is Control:
+		reticle_parent.visible = is_visible
 
 
 func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3) -> void:

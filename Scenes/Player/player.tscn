@@ -59,6 +59,7 @@ acceleration = 7.0
 deceleration = 15.0
 jump_velocity = 3.5
 slide_cooldown = 1.6
+isToggleCrouch = true
 
 [node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
@@ -443,3 +444,4 @@ shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 [connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/AimDownState" to="WeaponStateMachine/Sight/AimingState/ADSState" method="_on_aim_down_state_state_entered"]
 [connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/AimingState/AimDownState" to="WeaponStateMachine/Sight/AimingState/ADSState" method="_on_aim_down_state_state_physics_processing"]
 [connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/CantedAimState" to="WeaponStateMachine/Sight/AimingState/CantedAimState" method="_on_canted_aim_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/AimingState/CantedAimState" to="WeaponStateMachine/Sight/AimingState/CantedAimState" method="_on_canted_aim_state_state_physics_processing"]

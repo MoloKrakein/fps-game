@@ -14,4 +14,4 @@ func _on_canted_aim_state_state_physics_processing(delta: float) -> void:
 		
 	# Manual Alt-Aim override
 	if Input.is_action_just_pressed("combat_alt_aim"):
-		weapon_controller.weapon_state_chart.send_event("onADS ")
+		weapon_controller.weapon_state_chart.send_event("onADS")
