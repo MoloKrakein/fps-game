@@ -8,13 +8,14 @@ class_name WeaponController extends Node
 @export var shoot_position: Node3D
 @export var shoot_position_offset: Vector3 = Vector3(0, 0, 0)
 
-
 var player: PlayerController
 var current_weapon_model: Node3D
 var current_ammo: int
+var reserve_ammo: int = 0
 var fire_timer: float = 0.0
 var is_loaded: bool = false
 var is_reloading: bool = false
+
 # var weapon_hipfire_position: Vector3 = Vector3(0, 0, 0)
 # var weapon_hipfire_rotation: Vector3 = Vector3(0, 0, 0)
 
@@ -37,30 +38,28 @@ var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
 var burst_shots_remaining: int = 0
 
-
-
 const DEFAULT_BURST_SHOTS_PER_TRIGGER: int = 3
 
+#region Lifecycle
 func _ready() -> void:
 	if current_weapon != null:
 		spawn_weapon_model(current_weapon)
-		current_ammo = current_weapon.max_ammo
+		# Initialize magazine and reserve from weapon stats
+		current_ammo = current_weapon.mags_ammo
+		reserve_ammo = current_weapon.max_ammo
 		current_fire_mode = current_weapon.fire_mode
-		if current_ammo > 0:
-			current_ammo -= 1
-			is_loaded = true
+		is_loaded = current_ammo > 0
 
 	player = get_parent() as PlayerController
 	print("hipfire position: ", current_weapon.weapon_position, " hipfire rotation: ", current_weapon.weapon_rotation)
 
-	
-
 func _process(delta: float) -> void:
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)
+#endregion
 
 
-
+#region Trigger & Fire Mode
 func get_burst_shot_count() -> int:
 	if current_weapon == null:
 		return DEFAULT_BURST_SHOTS_PER_TRIGGER
@@ -95,24 +94,6 @@ func toggle_fire_mode() -> void:
 			current_fire_mode = Weapon.WeaponFireMode.SEMI_AUTO
 
 	reset_trigger()
-
-
-func spawn_weapon_model(weapon: Weapon) -> void:
-	if current_weapon_model != null:
-		current_weapon_model.queue_free()
-
-	if weapon != null and weapon.weapon_model:
-		current_weapon_model = weapon.weapon_model.instantiate()
-		weapon_model_parent.add_child(current_weapon_model)
-		current_weapon_model.position = weapon.weapon_position
-		current_weapon_model.rotation = weapon.weapon_rotation
-		current_weapon_model.scale = weapon.weapon_scale
-		# look for Node3D named "Muzzle" and set the shoot_position to it
-		var muzzle = current_weapon_model.get_node_or_null("Muzzle") as Node3D
-		if muzzle != null:
-			shoot_position = muzzle
-
-		
 
 func is_burst_fire() -> bool:
 	return current_fire_mode == Weapon.WeaponFireMode.BURST and burst_shots_remaining > 0 and burst_shots_remaining < get_burst_shot_count()
@@ -176,19 +157,52 @@ func _cycle_weapon() -> void:
 
 func execute_reload() -> void:
 	# This function is now ONLY called by the State Chart when the reload timer finishes
-	current_ammo = current_weapon.max_ammo
-	
-	if not is_loaded:
+	if current_weapon == null:
+		return
+
+	if reserve_ammo <= 0:
+		print("No reserve ammo to reload.")
+		return
+
+	var mag_capacity = current_weapon.mags_ammo
+	var needed = max(mag_capacity - current_ammo, 0)
+	if needed == 0:
+		print("Magazine already full. Mag:", current_ammo, "Reserve:", reserve_ammo)
+		return
+
+	var transfer = min(needed, reserve_ammo)
+	current_ammo += transfer
+	reserve_ammo -= transfer
+
+	# If chamber empty, chamber a round (consume one from magazine)
+	if not is_loaded and current_ammo > 0:
 		current_ammo -= 1
 		is_loaded = true
-		print("Reloaded: Chambered a new round. Mag has: ", current_ammo)
+		print("Reloaded and chambered a round. Mag:", current_ammo, "Reserve:", reserve_ammo)
 	else:
-		print("Tactical reload! Chamber was already loaded. Mag has: ", current_ammo)
+		print("Reloaded. Mag:", current_ammo, "Reserve:", reserve_ammo)
+#endregion
 
-# func _unhandled_input(event: InputEvent) -> void:
-# 	if event.is_action_pressed("combat_reload"):
-# 		reload_weapon()
 
+#region Weapon Model
+func spawn_weapon_model(weapon: Weapon) -> void:
+	if current_weapon_model != null:
+		current_weapon_model.queue_free()
+
+	if weapon != null and weapon.weapon_model:
+		current_weapon_model = weapon.weapon_model.instantiate()
+		weapon_model_parent.add_child(current_weapon_model)
+		current_weapon_model.position = weapon.weapon_position
+		current_weapon_model.rotation = weapon.weapon_rotation
+		current_weapon_model.scale = weapon.weapon_scale
+		# look for Node3D named "Muzzle" and set the shoot_position to it
+		var muzzle = current_weapon_model.get_node_or_null("Muzzle") as Node3D
+		if muzzle != null:
+			shoot_position = muzzle
+#endregion
+
+
+#region Firing Implementations
 func _perform_hitscan_fire() -> void:
 	if current_weapon == null or shoot_position == null:
 		print("Cannot perform hitscan fire: Weapon or shoot position is null.")
@@ -255,27 +269,33 @@ func _perform_projectile_fire() -> void:
 		print("Cannot perform projectile fire: Weapon or shoot position is null.")
 		return
 
+	for i in range(current_weapon.pellet_count):
+		var projectile = current_weapon.projectile_scene.instantiate() as Projectile
+		get_tree().current_scene.add_child(projectile)
 
-	var projectile = current_weapon.projectile_scene.instantiate() as Projectile
-	get_tree().current_scene.add_child(projectile)
+		projectile.global_position = shoot_position.global_position + shoot_position_offset
+		var forward = -shoot_position.global_transform.basis.z
+		
+		var accuracy_spread = (100 - current_weapon.accuracy) / 1000.0
+		if current_weapon.pellet_count > 1:
+			var spread_x = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
+			var spread_y = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
+			forward += Vector3(spread_x, spread_y, 0) * shoot_position.global_transform.basis
+		var acc_x = randf_range(-accuracy_spread, accuracy_spread)
+		var acc_y = randf_range(-accuracy_spread, accuracy_spread)
+		var direction = forward + Vector3(acc_x, acc_y, 0) * shoot_position.global_transform.basis
 
-	projectile.global_position = shoot_position.global_position + shoot_position_offset
-	var forward = -shoot_position.global_transform.basis.z
-	
-	var accuracy_spread = (100 - current_weapon.accuracy) / 1000.0
-	var acc_x = randf_range(-accuracy_spread, accuracy_spread)
-	var acc_y = randf_range(-accuracy_spread, accuracy_spread)
-	var direction = forward + Vector3(acc_x, acc_y, 0) * shoot_position.global_transform.basis
-
-	var projectile_velocity = direction * current_weapon.get_muzzle_velocity_mps()
-
-
-	# make sure the projectile is facing the direction it is moving
-
-	projectile.look_at(projectile.global_position + direction, Vector3.UP)
-	projectile.setup(projectile_velocity, current_weapon.damage)
+		var projectile_velocity = direction * current_weapon.get_muzzle_velocity_mps()
 
 
+		# make sure the projectile is facing the direction it is moving
+
+		projectile.look_at(projectile.global_position + direction, Vector3.UP)
+		projectile.setup(projectile_velocity, current_weapon.damage)
+#endregion
+
+
+#region Aiming & Tweens
 func aim_hipfire() -> void:
 	if current_weapon:
 		accuracy_modifier = 1.0
@@ -325,3 +345,4 @@ func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3
 
 	aim_tween.tween_property(current_weapon_model, "position", target_position, AIM_SPEED)
 	aim_tween.tween_property(current_weapon_model, "rotation", target_rotation, AIM_SPEED)
+#endregion

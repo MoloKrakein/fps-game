@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://csw2i3ljsxa6g"]
+
+[ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_awtbi"]
+[ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="1_i6r2f"]
+[ext_resource type="PackedScene" uid="uid://6baebp0xgdtr" path="res://Art/Assets/Weapon/SG/sg_model.tscn" id="3_dv3g3"]
+
+[resource]
+script = ExtResource("1_awtbi")
+weapon_name = "SG"
+weapon_type = 3
+is_hitscan = false
+accuracy = 24.637
+spread_angle = 0.298
+pellet_count = 45
+projectile_speed = 100.0
+aim_accuracy_modifier = 100.0
+aim_ADS_position = Vector3(0, -0.05, -0.3)
+canted_sight_position = Vector3(0, -0.32, -0.625)
+canted_sight_rotation = Vector3(0, 0, 0.7889586)
+weapon_model = ExtResource("3_dv3g3")
+projectile_scene = ExtResource("1_i6r2f")
+weapon_position = Vector3(0.379, -0.32, -0.625)
+weapon_scale = Vector3(0.23, 0.23, 0.23)
+metadata/_custom_type_script = "uid://djccd7pdwygtl"

@@ -28,11 +28,11 @@
 [ext_resource type="Script" uid="uid://gwkuothaiqkm" path="res://Scenes/Player/step_handler.gd" id="23_jincj"]
 [ext_resource type="Script" uid="uid://bdvwooe4dfsx0" path="res://_Assets/Weapon/Scripts/weapon_controller.gd" id="24_qr1w5"]
 [ext_resource type="Script" uid="uid://dwaido63afkrc" path="res://_Assets/Weapon/Scripts/States/weap_empty_state.gd" id="24_rukb4"]
-[ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="25_ythyg"]
 [ext_resource type="Script" uid="uid://vkhddca7hyn2" path="res://_Assets/Weapon/Scripts/States/weap_reloading_state.gd" id="26_1agin"]
 [ext_resource type="Script" uid="uid://fo18j0fu5t4e" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_hipfire_state.gd" id="26_fcwna"]
 [ext_resource type="Script" uid="uid://c4ugr8wbr6sn" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_ads_state.gd" id="27_1agin"]
 [ext_resource type="Script" uid="uid://dm1430qubtqlq" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_canted_state.gd" id="28_2jnj1"]
+[ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="33_1agin"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -431,7 +431,7 @@ max_step_height = 1.0
 
 [node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position")]
 script = ExtResource("24_qr1w5")
-current_weapon = ExtResource("25_ythyg")
+current_weapon = ExtResource("33_1agin")
 weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")

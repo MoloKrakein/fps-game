@@ -25,7 +25,8 @@ enum WeaponAmmoType {
 @export var weapon_name: String = "Weapon"
 @export var weapon_type: WeaponType = WeaponType.PISTOL
 @export var damage: float = 10.0
-@export var max_ammo: int = 7
+@export var mags_ammo: int = 7
+@export var max_ammo: int = 90
 # @export var ammo_per_clip: int = 7 #for future use, if we want to implement a reload system with clips
 @export var is_hitscan: bool = true
 
