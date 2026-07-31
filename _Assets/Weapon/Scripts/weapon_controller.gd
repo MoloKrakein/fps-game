@@ -13,6 +13,8 @@ var player: PlayerController
 var current_weapon_model: Node3D
 var current_ammo: int
 var fire_timer: float = 0.0
+var is_loaded: bool = false
+var is_reloading: bool = false
 # var weapon_hipfire_position: Vector3 = Vector3(0, 0, 0)
 # var weapon_hipfire_rotation: Vector3 = Vector3(0, 0, 0)
 
@@ -35,6 +37,8 @@ var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
 var burst_shots_remaining: int = 0
 
+
+
 const DEFAULT_BURST_SHOTS_PER_TRIGGER: int = 3
 
 func _ready() -> void:
@@ -42,6 +46,10 @@ func _ready() -> void:
 		spawn_weapon_model(current_weapon)
 		current_ammo = current_weapon.max_ammo
 		current_fire_mode = current_weapon.fire_mode
+		if current_ammo > 0:
+			current_ammo -= 1
+			is_loaded = true
+
 	player = get_parent() as PlayerController
 	print("hipfire position: ", current_weapon.weapon_position, " hipfire rotation: ", current_weapon.weapon_rotation)
 
@@ -117,7 +125,7 @@ func can_fire() -> bool:
 	if current_weapon == null:
 		return false
 
-	if current_ammo <= 0 or fire_timer > 0.0:
+	if not is_loaded or fire_timer > 0.0:
 		return false
 
 	match current_fire_mode:
@@ -132,7 +140,6 @@ func can_fire() -> bool:
 
 func fire_weapon() -> void:
 	if can_fire():
-		current_ammo -= 1
 		fire_timer = current_weapon.get_fire_interval_seconds()
 
 		match current_fire_mode:
@@ -152,8 +159,35 @@ func fire_weapon() -> void:
 			_perform_hitscan_fire()
 		else:
 			_perform_projectile_fire()
+
+		_cycle_weapon()
 		# print("Fired weapon: %s, Remaining ammo: %d" % [current_weapon.weapon_name, current_ammo])
 
+func _cycle_weapon() -> void:
+	if current_weapon == null:
+		return
+	is_loaded = false
+
+	if current_ammo > 0:
+		current_ammo -= 1
+		is_loaded = true
+	else:
+		print("Out of ammo for weapon: %s" % current_weapon.weapon_name)
+
+func execute_reload() -> void:
+	# This function is now ONLY called by the State Chart when the reload timer finishes
+	current_ammo = current_weapon.max_ammo
+	
+	if not is_loaded:
+		current_ammo -= 1
+		is_loaded = true
+		print("Reloaded: Chambered a new round. Mag has: ", current_ammo)
+	else:
+		print("Tactical reload! Chamber was already loaded. Mag has: ", current_ammo)
+
+# func _unhandled_input(event: InputEvent) -> void:
+# 	if event.is_action_pressed("combat_reload"):
+# 		reload_weapon()
 
 func _perform_hitscan_fire() -> void:
 	if current_weapon == null or shoot_position == null:

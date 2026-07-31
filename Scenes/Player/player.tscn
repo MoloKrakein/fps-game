@@ -29,6 +29,7 @@
 [ext_resource type="Script" uid="uid://bdvwooe4dfsx0" path="res://_Assets/Weapon/Scripts/weapon_controller.gd" id="24_qr1w5"]
 [ext_resource type="Script" uid="uid://dwaido63afkrc" path="res://_Assets/Weapon/Scripts/States/weap_empty_state.gd" id="24_rukb4"]
 [ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="25_ythyg"]
+[ext_resource type="Script" uid="uid://vkhddca7hyn2" path="res://_Assets/Weapon/Scripts/States/weap_reloading_state.gd" id="26_1agin"]
 [ext_resource type="Script" uid="uid://fo18j0fu5t4e" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_hipfire_state.gd" id="26_fcwna"]
 [ext_resource type="Script" uid="uid://c4ugr8wbr6sn" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_ads_state.gd" id="27_1agin"]
 [ext_resource type="Script" uid="uid://dm1430qubtqlq" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_canted_state.gd" id="28_2jnj1"]
@@ -312,6 +313,15 @@ script = ExtResource("8_06tpx")
 [node name="EmptyState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1258316839]
 script = ExtResource("8_06tpx")
 
+[node name="ReloadState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1097449954]
+script = ExtResource("8_06tpx")
+
+[node name="OnReloadFinish" type="Node" parent="WeaponStateChart/Root/Trigger/ReloadState" unique_id=326207974]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../IdleState")
+event = &"onReloadFinish"
+delay_in_seconds = "0.0"
+
 [node name="OnIdle" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1258442477]
 script = ExtResource("9_7g0yx")
 to = NodePath("../IdleState")
@@ -328,6 +338,12 @@ delay_in_seconds = "0.0"
 script = ExtResource("9_7g0yx")
 to = NodePath("../EmptyState")
 event = &"onEmpty"
+delay_in_seconds = "0.0"
+
+[node name="OnReload" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=792372889]
+script = ExtResource("9_7g0yx")
+to = NodePath("../ReloadState")
+event = &"onReload"
 delay_in_seconds = "0.0"
 
 [node name="Sight" type="Node" parent="WeaponStateChart/Root" unique_id=243993872]
@@ -387,6 +403,9 @@ script = ExtResource("23_2ahak")
 [node name="EmptyState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=1112135551]
 script = ExtResource("24_rukb4")
 
+[node name="ReloadState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=1196378006]
+script = ExtResource("26_1agin")
+
 [node name="Sight" type="Node" parent="WeaponStateMachine" unique_id=1107421997]
 
 [node name="HipfireState" type="Node" parent="WeaponStateMachine/Sight" unique_id=1580461824]
@@ -438,6 +457,7 @@ shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 [connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/Trigger/FiringState" method="_on_firing_state_state_physics_processing"]
 [connection signal="state_entered" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/Trigger/EmptyState" method="_on_empty_state_state_entered"]
 [connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/Trigger/EmptyState" method="_on_empty_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/ReloadState" to="WeaponStateMachine/Trigger/ReloadState" method="_on_reload_state_state_entered"]
 [connection signal="state_entered" from="WeaponStateChart/Root/Sight/HipfireState" to="WeaponStateMachine/Sight/HipfireState" method="_on_hipfire_state_state_entered"]
 [connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/HipfireState" to="WeaponStateMachine/Sight/HipfireState" method="_on_hipfire_state_state_physics_processing"]
 [connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/AimDownState" to="WeaponStateMachine/Sight/AimingState/ADSState" method="_on_aim_down_state_state_entered"]

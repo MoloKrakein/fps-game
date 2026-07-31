@@ -16,6 +16,8 @@ func _on_idle_state_state_physics_processing(_delta: float) -> void:
 		# print("Firing weapon: %s" % weapon_controller.current_weapon.weapon_name)
 		weapon_controller.weapon_state_chart.send_event("onFiring")
 
+	if Input.is_action_just_pressed("combat_reload"):
+		weapon_controller.weapon_state_chart.send_event("onReload")
 
 	if weapon_controller.current_ammo <= 0:
 		weapon_controller.weapon_state_chart.send_event("onEmpty")
