@@ -3,10 +3,12 @@
 [ext_resource type="Resource" uid="uid://crgpdahjaj" path="res://addons/func_godot/fgd/func_godot_fgd.tres" id="1_pt5he"]
 [ext_resource type="Resource" uid="uid://d0hsap1dciurn" path="res://trenchbroom/fgd/solid/func_moving_platform.tres" id="2_aypyt"]
 [ext_resource type="Script" uid="uid://drlmgulwbjwqu" path="res://addons/func_godot/src/fgd/func_godot_fgd_file.gd" id="2_rrhqs"]
+[ext_resource type="Resource" uid="uid://dkilvm3askjwo" path="res://trenchbroom/fgd/solid/func_border_wall.tres" id="3_aypyt"]
+[ext_resource type="Resource" uid="uid://g7g8k4n2fr0u" path="res://trenchbroom/fgd/solid/func_static_stairs.tres" id="4_sx14s"]
 
 [resource]
 script = ExtResource("2_rrhqs")
 fgd_name = "FPS_game"
 base_fgd_files = Array[Resource]([ExtResource("1_pt5he")])
-entity_definitions = Array[Resource]([ExtResource("2_aypyt")])
+entity_definitions = Array[Resource]([ExtResource("2_aypyt"), ExtResource("3_aypyt"), ExtResource("4_sx14s")])
 metadata/_custom_type_script = "uid://drlmgulwbjwqu"

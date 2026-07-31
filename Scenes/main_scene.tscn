@@ -16,7 +16,7 @@ is_debug_mode = true
 [node name="CurrentLevel" type="Node3D" parent="." unique_id=1396905234]
 
 [node name="PlayerController" parent="CurrentLevel" unique_id=1796224466 instance=ExtResource("2_x6ack")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.39516, 3.3392935, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.39516, 5.3336134, 0)
 default_speed = 6.0
 
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]

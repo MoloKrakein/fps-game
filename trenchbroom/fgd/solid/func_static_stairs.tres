@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FuncGodotFGDSolidClass" format=3 uid="uid://g7g8k4n2fr0u"]
+
+[ext_resource type="Script" uid="uid://5cow84q03m6a" path="res://addons/func_godot/src/fgd/func_godot_fgd_solid_class.gd" id="1_ar775"]
+[ext_resource type="Script" uid="uid://dv4qflp5w4pxa" path="res://_Assets/Env/static_stairs.gd" id="2_ogdd2"]
+
+[resource]
+script = ExtResource("1_ar775")
+script_class = ExtResource("2_ogdd2")
+classname = "static_stairs"
+description = "set this object collision layer so player can walk into it"
+metadata/_custom_type_script = "uid://5cow84q03m6a"

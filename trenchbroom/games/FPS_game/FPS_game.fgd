@@ -34,9 +34,13 @@
 @SolidClass color(204 204 204) = movement_movingplatform : "platform that moving
 " 
 [
-	move_speed(float) : "" : "0.0"
-	wait_time(float) : "" : "0.0"
-	start_position(string) : "" : "0.0 0.0 0.0"
 	end_position(string) : "" : "0.0 0.0 0.0"
 	move_direction(string) : "" : "0.0 0.0 0.0"
+	move_speed(float) : "" : "0.0"
+	start_position(string) : "" : "0.0 0.0 0.0"
+	wait_time(float) : "" : "0.0"
 ]
+
+@SolidClass color(204 204 204) = static_BorderWall : "set layer collision of that object to border wall so player can't try to climbing that" []
+
+@SolidClass color(204 204 204) = static_stairs : "set this object collision layer so player can walk into it" []

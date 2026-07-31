@@ -35,10 +35,6 @@ folder_colors={
 "res://trenchbroom/": "red"
 }
 
-[filesystem]
-
-import/blender/enabled=false
-
 [input]
 
 move_forward={
@@ -111,6 +107,7 @@ dev_reload={
 
 [layer_names]
 
+3d_physics/layer_2="Stairs"
 3d_physics/layer_3="Wall"
 
 [physics]
