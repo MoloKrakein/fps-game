@@ -29,7 +29,7 @@ func _ready() -> void:
 	_rotation = player_controller.rotation
 	offset_height = DEFAULT_HEIGHT
 
-func update_camera_rotation(input: Vector2) -> void:
+func update_camera_rotation(input: Vector2, delta: float) -> void:
 	_rotation.x += input.y * (1 if is_Vertical_inverted else -1)
 	_rotation.y += input.x * (1 if is_Horizontal_inverted else -1)
 	_rotation.x = clamp(_rotation.x, deg_to_rad(tilt_low_limit), deg_to_rad(tilt_high_limit))
@@ -46,7 +46,7 @@ func update_camera_rotation(input: Vector2) -> void:
 
 func _process(delta: float) -> void:
 	if component_mouse_capture._mouse_input != Vector2.ZERO:
-		update_camera_rotation(component_mouse_capture._mouse_input)
+		update_camera_rotation(component_mouse_capture._mouse_input,delta)
 	
 	if _step_smoothing:
 		_target_h = lerp(_target_h, 0.0, step_speed * delta)

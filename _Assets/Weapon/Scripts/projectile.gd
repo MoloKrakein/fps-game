@@ -26,7 +26,7 @@ func _physics_process(delta: float) -> void:
 	query.exclude = [self]  # Exclude the projectile itself from the raycast
 	query.collision_mask = 1  # Set the collision mask to detect only relevant layers
 	var result = space_state.intersect_ray(query)
-
+	
 	if result:
 		global_position = result.position
 		_on_body_entered(result.collider)
