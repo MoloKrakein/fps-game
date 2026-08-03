@@ -1,9 +1,13 @@
 [gd_scene format=3 uid="uid://hwk6pn368wgi"]
 
 [ext_resource type="Script" uid="uid://crlytgfbv16cg" path="res://_Assets/Managers/GameManager/game_manager.gd" id="1_jv6wh"]
+[ext_resource type="Script" uid="uid://cb46sur18xpqo" path="res://_Assets/Managers/WeaponManager/weapon_manager.gd" id="2_huasi"]
 [ext_resource type="PackedScene" uid="uid://boarmlj6juypt" path="res://Scenes/UI/UserInterface_Scene.tscn" id="2_jv6wh"]
 [ext_resource type="PackedScene" uid="uid://df68lxky3tvad" path="res://Scenes/Player/player.tscn" id="2_x6ack"]
 [ext_resource type="PackedScene" uid="uid://ddk12wbbbxwfx" path="res://Scenes/Level/trenchbroom_test.tscn" id="3_iacmt"]
+[ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="3_m1efj"]
+[ext_resource type="Resource" uid="uid://b7asglgx28t27" path="res://Resources/Weapons/pistol_data.tres" id="4_mai8y"]
+[ext_resource type="Resource" uid="uid://b4wuvyceoofh6" path="res://Resources/Weapons/sg_data.tres" id="5_76v2p"]
 
 [node name="MainScene" type="Node" unique_id=1881302021]
 
@@ -12,6 +16,14 @@
 [node name="GameManager" type="Node" parent="Managers" unique_id=468431270]
 script = ExtResource("1_jv6wh")
 is_debug_mode = true
+
+[node name="WeaponManager" type="Node" parent="Managers" unique_id=1093545452 node_paths=PackedStringArray("player")]
+script = ExtResource("2_huasi")
+weapons = Dictionary[int, ExtResource("3_m1efj")]({
+1: ExtResource("4_mai8y"),
+2: ExtResource("5_76v2p")
+})
+player = NodePath("../../CurrentLevel/PlayerController")
 
 [node name="CurrentLevel" type="Node3D" parent="." unique_id=1396905234]
 

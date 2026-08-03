@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://b4wuvyceoofh6"]
+
+[ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="1_xkeux"]
+[ext_resource type="Resource" uid="uid://csw2i3ljsxa6g" path="res://Resources/Weapons/sg.tres" id="2_aiw6n"]
+
+[resource]
+script = ExtResource("1_xkeux")
+weapon = ExtResource("2_aiw6n")
+is_unlocked = true
+metadata/_custom_type_script = "uid://qd0wv6hu5uby"

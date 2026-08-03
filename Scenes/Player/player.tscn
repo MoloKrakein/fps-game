@@ -42,12 +42,13 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
-[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "step_handler")]
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "step_handler") groups=["player"]]
 process_priority = -9
 collision_layer = 0
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
+weapon_controller = NodePath("Component/WeaponController")
 standing_col = NodePath("StandCollider")
 crouching_col = NodePath("CrouchCollider")
 crouch_check = NodePath("CrouchCheck")

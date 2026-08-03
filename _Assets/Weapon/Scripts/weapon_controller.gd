@@ -182,9 +182,6 @@ func execute_reload() -> void:
 		is_loaded = true
 		print("Reloaded and chambered a round. Mag:", current_ammo, "Reserve:", reserve_ammo)
 		return
-	else:
-		# Chamber already had a round; magazine count stays as transferred
-		print("Reloaded. Mag:", current_ammo, "Reserve:", reserve_ammo)
 #endregion
 
 
@@ -203,6 +200,12 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 		var muzzle = current_weapon_model.get_node_or_null("Muzzle") as Node3D
 		if muzzle != null:
 			shoot_position = muzzle
+
+func switch_weapon(weapon_data:WeaponData) -> void:
+	current_weapon = weapon_data.weapon
+	if current_weapon_model:
+		current_weapon_model.queue_free()
+	spawn_weapon_model(weapon_data.weapon)
 #endregion
 
 

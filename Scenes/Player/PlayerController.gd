@@ -5,6 +5,7 @@ class_name PlayerController extends CharacterBody3D
 @export_category("References")
 @export var camera : CameraController
 @export var state_chart : StateChart
+@export var weapon_controller: WeaponController
 @export var standing_col: CollisionShape3D
 @export var crouching_col: CollisionShape3D
 @export var crouch_check: ShapeCast3D
@@ -51,6 +52,9 @@ var is_crouching: bool = false
 var is_sprinting: bool = false
 var is_sliding: bool = false
 
+
+func equip_weapon(weapon_data: WeaponData) -> void:
+	weapon_controller.switch_weapon(weapon_data)
 
 func _physics_process(delta: float) -> void:
 	
