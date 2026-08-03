@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://cfdj0j3pd1bfv"]
+
+[ext_resource type="Script" uid="uid://dx7xk2xtrsfsk" path="res://_Assets/Weapon/Scripts/projectile.gd" id="1_n5npx"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vx3u4"]
+albedo_color = Color(0.35906908, 0.35906908, 0.35906908, 1)
+metallic = 0.51
+metallic_specular = 0.67
+
+[sub_resource type="SphereMesh" id="SphereMesh_o08ba"]
+material = SubResource("StandardMaterial3D_vx3u4")
+
+[node name="Buckshot" type="Area3D" unique_id=1064984374]
+transform = Transform3D(0.08, 0, 0, 0, 0.08, 0, 0, 0, 0.08, 0, 0, 0)
+script = ExtResource("1_n5npx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1570507745]
+shape = SubResource("SphereShape3D_o08ba")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=446356486]
+mesh = SubResource("SphereMesh_o08ba")
