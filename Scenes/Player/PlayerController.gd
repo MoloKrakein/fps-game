@@ -152,7 +152,6 @@ func start_slide() -> void:
 	# disable wasd movement input while sliding
 	disable_movement()
 
-
 	
 func can_slide() -> bool:
 	if _current_slide_cooldown > 0.0:

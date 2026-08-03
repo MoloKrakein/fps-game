@@ -21,7 +21,7 @@ func handle_step_climbing():
 			var measured_height = _measure_step_height(collision)
 			
 			# Using the corrected max_step_height variable
-			if measured_height > MIN_STEP_HEIGHT and measured_height <= max_step_height and _is_valid_step_dir(collision):
+			if measured_height > MIN_STEP_HEIGHT and measured_height <= max_step_height and _is_valid_step_dir(collision) and not player.is_sliding:
 				step_status = "Step detected with height: " + str(measured_height)
 				player.global_position.y += measured_height
 				player.velocity = player.previous_velocity
@@ -70,15 +70,16 @@ func _measure_step_height(collision: KinematicCollision3D) -> float:
 	var player_feet_pos = _get_player_feet_position()
 	
 	# Check slightly below max step height so we don't accidentally measure the roof!
-	var check_height = player_feet_pos.y + max_step_height + 0.05 
+	# var check_height = player_feet_pos.y + max_step_height + 0.05 
+	var player_head_pos = player.global_position.y + (player.standing_col.shape.height / 2) + max_step_height + 0.05 # Check slightly above max step height to avoid roof collisions
 
 	# Calculate inward shift based on the wall's normal
 	# This pushes the ray 5cm DEEP into the step to avoid the mathematical edge
 	var inward_shift = -collision.get_normal() * 0.05
 	inward_shift.y = 0.0
 
-	var ray_start = Vector3(collision_point.x + inward_shift.x, check_height, collision_point.z + inward_shift.z)
-	var ray_end = Vector3(collision_point.x + inward_shift.x, player_feet_pos.y, collision_point.z + inward_shift.z)
+	var ray_start = Vector3(collision_point.x, player_head_pos, collision_point.z)
+	var ray_end = Vector3(collision_point.x, player_feet_pos.y, collision_point.z)
 
 	var query = PhysicsRayQueryParameters3D.create(ray_start, ray_end)
 	query.collision_mask = player.collision_mask

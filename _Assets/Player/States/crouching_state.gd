@@ -20,5 +20,6 @@ func _on_crouching_state_physics_processing(delta: float) -> void:
 
 func _on_crouching_state_entered() -> void:
 	# pass # Replace with function body.
+	player_controller.slide_modifier = 0.0
 	player_controller.crouch()
 	# print("Crouching State Entered")

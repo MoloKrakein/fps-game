@@ -16,7 +16,7 @@ func _on_sliding_state_physics_processing(delta: float) -> void:
 	player_controller.slide_modifier = player_controller.slide_power * (_slide_timer / player_controller.slide_duration)
 
 	
-	if _slide_timer <= 0.0:
+	if _slide_timer <= 0.0 or player_controller.velocity.length() < 0.1:
 		# end_slide() is now called, which will trigger the cooldown timer!
 		player_controller.state_chart.send_event("onCrouching")
 
