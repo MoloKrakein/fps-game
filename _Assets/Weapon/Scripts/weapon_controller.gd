@@ -147,6 +147,7 @@ func fire_weapon() -> void:
 func _cycle_weapon() -> void:
 	if current_weapon == null:
 		return
+		
 	is_loaded = false
 
 	if current_ammo > 0:
@@ -176,10 +177,13 @@ func execute_reload() -> void:
 
 	# If chamber empty, chamber a round (consume one from magazine)
 	if not is_loaded and current_ammo > 0:
-		current_ammo -= 1
+		# Consume one round from the magazine to chamber it
+		current_ammo = max(current_ammo - 1, 0)
 		is_loaded = true
 		print("Reloaded and chambered a round. Mag:", current_ammo, "Reserve:", reserve_ammo)
+		return
 	else:
+		# Chamber already had a round; magazine count stays as transferred
 		print("Reloaded. Mag:", current_ammo, "Reserve:", reserve_ammo)
 #endregion
 
