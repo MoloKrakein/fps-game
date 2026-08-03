@@ -53,9 +53,6 @@ var is_sprinting: bool = false
 var is_sliding: bool = false
 
 
-func equip_weapon(weapon_data: WeaponData) -> void:
-	weapon_controller.switch_weapon(weapon_data)
-
 func _physics_process(delta: float) -> void:
 	
 #region Physics Process

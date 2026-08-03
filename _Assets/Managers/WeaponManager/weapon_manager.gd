@@ -28,7 +28,7 @@ func equip_weapon(slot: int) -> void:
 
 	if weapon_data and weapon_data.is_unlocked:
 		current_weap_slot = slot
-		player.equip_weapon(weapon_data.weapon)
+		player.weapon_controller.switch_weapon(weapon_data)
 
 
 func use_ammo(slot: int, amount: int) -> void:
