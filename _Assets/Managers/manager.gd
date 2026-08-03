@@ -1,4 +1,4 @@
-extends Node
+class_name Managers extends Node
 
 var weapon_manager: WeaponManager
 # Called when the node enters the scene tree for the first time.
