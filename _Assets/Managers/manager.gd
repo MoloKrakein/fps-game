@@ -1,9 +1,10 @@
-class_name Managers extends Node
+extends Node
 
 var weapon_manager: WeaponManager
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	call_deferred("find_managers")
+	Manager.weapon_manager = weapon_manager
 
 
 func find_managers() -> void:

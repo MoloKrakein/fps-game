@@ -75,8 +75,6 @@ enum WeaponAmmoType {
 const METERS_PER_WORLD_UNIT: float = 1.0
 
 
-
-
 func get_muzzle_velocity_mps() -> float:
 	return maxf(projectile_speed / METERS_PER_WORLD_UNIT, 0.0)
 

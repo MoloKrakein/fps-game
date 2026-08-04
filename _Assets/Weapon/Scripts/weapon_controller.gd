@@ -37,7 +37,6 @@ var current_fire_mode: Weapon.WeaponFireMode
 var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
 var burst_shots_remaining: int = 0
-var weapon_data: WeaponData
 
 const DEFAULT_BURST_SHOTS_PER_TRIGGER: int = 3
 
@@ -46,12 +45,10 @@ func _ready() -> void:
 	if current_weapon != null:
 		spawn_weapon_model(current_weapon)
 		# Initialize magazine and reserve from weapon stats
-
 		current_ammo = current_weapon.mags_ammo
 		reserve_ammo = current_weapon.max_ammo
 		current_fire_mode = current_weapon.fire_mode
 		is_loaded = current_ammo > 0
-		# Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]._init_from_weapon()
 
 	player = get_parent() as PlayerController
 	print("hipfire position: ", current_weapon.weapon_position, " hipfire rotation: ", current_weapon.weapon_rotation)
@@ -85,7 +82,7 @@ func stop_trigger() -> void:
 func toggle_fire_mode() -> void:
 	if not current_weapon.can_change_fire_mode:
 		return
-	match weapon_data.fire_mode:
+	match current_fire_mode:
 		Weapon.WeaponFireMode.SEMI_AUTO:
 			if current_weapon.has_burst_mode:
 				current_fire_mode = Weapon.WeaponFireMode.BURST
@@ -106,11 +103,10 @@ func reset_trigger() -> void:
 	burst_shots_remaining = 0
 
 func can_fire() -> bool:
-	weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
 	if current_weapon == null:
 		return false
 
-	if not weapon_data.is_loaded or fire_timer > 0.0:
+	if not is_loaded or fire_timer > 0.0:
 		return false
 
 	match current_fire_mode:
@@ -149,59 +145,63 @@ func fire_weapon() -> void:
 		# print("Fired weapon: %s, Remaining ammo: %d" % [current_weapon.weapon_name, current_ammo])
 
 func _cycle_weapon() -> void:
-	weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
 	if current_weapon == null:
 		return
 		
-	weapon_data.is_loaded = false
+	is_loaded = false
 
-	if weapon_data.ammo_in_magazine > 0:
-		weapon_data.ammo_in_magazine -= 1
-		weapon_data.is_loaded = true
+	if current_ammo > 0:
+		current_ammo -= 1
+		is_loaded = true
 	else:
 		print("Out of ammo for weapon: %s" % current_weapon.weapon_name)
 
-	# Keep controller-local copies in sync
-	current_ammo = weapon_data.ammo_in_magazine
-	reserve_ammo = weapon_data.reserve_ammo
-	is_loaded = weapon_data.is_loaded
-
 func execute_reload() -> void:
-	weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
 	# This function is now ONLY called by the State Chart when the reload timer finishes
+	reset_trigger()
+
 	if current_weapon == null:
 		return
 
-	if weapon_data.reserve_ammo <= 0:
+	if reserve_ammo <= 0:
 		print("No reserve ammo to reload.")
 		return
-
+	
 	var mag_capacity = current_weapon.mags_ammo
-	var needed = max(mag_capacity - weapon_data.ammo_in_magazine, 0)
-	if needed == 0:
-		print("Magazine already full. Mag:", weapon_data.ammo_in_magazine, "Reserve:", weapon_data.reserve_ammo)
+	if current_ammo >= mag_capacity:
+		print("Magazine already full. Mag:", current_ammo, "Reserve:", reserve_ammo)
 		return
+	current_ammo = min(mag_capacity, current_ammo + reserve_ammo)
+	reserve_ammo = max(0, reserve_ammo - (mag_capacity - current_ammo))
+	
+	if not is_loaded and current_ammo > 0:
+		_cycle_weapon()
 
-	var transfer = min(needed, weapon_data.reserve_ammo)
-	weapon_data.ammo_in_magazine += transfer
-	weapon_data.reserve_ammo = max(weapon_data.reserve_ammo - transfer, 0)
 
-	# If chamber empty, chamber a round (consume one from magazine)
-	if not weapon_data.is_loaded and weapon_data.ammo_in_magazine > 0:
-		# Consume one round from the magazine to chamber it
-		weapon_data.ammo_in_magazine = max(weapon_data.ammo_in_magazine - 1, 0)
-		weapon_data.is_loaded = true
-		# Sync controller-local values
-		current_ammo = weapon_data.ammo_in_magazine
-		reserve_ammo = weapon_data.reserve_ammo
-		is_loaded = weapon_data.is_loaded
-		print("Reloaded and chambered a round. Mag:", weapon_data.ammo_in_magazine, "Reserve:", weapon_data.reserve_ammo)
-		return
+	# if current_weapon == null:
+	# 	return
 
-	# Sync controller-local values after reload
-	current_ammo = weapon_data.ammo_in_magazine
-	reserve_ammo = weapon_data.reserve_ammo
-	is_loaded = weapon_data.is_loaded
+	# if reserve_ammo <= 0:
+	# 	print("No reserve ammo to reload.")
+	# 	return
+
+	# var mag_capacity = current_weapon.mags_ammo
+	# var needed = max(mag_capacity - current_ammo, 0)
+	# if needed == 0:
+	# 	print("Magazine already full. Mag:", current_ammo, "Reserve:", reserve_ammo)
+	# 	return
+
+	# var transfer = min(needed, reserve_ammo)
+	# current_ammo += transfer
+	# reserve_ammo -= transfer
+
+	# # If chamber empty, chamber a round (consume one from magazine)
+	# if not is_loaded:
+	# 	# Consume one round from the magazine to chamber it
+	# 	print("Reloaded and chambered a round. Mag:", current_ammo, "Reserve:", reserve_ammo)
+	# 	_cycle_weapon()
+	# 	return
+	
 #endregion
 
 
@@ -226,20 +226,6 @@ func switch_weapon(weapon_data:WeaponData) -> void:
 	if current_weapon_model:
 		current_weapon_model.queue_free()
 	spawn_weapon_model(weapon_data.weapon)
-
-	# Sync controller state from the WeaponData so ammo/reserve/is_loaded match
-	self.weapon_data = weapon_data
-	if weapon_data:
-		current_ammo = weapon_data.ammo_in_magazine
-		reserve_ammo = weapon_data.reserve_ammo
-		current_fire_mode = weapon_data.current_fire_mode
-		is_loaded = weapon_data.is_loaded
-	else:
-		current_ammo = 0
-		reserve_ammo = 0
-		is_loaded = false
-
-	print("Switched weapon: %s — Mag:%d Reserve:%d Loaded:%s" % [current_weapon.weapon_name if current_weapon else "<none>", current_ammo, reserve_ammo, str(is_loaded)])
 #endregion
 
 

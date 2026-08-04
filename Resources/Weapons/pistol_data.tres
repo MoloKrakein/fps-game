@@ -7,4 +7,6 @@
 script = ExtResource("1_5ows3")
 weapon = ExtResource("2_1gkjs")
 is_unlocked = true
+ammo_in_magazine = 7
+reserve_ammo = 800
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"
