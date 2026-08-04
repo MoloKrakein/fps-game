@@ -31,7 +31,7 @@ func equip_weapon(slot: int) -> void:
 		player.weapon_controller.switch_weapon(weapon_data)
 
 
-func use_ammo(slot: int, amount: int) -> void:
+func use_ammo(slot: int, amount: int = 1) -> void:
 	if slot in weapons:
 		weapons[slot].ammo_in_magazine = max(0,weapons[slot].ammo_in_magazine - amount)
 		weapons[slot].reserve_ammo = max(0,weapons[slot].reserve_ammo - amount)
@@ -39,3 +39,6 @@ func use_ammo(slot: int, amount: int) -> void:
 
 func get_current_ammo() -> int:
 	return weapons[current_weap_slot].ammo_in_magazine if current_weap_slot in weapons else 0
+
+func get_reserve_ammo() -> int:
+	return weapons[current_weap_slot].reserve_ammo if current_weap_slot in weapons else 0

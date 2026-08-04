@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://csw2i3ljsxa6g"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_awtbi"]
-[ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="1_i6r2f"]
+[ext_resource type="PackedScene" uid="uid://cfdj0j3pd1bfv" path="res://Art/Assets/Weapon/Projectile/buckshot.tscn" id="1_i6r2f"]
 [ext_resource type="PackedScene" uid="uid://6baebp0xgdtr" path="res://Art/Assets/Weapon/SG/sg_model.tscn" id="3_dv3g3"]
 
 [resource]
