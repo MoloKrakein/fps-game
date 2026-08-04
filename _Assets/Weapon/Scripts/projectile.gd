@@ -5,6 +5,7 @@ var damage: float
 var trail_start_timer: Timer
 
 @export var trail_effect: MeshInstance3D
+# @export var trail_effect: GPUParticles3D
 @export var is_tracer: bool = false
 
 
