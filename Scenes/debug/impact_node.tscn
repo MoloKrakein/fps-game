@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://j7vugwdi3el5"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vx3u4"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_o08ba"]
+material = SubResource("StandardMaterial3D_vx3u4")
+radius = 0.1
+height = 0.1
+radial_segments = 4
+rings = 1
+
+[node name="ImpactNode" type="Node3D" unique_id=646890608]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1392542599]
+mesh = SubResource("SphereMesh_o08ba")
