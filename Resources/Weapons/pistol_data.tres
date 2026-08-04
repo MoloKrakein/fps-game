@@ -9,4 +9,5 @@ weapon = ExtResource("2_1gkjs")
 is_unlocked = true
 ammo_in_magazine = 7
 reserve_ammo = 800
+is_loaded = true
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"

@@ -37,7 +37,6 @@ var current_fire_mode: Weapon.WeaponFireMode
 var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
 var burst_shots_remaining: int = 0
-var w_data: WeaponData
 const DEFAULT_BURST_SHOTS_PER_TRIGGER: int = 3
 
 #region Lifecycle
@@ -103,10 +102,11 @@ func reset_trigger() -> void:
 	burst_shots_remaining = 0
 
 func can_fire() -> bool:
+	var weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
 	if current_weapon == null:
 		return false
 
-	if not is_loaded or fire_timer > 0.0:
+	if not weapon_data.is_loaded or fire_timer > 0.0:
 		return false
 
 	match current_fire_mode:
@@ -150,13 +150,14 @@ func _cycle_weapon() -> void:
 	if current_weapon == null:
 		return
 		
-	is_loaded = false
+	weapon_data.is_loaded = false
 
 	if weapon_data.ammo_in_magazine > 0:
 		weapon_data.ammo_in_magazine -= 1
-		is_loaded = true
-	else:
-		print("Out of ammo for weapon: %s" % current_weapon.weapon_name)
+		weapon_data.is_loaded = true
+		print("loaded ", weapon_data.is_loaded)
+	# else:
+	# 	print("Out of ammo for weapon: %s" % weapon_data.weapon_name)
 
 func execute_reload() -> void:
 	var weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
@@ -174,10 +175,13 @@ func execute_reload() -> void:
 	if weapon_data.ammo_in_magazine >= mag_capacity:
 		print("Magazine already full. Mag:", weapon_data.ammo_in_magazine, "Reserve:", weapon_data.reserve_ammo)
 		return
-	weapon_data.ammo_in_magazine = min(mag_capacity, weapon_data.ammo_in_magazine + weapon_data.reserve_ammo)
-	weapon_data.reserve_ammo = max(0, weapon_data.reserve_ammo - (mag_capacity - weapon_data.ammo_in_magazine))
-	
-	if not is_loaded and weapon_data.ammo_in_magazine > 0:
+	var needed = mag_capacity - weapon_data.ammo_in_magazine
+	var transfer = min(needed, weapon_data.reserve_ammo)
+	weapon_data.ammo_in_magazine += transfer
+	# update reserve ammo after transferring to magazine
+	weapon_data.reserve_ammo -= transfer
+
+	if not weapon_data.is_loaded and weapon_data.ammo_in_magazine > 0:
 		_cycle_weapon()
 
 

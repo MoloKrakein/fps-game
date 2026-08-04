@@ -24,4 +24,4 @@ func _process(delta: float) -> void:
 		weapon_controller.weapon_state_chart.set_expression_property("Reserve Ammo", weapon_data.reserve_ammo)
 		weapon_controller.weapon_state_chart.set_expression_property("Can Fire", weapon_controller.can_fire())
 		weapon_controller.weapon_state_chart.set_expression_property("Fire Mode", weapon_controller.current_fire_mode)
-		weapon_controller.weapon_state_chart.set_expression_property("Bullet in chamber ?",weapon_controller.is_loaded)
+		weapon_controller.weapon_state_chart.set_expression_property("Bullet in chamber ?",weapon_data.is_loaded)
