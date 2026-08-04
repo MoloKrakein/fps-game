@@ -18,9 +18,10 @@ func _inject_references(node: Node) -> void:
 
 func _process(delta: float) -> void:
 	# Update any relevant properties in the state chart
+	var weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
 	if weapon_controller or debug:
-		weapon_controller.weapon_state_chart.set_expression_property("Current Ammo", weapon_controller.current_ammo)
-		weapon_controller.weapon_state_chart.set_expression_property("Reserve Ammo", weapon_controller.reserve_ammo)
+		weapon_controller.weapon_state_chart.set_expression_property("Current Ammo", weapon_data.ammo_in_magazine)
+		weapon_controller.weapon_state_chart.set_expression_property("Reserve Ammo", weapon_data.reserve_ammo)
 		weapon_controller.weapon_state_chart.set_expression_property("Can Fire", weapon_controller.can_fire())
 		weapon_controller.weapon_state_chart.set_expression_property("Fire Mode", weapon_controller.current_fire_mode)
 		weapon_controller.weapon_state_chart.set_expression_property("Bullet in chamber ?",weapon_controller.is_loaded)

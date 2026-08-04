@@ -37,7 +37,7 @@ var current_fire_mode: Weapon.WeaponFireMode
 var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
 var burst_shots_remaining: int = 0
-
+var w_data: WeaponData
 const DEFAULT_BURST_SHOTS_PER_TRIGGER: int = 3
 
 #region Lifecycle
@@ -229,6 +229,7 @@ func switch_weapon(weapon_data:WeaponData) -> void:
 	if current_weapon_model:
 		current_weapon_model.queue_free()
 	spawn_weapon_model(weapon_data.weapon)
+	weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
 #endregion
 
 
