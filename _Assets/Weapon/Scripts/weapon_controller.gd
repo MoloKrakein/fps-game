@@ -145,36 +145,39 @@ func fire_weapon() -> void:
 		# print("Fired weapon: %s, Remaining ammo: %d" % [current_weapon.weapon_name, current_ammo])
 
 func _cycle_weapon() -> void:
+	var weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
+
 	if current_weapon == null:
 		return
 		
 	is_loaded = false
 
-	if current_ammo > 0:
-		current_ammo -= 1
+	if weapon_data.ammo_in_magazine > 0:
+		weapon_data.ammo_in_magazine -= 1
 		is_loaded = true
 	else:
 		print("Out of ammo for weapon: %s" % current_weapon.weapon_name)
 
 func execute_reload() -> void:
+	var weapon_data = Manager.weapon_manager.weapons[Manager.weapon_manager.current_weap_slot]
 	# This function is now ONLY called by the State Chart when the reload timer finishes
 	reset_trigger()
 
 	if current_weapon == null:
 		return
 
-	if reserve_ammo <= 0:
+	if weapon_data.reserve_ammo <= 0:
 		print("No reserve ammo to reload.")
 		return
 	
 	var mag_capacity = current_weapon.mags_ammo
-	if current_ammo >= mag_capacity:
-		print("Magazine already full. Mag:", current_ammo, "Reserve:", reserve_ammo)
+	if weapon_data.ammo_in_magazine >= mag_capacity:
+		print("Magazine already full. Mag:", weapon_data.ammo_in_magazine, "Reserve:", weapon_data.reserve_ammo)
 		return
-	current_ammo = min(mag_capacity, current_ammo + reserve_ammo)
-	reserve_ammo = max(0, reserve_ammo - (mag_capacity - current_ammo))
+	weapon_data.ammo_in_magazine = min(mag_capacity, weapon_data.ammo_in_magazine + weapon_data.reserve_ammo)
+	weapon_data.reserve_ammo = max(0, weapon_data.reserve_ammo - (mag_capacity - weapon_data.ammo_in_magazine))
 	
-	if not is_loaded and current_ammo > 0:
+	if not is_loaded and weapon_data.ammo_in_magazine > 0:
 		_cycle_weapon()
 
 
