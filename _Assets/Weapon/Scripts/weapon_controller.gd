@@ -41,10 +41,11 @@ func _ready() -> void:
 		reserve_ammo = current_weapon.max_ammo
 		current_fire_mode = current_weapon.fire_mode
 		is_loaded = current_ammo > 0
-
+	# get active weapon data from the WeaponManager
+	
 	player = get_parent() as PlayerController
-	if current_weapon:
-		print("hipfire position: ", current_weapon.weapon_position, " hipfire rotation: ", current_weapon.weapon_rotation)
+
+	
 
 func _process(delta: float) -> void:
 	if fire_timer > 0.0:
@@ -309,3 +310,12 @@ func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3
 	aim_tween.tween_property(current_weapon_model, "position", target_position, AIM_SPEED)
 	aim_tween.tween_property(current_weapon_model, "rotation", target_rotation, AIM_SPEED)
 #endregion
+
+func initialize_weapon_data(weapon_data: WeaponData) -> void:
+	if weapon_data == null:
+		return
+
+	active_weapon_data = weapon_data
+	current_ammo = weapon_data.ammo_in_magazine
+	reserve_ammo = weapon_data.reserve_ammo
+	is_loaded = weapon_data.is_loaded
