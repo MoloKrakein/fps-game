@@ -44,6 +44,11 @@ func setup(_velocity: Vector3, _damage: float) -> void:
 func _on_body_entered(body: Node3D) -> void:
 	print("Projectile hit: ", body)
 	_spawn_impact_effect(global_position)
+	
+	var health_component = body.get_node_or_null("HealthComponent")
+	if health_component and health_component is HealthComponent:
+		health_component.take_damage(damage, owner)
+
 	queue_free()
 
 func _spawn_impact_effect(hit_position: Vector3) -> void:

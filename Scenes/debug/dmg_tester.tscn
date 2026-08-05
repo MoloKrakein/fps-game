@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dvd2dyo0ite51"]
+
+[ext_resource type="Script" uid="uid://c1fw70k74r74w" path="res://Scenes/debug/dmg_tester.gd" id="1_ld45n"]
+[ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="1_mdfkn"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o08ba"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_o08ba"]
+
+[node name="StaticBody3D" type="StaticBody3D" unique_id=1339061370]
+script = ExtResource("1_ld45n")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1798139819]
+shape = SubResource("BoxShape3D_o08ba")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=575639832]
+mesh = SubResource("BoxMesh_o08ba")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=580911915]
+script = ExtResource("1_mdfkn")
+
+[connection signal="died" from="HealthComponent" to="." method="_on_health_component_died"]

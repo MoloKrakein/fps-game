@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://b7slawfhohc4c" path="res://Scenes/Level/pickups/ammo_pickup.tscn" id="10_b1bvi"]
 [ext_resource type="PackedScene" uid="uid://dy7cjm0lujfkn" path="res://Scenes/Level/pickups/weapon_pickup.tscn" id="10_mrt38"]
 [ext_resource type="Script" uid="uid://cl32yfvelp6iy" path="res://_Assets/Env/pickups/ammo_pickup.gd" id="11_kmrk6"]
+[ext_resource type="PackedScene" uid="uid://dvd2dyo0ite51" path="res://Scenes/debug/dmg_tester.tscn" id="12_kmrk6"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_bvu62"]
 _surfaces = [{
@@ -263,6 +264,9 @@ transform = Transform3D(0.97893196, 0.20418677, 0, -0.1499749, 0.7190242, 0.6786
 light_bake_mode = 1
 shadow_normal_bias = 0.0
 shadow_opacity = 0.8
+
+[node name="StaticBody3D" parent="Environment" unique_id=1339061370 instance=ExtResource("12_kmrk6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.153877, 4.0144367, 0)
 
 [node name="BasePickup" parent="." unique_id=418274648 instance=ExtResource("10_mrt38")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.653402, 2.8730125, -0.15212488)

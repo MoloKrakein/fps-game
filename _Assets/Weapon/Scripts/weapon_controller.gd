@@ -204,6 +204,17 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	if current_weapon_model:
 		current_weapon_model.queue_free()
 	spawn_weapon_model(weapon_data.weapon)
+
+func has_ammo() -> bool:
+	return active_weapon_data != null and (active_weapon_data.ammo_in_magazine > 0 or active_weapon_data.reserve_ammo > 0)
+
+func _apply_damage_to_target(target: Node3D, damage: float) -> void:
+	if target == null or damage <= 0:
+		return
+
+	var health_component = target.get_node_or_null("HealthComponent")
+	if health_component and health_component.has_method("take_damage"):
+		health_component.take_damage(current_weapon.damage, owner)
 #endregion
 
 #region Firing Implementations
@@ -233,6 +244,7 @@ func _perform_hitscan_fire() -> void:
 
 		if result:
 			_spawn_impact_effect(result.position)
+			_apply_damage_to_target(result.collider, current_weapon.damage)
 
 func _spawn_impact_effect(hit_position: Vector3) -> void:
 	# Instantiate the preloaded scene to avoid brutal Garbage Collection spikes
