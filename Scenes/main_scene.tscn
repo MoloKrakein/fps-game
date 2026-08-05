@@ -29,6 +29,7 @@ player = NodePath("../../CurrentLevel/PlayerController")
 
 [node name="PlayerController" parent="CurrentLevel" unique_id=1796224466 instance=ExtResource("2_x6ack")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.39516, 5.3336134, 0)
+collision_mask = 3
 default_speed = 6.0
 
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]

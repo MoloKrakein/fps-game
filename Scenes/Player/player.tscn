@@ -428,7 +428,7 @@ script = ExtResource("2_xpcdj")
 [node name="StepHandler" type="Node" parent="Component" unique_id=1782951827 node_paths=PackedStringArray("player")]
 script = ExtResource("23_jincj")
 player = NodePath("../..")
-max_step_height = 0.45
+max_step_height = 0.6
 
 [node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position")]
 script = ExtResource("24_qr1w5")

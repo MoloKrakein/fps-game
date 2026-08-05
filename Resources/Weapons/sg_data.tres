@@ -6,7 +6,6 @@
 [resource]
 script = ExtResource("1_xkeux")
 weapon = ExtResource("2_aiw6n")
-is_unlocked = true
 ammo_in_magazine = 8
 reserve_ammo = 80
 is_loaded = true

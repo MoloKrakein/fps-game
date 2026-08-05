@@ -53,6 +53,12 @@ func get_current_weapon_data() -> WeaponData:
 func get_is_loaded() -> bool:
 	return weapons[current_weap_slot].is_loaded if current_weap_slot in weapons else false
 
+func unlock_weapon(slot: int, weapon_resource: Weapon) -> void:
+	if slot in weapons:
+		weapons[slot].weapon = weapon_resource
+		weapons[slot].is_unlocked = true
+		weapons[slot].reserve_ammo = weapon_resource.max_ammo
+
 # func initialize_starting_weapon(weapon_data: WeaponData) -> void:
 # 	for slot in range(1, 10):
 # 		if weapons.has(slot) and weapons[slot].is_unlocked:

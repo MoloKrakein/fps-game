@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dy7cjm0lujfkn"]
+
+[ext_resource type="PackedScene" uid="uid://b8nr6hmx4x7h0" path="res://Scenes/Level/pickups/base_pickup.tscn" id="1_oxpxr"]
+[ext_resource type="Script" uid="uid://b5rhv4tengixq" path="res://_Assets/Env/pickups/weapon_pickup.gd" id="2_j5j5o"]
+[ext_resource type="Resource" uid="uid://csw2i3ljsxa6g" path="res://Resources/Weapons/sg.tres" id="3_xmt57"]
+
+[node name="BasePickup" unique_id=990496783 instance=ExtResource("1_oxpxr")]
+collision_mask = 3
+script = ExtResource("2_j5j5o")
+weapon_slot = 2
+weapon_resource = ExtResource("3_xmt57")
+
+[node name="MeshInstance3D" parent="." index="1" unique_id=1036227586]
+visible = true

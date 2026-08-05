@@ -9,7 +9,7 @@
 [ext_resource type="Material" uid="uid://ctsjbdy3yd4xd" path="res://trenchbroom/textures/Wire Fence.tres" id="7_mrt38"]
 [ext_resource type="Material" uid="uid://dmtcalmo4sedy" path="res://trenchbroom/textures/backroom-ass-wallpaper.tres" id="9_6b8y7"]
 [ext_resource type="Material" uid="uid://b650wgea1b8dy" path="res://trenchbroom/textures/backroom-ass-floor.tres" id="10_6b8y7"]
-[ext_resource type="PackedScene" uid="uid://b8nr6hmx4x7h0" path="res://Scenes/Level/pickups/base_pickup.tscn" id="10_mrt38"]
+[ext_resource type="PackedScene" uid="uid://dy7cjm0lujfkn" path="res://Scenes/Level/pickups/weapon_pickup.tscn" id="10_mrt38"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_bvu62"]
 _surfaces = [{
@@ -257,4 +257,4 @@ shadow_normal_bias = 0.0
 shadow_opacity = 0.8
 
 [node name="BasePickup" parent="." unique_id=990496783 instance=ExtResource("10_mrt38")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.149861, 3.0983386, -0.7002945)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.653402, 2.8730125, -0.15212488)
