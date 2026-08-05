@@ -44,6 +44,7 @@
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "step_handler") groups=["player"]]
 process_priority = -9
+collision_mask = 3
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
