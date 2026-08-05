@@ -5,6 +5,7 @@
 [ext_resource type="Resource" uid="uid://csw2i3ljsxa6g" path="res://Resources/Weapons/sg.tres" id="3_xmt57"]
 
 [node name="BasePickup" unique_id=990496783 instance=ExtResource("1_oxpxr")]
+collision_layer = 3
 collision_mask = 3
 script = ExtResource("2_j5j5o")
 weapon_slot = 2

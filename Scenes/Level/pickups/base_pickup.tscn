@@ -22,5 +22,6 @@ mesh = SubResource("BoxMesh_p5sh5")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="MeshInstance3D" unique_id=537257720]
 transform = Transform3D(0.9416012, -0.33673006, 0, 0.33673006, 0.9416012, 0, 0, 0, 1, 0, 0, 0)
+layers = 2
 shadow_enabled = true
 omni_range = 1.436
