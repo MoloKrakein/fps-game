@@ -155,6 +155,7 @@ func _cycle_weapon() -> void:
 func execute_reload() -> void:
 	reset_trigger()
 
+
 	if current_weapon == null or active_weapon_data == null:
 		return
 
@@ -173,6 +174,7 @@ func execute_reload() -> void:
 
 	if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
 		_cycle_weapon()
+	
 #endregion
 
 #region Weapon Model
@@ -192,6 +194,8 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 			shoot_position = muzzle
 
 func switch_weapon(weapon_data: WeaponData) -> void:
+	if is_reloading:
+		return
 	# 1. Update current weapon
 	current_weapon = weapon_data.weapon
 	# 2. CACHE the active data immediately so _process loops don't have to query the Manager

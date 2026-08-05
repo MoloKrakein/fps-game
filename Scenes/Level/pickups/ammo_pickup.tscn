@@ -1,7 +1,18 @@
 [gd_scene format=3 uid="uid://b7slawfhohc4c"]
 
 [ext_resource type="PackedScene" uid="uid://b8nr6hmx4x7h0" path="res://Scenes/Level/pickups/base_pickup.tscn" id="1_hh50b"]
+[ext_resource type="ArrayMesh" uid="uid://b38tssg55q3tn" path="res://Art/3D/ammo_pickup.obj" id="2_rgkek"]
 
 [node name="BasePickup" unique_id=990496783 instance=ExtResource("1_hh50b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5526254, 0)
 collision_mask = 3
+
+[node name="MeshInstance3D" parent="." index="1" unique_id=1036227586]
+transform = Transform3D(0.20037839, -0.97971857, 0, 0.837442, 0.17127906, -0.5189935, 0.5084677, 0.1039951, 0.8547781, 0.15867198, 0, 0)
+visible = true
+mesh = ExtResource("2_rgkek")
+
+[node name="OmniLight3D" parent="MeshInstance3D" index="0" unique_id=537257720]
+light_color = Color(0.8784314, 0.85882354, 0.5686275, 1)
+light_bake_mode = 1
+shadow_enabled = false

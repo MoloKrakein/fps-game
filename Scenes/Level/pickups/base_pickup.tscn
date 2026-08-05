@@ -17,4 +17,10 @@ shape = SubResource("SphereShape3D_bhunq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1036227586]
 transform = Transform3D(0.9416012, 0.33673006, 0, -0.33673006, 0.9416012, 0, 0, 0, 1, 0, 0, 0)
+visible = false
 mesh = SubResource("BoxMesh_p5sh5")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="MeshInstance3D" unique_id=537257720]
+transform = Transform3D(0.9416012, -0.33673006, 0, 0.33673006, 0.9416012, 0, 0, 0, 1, 0, 0, 0)
+shadow_enabled = true
+omni_range = 1.436

@@ -3,6 +3,7 @@ extends WeaponState
 
 
 func _on_reload_state_state_entered() -> void:
+	weapon_controller.is_reloading = true
 	print("State Chart: Entered Reloading State")
 	
 	# 1. Get the reload time from your weapon stats
@@ -16,3 +17,4 @@ func _on_reload_state_state_entered() -> void:
 	
 	# 4. Tell the state chart we are done, so it can go back to Idle
 	weapon_controller.weapon_state_chart.send_event("onReloadFinish")
+	weapon_controller.is_reloading = false

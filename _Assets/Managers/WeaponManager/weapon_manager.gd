@@ -29,7 +29,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func equip_weapon(slot: int) -> void:
 	var weapon_data = weapons.get(slot)
-
+	if player.weapon_controller.is_reloading:
+		return
 	if weapon_data and weapon_data.is_unlocked:
 		current_weap_slot = slot
 		player.weapon_controller.switch_weapon(weapon_data)
