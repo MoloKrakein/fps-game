@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://b8nr6hmx4x7h0"]
+
+[ext_resource type="Script" uid="uid://ces3w44qrfsal" path="res://_Assets/Env/pickups/base_pickup.gd" id="1_p5sh5"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_bhunq"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_sn0t7"]
+
+[node name="BasePickup" type="Area3D" unique_id=990496783]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.90979, 0)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_p5sh5")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=28170565]
+shape = SubResource("SphereShape3D_bhunq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1036227586]
+transform = Transform3D(0.9416012, 0.33673006, 0, -0.33673006, 0.9416012, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_sn0t7")

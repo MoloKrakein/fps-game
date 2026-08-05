@@ -15,6 +15,8 @@ func _ready() -> void:
 			var key_event = InputEventKey.new()
 			key_event.keycode = KEY_1 + (i - 1)  # KEY_1 corresponds to the first weapon slot
 			InputMap.action_add_event(action_name, key_event)
+	# call_deferred("initialize_starting_weapon",1)
+
 	player.weapon_controller.initialize_weapon_data(weapons.get(current_weap_slot))
 
 
@@ -50,3 +52,8 @@ func get_current_weapon_data() -> WeaponData:
 
 func get_is_loaded() -> bool:
 	return weapons[current_weap_slot].is_loaded if current_weap_slot in weapons else false
+
+# func initialize_starting_weapon(weapon_data: WeaponData) -> void:
+# 	for slot in range(1, 10):
+# 		if weapons.has(slot) and weapons[slot].is_unlocked:
+# 			equip_weapon(slot)
