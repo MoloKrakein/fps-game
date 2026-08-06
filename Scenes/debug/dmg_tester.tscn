@@ -18,5 +18,8 @@ mesh = SubResource("BoxMesh_o08ba")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=580911915]
 script = ExtResource("1_mdfkn")
+armor_value = 100.0
+armor_absorption = 0.78
+start_with_armor = true
 
 [connection signal="died" from="HealthComponent" to="." method="_on_health_component_died"]

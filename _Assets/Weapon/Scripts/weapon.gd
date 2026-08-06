@@ -25,6 +25,10 @@ enum WeaponAmmoType {
 @export var weapon_name: String = "Weapon"
 @export var weapon_type: WeaponType = WeaponType.PISTOL
 @export var damage: float = 10.0
+@export_range(0, 100) var headshot_multiplier: float = 2.0
+@export_range(0, 100) var armor_penetration: float = 0.0
+@export var crit_rate: float = 0.0
+@export var crit_damage: float = 0.0
 @export var mags_ammo: int = 7
 @export var max_ammo: int = 90
 # @export var ammo_per_clip: int = 7 #for future use, if we want to implement a reload system with clips
@@ -46,7 +50,6 @@ enum WeaponAmmoType {
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
 @export var projectile_speed: float = 50.0
 # @export var is_projectile_tracer: bool = false
-
 
 @export_category("Aiming")
 @export var aim_fov: float = 60.0

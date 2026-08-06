@@ -232,11 +232,12 @@ func _perform_hitscan_fire() -> void:
 		var acc_x: float = randf_range(-accuracy_spread, accuracy_spread)
 		var acc_y: float = randf_range(-accuracy_spread, accuracy_spread)
 		var direction: Vector3 = (forward + Vector3(acc_x, acc_y, 0)).normalized()
-
+		var damage: float = current_weapon.damage
 		if current_weapon.pellet_count > 1:
 			var spread_x: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			var spread_y: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			direction += Vector3(spread_x, spread_y, 0) * shoot_position.global_transform.basis
+			damage = (current_weapon.damage / current_weapon.pellet_count) * 10
 		
 		var to: Vector3 = from + direction * current_weapon.shoot_range
 		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
@@ -244,7 +245,7 @@ func _perform_hitscan_fire() -> void:
 
 		if result:
 			_spawn_impact_effect(result.position)
-			_apply_damage_to_target(result.collider, current_weapon.damage)
+			_apply_damage_to_target(result.collider, damage)
 
 func _spawn_impact_effect(hit_position: Vector3) -> void:
 	# Instantiate the preloaded scene to avoid brutal Garbage Collection spikes
@@ -269,19 +270,21 @@ func _perform_projectile_fire() -> void:
 
 		projectile.global_position = shoot_position.global_position + shoot_position_offset
 		var current_forward: Vector3 = forward
+		var damage: float = current_weapon.damage
 		
 		if current_weapon.pellet_count > 1:
 			var spread_x: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			var spread_y: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			current_forward += Vector3(spread_x, spread_y, 0) * shoot_position.global_transform.basis
-			
+			damage = (current_weapon.damage / current_weapon.pellet_count) * 10
+		
 		var acc_x: float = randf_range(-accuracy_spread, accuracy_spread)
 		var acc_y: float = randf_range(-accuracy_spread, accuracy_spread)
 		var direction: Vector3 = current_forward + Vector3(acc_x, acc_y, 0) * shoot_position.global_transform.basis
 		var projectile_velocity: Vector3 = direction * current_weapon.get_muzzle_velocity_mps()
 
 		projectile.look_at(projectile.global_position + direction, Vector3.UP)
-		projectile.setup(projectile_velocity, current_weapon.damage)
+		projectile.setup(projectile_velocity, damage)
 #endregion
 
 #region Aiming & Tweens
@@ -335,3 +338,5 @@ func initialize_weapon_data(weapon_data: WeaponData) -> void:
 	current_ammo = weapon_data.ammo_in_magazine
 	reserve_ammo = weapon_data.reserve_ammo
 	is_loaded = weapon_data.is_loaded
+
+

@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://b4bqkfy3ay7um"]
+
+[ext_resource type="PackedScene" uid="uid://b8nr6hmx4x7h0" path="res://Scenes/Level/pickups/base_pickup.tscn" id="1_6f3gk"]
+
+[node name="BasePickup" unique_id=990496783 instance=ExtResource("1_6f3gk")]

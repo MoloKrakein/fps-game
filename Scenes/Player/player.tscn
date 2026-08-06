@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://kxvoo2aa83f8" path="res://Scenes/Player/PlayerController.gd" id="1_mtuoh"]
 [ext_resource type="Script" uid="uid://cpa8hpwwdko5m" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
+[ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="2_2jnj1"]
 [ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Assets/UI/reticle.gd" id="2_a3d8c"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
@@ -61,6 +62,10 @@ acceleration = 7.0
 deceleration = 15.0
 jump_velocity = 3.5
 slide_cooldown = 1.6
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1115016750]
+script = ExtResource("2_2jnj1")
+metadata/_custom_type_script = "uid://dtyhxdhs168m"
 
 [node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
