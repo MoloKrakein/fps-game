@@ -1,5 +1,27 @@
 [gd_scene format=3 uid="uid://b4bqkfy3ay7um"]
 
 [ext_resource type="PackedScene" uid="uid://b8nr6hmx4x7h0" path="res://Scenes/Level/pickups/base_pickup.tscn" id="1_6f3gk"]
+[ext_resource type="Script" uid="uid://k5xp5573pf72" path="res://_Assets/Env/pickups/health_pickup.gd" id="2_h0yxx"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_riqys"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.70980394, 1, 0.36078432, 0.40784314)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bhunq"]
+material = SubResource("StandardMaterial3D_riqys")
+size = Vector3(1.2861328, 0.57421875, 0.33203125)
 
 [node name="BasePickup" unique_id=990496783 instance=ExtResource("1_6f3gk")]
+script = ExtResource("2_h0yxx")
+heal_amount = 25.0
+armor_amount = 25.0
+float_height = 0.3
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." index="1" unique_id=1623630867]
+transform = Transform3D(0.9416012, 0.33673006, 0, -0.33673006, 0.9416012, 0, 0, 0, 1, -0.024435103, 0.029437363, 0)
+mesh = SubResource("BoxMesh_bhunq")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="." index="2" unique_id=689875209]
+transform = Transform3D(0.33673003, -0.9416012, 0, 0.9416012, 0.33673003, 0, 0, 0, 1, -0.024435103, 0.029437363, 0)
+mesh = SubResource("BoxMesh_bhunq")

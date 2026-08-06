@@ -195,8 +195,8 @@ func _on_aiming_state_state_entered() -> void:
 	pass # Replace with function body.
 
 #region Debugging
-# func _unhandled_input(event: InputEvent) -> void:
-# 	# shoot ur self debug
-# 	var health_component = get_node_or_null("HealthComponent")
-# 	if health_component and event.is_action_pressed("test1"):
-# 		health_component.take_damage(50)
+func _unhandled_input(event: InputEvent) -> void:
+	# shoot ur self debug
+	var health_component = get_node_or_null("HealthComponent")
+	if health_component and event.is_action_pressed("test1"):
+		health_component.take_damage(50)
