@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cwr1qj5g5mqkf"]
+
+[ext_resource type="Texture2D" uid="uid://d4csdvt7ba5o0" path="res://trenchbroom/textures/backroom-ass-celing.png" id="1_rrdvd"]
+
+[resource]
+albedo_texture = ExtResource("1_rrdvd")
+metallic_specular = 0.0
+texture_filter = 2
