@@ -42,6 +42,7 @@ folder_colors={
 [global_group]
 
 player=""
+level_geometry="for level navmesh"
 
 [input]
 

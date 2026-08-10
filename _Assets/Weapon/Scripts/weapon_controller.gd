@@ -296,6 +296,7 @@ func aim_hipfire() -> void:
 func aim_ads() -> void:
 	if current_weapon:
 		accuracy_modifier = current_weapon.aim_accuracy_modifier
+		
 		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
 		
 func aim_canted() -> void:
