@@ -16,6 +16,9 @@ material = SubResource("StandardMaterial3D_vx3u4")
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_vx3u4"]
+radius = 5.2074046
+
 [node name="NormalEnemy" type="CharacterBody3D" unique_id=1253637122]
 script = ExtResource("1_n31bn")
 
@@ -28,6 +31,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0334291, 0)
 shape = SubResource("CapsuleShape3D_o08ba")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=792034714]
+debug_enabled = true
 
 [node name="HealthComponent" type="Node" parent="." unique_id=926395659]
 script = ExtResource("2_di8u2")
@@ -59,4 +63,15 @@ to = NodePath("../FollowState")
 event = &"toFollow"
 delay_in_seconds = "0.0"
 
+[node name="DetectionRange" type="Area3D" parent="." unique_id=1814576519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.894758, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionRange" unique_id=1866542978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6444154, 0)
+shape = SubResource("SphereShape3D_vx3u4")
+
 [connection signal="state_physics_processing" from="StateChart/root/FollowState" to="." method="_on_follow_state_physics_processing"]
+[connection signal="body_entered" from="DetectionRange" to="." method="_on_detection_range_body_entered"]

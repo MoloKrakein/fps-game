@@ -59,8 +59,10 @@ step_handler = NodePath("Component/StepHandler")
 default_speed = 1.0
 sprint_speed = 3.5
 acceleration = 7.0
-deceleration = 15.0
+deceleration = 20.0
 jump_velocity = 3.5
+fall_velocity_threshold = -7.0
+fall_damage_multiplier = 0.45
 slide_cooldown = 1.6
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1115016750]
@@ -78,7 +80,7 @@ offset_right = 485.0
 offset_bottom = 497.0
 grow_horizontal = 1
 grow_vertical = 1
-initial_node_to_watch = NodePath("../../WeaponStateChart")
+initial_node_to_watch = NodePath("../../StateChart")
 
 [node name="CrouchCollider" type="CollisionShape3D" parent="." unique_id=1751202798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.43174714, 0)
@@ -443,6 +445,7 @@ weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_entered"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="StateMachine/MovementState/GroundedState/MovingState" method="_on_moving_state_physics_processing"]

@@ -11,3 +11,8 @@ func _on_grounded_state_physics_processing(delta: float) -> void:
 	if not player_controller.is_on_floor():
 		player_controller.state_chart.send_event("onAirborne")
 
+
+
+func _on_grounded_state_entered() -> void:
+	player_controller.apply_fall_damage()
+	player_controller.impact_velocity = 0.0

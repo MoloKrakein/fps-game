@@ -36,8 +36,6 @@ func _on_died() -> void:
 	var timer = Timer.new()
 	# since the enemy just simple cylinder, make this object fall over the ground, so we can see the death animation
 
-	
-
 	timer.wait_time = 1.0
 	timer.one_shot = true
 	timer.connect("timeout", Callable(self, "_on_death_timer_timeout"))
@@ -46,4 +44,28 @@ func _on_died() -> void:
 	queue_free()
 
 func _on_follow_state_physics_processing(delta: float) -> void:
-	pass
+	# move towards the target using the navigation agent
+
+	if not target:
+		return
+
+	navigation_agent.target_position = target.global_position
+
+
+	if navigation_agent.is_navigation_finished():
+		navigation_agent.velocity = Vector3.ZERO
+		return
+
+	var next_pos = navigation_agent.get_next_path_position()
+	var direction = (next_pos - global_position).normalized()
+
+	navigation_agent.velocity = direction * follow_speed
+
+	if direction.length() > 0.01:
+		var target_rot = atan2(direction.x, direction.z)
+		rotation.y = lerp_angle(rotation.y, target_rot, 5.0 * delta)
+
+
+func _on_detection_range_body_entered(body: Node3D) -> void:
+	if body.is_in_group("player"):
+		on_triggered()

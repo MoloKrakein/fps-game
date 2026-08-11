@@ -23,6 +23,7 @@ class_name PlayerController extends CharacterBody3D
 @export_category("Jumping")
 @export var jump_velocity: float = 4.5
 @export var fall_velocity_threshold: float = -5.0
+@export var fall_damage_multiplier: float = 2.0
 
 @export_category("Sliding")
 @export var slide_duration: float = 1.0
@@ -46,6 +47,8 @@ var _current_max_velocity: float = 0.0
 var current_fall_velocity: float = 0.0
 var previous_velocity: Vector3 = Vector3.ZERO
 var current_player_rotation: float = 0.0
+var impact_velocity: float = 0.0
+var on_airbone_time: float = 0.0
 
 # settings
 var is_crouching: bool = false
@@ -67,6 +70,9 @@ func _physics_process(delta: float) -> void:
 	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
+		on_airbone_time += delta
+	else:
+		on_airbone_time = 0.0
 
 	var speed_modifier: float = sprint_modifier + crouch_modifier
 	speed = default_speed + speed_modifier + slide_modifier
@@ -89,11 +95,16 @@ func _physics_process(delta: float) -> void:
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
 	velocity = _movement_velocity
+	var y_velocity_before_on_floor = velocity.y
+	
 
 	# get max velocity for debugging purposes
 	if _movement_velocity.length() > _current_max_velocity:
 		_current_max_velocity = _movement_velocity.length()
 	move_and_slide()
+
+	if is_on_floor() and y_velocity_before_on_floor < 0.0:
+		impact_velocity = y_velocity_before_on_floor
 
 	if is_on_floor():
 		step_handler.handle_step_climbing()
@@ -182,6 +193,22 @@ func check_fall_speed() -> bool:
 	else:
 		current_fall_velocity = velocity.y
 		return false
+
+# fall damage calculation based on the current fall velocity
+func calculate_fall_damage() -> float:
+	var damage: float = 0.0
+	if impact_velocity < fall_velocity_threshold:
+		damage = abs(impact_velocity) * fall_damage_multiplier
+	return damage
+
+func apply_fall_damage() -> void:
+	var damage_amount = calculate_fall_damage()
+
+	if damage_amount > 0.0:
+		var health_component = get_node_or_null("HealthComponent")
+		if health_component:
+			health_component.take_damage(damage_amount)
+
 #endregion
 
 func disable_movement() -> void:
@@ -200,15 +227,3 @@ func _unhandled_input(event: InputEvent) -> void:
 	var health_component = get_node_or_null("HealthComponent")
 	if health_component and event.is_action_pressed("test1"):
 		health_component.take_damage(50)
-
-func fall_dmg(damage:float) -> float:
-	if damage > 0.0:
-		var health_component = get_node_or_null("HealthComponent")
-		if health_component:
-			health_component.take_damage(damage)
-
-func calculate_fall_damage() -> float:
-	var damage: float = 0.0
-	if current_fall_velocity < fall_velocity_threshold:
-		damage = abs(current_fall_velocity) * 2.0
-	return damage
