@@ -7,8 +7,11 @@ extends BaseEnemy
 @onready var state_chart: StateChart = $StateChart
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 
+var character_height: float = 2.0
 
+var previous_velocity: Vector3
 var target: Node3D
+var is_sliding: bool = false
 
 func _ready() -> void:
 	super._ready()
@@ -26,6 +29,7 @@ func _physics_process(delta: float) -> void:
 
 
 func on_triggered() -> void:
+	print("Saw Player")
 	state_chart.send_event("toFollow")
 
 func _on_velocity_computed(suggested_velocity: Vector3) -> void:
@@ -33,19 +37,10 @@ func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	velocity.z = suggested_velocity.z
 
 func _on_died() -> void:
-	var timer = Timer.new()
-	# since the enemy just simple cylinder, make this object fall over the ground, so we can see the death animation
-
-	timer.wait_time = 1.0
-	timer.one_shot = true
-	timer.connect("timeout", Callable(self, "_on_death_timer_timeout"))
-	add_child(timer)
-	timer.start()
+	
 	queue_free()
 
 func _on_follow_state_physics_processing(delta: float) -> void:
-	# move towards the target using the navigation agent
-
 	if not target:
 		return
 
@@ -55,6 +50,9 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 	if navigation_agent.is_navigation_finished():
 		navigation_agent.velocity = Vector3.ZERO
 		return
+
+	# Move towards the target
+
 
 	var next_pos = navigation_agent.get_next_path_position()
 	var direction = (next_pos - global_position).normalized()
