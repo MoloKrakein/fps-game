@@ -200,3 +200,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	var health_component = get_node_or_null("HealthComponent")
 	if health_component and event.is_action_pressed("test1"):
 		health_component.take_damage(50)
+
+func fall_dmg(damage:float) -> float:
+	if damage > 0.0:
+		var health_component = get_node_or_null("HealthComponent")
+		if health_component:
+			health_component.take_damage(damage)
+
+func calculate_fall_damage() -> float:
+	var damage: float = 0.0
+	if current_fall_velocity < fall_velocity_threshold:
+		damage = abs(current_fall_velocity) * 2.0
+	return damage
