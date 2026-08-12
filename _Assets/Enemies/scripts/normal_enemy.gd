@@ -7,7 +7,10 @@ extends BaseEnemy
 @onready var state_chart: StateChart = $StateChart
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 
+@onready var shoot_component: EnemyShootComponent = $EnemyShootComponent
+
 var character_height: float = 2.0
+var attack_range: float = 10.0
 
 var previous_velocity: Vector3
 var target: Node3D
@@ -67,3 +70,21 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 func _on_detection_range_body_entered(body: Node3D) -> void:
 	if body.is_in_group("player"):
 		on_triggered()
+
+
+func _on_attack_state_physics_processing(delta: float) -> void:
+	if not target:
+		return
+
+	var distance_to_target = global_position.distance_to(target.global_position)
+	if distance_to_target > attack_range:
+		state_chart.send_event("toFollow")
+		return
+
+	navigation_agent.velocity = Vector3.ZERO
+
+	var direction_to_target = (target.global_position - global_position).normalized()
+	var target_rot = atan2(direction_to_target.x, direction_to_target.z)
+	rotation.y = lerp_angle(rotation.y, target_rot, 15.0 * delta)
+
+	shoot_component._execute_shot()

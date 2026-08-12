@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="4_hkgbp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="5_m7f1c"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="6_bcpb1"]
+[ext_resource type="Script" uid="uid://draedm6g40tbf" path="res://_Assets/Enemies/components/enemy_shoot_component.gd" id="7_di8u2"]
+[ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="8_t0ntk"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vx3u4"]
 shading_mode = 0
@@ -63,6 +65,9 @@ script = ExtResource("5_m7f1c")
 [node name="FollowState" type="Node" parent="StateChart/root" unique_id=283097608]
 script = ExtResource("5_m7f1c")
 
+[node name="AttackState" type="Node" parent="StateChart/root" unique_id=1539277819]
+script = ExtResource("5_m7f1c")
+
 [node name="ToIdle" type="Node" parent="StateChart/root" unique_id=939488438]
 script = ExtResource("6_bcpb1")
 to = NodePath("../IdleState")
@@ -75,6 +80,12 @@ to = NodePath("../FollowState")
 event = &"toFollow"
 delay_in_seconds = "0.0"
 
+[node name="ToAttack" type="Node" parent="StateChart/root" unique_id=700072468]
+script = ExtResource("6_bcpb1")
+to = NodePath("../AttackState")
+event = &"toAttack"
+delay_in_seconds = "0.0"
+
 [node name="DetectionRange" type="Area3D" parent="." unique_id=1814576519]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.894758, 0)
 collision_layer = 0
@@ -85,5 +96,17 @@ monitorable = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6444154, 0)
 shape = SubResource("SphereShape3D_vx3u4")
 
+[node name="EnemyShootComponent" type="Node3D" parent="." unique_id=1986264680 node_paths=PackedStringArray("aim_raycast")]
+script = ExtResource("7_di8u2")
+aim_raycast = NodePath("../RayCast3D")
+weapon = ExtResource("8_t0ntk")
+metadata/_custom_type_script = "uid://draedm6g40tbf"
+
+[node name="RayCast3D" type="RayCast3D" parent="." unique_id=613111368]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0.47024, 2.0615988, 0)
+debug_shape_custom_color = Color(0, 1, 0, 1)
+debug_shape_thickness = 5
+
 [connection signal="state_physics_processing" from="StateChart/root/FollowState" to="." method="_on_follow_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/root/AttackState" to="." method="_on_attack_state_physics_processing"]
 [connection signal="body_entered" from="DetectionRange" to="." method="_on_detection_range_body_entered"]
