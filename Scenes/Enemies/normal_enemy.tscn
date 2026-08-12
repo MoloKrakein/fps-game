@@ -14,20 +14,36 @@ albedo_color = Color(1, 0, 0, 1)
 [sub_resource type="CylinderMesh" id="CylinderMesh_o08ba"]
 material = SubResource("StandardMaterial3D_vx3u4")
 
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_o08ba"]
+margin = 1.2
+length = 0.75
+slide_on_slope = true
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_vx3u4"]
+radius = 5.2074046
+
 [node name="NormalEnemy" type="CharacterBody3D" unique_id=1253637122]
+platform_on_leave = 1
 script = ExtResource("1_n31bn")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1895812746]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1260614, 0)
 mesh = SubResource("CylinderMesh_o08ba")
 
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=274294896]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.025958449, 0)
+shape = SubResource("SeparationRayShape3D_o08ba")
+debug_color = Color(0.9664827, 0, 0.49429512, 0.41960785)
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1647058949]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0334291, 0)
 shape = SubResource("CapsuleShape3D_o08ba")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=792034714]
+avoidance_enabled = true
+debug_enabled = true
 
 [node name="HealthComponent" type="Node" parent="." unique_id=926395659]
 script = ExtResource("2_di8u2")
@@ -59,4 +75,15 @@ to = NodePath("../FollowState")
 event = &"toFollow"
 delay_in_seconds = "0.0"
 
+[node name="DetectionRange" type="Area3D" parent="." unique_id=1814576519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.894758, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionRange" unique_id=1866542978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6444154, 0)
+shape = SubResource("SphereShape3D_vx3u4")
+
 [connection signal="state_physics_processing" from="StateChart/root/FollowState" to="." method="_on_follow_state_physics_processing"]
+[connection signal="body_entered" from="DetectionRange" to="." method="_on_detection_range_body_entered"]
