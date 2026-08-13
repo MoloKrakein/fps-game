@@ -39,6 +39,10 @@ folder_colors={
 "res://trenchbroom/": "red"
 }
 
+[func_godot]
+
+model_point_class_save_path="trenchbroom/models"
+
 [global_group]
 
 player=""

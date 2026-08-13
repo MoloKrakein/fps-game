@@ -493,4 +493,43 @@
 ( 64 960 288 ) ( 352 992 288 ) ( 352 992 272 ) backroom-ass-celing [ 1 0 0 0 ] [ 0 0 -1 0 ] 0 1 1
 ( 352 992 288 ) ( 352 1072 288 ) ( 352 1072 272 ) backroom-ass-celing [ 0 1 0 0 ] [ 0 0 -1 0 ] 0 1 1
 }
+// brush 54
+{
+( -464 -512 656 ) ( -464 -511 656 ) ( -464 -512 657 ) backroom-ass-celing [ 0 -1 0 0 ] [ 0 0 -1 0 ] 0 1 1
+( -464 -512 656 ) ( -464 -512 657 ) ( -463 -512 656 ) backroom-ass-celing [ 1 0 0 0 ] [ 0 0 -1 0 ] 0 1 1
+( -464 -512 656 ) ( -463 -512 656 ) ( -464 -511 656 ) backroom-ass-celing [ -1 0 0 0 ] [ 0 -1 0 0 ] 0 1 1
+( 368 1104 672 ) ( 368 1105 672 ) ( 369 1104 672 ) backroom-ass-celing [ 1 0 0 0 ] [ 0 -1 0 0 ] 0 1 1
+( 368 1104 672 ) ( 369 1104 672 ) ( 368 1104 673 ) backroom-ass-celing [ -1 0 0 0 ] [ 0 0 -1 0 ] 0 1 1
+( 368 1104 672 ) ( 368 1104 673 ) ( 368 1105 672 ) backroom-ass-celing [ 0 1 0 0 ] [ 0 0 -1 0 ] 0 1 1
+}
+}
+// entity 1
+{
+"classname" "office_celling_lamp"
+"origin" "-192 637 270"
+}
+// entity 2
+{
+"classname" "office_celling_lamp"
+"origin" "-352 819 270"
+}
+// entity 3
+{
+"classname" "office_celling_lamp"
+"origin" "-192 643 655"
+}
+// entity 4
+{
+"classname" "office_celling_lamp"
+"origin" "64 -131 655"
+}
+// entity 5
+{
+"classname" "office_celling_lamp"
+"origin" "-208 -141 655"
+}
+// entity 6
+{
+"classname" "office_celling_lamp"
+"origin" "240 627 655"
 }

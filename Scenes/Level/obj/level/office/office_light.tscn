@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://djeydf6fw1hyf"]
+
+[ext_resource type="Script" uid="uid://cextuqw0dxome" path="res://Scenes/Level/obj/level/office/office_light_script.gd" id="1_sfayu"]
+[ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="1_y3b75"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7b23g"]
+shading_mode = 0
+albedo_color = Color(0.6627451, 1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bhunq"]
+material = SubResource("StandardMaterial3D_7b23g")
+size = Vector3(0.19482422, 0.11071777, 1)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_7b23g"]
+data = PackedVector3Array(-0.097399995, 0.0554, 0.5, 0.097399995, 0.0554, 0.5, -0.097399995, -0.0554, 0.5, 0.097399995, 0.0554, 0.5, 0.097399995, -0.0554, 0.5, -0.097399995, -0.0554, 0.5, 0.097399995, 0.0554, -0.5, -0.097399995, 0.0554, -0.5, 0.097399995, -0.0554, -0.5, -0.097399995, 0.0554, -0.5, -0.097399995, -0.0554, -0.5, 0.097399995, -0.0554, -0.5, 0.097399995, 0.0554, 0.5, 0.097399995, 0.0554, -0.5, 0.097399995, -0.0554, 0.5, 0.097399995, 0.0554, -0.5, 0.097399995, -0.0554, -0.5, 0.097399995, -0.0554, 0.5, -0.097399995, 0.0554, -0.5, -0.097399995, 0.0554, 0.5, -0.097399995, -0.0554, -0.5, -0.097399995, 0.0554, 0.5, -0.097399995, -0.0554, 0.5, -0.097399995, -0.0554, -0.5, 0.097399995, 0.0554, 0.5, -0.097399995, 0.0554, 0.5, 0.097399995, 0.0554, -0.5, -0.097399995, 0.0554, 0.5, -0.097399995, 0.0554, -0.5, 0.097399995, 0.0554, -0.5, -0.097399995, -0.0554, 0.5, 0.097399995, -0.0554, 0.5, -0.097399995, -0.0554, -0.5, 0.097399995, -0.0554, 0.5, 0.097399995, -0.0554, -0.5, -0.097399995, -0.0554, -0.5)
+
+[node name="OfficeLight" type="Node3D" unique_id=1708216938]
+script = ExtResource("1_sfayu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=755638296]
+mesh = SubResource("BoxMesh_bhunq")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D" unique_id=538226660]
+
+[node name="HealthComponent" type="Node" parent="MeshInstance3D/StaticBody3D" unique_id=1640491468]
+script = ExtResource("1_y3b75")
+max_health = 5.0
+metadata/_custom_type_script = "uid://dtyhxdhs168m"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D" unique_id=1652625636]
+shape = SubResource("ConcavePolygonShape3D_7b23g")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1625406025]
+transform = Transform3D(1, 0, 0, 0, -0.019197226, 0.9998157, 0, -0.9998157, -0.019197226, 0, -0.077622294, 0)
+light_color = Color(0.92689455, 0.9635816, 0.99385756, 1)
+light_energy = 9.696
+shadow_enabled = true
+distance_fade_enabled = true
+spot_range = 189.39
+spot_angle = 65.171135
+
+[connection signal="died" from="MeshInstance3D/StaticBody3D/HealthComponent" to="." method="_on_health_component_died"]

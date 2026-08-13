@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="FuncGodotFGDModelPointClass" format=3 uid="uid://c8j7ujv4ha64m"]
+
+[ext_resource type="Script" uid="uid://d1nwwgcrner8b" path="res://addons/func_godot/src/fgd/func_godot_fgd_point_class_display_descriptor.gd" id="1_h13lj"]
+[ext_resource type="PackedScene" uid="uid://djeydf6fw1hyf" path="res://Scenes/Level/obj/level/office/office_light.tscn" id="2_c1tww"]
+[ext_resource type="Script" uid="uid://ldfqjtq0br35" path="res://addons/func_godot/src/fgd/func_godot_fgd_model_point_class.gd" id="2_dfh0j"]
+
+[resource]
+script = ExtResource("2_dfh0j")
+target_map_editor = 1
+generate_size_property = true
+scene_file = ExtResource("2_c1tww")
+classname = "office_celling_lamp"
+description = "that buzzing lamp on celling"
+meta_properties = Dictionary[String, Variant]({
+"color": Color(0.8, 0.8, 0.8, 1),
+"model": "{\"path\": \"trenchbroom/models/office_celling_lamp.glb\", \"scale\": 32.0 }",
+"size": AABB(-16, -3, -3, 16, 3, 1)
+})
+metadata/_custom_type_script = "uid://ldfqjtq0br35"

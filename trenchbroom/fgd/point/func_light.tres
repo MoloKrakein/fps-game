@@ -5,4 +5,8 @@
 
 [resource]
 script = ExtResource("2_qmhhd")
+target_map_editor = 1
+classname = "func_light"
+description = "Add Light"
+node_class = "OmniLight3D"
 metadata/_custom_type_script = "uid://ldfqjtq0br35"
