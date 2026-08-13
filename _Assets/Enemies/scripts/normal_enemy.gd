@@ -2,10 +2,17 @@ class_name NormalEnemy
 extends BaseEnemy
 
 @export var follow_speed: float = 5.0
+@export var max_step_up: float = 1.0
+@export var max_step_down: float = 1.0
+
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var state_chart: StateChart = $StateChart
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
+
+@onready var stair_detector: Node3D = $StairWalker
+@onready var stair_raycast: RayCast3D = $StairWalker/StairRaycast
+
 
 @onready var shoot_component: EnemyShootComponent = $EnemyShootComponent
 
@@ -28,7 +35,9 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= 20.0 * delta
 
-	move_and_slide()
+	# move_and_slide()
+	if not _try_stair_stepping(velocity * delta):
+		move_and_slide()
 
 
 func on_triggered() -> void:
@@ -61,6 +70,13 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 	var direction = (next_pos - global_position).normalized()
 
 	navigation_agent.velocity = direction * follow_speed
+	
+	# if abs(direction.length()) > 0.1:
+	# 	stair_detector.rotation.y = atan2(direction.x, direction.y)
+	# 	if is_on_wall() and is_on_floor():
+	# 		var stair_height = stair_raycast.get_collision_point().y - global_position.y
+	# 		global_position.y += stair_height + 2.5
+
 
 	if direction.length() > 0.01:
 		var target_rot = atan2(direction.x, direction.z)
@@ -88,3 +104,39 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 	rotation.y = lerp_angle(rotation.y, target_rot, 15.0 * delta)
 
 	shoot_component._execute_shot()
+
+
+func _try_stair_stepping(motion: Vector3) -> bool:
+	if motion.length_squared() == 0:
+		return false
+	
+
+	var jt_transform = global_transform
+	var params = PhysicsTestMotionParameters3D.new()
+	params.from = jt_transform
+	params.motion = motion
+	var result = PhysicsTestMotionResult3D.new()
+
+	if not PhysicsServer3D.body_test_motion(get_rid(), params, result):
+		move_and_slide()
+		return true
+
+
+	var step_up_transform = jt_transform.translated(Vector3(0, max_step_up, 0))
+	params.from = step_up_transform
+	params.motion = motion
+	
+
+	if not PhysicsServer3D.body_test_motion(get_rid(), params, result):
+
+		var step_down_transform = step_up_transform.translated(result.get_travel())
+		params.from = step_down_transform
+		params.motion = Vector3(0, -max_step_up * 2.0, 0)
+		
+		if PhysicsServer3D.body_test_motion(get_rid(), params, result):
+
+			global_position = step_down_transform.origin + result.get_travel()
+			move_and_slide()
+			return true
+
+	return false
