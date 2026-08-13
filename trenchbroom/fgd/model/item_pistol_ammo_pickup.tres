@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="FuncGodotFGDModelPointClass" format=3 uid="uid://co3qorg5dexp8"]
+
+[ext_resource type="Script" uid="uid://d1nwwgcrner8b" path="res://addons/func_godot/src/fgd/func_godot_fgd_point_class_display_descriptor.gd" id="1_18aex"]
+[ext_resource type="PackedScene" uid="uid://b7slawfhohc4c" path="res://Scenes/Level/pickups/ammo_pickup.tscn" id="2_gy1pt"]
+[ext_resource type="Script" uid="uid://ldfqjtq0br35" path="res://addons/func_godot/src/fgd/func_godot_fgd_model_point_class.gd" id="3_d66sy"]
+
+[resource]
+script = ExtResource("3_d66sy")
+target_map_editor = 1
+generate_size_property = true
+scene_file = ExtResource("2_gy1pt")
+classname = "item_ammo_pistol"
+description = "pistol ammo"
+meta_properties = Dictionary[String, Variant]({
+"color": Color(0.8, 0.8, 0.8, 1),
+"model": "{\"path\": \"trenchbroom/models/item_ammo_pistol.glb\", \"scale\": 32.0 }",
+"size": AABB(-10, -4, 0, 10, 10, 8)
+})
+metadata/_custom_type_script = "uid://ldfqjtq0br35"

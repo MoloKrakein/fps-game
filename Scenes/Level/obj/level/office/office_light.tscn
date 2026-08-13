@@ -24,7 +24,7 @@ mesh = SubResource("BoxMesh_bhunq")
 
 [node name="HealthComponent" type="Node" parent="MeshInstance3D/StaticBody3D" unique_id=1640491468]
 script = ExtResource("1_y3b75")
-max_health = 5.0
+max_health = 1.0
 metadata/_custom_type_script = "uid://dtyhxdhs168m"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D" unique_id=1652625636]

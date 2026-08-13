@@ -533,3 +533,8 @@
 "classname" "office_celling_lamp"
 "origin" "240 627 655"
 }
+// entity 7
+{
+"classname" "item_ammo_pistol"
+"origin" "-346 708 304"
+}

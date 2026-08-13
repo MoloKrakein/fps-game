@@ -44,3 +44,5 @@
 @PointClass size(-8.0 -8.0 -8.0, 8.0 8.0 8.0) color(204 204 204) = func_light : "Add Light" []
 
 @PointClass size(-16.0 -3.0 -3.0, 16.0 3.0 1.0) color(204 204 204) model({"path": "trenchbroom/models/office_celling_lamp.glb", "scale": 32.0 }) = office_celling_lamp : "that buzzing lamp on celling" []
+
+@PointClass size(-10.0 -4.0 0.0, 10.0 10.0 8.0) color(204 204 204) model({"path": "trenchbroom/models/item_ammo_pistol.glb", "scale": 32.0 }) = item_ammo_pistol : "pistol ammo" []
