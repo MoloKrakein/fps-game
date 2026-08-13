@@ -8,6 +8,7 @@
 size = Vector3(0.623291, 0.33789063, 0.35351563)
 
 [node name="BasePickup" type="Area3D" unique_id=990496783]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.83205295, 0)
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("1_p5sh5")
