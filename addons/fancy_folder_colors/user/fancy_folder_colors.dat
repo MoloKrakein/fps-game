@@ -1,6 +1,7 @@
 [DAT]
 
 PTH={
+"res://Art/": Color(1, 0.4392157, 1, 1),
 "res://Scenes/Player/": Color(0.8222656, 0.18367493, 0.18367493, 1),
 "res://trenchbroom/FPS_game_fgd.tres": Color(0.20703125, 1, 0, 1)
 }

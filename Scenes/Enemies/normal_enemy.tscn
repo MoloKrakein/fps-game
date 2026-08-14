@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bshdejtv6ivh3" path="res://_Assets/Enemies/scripts/normal_enemy.gd" id="1_n31bn"]
 [ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="2_di8u2"]
+[ext_resource type="PackedScene" uid="uid://cwinnkubxnuve" path="res://Art/3D/Blender/HumanoidModel/animation/Zombified.glb" id="2_hkgbp"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="3_t0ntk"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="4_hkgbp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="5_m7f1c"]
@@ -38,7 +39,10 @@ script = ExtResource("1_n31bn")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1895812746]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1260614, 0)
+visible = false
 mesh = SubResource("CylinderMesh_o08ba")
+
+[node name="Zombified" parent="." unique_id=1256437525 instance=ExtResource("2_hkgbp")]
 
 [node name="Collision" type="CollisionShape3D" parent="." unique_id=274294896]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0.38569206, 0.12080133, 0)
@@ -109,15 +113,18 @@ aim_raycast = NodePath("../AimRaycast")
 metadata/_custom_type_script = "uid://draedm6g40tbf"
 
 [node name="AimRaycast" type="RayCast3D" parent="." unique_id=613111368]
-transform = Transform3D(-6.217249e-15, -5.9604645e-08, -0.99999994, 1, -4.371139e-08, 0, -4.371139e-08, -0.99999994, 5.9604645e-08, 0.48552072, 2.0615988, 0)
-target_position = Vector3(0, 0, -50)
+transform = Transform3D(4.3711385e-08, 0.9999999, -1.589326e-08, 1, -4.371139e-08, 0, -7.859277e-15, -1.589326e-08, -0.9999999, 0.31215018, 1.3052685, 0)
+target_position = Vector3(0, 0, -10)
 debug_shape_custom_color = Color(0, 1, 0, 1)
 debug_shape_thickness = 5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="AimRaycast" unique_id=1474888120]
 transform = Transform3D(1, -4.371138e-08, -4.3711385e-08, -4.371138e-08, -4.371138e-08, -0.9999999, 4.371138e-08, 0.9999999, -4.3711374e-08, -1.1920929e-07, 0.45178843, -8.940697e-08)
+visible = false
 mesh = SubResource("CylinderMesh_bhunq")
 
 [connection signal="state_physics_processing" from="StateChart/root/FollowState" to="." method="_on_follow_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/root/AttackState" to="." method="_on_attack_state_physics_processing"]
 [connection signal="body_entered" from="DetectionRange" to="." method="_on_detection_range_body_entered"]
+
+[editable path="Zombified"]

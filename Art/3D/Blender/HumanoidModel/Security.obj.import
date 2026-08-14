@@ -3,11 +3,7 @@
 importer="wavefront_obj"
 importer_version=1
 type="Mesh"
-<<<<<<< HEAD
-uid="uid://dhejyumsi3xsh"
-=======
-uid="uid://wetet3jg8j1n"
->>>>>>> cc90885 (security model)
+uid="uid://c6ov7rnpdimbp"
 path="res://.godot/imported/Security.obj-6e5311fbb52a7bb9f042388c99a64c40.mesh"
 
 [deps]
