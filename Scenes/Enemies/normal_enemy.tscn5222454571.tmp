@@ -1,0 +1,115 @@
+[gd_scene format=3 uid="uid://ymhcm0a4omay"]
+
+[ext_resource type="Script" uid="uid://bshdejtv6ivh3" path="res://_Assets/Enemies/scripts/normal_enemy.gd" id="1_n31bn"]
+[ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="2_di8u2"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="3_t0ntk"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="4_hkgbp"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="5_m7f1c"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="6_bcpb1"]
+[ext_resource type="Script" uid="uid://draedm6g40tbf" path="res://_Assets/Enemies/components/enemy_shoot_component.gd" id="7_di8u2"]
+[ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="8_t0ntk"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vx3u4"]
+shading_mode = 0
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_o08ba"]
+material = SubResource("StandardMaterial3D_vx3u4")
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_o08ba"]
+margin = 1.2
+length = 0.75
+slide_on_slope = true
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
+margin = 0.01
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_vx3u4"]
+radius = 5.2074046
+
+[node name="NormalEnemy" type="CharacterBody3D" unique_id=1253637122]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.122186184, 0)
+platform_on_leave = 1
+script = ExtResource("1_n31bn")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1895812746]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1260614, 0)
+mesh = SubResource("CylinderMesh_o08ba")
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=274294896]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0.38569206, 0.12080133, 0)
+shape = SubResource("SeparationRayShape3D_o08ba")
+debug_color = Color(0.9664827, 0, 0.49429512, 0.41960785)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1647058949]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0334291, 0)
+shape = SubResource("CapsuleShape3D_o08ba")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=792034714]
+avoidance_enabled = true
+debug_enabled = true
+
+[node name="HealthComponent" type="Node" parent="." unique_id=926395659]
+script = ExtResource("2_di8u2")
+metadata/_custom_type_script = "uid://dtyhxdhs168m"
+
+[node name="StateChart" type="Node" parent="." unique_id=1767814074]
+script = ExtResource("3_t0ntk")
+metadata/_custom_type_script = "uid://couw105c3bde4"
+
+[node name="root" type="Node" parent="StateChart" unique_id=779622242]
+script = ExtResource("4_hkgbp")
+initial_state = NodePath("IdleState")
+
+[node name="IdleState" type="Node" parent="StateChart/root" unique_id=212248887]
+script = ExtResource("5_m7f1c")
+
+[node name="FollowState" type="Node" parent="StateChart/root" unique_id=283097608]
+script = ExtResource("5_m7f1c")
+
+[node name="AttackState" type="Node" parent="StateChart/root" unique_id=1539277819]
+script = ExtResource("5_m7f1c")
+
+[node name="ToIdle" type="Node" parent="StateChart/root" unique_id=939488438]
+script = ExtResource("6_bcpb1")
+to = NodePath("../IdleState")
+event = &"toIdle"
+delay_in_seconds = "0.0"
+
+[node name="ToFollow" type="Node" parent="StateChart/root" unique_id=415341793]
+script = ExtResource("6_bcpb1")
+to = NodePath("../FollowState")
+event = &"toFollow"
+delay_in_seconds = "0.0"
+
+[node name="ToAttack" type="Node" parent="StateChart/root" unique_id=700072468]
+script = ExtResource("6_bcpb1")
+to = NodePath("../AttackState")
+event = &"toAttack"
+delay_in_seconds = "0.0"
+
+[node name="DetectionRange" type="Area3D" parent="." unique_id=1814576519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.894758, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionRange" unique_id=1866542978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6444154, 0)
+shape = SubResource("SphereShape3D_vx3u4")
+
+[node name="EnemyShootComponent" type="Node3D" parent="." unique_id=1986264680 node_paths=PackedStringArray("aim_raycast")]
+script = ExtResource("7_di8u2")
+weapon_data = ExtResource("8_t0ntk")
+aim_raycast = NodePath("../AimRaycast")
+metadata/_custom_type_script = "uid://draedm6g40tbf"
+
+[node name="AimRaycast" type="RayCast3D" parent="." unique_id=613111368]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0.48552072, 2.0615988, 0)
+target_position = Vector3(0, -15, 0)
+debug_shape_custom_color = Color(0, 1, 0, 1)
+debug_shape_thickness = 5
+
+[connection signal="state_physics_processing" from="StateChart/root/FollowState" to="." method="_on_follow_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/root/AttackState" to="." method="_on_attack_state_physics_processing"]
+[connection signal="body_entered" from="DetectionRange" to="." method="_on_detection_range_body_entered"]

@@ -22,12 +22,14 @@ length = 0.75
 slide_on_slope = true
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
+margin = 0.01
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vx3u4"]
 radius = 5.2074046
 
-[sub_resource type="BoxMesh" id="BoxMesh_bhunq"]
-size = Vector3(0.07910156, 0.10058594, 0.08105469)
+[sub_resource type="CylinderMesh" id="CylinderMesh_bhunq"]
+top_radius = 0.13427734
+bottom_radius = 0.13427734
 
 [node name="NormalEnemy" type="CharacterBody3D" unique_id=1253637122]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.122186184, 0)
@@ -101,27 +103,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6444154, 0)
 shape = SubResource("SphereShape3D_vx3u4")
 
 [node name="EnemyShootComponent" type="Node3D" parent="." unique_id=1986264680 node_paths=PackedStringArray("aim_raycast")]
-visible = false
 script = ExtResource("7_di8u2")
-aim_raycast = NodePath("../RayCast3D")
-weapon = ExtResource("8_t0ntk")
+weapon_data = ExtResource("8_t0ntk")
+aim_raycast = NodePath("../AimRaycast")
 metadata/_custom_type_script = "uid://draedm6g40tbf"
 
-[node name="RayCast3D" type="RayCast3D" parent="." unique_id=613111368]
-transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0.47024, 2.0615988, 0)
-visible = false
+[node name="AimRaycast" type="RayCast3D" parent="." unique_id=613111368]
+transform = Transform3D(-6.217249e-15, -5.9604645e-08, -0.99999994, 1, -4.371139e-08, 0, -4.371139e-08, -0.99999994, 5.9604645e-08, 0.48552072, 2.0615988, 0)
+target_position = Vector3(0, 0, -50)
 debug_shape_custom_color = Color(0, 1, 0, 1)
 debug_shape_thickness = 5
 
-[node name="StairWalker" type="Node3D" parent="." unique_id=350620727]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StairWalker" unique_id=493324505]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.010084957, 0.055035308, 0.9453953)
-mesh = SubResource("BoxMesh_bhunq")
-
-[node name="StairRaycast" type="RayCast3D" parent="StairWalker" unique_id=950340611]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.7905828)
-target_position = Vector3(0, -0.2, 0)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="AimRaycast" unique_id=1474888120]
+transform = Transform3D(1, -4.371138e-08, -4.3711385e-08, -4.371138e-08, -4.371138e-08, -0.9999999, 4.371138e-08, 0.9999999, -4.3711374e-08, -1.1920929e-07, 0.45178843, -8.940697e-08)
+mesh = SubResource("CylinderMesh_bhunq")
 
 [connection signal="state_physics_processing" from="StateChart/root/FollowState" to="." method="_on_follow_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/root/AttackState" to="." method="_on_attack_state_physics_processing"]

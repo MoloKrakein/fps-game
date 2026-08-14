@@ -20,6 +20,7 @@ var reserve_ammo: int = 0
 var fire_timer: float = 0.0
 var is_loaded: bool = false
 var is_reloading: bool = false
+var is_aiming: bool = false
 
 var aim_tween: Tween
 const AIM_SPEED: float = 0.2
@@ -339,5 +340,4 @@ func initialize_weapon_data(weapon_data: WeaponData) -> void:
 	current_ammo = weapon_data.ammo_in_magazine
 	reserve_ammo = weapon_data.reserve_ammo
 	is_loaded = weapon_data.is_loaded
-
 

@@ -10,11 +10,9 @@ extends BaseEnemy
 @onready var state_chart: StateChart = $StateChart
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 
-@onready var stair_detector: Node3D = $StairWalker
-@onready var stair_raycast: RayCast3D = $StairWalker/StairRaycast
+@onready var enemy_shoot_component: Node3D = $EnemyShootComponent
 
 
-@onready var shoot_component: EnemyShootComponent = $EnemyShootComponent
 
 var character_height: float = 2.0
 var attack_range: float = 10.0
@@ -41,8 +39,9 @@ func _physics_process(delta: float) -> void:
 
 
 func on_triggered() -> void:
-	print("Saw Player")
+	# print("Saw Player")
 	state_chart.send_event("toFollow")
+	state_chart.send_event("toAttack")
 
 func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	velocity.x = suggested_velocity.x
@@ -70,12 +69,7 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 	var direction = (next_pos - global_position).normalized()
 
 	navigation_agent.velocity = direction * follow_speed
-	
-	# if abs(direction.length()) > 0.1:
-	# 	stair_detector.rotation.y = atan2(direction.x, direction.y)
-	# 	if is_on_wall() and is_on_floor():
-	# 		var stair_height = stair_raycast.get_collision_point().y - global_position.y
-	# 		global_position.y += stair_height + 2.5
+
 
 
 	if direction.length() > 0.01:
@@ -91,20 +85,42 @@ func _on_detection_range_body_entered(body: Node3D) -> void:
 func _on_attack_state_physics_processing(delta: float) -> void:
 	if not target:
 		return
-
+		
 	var distance_to_target = global_position.distance_to(target.global_position)
+	
+	# Transition back to follow if player runs away
 	if distance_to_target > attack_range:
 		state_chart.send_event("toFollow")
 		return
-
+		
+	# 1. Stop moving
 	navigation_agent.velocity = Vector3.ZERO
-
-	var direction_to_target = (target.global_position - global_position).normalized()
-	var target_rot = atan2(direction_to_target.x, direction_to_target.z)
-	rotation.y = lerp_angle(rotation.y, target_rot, 15.0 * delta)
-
-	shoot_component._execute_shot()
-
+	
+	# 2. Rotate the Enemy Body Left/Right (Yaw)
+	# We force the Y-axis to 0 so the enemy capsule doesn't tilt over on ramps/stairs.
+	var flat_direction = Vector3(
+		target.global_position.x - global_position.x, 
+		0.0, 
+		target.global_position.z - global_position.z
+	).normalized()
+	
+	var target_rot = atan2(flat_direction.x, flat_direction.z)
+	rotation.y = lerp_angle(rotation.y, target_rot, 10.0 * delta)
+	
+	# 3. Rotate the AimRaycast Up/Down/All-around (Pitch/Yaw)
+	# We add a Y-offset so the enemy aims at your chest/head, not your feet!
+	var aim_target_position = target.global_position + Vector3(0.0, 2.0, 0.0) # Adjust 2.0 based on your player's height
+	
+	# We grab the raycast and smoothly interpolate its 3D rotation towards the player
+	var raycast = enemy_shoot_component.aim_raycast
+	var current_transform = raycast.global_transform
+	var target_transform = current_transform.looking_at(aim_target_position, Vector3.UP)
+	
+	# slerp (Spherical Linear Interpolation) makes the 3D rotation smooth
+	raycast.global_transform.basis = current_transform.basis.slerp(target_transform.basis, 15.0 * delta)
+	
+	# 4. Pull the trigger!
+	enemy_shoot_component.fire()
 
 func _try_stair_stepping(motion: Vector3) -> bool:
 	if motion.length_squared() == 0:

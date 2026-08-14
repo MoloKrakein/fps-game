@@ -557,3 +557,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.566474, 0.936, -6.692631)
 
 [node name="NormalEnemy" parent="." unique_id=1253637122 instance=ExtResource("1_r01ad")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.290585, 3.2547789, 0.9280734)
+
+[node name="NormalEnemy2" parent="." unique_id=1588764678 instance=ExtResource("1_r01ad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.290585, 3.2547789, -0.7589493)
