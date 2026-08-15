@@ -78,3 +78,5 @@ func update_camera_height(delta: float, direction: int) -> void:
 			position.y = clamp(min(position.y + (crouch_speed * direction) * delta, DEFAULT_HEIGHT), crouch_offset, DEFAULT_HEIGHT)
 		# print("Camera Raising: ", position.y)
 		
+
+

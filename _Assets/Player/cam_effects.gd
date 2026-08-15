@@ -225,3 +225,6 @@ func _animate_fov(target_fov: float, duration: float) -> void:
 	_fov_tween.set_trans(Tween.TRANS_SINE)
 
 	_fov_tween.tween_property(self, "fov", target_fov, duration)
+
+func apply_ads_fov(target_fov: float, duration: float) -> void:
+	_animate_fov(target_fov, duration)

@@ -44,7 +44,7 @@ func _ready() -> void:
 		is_loaded = current_ammo > 0
 	# get active weapon data from the WeaponManager
 	
-	player = get_parent() as PlayerController
+	player = get_tree().get_first_node_in_group("player") as PlayerController
 
 	
 
@@ -297,7 +297,7 @@ func aim_hipfire() -> void:
 func aim_ads() -> void:
 	if current_weapon:
 		accuracy_modifier = current_weapon.aim_accuracy_modifier
-		
+		player.cam_effects.apply_ads_fov(current_weapon.aim_fov,1)
 		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
 		
 func aim_canted() -> void:
@@ -340,4 +340,3 @@ func initialize_weapon_data(weapon_data: WeaponData) -> void:
 	current_ammo = weapon_data.ammo_in_magazine
 	reserve_ammo = weapon_data.reserve_ammo
 	is_loaded = weapon_data.is_loaded
-
