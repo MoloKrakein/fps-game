@@ -4,7 +4,9 @@ extends BaseEnemy
 @export var follow_speed: float = 5.0
 @export var max_step_up: float = 1.0
 @export var max_step_down: float = 1.0
+
 @export var animation_player: AnimationPlayer
+@export var animation_tree: AnimationTree
 
 
 @onready var health_component: HealthComponent = $HealthComponent
@@ -19,6 +21,8 @@ extends BaseEnemy
 var character_height: float = 2.0
 var attack_range: float = 10.0
 
+var anima_tree_state: AnimationNodeStateMachinePlayback
+
 var previous_velocity: Vector3
 var target: Node3D
 var is_sliding: bool = false
@@ -29,9 +33,12 @@ func _ready() -> void:
 	target = get_tree().get_first_node_in_group("player")
 	health_component.died.connect(_on_died)
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
-	if animation_player:
-		animation_player.play("Idle")
-		animation_player.seek(randf_range(0.0,animation_player.current_animation_length))
+	
+	# animation setup
+	
+	await get_tree().process_frame
+	animation_tree["parameters/Idle/seek_request"] = randf_range(0.0, 1.0) # Randomize the starting point of the idle animation
+		
 	navigation_agent.target_desired_distance = randf_range(1.3, 3.0) # Randomize the distance to the player when following
 func _physics_process(delta: float) -> void:
 	
@@ -57,8 +64,7 @@ func _on_died() -> void:
 	queue_free()
 
 func _on_follow_state_physics_processing(delta: float) -> void:
-	if not target:
-		return
+
 
 	navigation_agent.target_position = target.global_position
 
@@ -77,9 +83,11 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 
 	navigation_agent.velocity = direction * follow_speed
 
-	if animation_player and animation_player.current_animation != "Running":
-		animation_player.play("Running")
+	# if animation_player and animation_player.current_animation != "Running":
+	# 	animation_player.play("Running")
 		# animation_player.seek(randf_range(0.0,animation_player.current_animation_length))
+
+
 
 	if direction.length() > 0.01:
 		var target_rot = atan2(direction.x, direction.z)
