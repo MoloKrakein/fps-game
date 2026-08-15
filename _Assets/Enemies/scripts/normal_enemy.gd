@@ -4,11 +4,13 @@ extends BaseEnemy
 @export var follow_speed: float = 5.0
 @export var max_step_up: float = 1.0
 @export var max_step_down: float = 1.0
+@export var animation_player: AnimationPlayer
 
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var state_chart: StateChart = $StateChart
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
+
 
 @onready var enemy_shoot_component: Node3D = $EnemyShootComponent
 
@@ -27,7 +29,10 @@ func _ready() -> void:
 	target = get_tree().get_first_node_in_group("player")
 	health_component.died.connect(_on_died)
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
-
+	if animation_player:
+		animation_player.play("Idle")
+		animation_player.seek(randf_range(0.0,animation_player.current_animation_length))
+	navigation_agent.target_desired_distance = randf_range(1.3, 3.0) # Randomize the distance to the player when following
 func _physics_process(delta: float) -> void:
 	
 	if not is_on_floor():
@@ -41,7 +46,7 @@ func _physics_process(delta: float) -> void:
 func on_triggered() -> void:
 	# print("Saw Player")
 	state_chart.send_event("toFollow")
-	state_chart.send_event("toAttack")
+	# state_chart.send_event("toAttack")
 
 func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	velocity.x = suggested_velocity.x
@@ -60,6 +65,8 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 
 	if navigation_agent.is_navigation_finished():
 		navigation_agent.velocity = Vector3.ZERO
+		if animation_player and animation_player.current_animation != "Idle":
+			animation_player.play("Idle")
 		return
 
 	# Move towards the target
@@ -70,11 +77,16 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 
 	navigation_agent.velocity = direction * follow_speed
 
-
+	if animation_player and animation_player.current_animation != "Running":
+		animation_player.play("Running")
+		# animation_player.seek(randf_range(0.0,animation_player.current_animation_length))
 
 	if direction.length() > 0.01:
 		var target_rot = atan2(direction.x, direction.z)
 		rotation.y = lerp_angle(rotation.y, target_rot, 5.0 * delta)
+	
+	
+
 
 
 func _on_detection_range_body_entered(body: Node3D) -> void:
@@ -85,6 +97,8 @@ func _on_detection_range_body_entered(body: Node3D) -> void:
 func _on_attack_state_physics_processing(delta: float) -> void:
 	if not target:
 		return
+	if animation_player:
+		animation_player.play("Idle")
 		
 	var distance_to_target = global_position.distance_to(target.global_position)
 	
@@ -156,3 +170,8 @@ func _try_stair_stepping(motion: Vector3) -> bool:
 			return true
 
 	return false
+
+
+func _on_idle_state_state_physics_processing(delta: float) -> void:
+	if animation_player:
+		animation_player.play("Idle")
