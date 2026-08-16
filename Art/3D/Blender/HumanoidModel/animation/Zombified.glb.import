@@ -4162,7 +4162,7 @@ _subresources={
 "import/skip_import": true
 },
 "PATH:Armature/Skeleton3D": {
-"retarget/bone_map": null
+"retarget/bone_map": Resource("uid://jsmvf7l3e2tg", "res://Art/3D/Blender/HumanoidModel/animation/Mixamo BoneMap.tres")
 },
 "PATH:Armature/Skeleton3D/ArmorV2": {
 "import/skip_import": true
