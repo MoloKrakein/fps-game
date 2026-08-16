@@ -4155,10 +4155,20 @@ _subresources={
 }
 },
 "nodes": {
+"PATH:Armature/CharacterMesh/ArmorV2 Acc": {
+"import/skip_import": true
+},
+"PATH:Armature/CharacterMesh/CharacterTie": {
+"import/skip_import": true
+},
 "PATH:Armature/Skeleton3D": {
-"retarget/bone_map": Object(BoneMap,"resource_local_to_scene":false,"resource_name":"","profile":Object(SkeletonProfileHumanoid,"resource_local_to_scene":false,"resource_name":"","root_bone":&"Root","scale_base_bone":&"Hips","group_size":4,"bone_size":56,"script":null)
-,"bonemap":null,"bone_map/Root":&"root","bone_map/Hips":&"pelvis","bone_map/Spine":&"spine_01","bone_map/Chest":&"spine_02","bone_map/UpperChest":&"","bone_map/Neck":&"neck","bone_map/Head":&"head","bone_map/LeftEye":&"","bone_map/RightEye":&"","bone_map/Jaw":&"","bone_map/LeftShoulder":&"clavicle_l","bone_map/LeftUpperArm":&"arm_l","bone_map/LeftLowerArm":&"forearm_l","bone_map/LeftHand":&"hand_l","bone_map/LeftThumbMetacarpal":&"thumb_01_l","bone_map/LeftThumbProximal":&"thumb_02_l","bone_map/LeftThumbDistal":&"thumb_03_l","bone_map/LeftIndexProximal":&"index_01_l","bone_map/LeftIndexIntermediate":&"index_02_l","bone_map/LeftIndexDistal":&"index_03_l","bone_map/LeftMiddleProximal":&"","bone_map/LeftMiddleIntermediate":&"","bone_map/LeftMiddleDistal":&"","bone_map/LeftRingProximal":&"","bone_map/LeftRingIntermediate":&"","bone_map/LeftRingDistal":&"","bone_map/LeftLittleProximal":&"","bone_map/LeftLittleIntermediate":&"","bone_map/LeftLittleDistal":&"","bone_map/RightShoulder":&"clavicle_r","bone_map/RightUpperArm":&"arm_r","bone_map/RightLowerArm":&"forearm_r","bone_map/RightHand":&"hand_r","bone_map/RightThumbMetacarpal":&"thumb_01_r","bone_map/RightThumbProximal":&"thumb_02_r","bone_map/RightThumbDistal":&"thumb_03_r","bone_map/RightIndexProximal":&"index_01_r","bone_map/RightIndexIntermediate":&"index_02_r","bone_map/RightIndexDistal":&"index_03_r","bone_map/RightMiddleProximal":&"","bone_map/RightMiddleIntermediate":&"","bone_map/RightMiddleDistal":&"","bone_map/RightRingProximal":&"","bone_map/RightRingIntermediate":&"","bone_map/RightRingDistal":&"","bone_map/RightLittleProximal":&"","bone_map/RightLittleIntermediate":&"","bone_map/RightLittleDistal":&"","bone_map/LeftUpperLeg":&"thigh_l","bone_map/LeftLowerLeg":&"calf_l","bone_map/LeftFoot":&"foot_l","bone_map/LeftToes":&"toe_l","bone_map/RightUpperLeg":&"thigh_r","bone_map/RightLowerLeg":&"calf_r","bone_map/RightFoot":&"foot_r","bone_map/RightToes":&"toe_r","script":null)
-
+"retarget/bone_map": null
+},
+"PATH:Armature/Skeleton3D/ArmorV2": {
+"import/skip_import": true
+},
+"PATH:Armature/Skeleton3D/CharacterClothing": {
+"import/skip_import": true
 }
 }
 }

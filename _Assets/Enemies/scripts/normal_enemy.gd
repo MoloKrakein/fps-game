@@ -31,6 +31,7 @@ var deceleration: float = 10.0
 var previous_velocity: Vector3
 var target: Node3D
 var is_sliding: bool = false
+var is_dead: bool = false
 
 func _ready() -> void:
 	super._ready()
@@ -72,6 +73,8 @@ func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	velocity.z = move_toward(velocity.z, target_velocity.z, acceleration * get_physics_process_delta_time())
 
 func _on_died() -> void:
+
+
 	state_chart.send_event("toDead")
 	# queue_free()
 
@@ -125,7 +128,7 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 
 
 func _on_detection_range_body_entered(body: Node3D) -> void:
-	if body.is_in_group("player"):
+	if body.is_in_group("player") and not is_dead:
 		on_triggered()
 
 
@@ -227,6 +230,11 @@ func _on_dead_state_entered() -> void:
 	# 1. STOP the main body from running gravity and move_and_slide!
 	# This prevents the parent node from dragging the ragdoll into the void.
 	set_physics_process(false)
+	is_dead = true
+	navigation_agent.velocity = Vector3.ZERO
+	# stop rotation and looking for the player
+	# rotation.y = 0
+	navigation_agent.target_position = global_position
 	
 	# 2. Turn the main body into a ghost to prevent collision explosions
 	collision_layer = 0
@@ -246,4 +254,4 @@ func _on_dead_state_entered() -> void:
 		
 	# 5. Clean up after 5 seconds
 	await get_tree().create_timer(5.0).timeout
-	queue_free()
+	# queue_free()
