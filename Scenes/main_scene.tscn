@@ -28,7 +28,7 @@ player = NodePath("../../CurrentLevel/PlayerController")
 [node name="CurrentLevel" type="Node3D" parent="." unique_id=1396905234]
 
 [node name="PlayerController" parent="CurrentLevel" unique_id=1796224466 instance=ExtResource("2_x6ack")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.809613, 13.551608, -4.549453)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.809613, 5.8104715, 0.61031055)
 collision_mask = 3
 default_speed = 6.0
 
