@@ -17,6 +17,7 @@ func _ready() -> void:
 		current_ammo = weapon_data.mags_ammo
 
 func _process(delta: float) -> void:
+	
 	# Tick down fire rate cooldown
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)

@@ -64,7 +64,7 @@ func _physics_process(delta: float) -> void:
 func on_triggered() -> void:
 	# print("Saw Player")
 	state_chart.send_event("toFollow")
-	# state_chart.send_event("toAttack")
+	state_chart.send_event("toAttack")
 
 func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	var target_velocity = Vector3(suggested_velocity.x, velocity.y, suggested_velocity.z)

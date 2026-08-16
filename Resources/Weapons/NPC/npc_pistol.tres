@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://cj0y567xdyope"]
+
+[ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_w7rt3"]
+
+[resource]
+script = ExtResource("1_w7rt3")
+weapon_name = "npc_gun"
+max_ammo = 999
+fire_rate_rpm = 200.0
+accuracy = 65.849
+metadata/_custom_type_script = "uid://djccd7pdwygtl"
