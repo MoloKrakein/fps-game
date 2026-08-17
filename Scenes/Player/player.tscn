@@ -34,6 +34,7 @@
 [ext_resource type="Script" uid="uid://c4ugr8wbr6sn" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_ads_state.gd" id="27_1agin"]
 [ext_resource type="Script" uid="uid://dm1430qubtqlq" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_canted_state.gd" id="28_2jnj1"]
 [ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="33_1agin"]
+[ext_resource type="Script" uid="uid://b24cno8aek6ob" path="res://_Assets/Player/components/ragdoll_kicker.gd" id="35_enij7"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -42,6 +43,10 @@
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_o08ba"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enij7"]
+radius = 1.436
+height = 6.718
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "step_handler") groups=["player"]]
 process_priority = -9
@@ -72,6 +77,7 @@ metadata/_custom_type_script = "uid://dtyhxdhs168m"
 
 [node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]
 shape = SubResource("CapsuleShape3D_o08ba")
+debug_fill = false
 
 [node name="StateChartDebugger" parent="StandCollider" unique_id=854209845 instance=ExtResource("2_oikmp")]
 anchors_preset = 0
@@ -86,6 +92,7 @@ initial_node_to_watch = NodePath("../../StateChart")
 [node name="CrouchCollider" type="CollisionShape3D" parent="." unique_id=1751202798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.43174714, 0)
 shape = SubResource("SphereShape3D_ks1b7")
+debug_fill = false
 
 [node name="Mesh" type="MeshInstance3D" parent="." unique_id=1636070211]
 visible = false
@@ -116,9 +123,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5676575)
 
 [node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
 transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)
+visible = false
 debug_shape_custom_color = Color(0.9588106, 0, 0.51712954, 1)
 debug_shape_thickness = 5
 script = ExtResource("4_h8ma5")
+
+[node name="BodyKicker" type="Area3D" parent="." unique_id=428381360 node_paths=PackedStringArray("actor")]
+collision_layer = 9
+collision_mask = 8
+script = ExtResource("35_enij7")
+actor = NodePath("..")
+kick_force = 60.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BodyKicker" unique_id=1147680536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7519531, 0)
+shape = SubResource("CapsuleShape3D_enij7")
+debug_color = Color(0.9085531, 0.00011666894, 0.73807245, 0.41960785)
 
 [node name="UI" type="Control" parent="." unique_id=533540372]
 visible = false
@@ -446,6 +466,7 @@ weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 
+[connection signal="body_entered" from="BodyKicker" to="BodyKicker" method="_on_body_entered"]
 [connection signal="state_entered" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_entered"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]

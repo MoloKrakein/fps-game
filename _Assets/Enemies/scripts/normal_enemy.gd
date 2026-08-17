@@ -76,7 +76,9 @@ func _on_died() -> void:
 
 
 	state_chart.send_event("toDead")
-	# queue_free()
+	# put the enemy into a ragdoll group so the player can kick it around
+	add_to_group("ragdoll")
+	
 
 func _on_follow_state_physics_processing(delta: float) -> void:
 
@@ -239,8 +241,8 @@ func _on_dead_state_entered() -> void:
 	# 2. Turn the main body into a ghost to prevent collision explosions
 	collision_layer = 0
 	collision_mask = 1
-	# if collision_shape:
-		# collision_shape.set_deferred("disabled", true)
+	if collision_shape:
+		collision_shape.set_deferred("disabled", true)
 	
 	# 3. Disable the AnimationTree so it stops forcing poses
 	if anim_tree:
