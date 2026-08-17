@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_0sgi0")
+damage = 120.0
 max_ammo = 900
 is_hitscan = false
 accuracy = 78.218
