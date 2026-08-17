@@ -64,7 +64,3 @@ func _physics_process(_delta: float) -> void:
 			
 			# Apply the impulse to the bone
 			body.apply_central_impulse(final_force)
-
-	if overlapping_bodies.size() > 0:
-		for body in overlapping_bodies:
-			print("Kicker is touching: ", body.name, " | Class: ", body.get_class())

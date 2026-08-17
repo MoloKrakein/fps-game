@@ -6,6 +6,6 @@
 script = ExtResource("1_w7rt3")
 weapon_name = "npc_gun"
 max_ammo = 999
-fire_rate_rpm = 200.0
-accuracy = 65.849
+fire_rate_rpm = 8.0
+accuracy = 80.0
 metadata/_custom_type_script = "uid://djccd7pdwygtl"
