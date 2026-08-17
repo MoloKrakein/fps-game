@@ -17,7 +17,7 @@ extends BaseEnemy
 
 
 @onready var enemy_shoot_component: Node3D = $EnemyShootComponent
-
+@onready var body_kicker: Area3D = $BodyKicker
 
 
 var character_height: float = 2.0
@@ -32,6 +32,7 @@ var previous_velocity: Vector3
 var target: Node3D
 var is_sliding: bool = false
 var is_dead: bool = false
+
 
 func _ready() -> void:
 	super._ready()
@@ -78,7 +79,9 @@ func _on_died() -> void:
 	state_chart.send_event("toDead")
 	# put the enemy into a ragdoll group so the player can kick it around
 	add_to_group("ragdoll")
-	
+	body_kicker.queue_free()
+	navigation_agent.queue_free()
+
 
 func _on_follow_state_physics_processing(delta: float) -> void:
 

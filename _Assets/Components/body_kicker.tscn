@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://jc4o0ev03hbu"]
+
+[ext_resource type="Script" uid="uid://b24cno8aek6ob" path="res://_Assets/Player/components/ragdoll_kicker.gd" id="1_nod7d"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enij7"]
+radius = 1.436
+height = 6.718
+
+[node name="BodyKicker" type="Area3D" unique_id=1491175186]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("1_nod7d")
+kick_force = 60.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1003761908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7519531, 0)
+shape = SubResource("CapsuleShape3D_enij7")
+debug_color = Color(0.9085531, 0.00011666894, 0.73807245, 0.41960785)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
