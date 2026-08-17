@@ -16,7 +16,7 @@ extends BaseEnemy
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 
 
-@onready var enemy_shoot_component: Node3D = $EnemyShootComponent
+@onready var enemy_shoot_component: EnemyShootingComponent = $EnemyShootComponent
 @onready var body_kicker: Area3D = $BodyKicker
 
 
@@ -140,45 +140,46 @@ func _on_detection_range_body_entered(body: Node3D) -> void:
 func _on_attack_state_physics_processing(delta: float) -> void:
 	if not target:
 		return
-	if anim_tree_state.get_current_node() != "Idle":
-		anim_tree_state.travel("Idle")
-		
+
 	var distance_to_target = global_position.distance_to(target.global_position)
-	
-	# Transition back to follow if player runs away
 	if distance_to_target > attack_range:
 		state_chart.send_event("toFollow")
 		return
-		
+
 	# 1. Stop moving
 	navigation_agent.velocity = Vector3.ZERO
-	
-	# 2. Rotate the Enemy Body Left/Right (Yaw)
-	# We force the Y-axis to 0 so the enemy capsule doesn't tilt over on ramps/stairs.
+
+	# 2. Rotate the Enemy Body Left/Right (Yaw) safely keeping Y flat
 	var flat_direction = Vector3(
 		target.global_position.x - global_position.x, 
 		0.0, 
 		target.global_position.z - global_position.z
 	).normalized()
 	
-	var target_rot = atan2(flat_direction.x, flat_direction.z)
-	rotation.y = lerp_angle(rotation.y, target_rot, 10.0 * delta)
-	
-	# 3. Rotate the AimRaycast Up/Down/All-around (Pitch/Yaw)
-	# We add a Y-offset so the enemy aims at your chest/head, not your feet!
-	var aim_target_position = target.global_position + Vector3(0.0, 2.0, 0.0) # Adjust 2.0 based on your player's height
-	
-	# We grab the raycast and smoothly interpolate its 3D rotation towards the player
-	var raycast = enemy_shoot_component.aim_raycast
-	var current_transform = raycast.global_transform
-	var target_transform = current_transform.looking_at(aim_target_position, Vector3.UP)
-	
-	# slerp (Spherical Linear Interpolation) makes the 3D rotation smooth
-	raycast.global_transform.basis = current_transform.basis.slerp(target_transform.basis, 15.0 * delta)
+	if flat_direction.length_squared() > 0.001:
+		var target_rot = atan2(flat_direction.x, flat_direction.z)
+		rotation.y = lerp_angle(rotation.y, target_rot, 15.0 * delta)
+
+	# 3. Rotate the Shoot Position Up/Down/All-Around using Quaternions
+	if is_instance_valid(enemy_shoot_component.shoot_position):
+		# Aim at the center of the player, not their toes (adjust the +1.0 if needed)
+		var aim_target_position = target.global_position + Vector3(0.0, 1.0, 0.0) 
+		
+		var shoot_pos = enemy_shoot_component.shoot_position
+		var aim_direction = (aim_target_position - shoot_pos.global_position).normalized()
+		
+		if aim_direction.length_squared() > 0.001:
+			var target_basis = Basis.looking_at(aim_direction, Vector3.UP)
+			
+			# Use Quaternions to prevent scaling/stretching crashes!
+			var current_quat = shoot_pos.global_basis.orthonormalized().get_rotation_quaternion()
+			var target_quat = target_basis.get_rotation_quaternion()
+			
+			shoot_pos.global_basis = Basis(current_quat.slerp(target_quat, 15.0 * delta))
 	
 	# 4. Pull the trigger!
 	enemy_shoot_component.fire()
-
+	
 func _try_stair_stepping(motion: Vector3) -> bool:
 	if motion.length_squared() == 0:
 		return false
