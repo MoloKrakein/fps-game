@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dr1gjsouxfhid"]
+
+[ext_resource type="PackedScene" uid="uid://cmy38yhi830li" path="res://_Assets/Env/objects/base_breakable.tscn" id="1_x0gj0"]
+[ext_resource type="PackedScene" uid="uid://bqj10illg3gai" path="res://Art/3D/Blender/prop/Scenes/table_broken.tscn" id="2_s66q5"]
+[ext_resource type="PackedScene" uid="uid://os2a1q58bbgu" path="res://Art/3D/Blender/prop/table.glb" id="3_l0aby"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
+size = Vector3(5.031784, 1.8131104, 1.8554688)
+
+[node name="Base_Breakable" unique_id=1360629975 instance=ExtResource("1_x0gj0")]
+break_scene = ExtResource("2_s66q5")
+
+[node name="table" parent="." index="0" unique_id=1441103216 instance=ExtResource("3_l0aby")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." index="1" unique_id=1443037669]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017662048, 0.8303833, -0.02734375)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="HealthComponent" parent="." index="2" unique_id=68015359]
+start_max_health = true
+
+[editable path="table"]

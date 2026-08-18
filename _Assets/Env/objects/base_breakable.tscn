@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cmy38yhi830li"]
+
+[ext_resource type="Script" uid="uid://m3qsj4itxt5d" path="res://_Assets/Env/objects/base_breakable.gd" id="1_fw5s4"]
+[ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="2_tla4t"]
+
+[node name="Base_Breakable" type="Node3D" unique_id=1360629975]
+script = ExtResource("1_fw5s4")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=68015359]
+script = ExtResource("2_tla4t")
+max_health = 2.0
+start_max_health = false
+metadata/_custom_type_script = "uid://dtyhxdhs168m"
+
+[connection signal="died" from="HealthComponent" to="." method="_on_health_component_died"]

@@ -25,6 +25,9 @@ func _on_body_entered(body: Node3D) -> void:
 		push_dir = push_dir.normalized()
 		
 		var speed_multiplier = current_speed / base_walk_speed
+		if body is RigidBody3D:
+			kick_force *= 0.5 # Reduce force for RigidBody3D to avoid excessive movement
+
 		var final_force = push_dir * kick_force * speed_multiplier
 		
 		body.apply_central_impulse(final_force)
