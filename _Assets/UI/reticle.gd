@@ -1,5 +1,5 @@
 @tool
-extends Control
+class_name Reticle extends Control
 
 @export var DOT_RADIUS: float = 30.0 : set = set_dot_radius
 @export var DOT_COLOR: Color = Color(1, 0, 0, 1) : set = set_crosshair_color

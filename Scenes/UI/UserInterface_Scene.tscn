@@ -1,8 +1,25 @@
 [gd_scene format=3 uid="uid://boarmlj6juypt"]
 
+[ext_resource type="Script" uid="uid://ddm6c8g4gwqes" path="res://_Assets/UI/user_interface.gd" id="1_em0eb"]
 [ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Assets/UI/reticle.gd" id="1_g8q8s"]
 
-[node name="UserInterface" type="CanvasLayer" unique_id=2116638828]
+[sub_resource type="Theme" id="Theme_o08ba"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vx3u4"]
+bg_color = Color(0.11776582, 8.0643076e-05, 0.38011408, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bors"]
+bg_color = Color(0.16300386, 0.6169165, 0.99999994, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7emvt"]
+bg_color = Color(0.35, 0.105000004, 0.11316666, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_halmm"]
+bg_color = Color(1, 0, 0, 1)
+
+[node name="UserInterface" type="CanvasLayer" unique_id=2116638828 node_paths=PackedStringArray("crosshair")]
+script = ExtResource("1_em0eb")
+crosshair = NodePath("Reticle/ReticleDraw")
 
 [node name="Reticle" type="CenterContainer" parent="." unique_id=1535928905]
 anchors_preset = 15
@@ -10,6 +27,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_lock_ = true
 
 [node name="ReticleDraw" type="Control" parent="Reticle" unique_id=1678006504]
 layout_mode = 2
@@ -18,3 +36,58 @@ DOT_SCALE = 5.0
 GAP_ANGLE = 50.0
 SEGMENTS = 1
 CENTER_DOT_RADIUS = 0.2
+metadata/_edit_lock_ = true
+
+[node name="BarContainer" type="PanelContainer" parent="." unique_id=361265110]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -85.0
+offset_right = 275.0
+offset_bottom = -1.0
+grow_vertical = 0
+
+[node name="Armorbar" type="ProgressBar" parent="BarContainer" unique_id=1626262654]
+unique_name_in_owner = true
+layout_mode = 2
+theme = SubResource("Theme_o08ba")
+theme_override_styles/background = SubResource("StyleBoxFlat_vx3u4")
+theme_override_styles/fill = SubResource("StyleBoxFlat_6bors")
+value = 80.0
+
+[node name="Healthbar" type="ProgressBar" parent="BarContainer" unique_id=1716491587]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_7emvt")
+theme_override_styles/fill = SubResource("StyleBoxFlat_halmm")
+value = 70.0
+
+[node name="AmmoContainer" type="PanelContainer" parent="." unique_id=386732142]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -145.0
+offset_top = -41.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="AmmoContainer" unique_id=1166870338]
+layout_mode = 2
+alignment = 1
+
+[node name="CurrentAmmoLabel" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=1555833833]
+unique_name_in_owner = true
+layout_mode = 2
+text = "000"
+
+[node name="Separator" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=354271008]
+layout_mode = 2
+text = "/"
+
+[node name="ReservedAmmoLabel" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=385965612]
+unique_name_in_owner = true
+layout_mode = 2
+text = "9999"

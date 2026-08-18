@@ -25,6 +25,8 @@ weapons = Dictionary[int, ExtResource("3_m1efj")]({
 })
 player = NodePath("../../CurrentLevel/PlayerController")
 
+[node name="UIManager" type="Node" parent="Managers" unique_id=1809892748]
+
 [node name="CurrentLevel" type="Node3D" parent="." unique_id=1396905234]
 
 [node name="PlayerController" parent="CurrentLevel" unique_id=1796224466 instance=ExtResource("2_x6ack")]

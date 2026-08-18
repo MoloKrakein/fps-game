@@ -45,8 +45,9 @@ func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool 
     
     damage_taken.emit(damage_amount)
     health_changed.emit(current_health, max_health)
-    print(get_parent().name, " took ", damage_amount, " damage. Current health: ", current_health, "/", max_health)
-    print("Current armor: ", current_armor, "/", armor_value)
+    Manager.ui_manager.user_interface.set_health_value(current_health, max_health)
+    # print(get_parent().name, " took ", damage_amount, " damage. Current health: ", current_health, "/", max_health)
+    # print("Current armor: ", current_armor, "/", armor_value)
     if current_health <= 0.0:
         _handle_death()
 
@@ -56,6 +57,7 @@ func heal(heal_amount: float) -> void:
     var actual_heal = max(0.0, heal_amount)
     current_health = min(max_health, current_health + actual_heal)
     health_changed.emit(current_health, max_health)
+    Manager.ui_manager.user_interface.set_health_value(current_health, max_health)
 
 func _handle_death() -> void:
     if not is_alive:
@@ -63,10 +65,12 @@ func _handle_death() -> void:
     is_alive = false
     current_health = 0.0
     died.emit()
-    print(get_parent().name, " is Died")
+    Manager.ui_manager.user_interface.set_health_value(current_health, max_health)
+    # print(get_parent().name, " is Died")
 
 func _ready() -> void:
     if start_max_health:
         current_health = max_health
     if start_with_armor:
         current_armor = armor_value
+
