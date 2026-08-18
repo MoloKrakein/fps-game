@@ -45,6 +45,7 @@ func _ready() -> void:
 	# get active weapon data from the WeaponManager
 	
 	player = get_tree().get_first_node_in_group("player") as PlayerController
+	call_deferred("update_weapon_ui")
 
 	
 
@@ -153,6 +154,8 @@ func _cycle_weapon() -> void:
 		active_weapon_data.ammo_in_magazine -= 1
 		active_weapon_data.is_loaded = true
 
+	update_weapon_ui()
+
 func execute_reload() -> void:
 	reset_trigger()
 
@@ -175,7 +178,7 @@ func execute_reload() -> void:
 
 	if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
 		_cycle_weapon()
-	
+	update_weapon_ui()
 #endregion
 
 #region Weapon Model
@@ -205,6 +208,7 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	if current_weapon_model:
 		current_weapon_model.queue_free()
 	spawn_weapon_model(weapon_data.weapon)
+
 
 func has_ammo() -> bool:
 	return active_weapon_data != null and (active_weapon_data.ammo_in_magazine > 0 or active_weapon_data.reserve_ammo > 0)
@@ -340,3 +344,10 @@ func initialize_weapon_data(weapon_data: WeaponData) -> void:
 	current_ammo = weapon_data.ammo_in_magazine
 	reserve_ammo = weapon_data.reserve_ammo
 	is_loaded = weapon_data.is_loaded
+
+func update_weapon_ui() -> void:
+	# 1. Check if the manager exists yet
+	if active_weapon_data == null:
+		return
+
+	EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo)

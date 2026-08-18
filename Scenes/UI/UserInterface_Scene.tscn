@@ -47,7 +47,7 @@ offset_right = 275.0
 offset_bottom = -1.0
 grow_vertical = 0
 
-[node name="Armorbar" type="ProgressBar" parent="BarContainer" unique_id=1626262654]
+[node name="ArmorBar" type="ProgressBar" parent="BarContainer" unique_id=1626262654]
 unique_name_in_owner = true
 layout_mode = 2
 theme = SubResource("Theme_o08ba")
@@ -55,7 +55,7 @@ theme_override_styles/background = SubResource("StyleBoxFlat_vx3u4")
 theme_override_styles/fill = SubResource("StyleBoxFlat_6bors")
 value = 80.0
 
-[node name="Healthbar" type="ProgressBar" parent="BarContainer" unique_id=1716491587]
+[node name="HealthBar" type="ProgressBar" parent="BarContainer" unique_id=1716491587]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4

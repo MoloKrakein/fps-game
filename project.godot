@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Manager="*uid://c8w3y7525ega7"
+EventBus="*uid://c6bv4siycophu"
 
 [display]
 

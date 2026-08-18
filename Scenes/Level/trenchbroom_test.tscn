@@ -556,7 +556,7 @@ directional_shadow_mode = 0
 sky_mode = 2
 
 [node name="Base_Breakable" parent="Environment" unique_id=1360629975 instance=ExtResource("14_vpkq5")]
-transform = Transform3D(0.555, 0, 0, 0, 0.555, 0, 0, 0, 0.555, 1.5085802, 3.4686685, 0)
+transform = Transform3D(0.555, 0, 0, 0, 0.555, 0, 0, 0, 0.555, -3.279707, 4.514069, 0)
 
 [node name="Weapon" parent="." unique_id=418274648 instance=ExtResource("10_mrt38")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.653402, 2.8730125, -0.15212488)

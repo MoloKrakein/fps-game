@@ -7,6 +7,7 @@ var current_weap_slot: int = 1
 
 func _ready() -> void:
 	add_to_group("weapon_manager")
+	Manager.weapon_manager = self
 
 	for i in range(1, 10):
 		var action_name = "equip_weapon_" + str(i)
@@ -34,6 +35,8 @@ func equip_weapon(slot: int) -> void:
 	if weapon_data and weapon_data.is_unlocked:
 		current_weap_slot = slot
 		player.weapon_controller.switch_weapon(weapon_data)
+		EventBus.weapon_ammo_changed.emit(weapon_data.ammo_in_magazine, weapon_data.reserve_ammo)
+		
 
 
 func use_ammo(slot: int, amount: int = 1) -> void:
@@ -59,6 +62,7 @@ func unlock_weapon(slot: int, weapon_resource: Weapon) -> void:
 		weapons[slot].weapon = weapon_resource
 		weapons[slot].is_unlocked = true
 		weapons[slot].reserve_ammo = weapon_resource.max_ammo
+		EventBus.weapon_ammo_changed.emit(weapons[slot].ammo_in_magazine, weapons[slot].reserve_ammo)
 
 # func initialize_starting_weapon(weapon_data: WeaponData) -> void:
 # 	for slot in range(1, 10):

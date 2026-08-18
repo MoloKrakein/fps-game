@@ -20,3 +20,4 @@ func apply_pickup(player: PlayerController) -> void:
     var ammo_to_add = min(space_available, ammo_amount)
 
     weapon_data.reserve_ammo += ammo_to_add
+    EventBus.weapon_ammo_changed.emit(weapon_data.ammo_in_magazine, weapon_data.reserve_ammo)
