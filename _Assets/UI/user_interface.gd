@@ -17,11 +17,13 @@ func _ready() -> void:
 
 func set_health_value(health: float, max_health: float) -> void:
     if health_bar:
+        print("Setting health value: ", health, " / ", max_health)
         health_bar.value = health
         health_bar.max_value = max_health
 
 func set_armor_value(armor: float, max_armor: float) -> void:
     if armor_bar:
+        print("Setting armor value: ", armor, " / ", max_armor)
         armor_bar.value = armor
         armor_bar.max_value = max_armor
 

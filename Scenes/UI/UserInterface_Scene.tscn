@@ -17,6 +17,20 @@ bg_color = Color(0.35, 0.105000004, 0.11316666, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_halmm"]
 bg_color = Color(1, 0, 0, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sn0t7"]
+bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_bhunq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+thickness = 3
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_riqys"]
+color = Color(0, 0, 1, 1)
+thickness = 3
+
 [node name="UserInterface" type="CanvasLayer" unique_id=2116638828 node_paths=PackedStringArray("crosshair")]
 script = ExtResource("1_em0eb")
 crosshair = NodePath("Reticle/ReticleDraw")
@@ -73,6 +87,15 @@ offset_left = -145.0
 offset_top = -41.0
 grow_horizontal = 0
 grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
+
+[node name="ProgressBar" type="ProgressBar" parent="AmmoContainer" unique_id=1612725676]
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxLine_bhunq")
+theme_override_styles/fill = SubResource("StyleBoxLine_riqys")
+value = 41.0
+rounded = true
+show_percentage = false
 
 [node name="HBoxContainer" type="HBoxContainer" parent="AmmoContainer" unique_id=1166870338]
 layout_mode = 2

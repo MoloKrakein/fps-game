@@ -467,6 +467,8 @@ weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 
+[connection signal="armor_changed" from="HealthComponent" to="." method="_on_health_component_armor_changed"]
+[connection signal="health_changed" from="HealthComponent" to="." method="_on_health_component_health_changed"]
 [connection signal="body_entered" from="BodyKicker" to="BodyKicker" method="_on_body_entered"]
 [connection signal="state_entered" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_entered"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]

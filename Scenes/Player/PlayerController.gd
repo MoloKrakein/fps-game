@@ -59,21 +59,24 @@ var is_sliding: bool = false
 
 
 func _ready() -> void:
-	health_component.armor_changed.connect(_on_health_changed)
-	health_component.health_changed.connect(_on_health_changed)
 	health_component.damage_taken.connect(_on_damage_taken)
 	_initilize_ui()
 
-func _on_health_changed(new_health: float, max_health: float) -> void:
+func _on_health_component_health_changed(new_health: float, max_health: float) -> void:
+	print("Health changed: ", new_health, " / ", max_health)
 	EventBus.player_health_changed.emit(new_health, max_health)
 
 func _on_damage_taken(damage_amount: float) -> void:
 	EventBus.player_damage_taken.emit(damage_amount)
 
-func _on_armor_changed(new_armor: float, max_armor: float) -> void:
+func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
+	print("Armor changed: ", new_armor, " / ", max_armor)
 	EventBus.player_armor_changed.emit(new_armor, max_armor)
 
 func _initilize_ui() -> void:
+	# print("Initializing UI with current health and armor values")
+	# print("Current Health: ", health_component.current_health, " / ", health_component.max_health)
+	# print("Current Armor: ", health_component.current_armor, " / ", health_component.armor_value)
 	EventBus.player_health_changed.emit(health_component.current_health, health_component.max_health)
 	EventBus.player_armor_changed.emit(health_component.current_armor, health_component.armor_value)
 
@@ -252,3 +255,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var health_component = get_node_or_null("HealthComponent")
 	if health_component and event.is_action_pressed("test1"):
 		health_component.take_damage(50)
+
+
+
+
