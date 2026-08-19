@@ -10,8 +10,9 @@ class_name UserInterface extends CanvasLayer
 
 func _ready() -> void:
     # Connect signals to update UI elements when values change
-    EventBus.health_changed.connect(set_health_value)
-    EventBus.armor_changed.connect(set_armor_value)
+    EventBus.player_health_changed.connect(set_health_value)
+    EventBus.player_armor_changed.connect(set_armor_value)
+    
     EventBus.weapon_ammo_changed.connect(set_ammo_values)
 
 func set_health_value(health: float, max_health: float) -> void:

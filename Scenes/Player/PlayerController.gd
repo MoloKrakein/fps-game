@@ -35,6 +35,8 @@ class_name PlayerController extends CharacterBody3D
 @export var isToggleCrouch: bool = false
 @export var isToggleSprint: bool = false
 
+@onready var health_component: HealthComponent = get_node("HealthComponent")
+
 var _input_dir: Vector2 = Vector2.ZERO
 var _movement_velocity: Vector3 = Vector3.ZERO
 var sprint_modifier: float = 0.0
@@ -57,7 +59,23 @@ var is_sliding: bool = false
 
 
 func _ready() -> void:
-	pass
+	health_component.armor_changed.connect(_on_health_changed)
+	health_component.health_changed.connect(_on_health_changed)
+	health_component.damage_taken.connect(_on_damage_taken)
+	_initilize_ui()
+
+func _on_health_changed(new_health: float, max_health: float) -> void:
+	EventBus.player_health_changed.emit(new_health, max_health)
+
+func _on_damage_taken(damage_amount: float) -> void:
+	EventBus.player_damage_taken.emit(damage_amount)
+
+func _on_armor_changed(new_armor: float, max_armor: float) -> void:
+	EventBus.player_armor_changed.emit(new_armor, max_armor)
+
+func _initilize_ui() -> void:
+	EventBus.player_health_changed.emit(health_component.current_health, health_component.max_health)
+	EventBus.player_armor_changed.emit(health_component.current_armor, health_component.armor_value)
 
 func _physics_process(delta: float) -> void:
 	
@@ -223,6 +241,10 @@ func enable_movement() -> void:
 
 func _on_aiming_state_state_entered() -> void:
 	pass # Replace with function body.
+
+func _on_player_dead() -> void:
+	# Disable player input and movement
+	disable_movement()
 
 #region Debugging
 func _unhandled_input(event: InputEvent) -> void:

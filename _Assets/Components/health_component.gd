@@ -1,9 +1,9 @@
 class_name HealthComponent extends Node
 
 
-signal health_changed(new_health: int, max_health: int)
-signal damage_taken(damage_amount: int)
-signal armor_changed(new_armor: int, max_armor: int)
+signal health_changed(new_health: float, max_health: float)
+signal damage_taken(damage_amount: float)
+signal armor_changed(new_armor: float, max_armor: float)
 signal on_armor_broken()
 signal died()
 
