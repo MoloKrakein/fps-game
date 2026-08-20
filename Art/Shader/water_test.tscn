@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://u18xoq05aslv"]
+
+[ext_resource type="Shader" uid="uid://cvqwqk5ywk18i" path="res://Art/Shader/water_manual.gdshader" id="1_3c6ud"]
+[ext_resource type="Texture2D" uid="uid://bp8w57r3cldqj" path="res://Art/2D/Noise Textures/Noise_Gradients/T_Random_23.png" id="2_vtkhg"]
+[ext_resource type="Texture2D" uid="uid://dh3em6y0hkgex" path="res://Art/2D/Noise Textures/Noise_Gradients/T_Random_53.png" id="3_nsqcl"]
+[ext_resource type="Texture2D" uid="uid://dnwxka5tmrey6" path="res://Art/2D/Noise Textures/Noise_Normals/T_NoiseNormal_45.png" id="4_hbae8"]
+[ext_resource type="Texture2D" uid="uid://dwgyah6tfejrk" path="res://Art/2D/Noise Textures/Noise_Gradients/T_Random_45.png" id="5_6h3fh"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_m2gsh"]
+render_priority = 0
+shader = ExtResource("1_3c6ud")
+shader_parameter/surface_color = Color(0.2, 1, 0.8, 1)
+shader_parameter/depth_color = Color(0.08, 0.2, 0.4, 1)
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/depth_size = 12.0
+shader_parameter/surface_roughness = 0.05
+shader_parameter/foam_roughness = 0.05
+shader_parameter/caustics_texture = ExtResource("2_vtkhg")
+shader_parameter/caustics_strength = 2.0
+shader_parameter/caustics_scale = Vector2(0.5, 0.5)
+shader_parameter/wave_texture = ExtResource("5_6h3fh")
+shader_parameter/wave_normal_texture = ExtResource("4_hbae8")
+shader_parameter/wave_softness = 5.5000000819566
+shader_parameter/wave_scale = Vector2(0.2, 0.2)
+shader_parameter/wave_layer_scale = Vector2(1.5, 1.5)
+shader_parameter/wave_highlight = 0.35000000521542
+shader_parameter/wave_velocity = Vector2(0.245, 0.325)
+shader_parameter/foam_texture = ExtResource("3_nsqcl")
+shader_parameter/edge_foam_depth_size = 4.91
+shader_parameter/wave_foam_amount = 0.28999999351792
+shader_parameter/foam_start = 0.15
+shader_parameter/foam_end = 0.30000000447036
+shader_parameter/foam_exponent = 2.0
+shader_parameter/refraction_amount = 1.72
+shader_parameter/refraction_exponent = 2.565
+shader_parameter/displacement_amount = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_r10ef"]
+material = SubResource("ShaderMaterial_m2gsh")
+size = Vector3(9.436386, 0.75, 36.51)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sn0t7"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_riqys"]
+material = SubResource("ShaderMaterial_sn0t7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" unique_id=381213941]
+transform = Transform3D(4.535, 0, 0, 0, 4.535, 0, 0, 0, 4.535, -3.0466437, -0.43976736, 0)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_r10ef")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1750516160]
+transform = Transform3D(0.9999997, 0, 0, 0, 0.9143318, -0.4049651, 0, 0.4049651, 0.9143318, -0.23876935, 0.37248486, 0)
+mesh = SubResource("PlaneMesh_riqys")

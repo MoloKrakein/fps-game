@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bxit5d33hy64v"]
+
+[ext_resource type="Texture2D" uid="uid://csgw764r3p0r5" path="res://trenchbroom/textures/poolWall.png" id="1_1runa"]
+
+[resource]
+albedo_texture = ExtResource("1_1runa")
+metallic_specular = 0.0
+texture_filter = 2

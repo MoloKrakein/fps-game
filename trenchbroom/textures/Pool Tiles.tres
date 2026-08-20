@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dn3th2vb2aydd"]
+
+[ext_resource type="Texture2D" uid="uid://cbhxccp1e7p0m" path="res://trenchbroom/textures/Pool Tiles.png" id="1_usa5b"]
+
+[resource]
+albedo_texture = ExtResource("1_usa5b")
+metallic_specular = 0.0
+texture_filter = 2
