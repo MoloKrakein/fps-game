@@ -111,7 +111,8 @@ player_controller = NodePath("..")
 component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
-fov = 90.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.59839463)
+fov = 80.0
 script = ExtResource("4_eksi1")
 player = NodePath("../..")
 max_roll = 1.5
