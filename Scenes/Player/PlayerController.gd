@@ -77,6 +77,8 @@ func _initilize_ui() -> void:
 	# print("Initializing UI with current health and armor values")
 	# print("Current Health: ", health_component.current_health, " / ", health_component.max_health)
 	# print("Current Armor: ", health_component.current_armor, " / ", health_component.armor_value)
+	# print("Emitting initial health and armor values to UI")
+	await get_tree().process_frame
 	EventBus.player_health_changed.emit(health_component.current_health, health_component.max_health)
 	EventBus.player_armor_changed.emit(health_component.current_armor, health_component.armor_value)
 

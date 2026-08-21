@@ -16,6 +16,9 @@ extends BaseEnemy
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 
 
+@onready var triggerable_component: TriggerableComponent = $TriggerableComponent
+
+
 @onready var enemy_shoot_component: EnemyShootingComponent = $EnemyShootComponent
 @onready var body_kicker: Area3D = $BodyKicker
 
@@ -33,6 +36,7 @@ var target: Node3D
 var is_sliding: bool = false
 var is_dead: bool = false
 
+#region Lifecycle
 
 func _ready() -> void:
 	super._ready()
@@ -62,10 +66,42 @@ func _physics_process(delta: float) -> void:
 	# ALWAYS update blends, regardless of whether we climbed a stair or walked flat!
 	update_blends()
 
-func on_triggered() -> void:
-	# print("Saw Player")
-	state_chart.send_event("toFollow")
-	state_chart.send_event("toAttack")
+#endregion
+
+#region Navigation and Movement
+
+func _try_stair_stepping(motion: Vector3) -> bool:
+	if motion.length_squared() == 0:
+		return false
+
+	var jt_transform = global_transform
+	var params = PhysicsTestMotionParameters3D.new()
+	params.from = jt_transform
+	params.motion = motion
+	var result = PhysicsTestMotionResult3D.new()
+
+	# 1. Test forward motion. If we don't hit a wall/stair, return false.
+	# We let _physics_process handle normal move_and_slide().
+	if not PhysicsServer3D.body_test_motion(get_rid(), params, result):
+		return false
+
+	# 2. We hit something! Test if we can step up over it.
+	var step_up_transform = jt_transform.translated(Vector3(0, max_step_up, 0))
+	params.from = step_up_transform
+	params.motion = motion
+
+	if not PhysicsServer3D.body_test_motion(get_rid(), params, result):
+		# We can move forward up high. Now cast down to find the stair tread.
+		var step_down_transform = step_up_transform.translated(result.get_travel())
+		params.from = step_down_transform
+		params.motion = Vector3(0, -max_step_up * 2.0, 0)
+
+		if PhysicsServer3D.body_test_motion(get_rid(), params, result):
+			# We found the stair floor! Move the enemy up and forward cleanly.
+			global_position = step_down_transform.origin + result.get_travel()
+			return true # We handled the movement, skip move_and_slide!
+
+	return false
 
 func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	var target_velocity = Vector3(suggested_velocity.x, velocity.y, suggested_velocity.z)
@@ -73,21 +109,8 @@ func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	velocity.x = move_toward(velocity.x, target_velocity.x, acceleration * get_physics_process_delta_time())
 	velocity.z = move_toward(velocity.z, target_velocity.z, acceleration * get_physics_process_delta_time())
 
-func _on_died() -> void:
-
-
-	state_chart.send_event("toDead")
-	# put the enemy into a ragdoll group so the player can kick it around
-	add_to_group("ragdoll")
-	body_kicker.queue_free()
-	navigation_agent.queue_free()
-
-
 func _on_follow_state_physics_processing(delta: float) -> void:
-
-
 	navigation_agent.target_position = target.global_position
-
 
 	if navigation_agent.is_navigation_finished():
 		navigation_agent.velocity = Vector3.ZERO
@@ -102,7 +125,6 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 
 	# 	state_chart.send_event("toAirborne")
 	# 	return
-
 
 	var next_pos = navigation_agent.get_next_path_position()
 	var direction = (next_pos - global_position).normalized()
@@ -122,20 +144,48 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 	if anim_tree_state.get_current_node() != "Follow":
 		anim_tree_state.travel("Follow")
 
-
 	if direction.length() > 0.01:
 		var target_rot = atan2(direction.x, direction.z)
 		rotation.y = lerp_angle(rotation.y, target_rot, 5.0 * delta)
-	
-	
-	
 
+func _on_airborne_state_physics_processing(delta: float) -> void:
+	if is_on_floor() and velocity.y < 0.0:
+		state_chart.send_event("toFollow")
+		navigation_agent.target_position = target.global_position
 
+#endregion
+
+#region Animation
+
+func _on_idle_state_state_physics_processing(delta: float) -> void:
+	if anim_tree_state.get_current_node() != "Idle":
+		anim_tree_state.travel("Idle")
+
+func update_blends() -> void:
+	var move_amount = velocity.length()
+	move_amount = remap(move_amount,0.0,follow_speed,0.0,1.0)
+	anim_tree["parameters/Follow/IdleRunBlend/blend_position"] = move_amount
+
+#endregion
+
+#region Combat and Detection
 
 func _on_detection_range_body_entered(body: Node3D) -> void:
 	if body.is_in_group("player") and not is_dead:
 		on_triggered()
 
+func on_triggered() -> void:
+	# print("Saw Player")
+	state_chart.send_event("toFollow")
+	# state_chart.send_event("toAttack")
+
+func on_trigger(player) -> void:
+	# print("Saw Player")
+	state_chart.send_event("toFollow")
+
+
+func get_targetname() -> String:
+	return triggerable_component.targetname if triggerable_component else ""
 
 func _on_attack_state_physics_processing(delta: float) -> void:
 	if not target:
@@ -179,58 +229,17 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 	
 	# 4. Pull the trigger!
 	enemy_shoot_component.fire()
-	
-func _try_stair_stepping(motion: Vector3) -> bool:
-	if motion.length_squared() == 0:
-		return false
 
-	var jt_transform = global_transform
-	var params = PhysicsTestMotionParameters3D.new()
-	params.from = jt_transform
-	params.motion = motion
-	var result = PhysicsTestMotionResult3D.new()
+#endregion
 
-	# 1. Test forward motion. If we don't hit a wall/stair, return false.
-	# We let _physics_process handle normal move_and_slide().
-	if not PhysicsServer3D.body_test_motion(get_rid(), params, result):
-		return false 
+#region Death and Ragdoll
 
-	# 2. We hit something! Test if we can step up over it.
-	var step_up_transform = jt_transform.translated(Vector3(0, max_step_up, 0))
-	params.from = step_up_transform
-	params.motion = motion
-
-	if not PhysicsServer3D.body_test_motion(get_rid(), params, result):
-		# We can move forward up high. Now cast down to find the stair tread.
-		var step_down_transform = step_up_transform.translated(result.get_travel())
-		params.from = step_down_transform
-		params.motion = Vector3(0, -max_step_up * 2.0, 0)
-
-		if PhysicsServer3D.body_test_motion(get_rid(), params, result):
-			# We found the stair floor! Move the enemy up and forward cleanly.
-			global_position = step_down_transform.origin + result.get_travel()
-			return true # We handled the movement, skip move_and_slide!
-
-	return false
-
-
-func _on_idle_state_state_physics_processing(delta: float) -> void:
-	if anim_tree_state.get_current_node() != "Idle":
-		anim_tree_state.travel("Idle")
-
-
-func update_blends() -> void:
-	var move_amount = velocity.length()
-	move_amount = remap(move_amount,0.0,follow_speed,0.0,1.0)
-	anim_tree["parameters/Follow/IdleRunBlend/blend_position"] = move_amount
-
-
-
-func _on_airborne_state_physics_processing(delta: float) -> void:
-	if is_on_floor() and velocity.y < 0.0:
-		state_chart.send_event("toFollow")
-		navigation_agent.target_position = target.global_position
-
+func _on_died() -> void:
+	state_chart.send_event("toDead")
+	# put the enemy into a ragdoll group so the player can kick it around
+	add_to_group("ragdoll")
+	body_kicker.queue_free()
+	navigation_agent.queue_free()
 
 func _on_dead_state_entered() -> void:
 	# 1. STOP the main body from running gravity and move_and_slide!
@@ -260,4 +269,6 @@ func _on_dead_state_entered() -> void:
 		
 	# 5. Clean up after 5 seconds
 	await get_tree().create_timer(5.0).timeout
-	# queue_free()
+	queue_free()
+
+#endregion
