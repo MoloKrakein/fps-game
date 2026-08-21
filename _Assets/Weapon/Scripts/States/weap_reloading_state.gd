@@ -4,10 +4,10 @@ extends WeaponState
 
 func _on_reload_state_state_entered() -> void:
 	weapon_controller.is_reloading = true
-	print("State Chart: Entered Reloading State")
-	
+	# print("State Chart: Entered Reloading State")
 	# 1. Get the reload time from your weapon stats
 	var reload_time = weapon_controller.current_weapon.reload_time
+	weapon_controller.reload_timer_ui(reload_time)
 	
 	# 2. Wait for the reload to finish
 	await get_tree().create_timer(reload_time).timeout

@@ -295,13 +295,14 @@ func _perform_projectile_fire() -> void:
 #region Aiming & Tweens
 func aim_hipfire() -> void:
 	if current_weapon:
+		EventBus.change_visibility_of_crosshair.emit(true)
 		accuracy_modifier = 1.0
 		tween_weapon_to_position(current_weapon.weapon_position, current_weapon.weapon_rotation)
 
 func aim_ads() -> void:
 	if current_weapon:
 		accuracy_modifier = current_weapon.aim_accuracy_modifier
-		player.cam_effects.apply_ads_fov(current_weapon.aim_fov,1)
+		# player.cam_effects.apply_ads_fov(current_weapon.aim_fov,1)
 		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
 		
 func aim_canted() -> void:
@@ -309,15 +310,8 @@ func aim_canted() -> void:
 		var target_pos: Vector3 = current_weapon.aim_ADS_position
 		var target_rot: Vector3 = current_weapon.aim_ADS_rotation
 		target_rot.z += deg_to_rad(45.0) 
+		EventBus.change_visibility_of_crosshair.emit(false)
 		tween_weapon_to_position(target_pos, target_rot)
-
-func _set_reticle_visible(is_visible: bool) -> void:
-	if reticle == null:
-		return
-	reticle.visible = is_visible
-	var reticle_parent = reticle.get_parent()
-	if reticle_parent is Control:
-		reticle_parent.visible = is_visible
 
 func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3) -> void:
 	if current_weapon_model == null:
@@ -349,5 +343,12 @@ func update_weapon_ui() -> void:
 	# 1. Check if the manager exists yet
 	if active_weapon_data == null:
 		return
+	var _reload_time: float = 0.0
+	if current_weapon != null:
+		EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo)
 
-	EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo)
+func reload_timer_ui(reload_time: float) -> void:
+	if active_weapon_data == null:
+		return
+	
+	EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo, reload_time)

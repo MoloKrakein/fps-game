@@ -31,11 +31,11 @@ thickness = 3
 color = Color(0, 0, 1, 1)
 thickness = 3
 
-[node name="UserInterface" type="CanvasLayer" unique_id=2116638828 node_paths=PackedStringArray("crosshair")]
+[node name="UserInterface" type="CanvasLayer" unique_id=2116638828]
 script = ExtResource("1_em0eb")
-crosshair = NodePath("Reticle/ReticleDraw")
 
 [node name="Reticle" type="CenterContainer" parent="." unique_id=1535928905]
+unique_name_in_owner = true
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -94,7 +94,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxLine_bhunq")
 theme_override_styles/fill = SubResource("StyleBoxLine_riqys")
-value = 41.0
+value = 100.0
 rounded = true
 show_percentage = false
 
