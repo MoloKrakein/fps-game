@@ -89,7 +89,8 @@ grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
 
-[node name="ProgressBar" type="ProgressBar" parent="AmmoContainer" unique_id=1612725676]
+[node name="AmmoBar" type="ProgressBar" parent="AmmoContainer" unique_id=1612725676]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxLine_bhunq")
 theme_override_styles/fill = SubResource("StyleBoxLine_riqys")

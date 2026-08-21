@@ -34,6 +34,8 @@ agent_max_climb = 0.7
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rtku8"]
 albedo_texture = ExtResource("11_udein")
 metallic_specular = 0.0
+clearcoat_enabled = true
+clearcoat = 0.25
 texture_filter = 2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qo5hl"]
@@ -427,6 +429,7 @@ metadata/_custom_type_script = "uid://cwu5cf7a0awcd"
 collision_mask = 0
 
 [node name="entity_0_mesh_instance" type="MeshInstance3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1639515818]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.052997112, -0.26626992, -0.2691183)
 mesh = SubResource("ArrayMesh_njbhx")
 
 [node name="entity_0_brush_0_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=388055822]
@@ -669,6 +672,7 @@ collision_layer = 0
 collision_mask = 2
 script = ExtResource("18_v83en")
 targets = Array[String](["enemy1"])
+trigger_once = true
 metadata/_custom_type_script = "uid://c3blk7u857k2m"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/TriggerVolume" unique_id=473621308]
@@ -698,3 +702,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.624307, -0.4261031, -8.202
 
 [node name="NormalEnemy6" parent="." unique_id=1264306112 instance=ExtResource("1_r01ad")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.624307, -0.4261031, -9.889347)
+
+[node name="entity_1_office_celling_lamp" parent="." unique_id=466402785 instance=ExtResource("11_r01ad")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 51.068497, 20.1186, -6)
