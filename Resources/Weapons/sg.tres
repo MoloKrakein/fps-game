@@ -12,6 +12,7 @@ is_hitscan = false
 accuracy = 67.391
 spread_angle = 0.135
 pellet_count = 8
+reload_time = 5.0
 projectile_speed = 600.0
 aim_accuracy_modifier = 100.0
 aim_ADS_position = Vector3(0, -0.142, -0.348)
