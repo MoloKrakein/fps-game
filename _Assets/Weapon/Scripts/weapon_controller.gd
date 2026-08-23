@@ -10,6 +10,19 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var shoot_position: Node3D
 @export var shoot_position_offset: Vector3 = Vector3.ZERO
 
+@export_group("Idle Sway Animations Settings")
+@export_category("Idle Sway Animations Settings")
+@export var idle_sway_enabled: bool = true
+@export var idle_sway_frequency: float = 0.8
+@export var idle_sway_amplitude: Vector2 = Vector2(0.005, 0.005)
+@export var idle_sway_stiffness: float = 40.0
+@export var idle_sway_damping: float = 60.0
+@export var idle_sway_rotation_multiplier: float = 0.5
+@export_category("Aiming Sway Settings")
+@export var aiming_sway_enabled: bool = true
+@export var aim_sway_multiplier: float = 0.15
+
+
 # Cached Data to prevent Singleton Bottlenecks
 var active_weapon_data: WeaponData
 
@@ -21,6 +34,28 @@ var fire_timer: float = 0.0
 var is_loaded: bool = false
 var is_reloading: bool = false
 var is_aiming: bool = false
+
+# Animation and Procedural Weapon Animation Variables
+
+var weapon_start_position: Vector3
+var weapon_start_rotation: Vector3
+
+var current_stance_pos: Vector3
+var current_stance_rot: Vector3
+
+var idle_time: float = 0.0
+var _idle_x: float = 0.0
+var _idle_y: float = 0.0
+var _idle_z: float = 0.0
+# var _idle_rot_x: float = 0.0
+# var _idle_rot_y: float = 0.0
+# var _idle_rot_z: float = 0.0
+var _idle_x_velocity: float = 0.0
+var _idle_y_velocity: float = 0.0
+# var _idle_z_velocity: float = 0.0
+# var _idle_rot_x_velocity: float = 0.0
+# var _idle_rot_y_velocity: float = 0.0
+
 
 var aim_tween: Tween
 const AIM_SPEED: float = 0.2
@@ -42,6 +77,7 @@ func _ready() -> void:
 		reserve_ammo = current_weapon.max_ammo
 		current_fire_mode = current_weapon.fire_mode
 		is_loaded = current_ammo > 0
+
 	# get active weapon data from the WeaponManager
 	
 	player = get_tree().get_first_node_in_group("player") as PlayerController
@@ -52,6 +88,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)
+	_update_idle_sway(delta)
 #endregion
 
 #region Trigger & Fire Mode
@@ -116,6 +153,21 @@ func can_fire() -> bool:
 
 	return false
 
+func can_reload() -> bool:
+	if current_weapon == null or active_weapon_data == null:
+		print("No weapon or weapon data available.")
+		return false
+
+	if active_weapon_data.reserve_ammo <= 0:
+		print("No reserve ammo left to reload.")
+		return false
+
+	if active_weapon_data.ammo_in_magazine == current_weapon.mags_ammo:
+		print("Magazine is already full.")
+		return false
+
+	return true
+
 func fire_weapon() -> void:
 	if not can_fire():
 		return
@@ -157,14 +209,15 @@ func _cycle_weapon() -> void:
 	update_weapon_ui()
 
 func execute_reload() -> void:
+	if not can_reload():
+		return
+
 	reset_trigger()
 
 
 	if current_weapon == null or active_weapon_data == null:
 		return
 
-	if active_weapon_data.reserve_ammo <= 0:
-		return
 	
 	var mag_capacity: int = current_weapon.mags_ammo
 	if active_weapon_data.ammo_in_magazine >= mag_capacity:
@@ -193,6 +246,12 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 		current_weapon_model.rotation = weapon.weapon_rotation
 		current_weapon_model.scale = weapon.weapon_scale
 		
+		weapon_start_position = current_weapon_model.position
+		weapon_start_rotation = current_weapon_model.rotation
+
+		current_stance_pos = weapon_start_position
+		current_stance_rot = weapon_start_rotation
+
 		var muzzle: Node3D = current_weapon_model.get_node_or_null("Muzzle") as Node3D
 		if muzzle != null:
 			shoot_position = muzzle
@@ -297,6 +356,7 @@ func aim_hipfire() -> void:
 	if current_weapon:
 		EventBus.change_visibility_of_crosshair.emit(true)
 		accuracy_modifier = 1.0
+		
 		tween_weapon_to_position(current_weapon.weapon_position, current_weapon.weapon_rotation)
 
 func aim_ads() -> void:
@@ -326,8 +386,11 @@ func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3
 	aim_tween.set_ease(Tween.EASE_IN_OUT)
 	aim_tween.set_parallel(true)
 
-	aim_tween.tween_property(current_weapon_model, "position", target_position, AIM_SPEED)
-	aim_tween.tween_property(current_weapon_model, "rotation", target_rotation, AIM_SPEED)
+	aim_tween.tween_property(self,"current_stance_pos", target_position, AIM_SPEED)
+	aim_tween.tween_property(self,"current_stance_rot", target_rotation, AIM_SPEED)
+
+	# aim_tween.tween_property(current_weapon_model, "position", target_position, AIM_SPEED)
+	# aim_tween.tween_property(current_weapon_model, "rotation", target_rotation, AIM_SPEED)
 #endregion
 
 func initialize_weapon_data(weapon_data: WeaponData) -> void:
@@ -352,3 +415,46 @@ func reload_timer_ui(reload_time: float) -> void:
 		return
 	
 	EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo, reload_time)
+
+
+#region Procedural Weapon Animations
+
+func _disable_procedural_weapon_animations() -> void:
+	idle_sway_enabled = false
+
+func _update_idle_sway(delta: float) -> void:
+	if not idle_sway_enabled or current_weapon_model == null:
+		return
+
+	idle_time += delta * idle_sway_frequency
+	var player_speed = Vector2(player.velocity.x, player.velocity.z).length()
+	
+	# 1. Dynamically scale the amplitude based on aim state
+	var current_amplitude: Vector2 = idle_sway_amplitude
+	if is_aiming: # Ensure this boolean tracks your AimingState chart folder!
+		current_amplitude *= aim_sway_multiplier
+
+	var target_x = 0.0
+	var target_y = 0.0
+
+	# 2. The Figure-8 Base (Using the scaled amplitude)
+	if player_speed < 0.1 or is_aiming:
+		target_x = sin(idle_time * idle_sway_frequency) * current_amplitude.x
+		target_y = cos(idle_time * idle_sway_frequency * 2.0) * current_amplitude.y
+
+	# 3. The Heartbeat Tremor
+	var micro_tremor: float = sin(idle_time * 15.0) * (current_amplitude.y * 0.15)
+	target_y += micro_tremor
+
+	# 4. Apply Spring Physics (No changes needed here!)
+	var result_x: Vector2 = SpringUtil.apply(_idle_x, _idle_x_velocity, target_x, delta, idle_sway_stiffness, idle_sway_damping)
+	_idle_x = result_x.x
+	_idle_x_velocity = result_x.y
+
+	var result_y: Vector2 = SpringUtil.apply(_idle_y, _idle_y_velocity, target_y, delta, idle_sway_stiffness, idle_sway_damping)
+	_idle_y = result_y.x
+	_idle_y_velocity = result_y.y
+
+	# 5. Final Transform (Assuming current_stance_position is implemented)
+	var _sway_offset: Vector3 = Vector3(_idle_x, _idle_y, 0)
+	current_weapon_model.position = current_stance_pos + _sway_offset

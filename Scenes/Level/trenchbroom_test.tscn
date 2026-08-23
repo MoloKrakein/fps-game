@@ -628,7 +628,7 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 19.9
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 25.59375, 8.9375, -11)
 
 [node name="entity_3_office_celling_lamp" parent="FuncGodotMap" unique_id=958057696 instance=ExtResource("11_r01ad")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 20.09375, 20.46875, -6)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 20.09375, 20.048542, -6)
 
 [node name="entity_4_office_celling_lamp" parent="FuncGodotMap" unique_id=324642974 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -4.09375, 20.46875, 2)

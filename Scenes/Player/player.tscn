@@ -87,7 +87,8 @@ offset_right = 485.0
 offset_bottom = 497.0
 grow_horizontal = 1
 grow_vertical = 1
-initial_node_to_watch = NodePath("../../StateChart")
+enabled = false
+initial_node_to_watch = NodePath("../../WeaponStateChart")
 
 [node name="CrouchCollider" type="CollisionShape3D" parent="." unique_id=1751202798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.43174714, 0)
@@ -165,6 +166,29 @@ offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_a3d8c")
+
+[node name="Component" type="Node" parent="." unique_id=2093724721]
+
+[node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
+script = ExtResource("2_xpcdj")
+
+[node name="StepHandler" type="Node" parent="Component" unique_id=1782951827 node_paths=PackedStringArray("player")]
+script = ExtResource("23_jincj")
+player = NodePath("../..")
+max_step_height = 0.6
+
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position")]
+script = ExtResource("24_qr1w5")
+current_weapon = ExtResource("33_1agin")
+weapon_model_parent = NodePath("../../CameraController/Cam")
+weapon_state_chart = NodePath("../../WeaponStateChart")
+reticle = NodePath("../../UI/Reticle")
+shoot_position = NodePath("../../CameraController/Cam/ShootPos")
+idle_sway_frequency = 1.2
+idle_sway_amplitude = Vector2(0.015, 0.01)
+idle_sway_stiffness = 150.0
+idle_sway_damping = 12.0
+idle_sway_rotation_multiplier = 3.01
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")
@@ -448,24 +472,6 @@ script = ExtResource("27_1agin")
 
 [node name="CantedAimState" type="Node" parent="WeaponStateMachine/Sight/AimingState" unique_id=1531340813]
 script = ExtResource("28_2jnj1")
-
-[node name="Component" type="Node" parent="." unique_id=2093724721]
-
-[node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
-script = ExtResource("2_xpcdj")
-
-[node name="StepHandler" type="Node" parent="Component" unique_id=1782951827 node_paths=PackedStringArray("player")]
-script = ExtResource("23_jincj")
-player = NodePath("../..")
-max_step_height = 0.6
-
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position")]
-script = ExtResource("24_qr1w5")
-current_weapon = ExtResource("33_1agin")
-weapon_model_parent = NodePath("../../CameraController/Cam")
-weapon_state_chart = NodePath("../../WeaponStateChart")
-reticle = NodePath("../../UI/Reticle")
-shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 
 [connection signal="armor_changed" from="HealthComponent" to="." method="_on_health_component_armor_changed"]
 [connection signal="health_changed" from="HealthComponent" to="." method="_on_health_component_health_changed"]

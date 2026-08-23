@@ -43,7 +43,7 @@ use_particle_trails = true
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_vx3u4"]
 material = SubResource("ORMMaterial3D_0cluu")
-height = 13.058838
+height = 21.184387
 
 [node name="22_bullet_projectile" unique_id=2127658052 node_paths=PackedStringArray("trail_effect") instance=ExtResource("1_tdwkw")]
 transform = Transform3D(0.22, 0, -1.2938413e-07, 0, 0.22, 0, 1.2938413e-07, 0, 0.22, 0, 0, 0)
@@ -54,12 +54,12 @@ trail_effect = NodePath("MeshInstance3D")
 transform = Transform3D(-0.1278467, 0.009195263, 0, 0, 0, -0.12800002, -0.0062629827, -0.18770352, 0, 0, 0, 0)
 shape = SubResource("ConvexPolygonShape3D_b77m3")
 
-[node name="Cylinder" parent="." index="1" unique_id=432497926]
+[node name="Cylinder" parent="." index="1" unique_id=277745491]
 transform = Transform3D(-0.1278467, 0.009195263, 0, 0, 0, -0.12800002, -0.0062629827, -0.18770352, 0, 0, 0, 0)
 cast_shadow = 0
 gi_mode = 0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." index="2" unique_id=921880052]
-transform = Transform3D(0.2767572, 4.1789193e-08, -4.178918e-08, -4.178918e-08, -1.2097441e-08, -0.2767572, -4.1789193e-08, 0.2767572, -1.209743e-08, 1.9305392e-06, 3.1347675e-08, 1.8602681)
+transform = Transform3D(0.2767572, 4.1789193e-08, -4.178918e-08, -4.178918e-08, -1.2097441e-08, -0.2767572, -4.1789193e-08, 0.2767572, -1.209743e-08, 2.0618686e-06, -6.6705863e-09, 2.7300246)
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_vx3u4")
