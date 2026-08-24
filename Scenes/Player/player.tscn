@@ -184,19 +184,23 @@ script = ExtResource("23_jincj")
 player = NodePath("../..")
 max_step_height = 0.6
 
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position")]
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position", "camera")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("33_1agin")
 weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
+camera = NodePath("../../CameraController/Cam")
 idle_sway_frequency = 0.7
 idle_sway_amplitude = Vector2(0.015, 0.01)
 idle_sway_stiffness = 150.0
 idle_sway_damping = 12.0
 idle_sway_rotation_multiplier = 3.01
 aim_sway_multiplier = 0.18
+look_lag_divisor = 30.0
+look_lag_rot_max = 20.0
+look_lag_pos_scale = 0.4
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

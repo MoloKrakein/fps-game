@@ -9,8 +9,9 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var reticle: Control
 @export var shoot_position: Node3D
 @export var shoot_position_offset: Vector3 = Vector3.ZERO
+@export	var camera: Camera3D
 
-@export_group("Idle Sway Animations Settings")
+@export_group("Sway Animations Settings")
 @export_category("Idle Sway Animations Settings")
 @export var idle_sway_enabled: bool = true
 @export var idle_sway_frequency: float = 0.8
@@ -18,10 +19,14 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var idle_sway_stiffness: float = 40.0
 @export var idle_sway_damping: float = 60.0
 @export var idle_sway_rotation_multiplier: float = 0.5
-@export_category("Aiming Sway Settings")
+@export_category("Idle Aiming Sway Settings")
 @export var aiming_sway_enabled: bool = true
 @export var aim_sway_multiplier: float = 0.15
-
+@export_category("Look Sway Settings")
+@export var look_sway_enabled: bool = true
+@export var look_lag_divisor: float = 10.0
+@export var look_lag_rot_max: float = 5.0
+@export var look_lag_pos_scale: float = 0.006
 
 # Cached Data to prevent Singleton Bottlenecks
 var active_weapon_data: WeaponData
@@ -43,10 +48,12 @@ var weapon_start_rotation: Vector3
 var current_stance_pos: Vector3
 var current_stance_rot: Vector3
 
+
+# idle sway variables
 var idle_time: float = 0.0
 var _idle_x: float = 0.0
 var _idle_y: float = 0.0
-var _idle_z: float = 0.0
+# var _idle_z: float = 0.0
 # var _idle_rot_x: float = 0.0
 # var _idle_rot_y: float = 0.0
 # var _idle_rot_z: float = 0.0
@@ -55,6 +62,10 @@ var _idle_y_velocity: float = 0.0
 # var _idle_z_velocity: float = 0.0
 # var _idle_rot_x_velocity: float = 0.0
 # var _idle_rot_y_velocity: float = 0.0
+
+# look sway variables
+var _previous_look_dir: Vector3 = Vector3.ZERO
+var _camera_rotation_rate: Vector3 = Vector3.ZERO
 
 
 var aim_tween: Tween
@@ -88,7 +99,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)
-	_update_idle_sway(delta)
+	_apply_offsets(delta)
 #endregion
 
 #region Trigger & Fire Mode
@@ -422,9 +433,9 @@ func reload_timer_ui(reload_time: float) -> void:
 func _disable_procedural_weapon_animations() -> void:
 	idle_sway_enabled = false
 
-func _update_idle_sway(delta: float) -> void:
+func _update_idle_sway(delta: float) -> Vector3:
 	if not idle_sway_enabled or current_weapon_model == null:
-		return
+		return Vector3.ZERO
 
 	# 1. Calculate the Normalized Tiredness (0.0 to 1.0)
 	# Using clamp ensures we never accidentally get negative or > 100% values
@@ -472,5 +483,43 @@ func _update_idle_sway(delta: float) -> void:
 
 	# 7. Final Transform 
 	var _sway_offset: Vector3 = Vector3(_idle_x, _idle_y, 0)
-	current_weapon_model.position = current_stance_pos + _sway_offset
+	return _sway_offset
+	# current_weapon_model.position = current_stance_pos + _sway_offset
+	# current_weapon_model.rotation = current_stance_rot
+
+func _update_look_sway(delta: float) -> Vector3:
+	if not look_sway_enabled or current_weapon_model == null or not camera:
+		return Vector3.ZERO
+	
+	var camera_rotation = camera.global_rotation
+
+	var rotation_delta = camera_rotation - _previous_look_dir
+	_previous_look_dir = camera_rotation
+	
+	var max_rad = deg_to_rad(look_lag_rot_max)
+	rotation_delta.x = clamp(rotation_delta.x, -max_rad, max_rad)
+	rotation_delta.y = clamp(rotation_delta.y, -max_rad, max_rad)
+	rotation_delta.z = 0.0
+
+	var interpolate_speed = (1.0 / delta) / look_lag_divisor
+	_camera_rotation_rate = _camera_rotation_rate.lerp(rotation_delta, clamp(interpolate_speed * delta,0.0,1.0))
+
+	var norm_pitch = _camera_rotation_rate.x / max_rad if max_rad > 0.0 else 0.0
+	var norm_yaw = _camera_rotation_rate.y / max_rad if max_rad > 0.0 else 0.0
+
+	var look_pos = Vector3(
+		norm_yaw * look_lag_pos_scale,
+		norm_pitch * look_lag_pos_scale,
+		0.0
+	)
+
+	return look_pos
+
+func _apply_offsets(delta: float) -> void:
+	var idle_offset: Vector3 = _update_idle_sway(delta)
+	var look_offset: Vector3 = _update_look_sway(delta)
+
+	current_weapon_model.position = current_stance_pos + idle_offset + look_offset
 	current_weapon_model.rotation = current_stance_rot
+
+#endregion
