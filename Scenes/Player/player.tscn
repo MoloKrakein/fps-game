@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Assets/Player/components/interaction_raycast.gd" id="4_h8ma5"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
+[ext_resource type="PackedScene" uid="uid://6baebp0xgdtr" path="res://Art/Assets/Weapon/SG/sg_model.tscn" id="6_mwii3"]
 [ext_resource type="Script" uid="uid://ds0atxnivefam" path="res://_Assets/Components/ragdoll_kicker.gd" id="7_enij7"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
@@ -51,6 +52,7 @@ height = 2.7826211
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "step_handler") groups=["player"]]
 process_priority = -9
 collision_layer = 2
+collision_mask = 3
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
@@ -70,6 +72,8 @@ fall_velocity_threshold = -7.0
 fall_damage_multiplier = 0.45
 slide_power = 7.0
 slide_cooldown = 1.6
+metadata/collision_preset_name = &"Player"
+metadata/collision_preset_id = &"2726797477598543100"
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1115016750]
 script = ExtResource("2_2jnj1")
@@ -119,6 +123,10 @@ max_roll = 1.5
 slide_pitch = 4.5
 slide_roll = 6.0
 slide_fov = 125.0
+
+[node name="PistolModel" parent="CameraController/Cam" unique_id=1425760719 instance=ExtResource("6_mwii3")]
+transform = Transform3D(0.42275086, -0.42577195, 0, 0.42577195, 0.42275086, 0, 0, 0, 0.6, 0.03, -0.135, -0.345)
+visible = false
 
 [node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5676575)
@@ -189,6 +197,7 @@ idle_sway_amplitude = Vector2(0.015, 0.01)
 idle_sway_stiffness = 150.0
 idle_sway_damping = 12.0
 idle_sway_rotation_multiplier = 3.01
+aim_sway_multiplier = 0.18
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

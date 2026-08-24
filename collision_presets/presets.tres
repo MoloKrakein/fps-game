@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CollisionPresetsDatabase" format=3 uid="uid://cfiv7tf0k3qgs"]
+
+[ext_resource type="Script" uid="uid://dle6wr75jpdaa" path="res://addons/collision_presets/collision_preset.gd" id="1_5yekf"]
+[ext_resource type="Script" uid="uid://bka8g5my3r20w" path="res://addons/collision_presets/collision_presets_database.gd" id="2_2mjqt"]
+
+[sub_resource type="Resource" id="Resource_5yekf"]
+script = ExtResource("1_5yekf")
+name = "Player"
+id = "2726797477598543100"
+layer = 2
+mask = 3
+
+[resource]
+script = ExtResource("2_2mjqt")
+presets = Array[ExtResource("1_5yekf")]([SubResource("Resource_5yekf")])

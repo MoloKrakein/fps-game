@@ -356,22 +356,22 @@ func aim_hipfire() -> void:
 	if current_weapon:
 		EventBus.change_visibility_of_crosshair.emit(true)
 		accuracy_modifier = 1.0
-		
+		player.cam_effects.reset_fov()
 		tween_weapon_to_position(current_weapon.weapon_position, current_weapon.weapon_rotation)
 
 func aim_ads() -> void:
 	if current_weapon:
 		accuracy_modifier = current_weapon.aim_accuracy_modifier
 		# player.cam_effects.apply_ads_fov(current_weapon.aim_fov,1)
+		player.cam_effects.apply_ads_fov(current_weapon.aim_fov)
 		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
 		
 func aim_canted() -> void:
 	if current_weapon:
-		var target_pos: Vector3 = current_weapon.aim_ADS_position
-		var target_rot: Vector3 = current_weapon.aim_ADS_rotation
-		target_rot.z += deg_to_rad(45.0) 
+		# var target_pos: Vector3 = current_weapon.canted_sight_position
+		# var target_rot: Vector3 = current_weapon.canted_sight_rotation
 		EventBus.change_visibility_of_crosshair.emit(false)
-		tween_weapon_to_position(target_pos, target_rot)
+		tween_weapon_to_position(current_weapon.canted_sight_position, current_weapon.canted_sight_rotation)
 
 func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3) -> void:
 	if current_weapon_model == null:
@@ -458,3 +458,4 @@ func _update_idle_sway(delta: float) -> void:
 	# 5. Final Transform (Assuming current_stance_position is implemented)
 	var _sway_offset: Vector3 = Vector3(_idle_x, _idle_y, 0)
 	current_weapon_model.position = current_stance_pos + _sway_offset
+	current_weapon_model.rotation = current_stance_rot
