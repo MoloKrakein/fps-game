@@ -51,6 +51,9 @@ var previous_velocity: Vector3 = Vector3.ZERO
 var current_player_rotation: float = 0.0
 var impact_velocity: float = 0.0
 var on_airbone_time: float = 0.0
+# stamina system just for visual purposes
+var _player_current_tiredness: float = 0
+var _player_max_tiredness: float = 100
 
 # settings
 var is_crouching: bool = false
@@ -91,6 +94,7 @@ func _physics_process(delta: float) -> void:
 	
 	# player dirrection
 
+
 	if _current_slide_cooldown > 0.0:
 		_current_slide_cooldown -= delta
 	
@@ -115,8 +119,10 @@ func _physics_process(delta: float) -> void:
 
 	if direction != Vector3.ZERO:
 		current_velocity = lerp(current_velocity, Vector2(direction.x, direction.z)* speed, acceleration * delta)
+		_player_current_tiredness = min(_player_current_tiredness + delta * 5, _player_max_tiredness) # increase tiredness over time while moving
 	else:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
+		_player_current_tiredness = max(_player_current_tiredness - delta * 3, 0) # decrease tiredness over time while idle
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
@@ -127,6 +133,7 @@ func _physics_process(delta: float) -> void:
 	# get max velocity for debugging purposes
 	if _movement_velocity.length() > _current_max_velocity:
 		_current_max_velocity = _movement_velocity.length()
+
 	move_and_slide()
 
 	if is_on_floor() and y_velocity_before_on_floor < 0.0:

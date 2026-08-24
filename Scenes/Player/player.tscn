@@ -91,8 +91,7 @@ offset_right = 485.0
 offset_bottom = 497.0
 grow_horizontal = 1
 grow_vertical = 1
-enabled = false
-initial_node_to_watch = NodePath("../../WeaponStateChart")
+initial_node_to_watch = NodePath("../../StateChart")
 
 [node name="CrouchCollider" type="CollisionShape3D" parent="." unique_id=1751202798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.43174714, 0)
@@ -192,7 +191,7 @@ weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
-idle_sway_frequency = 1.2
+idle_sway_frequency = 0.7
 idle_sway_amplitude = Vector2(0.015, 0.01)
 idle_sway_stiffness = 150.0
 idle_sway_damping = 12.0

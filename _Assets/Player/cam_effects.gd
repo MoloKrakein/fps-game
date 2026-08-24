@@ -226,9 +226,18 @@ func _animate_fov(target_fov: float, duration: float) -> void:
 
 	_fov_tween.tween_property(self, "fov", target_fov, duration)
 
+func _change_fov(target_fov: float) -> void:
+	if _fov_tween:
+		_fov_tween.kill()
+
+	_fov_tween = create_tween()
+	_fov_tween.set_ease(Tween.EASE_OUT)
+	_fov_tween.set_trans(Tween.TRANS_SINE)
+
+	_fov_tween.tween_property(self, "fov", target_fov,0.5)
 
 func apply_ads_fov(target_fov: float) -> void:
-	fov = target_fov
+	_change_fov(target_fov)
 
 func reset_fov() -> void:
-	fov = _base_fov
+	_change_fov(_base_fov)

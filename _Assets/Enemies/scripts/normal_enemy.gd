@@ -247,6 +247,10 @@ func _on_dead_state_entered() -> void:
 	set_physics_process(false)
 	is_dead = true
 	navigation_agent.velocity = Vector3.ZERO
+	# remove triggerable component
+	if triggerable_component:
+		triggerable_component.queue_free()
+		triggerable_component = null
 	# stop rotation and looking for the player
 	# rotation.y = 0
 	navigation_agent.target_position = global_position

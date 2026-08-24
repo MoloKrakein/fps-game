@@ -426,27 +426,42 @@ func _update_idle_sway(delta: float) -> void:
 	if not idle_sway_enabled or current_weapon_model == null:
 		return
 
-	idle_time += delta * idle_sway_frequency
+	# 1. Calculate the Normalized Tiredness (0.0 to 1.0)
+	# Using clamp ensures we never accidentally get negative or > 100% values
+	var tiredness_factor: float = clamp(player._player_current_tiredness / player._player_max_tiredness, 0.0, 1.0)
+
+	# 2. Scale Frequency (Tired players breathe faster)
+	# At 100% tiredness, the breathing speed is multiplied by 2.5x
+	var current_frequency: float = idle_sway_frequency * (1.0 + (tiredness_factor * 1.5)) 
+	idle_time += delta * current_frequency
+
 	var player_speed = Vector2(player.velocity.x, player.velocity.z).length()
-	
-	# 1. Dynamically scale the amplitude based on aim state
 	var current_amplitude: Vector2 = idle_sway_amplitude
-	if is_aiming: # Ensure this boolean tracks your AimingState chart folder!
+	
+	if is_aiming:
 		current_amplitude *= aim_sway_multiplier
+
+	# 3. Apply Tiredness to Amplitude AFTER the aim multiplier
+	# This ensures aiming is still difficult and shaky when fully exhausted
+	current_amplitude *= (1.0 + (tiredness_factor * 2.0)) 
 
 	var target_x = 0.0
 	var target_y = 0.0
 
-	# 2. The Figure-8 Base (Using the scaled amplitude)
+	# 4. The Figure-8 Base
 	if player_speed < 0.1 or is_aiming:
-		target_x = sin(idle_time * idle_sway_frequency) * current_amplitude.x
-		target_y = cos(idle_time * idle_sway_frequency * 2.0) * current_amplitude.y
+		# We don't multiply idle_time by frequency here anymore, 
+		# because we already scaled it in step 2!
+		target_x = sin(idle_time) * current_amplitude.x
+		target_y = cos(idle_time * 2.0) * current_amplitude.y
 
-	# 3. The Heartbeat Tremor
-	var micro_tremor: float = sin(idle_time * 15.0) * (current_amplitude.y * 0.15)
+	# 5. The Heartbeat Tremor
+	# As tiredness increases, the violent high-frequency shake becomes much more prominent
+	var tremor_intensity = current_amplitude.y * (0.15 + (tiredness_factor * 0.35))
+	var micro_tremor: float = sin(idle_time * 15.0) * tremor_intensity
 	target_y += micro_tremor
 
-	# 4. Apply Spring Physics (No changes needed here!)
+	# 6. Apply Spring Physics
 	var result_x: Vector2 = SpringUtil.apply(_idle_x, _idle_x_velocity, target_x, delta, idle_sway_stiffness, idle_sway_damping)
 	_idle_x = result_x.x
 	_idle_x_velocity = result_x.y
@@ -455,7 +470,7 @@ func _update_idle_sway(delta: float) -> void:
 	_idle_y = result_y.x
 	_idle_y_velocity = result_y.y
 
-	# 5. Final Transform (Assuming current_stance_position is implemented)
+	# 7. Final Transform 
 	var _sway_offset: Vector3 = Vector3(_idle_x, _idle_y, 0)
 	current_weapon_model.position = current_stance_pos + _sway_offset
 	current_weapon_model.rotation = current_stance_rot
