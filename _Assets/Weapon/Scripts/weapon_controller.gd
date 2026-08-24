@@ -9,9 +9,13 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var reticle: Control
 @export var shoot_position: Node3D
 @export var shoot_position_offset: Vector3 = Vector3.ZERO
-@export	var camera: Camera3D
+@export	var camera: CamEffects
 
-@export_group("Sway Animations Settings")
+@export_group("Weapon Animations Settings")
+@export_category("Crouch Stance Settings")
+@export var crouch_pos_offset: Vector3 = Vector3(0.04, -0.03, 0.06)
+@export var crouch_rot_offset: Vector3 = Vector3(deg_to_rad(-5), 0, deg_to_rad(15)) 
+@export var crouch_transition_speed: float = 10.0
 @export_category("Idle Sway Animations Settings")
 @export var idle_sway_enabled: bool = true
 @export var idle_sway_frequency: float = 0.8
@@ -34,6 +38,12 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var strafe_tilt_max: float = 0.09
 @export var strafe_tilt_stiffness: float = 90.0
 @export var strafe_tilt_damping: float = 10.0
+@export_category("Weapon Bob Settings")
+@export var weapon_bob_enabled: bool = true
+@export var bob_amplitude: Vector2 = Vector2(0.05, 0.05)
+@export var bob_max_speed: float = 10.0
+@export var bob_stiffness: float = 60.0
+@export var bob_damping: float = 10.0
 
 # Cached Data to prevent Singleton Bottlenecks
 var active_weapon_data: WeaponData
@@ -55,6 +65,9 @@ var weapon_start_rotation: Vector3
 var current_stance_pos: Vector3
 var current_stance_rot: Vector3
 
+# Crouch variables
+var _current_crouch_pos: Vector3 = Vector3.ZERO
+var _current_crouch_rot: Vector3 = Vector3.ZERO
 
 # idle sway variables
 var idle_time: float = 0.0
@@ -70,6 +83,12 @@ var _idle_y_velocity: float = 0.0
 var _idle_rot_x_velocity: float = 0.0
 # var _idle_rot_y_velocity: float = 0.0
 
+#weapon bob variables
+var _bob_x: float = 0.0
+var _bob_y: float = 0.0
+var _bob_x_velocity: float = 0.0
+var _bob_y_velocity: float = 0.0
+
 # look sway variables
 var _previous_look_dir: Vector3 = Vector3.ZERO
 var _camera_rotation_rate: Vector3 = Vector3.ZERO
@@ -77,6 +96,7 @@ var _camera_rotation_rate: Vector3 = Vector3.ZERO
 # Strafe tilt variables
 var _strafe_tilt: float = 0.0
 var _strafe_tilt_velocity: float = 0.0
+
 
 
 var aim_tween: Tween
@@ -273,6 +293,11 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 
 		current_stance_pos = weapon_start_position
 		current_stance_rot = weapon_start_rotation
+
+		_bob_x = 0.0
+		_bob_y = 0.0
+		_bob_x_velocity = 0.0
+		_bob_y_velocity = 0.0
 
 		var muzzle: Node3D = current_weapon_model.get_node_or_null("Muzzle") as Node3D
 		if muzzle != null:
@@ -558,13 +583,59 @@ func _update_strafe_tilt(delta:float) -> float:
 
 	return _strafe_tilt
 
+func _update_weapon_bob(delta: float) -> Vector3:
+	if not weapon_bob_enabled or current_weapon_model == null or not player or not camera:
+		return Vector3.ZERO
+
+	var phase = camera.get_bob_phase()
+	var speed = Vector2(player.velocity.x, player.velocity.z).length()
+
+	var target_x = 0.0
+	var target_y = 0.0
+	var bob_multiplier = 1.0
+
+	if is_aiming:
+		bob_multiplier = 0.08
+
+	if speed > 0.1 and not player.is_sliding:
+		var speed_factor = clamp(speed / bob_max_speed, 0.0, 1.0)
+		var angle = phase * TAU
+
+		target_x = sin(angle) * bob_amplitude.x * speed_factor * bob_multiplier
+		target_y = -abs(sin(angle)) * bob_amplitude.y * speed_factor * bob_multiplier
+
+	var result_x: Vector2 = SpringUtil.apply(_bob_x, _bob_x_velocity, target_x, delta, bob_stiffness, bob_damping)
+	_bob_x = result_x.x
+	_bob_x_velocity = result_x.y
+
+	var result_y: Vector2 = SpringUtil.apply(_bob_y, _bob_y_velocity, target_y, delta, bob_stiffness, bob_damping)
+	_bob_y = result_y.x
+	_bob_y_velocity = result_y.y
+
+
+
+	return Vector3(_bob_x, _bob_y, 0.0)
+	
+func _update_crouch_stance(delta:float) -> void:
+	var target_pos = Vector3.ZERO
+	var target_rot = Vector3.ZERO
+	if player.is_crouching and not is_aiming:
+		target_pos = crouch_pos_offset
+		target_rot = crouch_rot_offset
+	_current_crouch_pos = _current_crouch_pos.lerp(target_pos, crouch_transition_speed * delta)
+	_current_crouch_rot = _current_crouch_rot.lerp(target_rot, crouch_transition_speed * delta)
+
 func _apply_offsets(delta: float) -> void:
 	var idle_offset: Vector3 = _update_idle_sway(delta)
 	var look_offset: Vector3 = _update_look_sway(delta)
 	var strafe_tilt: float = _update_strafe_tilt(delta)
+	var bob_offset: Vector3 = _update_weapon_bob(delta)
 
-	current_weapon_model.position = current_stance_pos + idle_offset + look_offset
-	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt)
+	_update_crouch_stance(delta)
+
+	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos
+	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot
+
 
 
 #endregion

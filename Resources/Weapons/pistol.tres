@@ -18,4 +18,5 @@ canted_sight_rotation = Vector3(0, 0, 0.7889586)
 weapon_model = ExtResource("2_kmy37")
 projectile_scene = ExtResource("1_rsge2")
 weapon_position = Vector3(0.115, -0.403, -0.625)
+weapon_rotation = Vector3(0, 0, 0.3)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

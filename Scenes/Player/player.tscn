@@ -192,6 +192,7 @@ weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")
+crouch_rot_offset = Vector3(0, 0, 0.262)
 idle_sway_frequency = 0.4
 idle_sway_amplitude = Vector2(0.015, 0.01)
 idle_sway_stiffness = 150.0
@@ -202,6 +203,7 @@ aim_sway_multiplier = 0.18
 look_lag_divisor = 30.0
 look_lag_rot_max = 30.0
 look_lag_pos_scale = 0.3
+bob_max_speed = 5.0
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

@@ -241,3 +241,7 @@ func apply_ads_fov(target_fov: float) -> void:
 
 func reset_fov() -> void:
 	_change_fov(_base_fov)
+
+
+func get_bob_phase() -> float:
+	return _step_timer
