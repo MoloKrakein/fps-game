@@ -119,10 +119,12 @@ func _physics_process(delta: float) -> void:
 
 	if direction != Vector3.ZERO:
 		current_velocity = lerp(current_velocity, Vector2(direction.x, direction.z)* speed, acceleration * delta)
-		_player_current_tiredness = min(_player_current_tiredness + delta * 5, _player_max_tiredness) # increase tiredness over time while moving
+
 	else:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
-		_player_current_tiredness = max(_player_current_tiredness - delta * 3, 0) # decrease tiredness over time while idle
+
+	var is_moving:bool = direction != Vector3.ZERO
+	_handle_tiredness(delta, is_moving)
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
@@ -134,6 +136,7 @@ func _physics_process(delta: float) -> void:
 	if _movement_velocity.length() > _current_max_velocity:
 		_current_max_velocity = _movement_velocity.length()
 
+
 	move_and_slide()
 
 	if is_on_floor() and y_velocity_before_on_floor < 0.0:
@@ -141,6 +144,26 @@ func _physics_process(delta: float) -> void:
 
 	if is_on_floor():
 		step_handler.handle_step_climbing()
+
+func _handle_tiredness(delta: float, is_moving: bool) -> void:
+	var rate: float = 0.0
+
+	if is_moving:
+		if is_sprinting:
+			rate = 15.0 # Tires out very fast while sprinting
+		elif is_crouching:
+			rate = -5.0 # Slowly recovers while crouch-walking (tactical!)
+		else:
+			rate = 5.0 # Normal walking slowly increases tiredness
+	else:
+		if is_crouching:
+			rate = -20.0 # Rapid recovery while idle and crouched
+		else:
+			rate = -10.0 # Normal recovery while idle and standing
+
+	# Apply the rate and clamp it between 0 and Max
+	_player_current_tiredness += rate * delta
+	_player_current_tiredness = clamp(_player_current_tiredness, 0.0, _player_max_tiredness)
 #endregion
 
 
@@ -176,6 +199,7 @@ func crouch() -> void:
 	crouch_modifier = crouch_speed
 	crouching_col.disabled = false
 	standing_col.disabled = true
+	
 	if debug:
 		print("Changed crouch modifier to: ", crouch_modifier)
 	is_crouching = true

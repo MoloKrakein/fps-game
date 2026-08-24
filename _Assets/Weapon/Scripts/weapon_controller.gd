@@ -19,6 +19,7 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var idle_sway_stiffness: float = 40.0
 @export var idle_sway_damping: float = 60.0
 @export var idle_sway_rotation_multiplier: float = 0.5
+@export_range(0.0, 1.0, 0.001) var idle_sway_tremor_threshold: float = 0.5
 @export_category("Idle Aiming Sway Settings")
 @export var aiming_sway_enabled: bool = true
 @export var aim_sway_multiplier: float = 0.15
@@ -54,13 +55,13 @@ var idle_time: float = 0.0
 var _idle_x: float = 0.0
 var _idle_y: float = 0.0
 # var _idle_z: float = 0.0
-# var _idle_rot_x: float = 0.0
+var _idle_rot_x: float = 0.0
 # var _idle_rot_y: float = 0.0
 # var _idle_rot_z: float = 0.0
 var _idle_x_velocity: float = 0.0
 var _idle_y_velocity: float = 0.0
 # var _idle_z_velocity: float = 0.0
-# var _idle_rot_x_velocity: float = 0.0
+var _idle_rot_x_velocity: float = 0.0
 # var _idle_rot_y_velocity: float = 0.0
 
 # look sway variables
@@ -455,24 +456,27 @@ func _update_idle_sway(delta: float) -> Vector3:
 	# 3. Apply Tiredness to Amplitude AFTER the aim multiplier
 	# This ensures aiming is still difficult and shaky when fully exhausted
 	current_amplitude *= (1.0 + (tiredness_factor * 2.0)) 
+	var tremor_intensity = current_amplitude.y * (0.15 + (tiredness_factor * 0.35))
+	var micro_tremor: float = sin(idle_time * 15.0) * tremor_intensity
 
 	var target_x = 0.0
 	var target_y = 0.0
+	var target_rot_x = 0.0
 
 	# 4. The Figure-8 Base
 	if player_speed < 0.1 or is_aiming:
-		# We don't multiply idle_time by frequency here anymore, 
-		# because we already scaled it in step 2!
 		target_x = sin(idle_time) * current_amplitude.x
-		target_y = cos(idle_time * 2.0) * current_amplitude.y
+		target_y = cos(idle_time * 2.0) * current_amplitude.y + micro_tremor
 
-	# 5. The Heartbeat Tremor
-	# As tiredness increases, the violent high-frequency shake becomes much more prominent
-	var tremor_intensity = current_amplitude.y * (0.15 + (tiredness_factor * 0.35))
-	var micro_tremor: float = sin(idle_time * 15.0) * tremor_intensity
-	target_y += micro_tremor
+	# 2. Rotational Target (Exhausted Up/Down Tilt)
+	if tiredness_factor > idle_sway_tremor_threshold:
+		# Maps the remaining 0.5->1.0 tiredness to a 0.0->1.0 intensity scale
+		var exhaust_intensity: float = (tiredness_factor - idle_sway_tremor_threshold) * (1.0 / (1.0 - idle_sway_tremor_threshold))
+		
+		# Drive the tilt using the vertical breathing wave
+		target_rot_x = target_y * idle_sway_rotation_multiplier * exhaust_intensity
 
-	# 6. Apply Spring Physics
+	# 3. Apply Spring Physics (Position)
 	var result_x: Vector2 = SpringUtil.apply(_idle_x, _idle_x_velocity, target_x, delta, idle_sway_stiffness, idle_sway_damping)
 	_idle_x = result_x.x
 	_idle_x_velocity = result_x.y
@@ -481,11 +485,14 @@ func _update_idle_sway(delta: float) -> Vector3:
 	_idle_y = result_y.x
 	_idle_y_velocity = result_y.y
 
-	# 7. Final Transform 
+	# 4. Apply Spring Physics (Rotation)
+	var result_rot_x: Vector2 = SpringUtil.apply(_idle_rot_x, _idle_rot_x_velocity, target_rot_x, delta, idle_sway_stiffness, idle_sway_damping)
+	_idle_rot_x = result_rot_x.x
+	_idle_rot_x_velocity = result_rot_x.y
+
+
 	var _sway_offset: Vector3 = Vector3(_idle_x, _idle_y, 0)
 	return _sway_offset
-	# current_weapon_model.position = current_stance_pos + _sway_offset
-	# current_weapon_model.rotation = current_stance_rot
 
 func _update_look_sway(delta: float) -> Vector3:
 	if not look_sway_enabled or current_weapon_model == null or not camera:
@@ -520,6 +527,7 @@ func _apply_offsets(delta: float) -> void:
 	var look_offset: Vector3 = _update_look_sway(delta)
 
 	current_weapon_model.position = current_stance_pos + idle_offset + look_offset
-	current_weapon_model.rotation = current_stance_rot
+	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, 0.0)
+
 
 #endregion
