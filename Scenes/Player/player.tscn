@@ -199,7 +199,9 @@ idle_sway_damping = 12.0
 idle_sway_rotation_multiplier = 4.0
 idle_sway_tremor_threshold = 0.4
 aim_sway_multiplier = 0.18
-look_lag_pos_scale = 0.4
+look_lag_divisor = 30.0
+look_lag_rot_max = 30.0
+look_lag_pos_scale = 0.3
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

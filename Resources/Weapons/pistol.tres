@@ -11,6 +11,7 @@ is_hitscan = false
 accuracy = 78.218
 projectile_speed = 650.0
 aim_accuracy_modifier = 100.0
+aim_tilt_amount = 0.05
 aim_ADS_position = Vector3(0, -0.225, -0.305)
 canted_sight_position = Vector3(0.04, -0.218, -0.305)
 canted_sight_rotation = Vector3(0, 0, 0.7889586)

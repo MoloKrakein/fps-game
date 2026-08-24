@@ -57,6 +57,9 @@ enum WeaponAmmoType {
 @export_range(0, 100) var aim_accuracy_modifier: float = 0.5 # higher value means more accurate when aiming down sights
 @export var aim_sway: float = 0.5
 @export var aim_recoil_reduction: float = 0.5
+@export_group("Aim Visuals")
+@export var aim_sway_amount: float = 0.5
+@export var aim_tilt_amount: float = 0.5
 @export_group("Aiming Position")
 @export var aim_ADS_position: Vector3 = Vector3(0, 0, 0)
 @export var aim_ADS_rotation: Vector3 = Vector3(0, 0, 0)

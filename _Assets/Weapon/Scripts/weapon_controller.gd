@@ -28,6 +28,12 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var look_lag_divisor: float = 10.0
 @export var look_lag_rot_max: float = 5.0
 @export var look_lag_pos_scale: float = 0.006
+@export_category("Strafe Tilt Settings")
+@export var strafe_tilt_enabled: bool = true
+@export var strafe_tilt_scale: float = 0.3
+@export var strafe_tilt_max: float = 0.09
+@export var strafe_tilt_stiffness: float = 90.0
+@export var strafe_tilt_damping: float = 10.0
 
 # Cached Data to prevent Singleton Bottlenecks
 var active_weapon_data: WeaponData
@@ -67,6 +73,10 @@ var _idle_rot_x_velocity: float = 0.0
 # look sway variables
 var _previous_look_dir: Vector3 = Vector3.ZERO
 var _camera_rotation_rate: Vector3 = Vector3.ZERO
+
+# Strafe tilt variables
+var _strafe_tilt: float = 0.0
+var _strafe_tilt_velocity: float = 0.0
 
 
 var aim_tween: Tween
@@ -522,12 +532,39 @@ func _update_look_sway(delta: float) -> Vector3:
 
 	return look_pos
 
+func _update_strafe_tilt(delta:float) -> float:
+	if not strafe_tilt_enabled or current_weapon_model == null or not player or not camera:
+		return 0.0
+
+	var local_vel = camera.global_transform.basis.inverse() * player.velocity
+
+	var x_z = Vector2(local_vel.x, local_vel.z)
+	var x_z_speed = x_z.length()
+
+	var lateral_fraction = abs(x_z.x) / x_z_speed if x_z_speed > 0.1 else 0.0
+
+	var tilt_multiplier = 1.0
+	if is_aiming:
+		tilt_multiplier = current_weapon.aim_tilt_amount
+
+	if player._player_current_tiredness > 0.0:
+		var tiredness_factor: float = clamp(player._player_current_tiredness / player._player_max_tiredness, 0.0, 1.0)
+		tilt_multiplier *= (1.0 + (tiredness_factor * 2.0))
+
+	var target_tilt = clamp(local_vel.x * lateral_fraction * strafe_tilt_scale * tilt_multiplier, -strafe_tilt_max, strafe_tilt_max)
+	var result: Vector2 = SpringUtil.apply(_strafe_tilt, _strafe_tilt_velocity, target_tilt, delta, strafe_tilt_stiffness, strafe_tilt_damping)
+	_strafe_tilt = result.x
+	_strafe_tilt_velocity = result.y
+
+	return _strafe_tilt
+
 func _apply_offsets(delta: float) -> void:
 	var idle_offset: Vector3 = _update_idle_sway(delta)
 	var look_offset: Vector3 = _update_look_sway(delta)
+	var strafe_tilt: float = _update_strafe_tilt(delta)
 
 	current_weapon_model.position = current_stance_pos + idle_offset + look_offset
-	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, 0.0)
+	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt)
 
 
 #endregion
