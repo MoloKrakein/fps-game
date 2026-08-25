@@ -64,6 +64,7 @@ enum WeaponAmmoType {
 @export_category("Aiming")
 @export var aim_fov: float = 60.0
 @export var aim_sensitivity: float = 0.5
+@export var vertical_lag_multiplier: float = 1.0
 @export_range(0, 100) var aim_accuracy_modifier: float = 0.5 # higher value means more accurate when aiming down sights
 @export var aim_sway: float = 0.5
 @export var aim_recoil_reduction: float = 0.5

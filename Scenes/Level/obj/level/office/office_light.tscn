@@ -32,11 +32,16 @@ shape = SubResource("ConcavePolygonShape3D_7b23g")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1625406025]
 transform = Transform3D(1, 0, 0, 0, -0.019197226, 0.9998157, 0, -0.9998157, -0.019197226, 0, -0.077622294, 0)
+visible = false
 light_color = Color(0.92689455, 0.9635816, 0.99385756, 1)
 light_energy = 9.696
 shadow_enabled = true
 distance_fade_enabled = true
 spot_range = 189.39
 spot_angle = 65.171135
+
+[node name="AreaLight3D" type="AreaLight3D" parent="." unique_id=526838775]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+area_range = 242.502
 
 [connection signal="died" from="MeshInstance3D/StaticBody3D/HealthComponent" to="." method="_on_health_component_died"]

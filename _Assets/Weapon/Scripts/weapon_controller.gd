@@ -11,6 +11,7 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var casing_position: Node3D
 @export var shoot_position_offset: Vector3 = Vector3.ZERO
 @export	var camera: CamEffects
+@export var cam_rig: CameraController
 
 @export_group("Weapon Animations Settings")
 @export_category("Crouch Stance Settings")
@@ -45,7 +46,13 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var bob_max_speed: float = 10.0
 @export var bob_stiffness: float = 60.0
 @export var bob_damping: float = 10.0
-
+@export_category("vertical lag Settings")
+@export var vertical_lag_enabled: bool = true
+@export var vertical_lag_stiffness: float = 60.0
+@export var vertical_lag_damping: float = 12.0
+@export var vertical_lag_max: float = 0.1
+@export var vertical_lag_vel_max: float = 10.0
+@export var vertical_lag_deadzone: float = 0.05
 
 @export_group("Weapon Recoil Settings")
 @export var enable_recoil: bool = true
@@ -119,6 +126,11 @@ var _recoil_yaw_velocity: float = 0.0
 # var _recoil_y:float = 0.0
 # var _recoil_y_velocity: float = 0.0
 
+# vertical lag variables
+var _vlag_y: float = 0.0
+var _vlag_y_velocity: float = 0.0
+var _prev_camera_y: float = 0.0
+var _vlag_seeded: bool = false
 
 var aim_tween: Tween
 const AIM_SPEED: float = 0.2
@@ -850,11 +862,51 @@ func _update_model_recoil(delta: float) -> Vector3:
 
 	return Vector3(0.0, 0.0, _recoil_z)
 
+func _update_vertical_lag(delta: float) -> Vector3:
+	if not vertical_lag_enabled or current_weapon_model == null or not camera:
+		return Vector3.ZERO
+
+	var camera_y = cam_rig.global_position.y
+
+	if not _vlag_seeded:
+		_vlag_y = camera_y
+		_prev_camera_y = camera_y
+		_vlag_seeded = true
+		return Vector3.ZERO
+	
+	var cam_vel_y = (camera_y - _prev_camera_y) / delta
+	_prev_camera_y = camera_y
+
+	cam_vel_y = clamp(cam_vel_y, -vertical_lag_max, vertical_lag_max)
+	if abs(cam_vel_y) < vertical_lag_deadzone:
+		cam_vel_y = 0.0
+
+	var target_y = -cam_vel_y * current_weapon.vertical_lag_multiplier
+	var result = SpringUtil.apply(_vlag_y, _vlag_y_velocity, target_y, delta, vertical_lag_stiffness, vertical_lag_damping)
+	_vlag_y = clamp(result.x, -vertical_lag_max, vertical_lag_max)
+	_vlag_y_velocity = result.y
+
+	return Vector3(0.0, _vlag_y, 0.0)
+	# var camera_y = camera.global_transform.origin.y
+	# if not _vlag_seeded:
+	# 	_vlag_y = camera_y
+	# 	_prev_camera_y = camera_y
+	# 	_vlag_seeded = true
+
+	# var target_y = camera_y
+	# var result: Vector2 = SpringUtil.apply(_vlag_y, _vlag_y_velocity, target_y, delta, vertical_lag_stiffness, vertical_lag_damping)
+	# _vlag_y = result.x
+	# _vlag_y_velocity = result.y
+
+	# var lag_offset = _vlag_y - camera_y
+	# current_weapon_model.position += Vector3(0.0, lag_offset, 0.0)
+
 func _apply_offsets(delta: float) -> void:
 	var idle_offset: Vector3 = _update_idle_sway(delta)
 	var look_offset: Vector3 = _update_look_sway(delta)
 	var strafe_tilt: float = _update_strafe_tilt(delta)
 	var bob_offset: Vector3 = _update_weapon_bob(delta)
+	var vertical_lag_offset: Vector3 = _update_vertical_lag(delta)
 
 	_update_crouch_stance(delta)
 
@@ -865,7 +917,7 @@ func _apply_offsets(delta: float) -> void:
 	
 	var recoil_rot = Vector3(_recoil_pitch, _recoil_yaw, 0.0)
 
-	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos + recoil_pos
+	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos + recoil_pos + vertical_lag_offset
 	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot + recoil_rot
 
 

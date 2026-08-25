@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://btxu4nilsejs6"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_0sgi0"]
+[ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/bullet_casing.tscn" id="1_auceo"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="1_rsge2"]
 [ext_resource type="PackedScene" uid="uid://d0547qfi2hk3r" path="res://Art/Assets/Weapon/Pistol/pistol_model.tscn" id="2_kmy37"]
 
@@ -12,6 +13,7 @@ recoil_weapon_rise = 2.0
 accuracy = 78.218
 projectile_speed = 1000.0
 aim_fov = 30.0
+vertical_lag_multiplier = 3.635
 aim_accuracy_modifier = 100.0
 aim_tilt_amount = 0.05
 aim_ADS_position = Vector3(0, -0.225, -0.305)
@@ -19,6 +21,7 @@ canted_sight_position = Vector3(0.04, -0.218, -0.305)
 canted_sight_rotation = Vector3(0, 0, 0.7889586)
 weapon_model = ExtResource("2_kmy37")
 projectile_scene = ExtResource("1_rsge2")
+bullet_case_scene = ExtResource("1_auceo")
 weapon_position = Vector3(0.115, -0.403, -0.625)
 weapon_rotation = Vector3(0, 0, 0.3)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"
