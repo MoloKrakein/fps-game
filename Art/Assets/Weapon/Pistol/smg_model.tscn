@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bisdgbfcek7ee"]
+
+[ext_resource type="PackedScene" uid="uid://cafyoacc5mm8o" path="res://Art/3D/Weapons_Model/mac-10.glb" id="1_1gmp2"]
+
+[node name="SmgModel" type="Node3D" unique_id=1004586577]
+transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
+
+[node name="Muzzle" type="Node3D" parent="." unique_id=227635064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10780933, 0.8264061, -2.8872635)
+
+[node name="Sketchfab_Scene" parent="." unique_id=666343645 instance=ExtResource("1_1gmp2")]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0.57926273, -0.5950037, -0.3629117)

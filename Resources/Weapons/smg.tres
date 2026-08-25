@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://bjop8ilrehk8q"]
+
+[ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="1_7kahr"]
+[ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_a81bq"]
+[ext_resource type="PackedScene" uid="uid://bisdgbfcek7ee" path="res://Art/Assets/Weapon/Pistol/smg_model.tscn" id="3_mgcc5"]
+
+[resource]
+script = ExtResource("1_a81bq")
+weapon_name = "SMG"
+weapon_type = 2
+damage = 15.0
+mags_ammo = 32
+max_ammo = 800
+is_hitscan = false
+recoil_cam_roll = 0.175
+recoil_weapon_kick = 0.07
+recoil_weapon_rise = 1.085
+fire_rate_rpm = 1200.0
+reload_time = 2.4
+fire_mode = 1
+can_change_fire_mode = true
+projectile_speed = 1200.0
+aim_ADS_position = Vector3(-0.03, -0.258, -0.505)
+canted_sight_position = Vector3(0.145, -0.193, -0.545)
+canted_sight_rotation = Vector3(0, 0, 1.4398966)
+weapon_model = ExtResource("3_mgcc5")
+projectile_scene = ExtResource("1_7kahr")
+weapon_position = Vector3(0.115, -0.403, -0.625)
+weapon_rotation = Vector3(0, 0, 0.3)
+weapon_scale = Vector3(0.16, 0.16, 0.16)
+metadata/_custom_type_script = "uid://djccd7pdwygtl"

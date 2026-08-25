@@ -69,9 +69,10 @@ enum WeaponAmmoType {
 @export_group("Aim Visuals")
 @export var aim_sway_amount: float = 0.5
 @export var aim_tilt_amount: float = 0.5
-@export_group("Aiming Position")
+@export_group("Aiming ADS")
 @export var aim_ADS_position: Vector3 = Vector3(0, 0, 0)
 @export var aim_ADS_rotation: Vector3 = Vector3(0, 0, 0)
+@export_group("Aiming Canted Sight")
 @export var canted_sight_fov: float = 70.0
 @export var canted_sight_position: Vector3 = Vector3(0, 0, 0)
 @export var canted_sight_rotation: Vector3 = Vector3(0, 0, 0)

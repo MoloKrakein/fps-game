@@ -8,8 +8,9 @@
 script = ExtResource("1_0sgi0")
 max_ammo = 900
 is_hitscan = false
+recoil_weapon_rise = 2.0
 accuracy = 78.218
-projectile_speed = 650.0
+projectile_speed = 1000.0
 aim_accuracy_modifier = 100.0
 aim_tilt_amount = 0.05
 aim_ADS_position = Vector3(0, -0.225, -0.305)

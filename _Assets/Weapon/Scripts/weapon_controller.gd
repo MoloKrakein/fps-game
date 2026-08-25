@@ -151,6 +151,8 @@ func _process(delta: float) -> void:
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)
 	_apply_offsets(delta)
+	if Input.is_action_just_pressed("combat_switch_fire_mode"):
+		toggle_fire_mode()
 #endregion
 
 #region Trigger & Fire Mode
@@ -366,6 +368,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 	if weapon != null and weapon.weapon_model:
 		current_weapon_model = weapon.weapon_model.instantiate()
 		weapon_model_parent.add_child(current_weapon_model)
+		
 		current_weapon_model.position = weapon.weapon_position
 		current_weapon_model.rotation = weapon.weapon_rotation
 		current_weapon_model.scale = weapon.weapon_scale
@@ -392,6 +395,7 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	current_weapon = weapon_data.weapon
 	# 2. CACHE the active data immediately so _process loops don't have to query the Manager
 	active_weapon_data = weapon_data 
+
 	
 	if current_weapon_model:
 		current_weapon_model.queue_free()
