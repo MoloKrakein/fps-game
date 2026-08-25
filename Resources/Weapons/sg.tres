@@ -13,6 +13,7 @@ is_reload_per_bullet = true
 recoil_cam_pitch = 1.92
 recoil_cam_yaw = 0.445
 recoil_cam_roll = 0.165
+fire_rate_rpm = 300.0
 accuracy = 67.391
 spread_angle = 0.135
 pellet_count = 8

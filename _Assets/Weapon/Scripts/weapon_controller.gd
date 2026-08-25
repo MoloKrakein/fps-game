@@ -111,8 +111,8 @@ var _recoil_z:float = 0.0
 var _recoil_z_velocity: float = 0.0
 var _recoil_pitch:float = 0.0
 var _recoil_pitch_velocity: float = 0.0
-# var _recoil_yaw:float = 0.0
-# var _recoil_yaw_velocity: float = 0.0
+var _recoil_yaw:float = 0.0
+var _recoil_yaw_velocity: float = 0.0
 # var _recoil_x:float = 0.0
 # var _recoil_x_velocity
 # var _recoil_y:float = 0.0
@@ -717,19 +717,27 @@ func _add_model_recoil() -> void:
 	_recoil_z += current_weapon.recoil_weapon_kick
 	_recoil_pitch += deg_to_rad(current_weapon.recoil_weapon_rise)
 
+	var random_horizontal_sway = current_weapon.recoil_weapon_rise * 0.5
+	_recoil_yaw += deg_to_rad(randf_range(-random_horizontal_sway, random_horizontal_sway))
+
 func _update_model_recoil(delta: float) -> Vector3:
 	if not enable_recoil or current_weapon_model == null:
 		return Vector3.ZERO
 
 	var rz = SpringUtil.apply(_recoil_z, _recoil_z_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
 	var rp = SpringUtil.apply(_recoil_pitch, _recoil_pitch_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
+	var ry = SpringUtil.apply(_recoil_yaw, _recoil_yaw_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
 
 	_recoil_z = clamp(rz.x,-recoil_model_max_angle, recoil_model_max_angle)
 	_recoil_z_velocity = rz.y
+
 	_recoil_pitch = clamp(rp.x, -recoil_pitch_max, recoil_pitch_max)
 	_recoil_pitch_velocity = rp.y
 
-	return Vector3(_recoil_pitch, 0.0, _recoil_z)
+	_recoil_yaw = clamp(ry.x, -recoil_model_max_angle, recoil_model_max_angle)
+	_recoil_yaw_velocity = ry.y
+
+	return Vector3(0.0, 0.0, _recoil_z)
 
 func _apply_offsets(delta: float) -> void:
 	var idle_offset: Vector3 = _update_idle_sway(delta)
@@ -740,13 +748,14 @@ func _apply_offsets(delta: float) -> void:
 	_update_crouch_stance(delta)
 
 	var recoil_pos = Vector3.ZERO
-	var recoil_pitch = 0.0
+
 	if enable_recoil:
 		recoil_pos = _update_model_recoil(delta)
-		recoil_pitch = _recoil_pitch
+	
+	var recoil_rot = Vector3(_recoil_pitch, _recoil_yaw, 0.0)
 
 	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos + recoil_pos
-	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot + Vector3(recoil_pitch,0.0,0.0)
+	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot + recoil_rot
 
 
 
