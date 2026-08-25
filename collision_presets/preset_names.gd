@@ -2,8 +2,10 @@
 # Do not edit manually.
 class_name CollisionPresets
 const Player := "Player"
+const ragdoll := "ragdoll"
 
 static func all() -> PackedStringArray:
 	return PackedStringArray([
-		Player
+		Player,
+		ragdoll
 	])

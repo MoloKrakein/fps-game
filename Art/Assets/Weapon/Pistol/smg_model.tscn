@@ -1,12 +1,22 @@
 [gd_scene format=3 uid="uid://bisdgbfcek7ee"]
 
 [ext_resource type="PackedScene" uid="uid://cafyoacc5mm8o" path="res://Art/3D/Weapons_Model/mac-10.glb" id="1_1gmp2"]
+[ext_resource type="PackedScene" uid="uid://b1iqxt3ondern" path="res://Art/3D/Blender/m10.blend" id="2_mf45t"]
 
 [node name="SmgModel" type="Node3D" unique_id=1004586577]
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=227635064]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10780933, 0.8264061, -2.8872635)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10780933, 0.375822, -2.1982622)
 
 [node name="Sketchfab_Scene" parent="." unique_id=666343645 instance=ExtResource("1_1gmp2")]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0.57926273, -0.5950037, -0.3629117)
+visible = false
+
+[node name="m10" parent="." unique_id=617597518 instance=ExtResource("2_mf45t")]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="EjectionPort" type="Node3D" parent="." unique_id=919837844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13547409, 0.41633156, 0.39363363)
+
+[editable path="m10"]

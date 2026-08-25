@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://bg8x2fmkw3sgy"]
+
+[ext_resource type="PackedScene" uid="uid://b1iqxt3ondern" path="res://Art/3D/Blender/m10.blend" id="1_y7gup"]
+
+[node name="m10" unique_id=617597518 instance=ExtResource("1_y7gup")]

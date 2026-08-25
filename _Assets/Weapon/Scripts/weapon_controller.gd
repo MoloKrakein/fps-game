@@ -8,6 +8,7 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var weapon_state_chart: StateChart
 @export var reticle: Control
 @export var shoot_position: Node3D
+@export var casing_position: Node3D
 @export var shoot_position_offset: Vector3 = Vector3.ZERO
 @export	var camera: CamEffects
 
@@ -300,6 +301,7 @@ func fire_weapon() -> void:
 
 func _cycle_weapon() -> void:
 	# Bouncer logic + Cached data
+	_ejecting_bullet_case()
 	if current_weapon == null or active_weapon_data == null:
 		return
 
@@ -317,7 +319,6 @@ func _cycle_weapon() -> void:
 		active_weapon_data.ammo_in_magazine -= 1
 		active_weapon_data.is_loaded = true
 	
-
 	update_weapon_ui()
 
 func execute_reload() -> void:
@@ -443,8 +444,12 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 		_bob_y_velocity = 0.0
 
 		var muzzle: Node3D = current_weapon_model.get_node_or_null("Muzzle") as Node3D
+		var ejection_port:Node3D = current_weapon_model.get_node_or_null("EjectionPort") as Node3D
 		if muzzle != null:
 			shoot_position = muzzle
+		if ejection_port != null:
+			casing_position = ejection_port
+
 
 func switch_weapon(weapon_data: WeaponData) -> void:
 	if is_reloading:
@@ -543,6 +548,41 @@ func _perform_projectile_fire() -> void:
 
 		projectile.look_at(projectile.global_position + direction, Vector3.UP)
 		projectile.setup(projectile_velocity, damage)
+
+func _ejecting_bullet_case() -> void:
+	if current_weapon == null or casing_position == null:
+		# print("No current weapon or casing position available for bullet casing ejection.")
+		return
+	var casing_scene = current_weapon.bullet_case_scene
+	if casing_scene == null:
+		# print("No bullet casing scene defined for the current weapon.")
+		return
+	var casing: BulletCasing = casing_scene.instantiate() as BulletCasing
+	# set collision layer and mask for the casing to avoid immediate collision with the player
+
+	get_tree().current_scene.add_child(casing)
+	casing.global_transform = casing_position.global_transform
+	var right_dir: Vector3 = casing.global_transform.basis.x
+	var up_dir: Vector3 = casing.global_transform.basis.y
+	var forward_dir: Vector3 = -casing.global_transform.basis.z
+
+	var eject_dir: Vector3 = (
+		right_dir * randf_range(0.8, 1.2) +
+		up_dir * randf_range(0.3, 0.6) +
+		forward_dir * randf_range(-0.2, 0.2)
+	).normalized()
+
+	var linear_velocity: Vector3 = eject_dir * randf_range(2.0, 4.0) * 5.0
+	if player:
+		linear_velocity += player.velocity * 0.5
+	var torque: Vector3 = Vector3(
+		randf_range(-1.0, 1.0),
+		randf_range(-1.0, 1.0),
+		randf_range(-1.0, 1.0)
+	).normalized() * randf_range(0.5, 1.5) * 10.0
+
+	casing.eject(linear_velocity, torque)
+	
 #endregion
 
 #region Aiming & Tweens

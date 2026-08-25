@@ -11,7 +11,6 @@
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
 [ext_resource type="Script" uid="uid://ds0atxnivefam" path="res://_Assets/Components/ragdoll_kicker.gd" id="7_enij7"]
-[ext_resource type="PackedScene" uid="uid://bisdgbfcek7ee" path="res://Art/Assets/Weapon/Pistol/smg_model.tscn" id="7_mwii3"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
@@ -44,6 +43,14 @@
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_o08ba"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
+
+[sub_resource type="Environment" id="Environment_5yekf"]
+background_mode = 5
+reflected_light_source = 2
+ssr_enabled = true
+
+[sub_resource type="Compositor" id="Compositor_riqys"]
+compositor_effects = Array[CompositorEffect]([null])
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enij7"]
 radius = 1.0058594
@@ -115,6 +122,8 @@ component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.5983944)
+environment = SubResource("Environment_5yekf")
+compositor = SubResource("Compositor_riqys")
 fov = 80.0
 script = ExtResource("4_eksi1")
 player = NodePath("../..")
@@ -123,12 +132,14 @@ slide_pitch = 4.5
 slide_roll = 6.0
 slide_fov = 125.0
 
-[node name="SmgModel" parent="CameraController/Cam" unique_id=1004586577 instance=ExtResource("7_mwii3")]
-transform = Transform3D(0.020884199, -0.15863118, 0, 0.15863118, 0.020884199, 0, 0, 0, 0.16, 0.145, -0.193, -0.545)
-visible = false
-
 [node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5676575)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="CameraController/Cam/ShootPos" unique_id=1148951692]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5676575)
+light_energy = 1.862
+light_indirect_energy = 1.479
+spot_range = 20.0
 
 [node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
 transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)
@@ -143,6 +154,7 @@ collision_mask = 8
 script = ExtResource("7_enij7")
 actor = NodePath("..")
 kick_force = 15.0
+metadata/collision_preset_name = &"__custom__"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="BodyKicker" unique_id=1147680536]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4625994, 0)
@@ -184,13 +196,14 @@ script = ExtResource("23_jincj")
 player = NodePath("../..")
 max_step_height = 0.6
 
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position", "camera")]
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position", "casing_position", "camera")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("33_1agin")
 weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
 reticle = NodePath("../../UI/Reticle")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
+casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")
 crouch_rot_offset = Vector3(0, 0, 0.262)
 idle_sway_frequency = 0.4

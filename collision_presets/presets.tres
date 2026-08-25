@@ -10,6 +10,13 @@ id = "2726797477598543100"
 layer = 2
 mask = 3
 
+[sub_resource type="Resource" id="Resource_2mjqt"]
+script = ExtResource("1_5yekf")
+name = "ragdoll"
+id = "7381442230917582739"
+layer = 8
+mask = 9
+
 [resource]
 script = ExtResource("2_2mjqt")
-presets = Array[ExtResource("1_5yekf")]([SubResource("Resource_5yekf")])
+presets = Array[ExtResource("1_5yekf")]([SubResource("Resource_5yekf"), SubResource("Resource_2mjqt")])
