@@ -25,7 +25,11 @@ class_name CamEffects extends Camera3D
 @export_group("Damage Kick Settings")
 @export var dmg_time: float = 0.3
 @export_group("Weapon Recoil Settings")
-@export var weapon_decay: float = 0.5
+# @export var weapon_decay: float = 0.5
+@export var recoil_cam_stiffness: float = 80.0
+@export var recoil_cam_damping: float = 10.0
+@export var recoil_cam_max_angle: float = 50.0
+
 @export_subgroup("Headbob Settings")
 @export_range(0.0, 1.0,0.001) var headbob_pitch: float = 0.05
 @export_range(0.0, 1.0,0.001) var headbob_roll: float = 0.025
@@ -45,7 +49,11 @@ var _dmg_roll_value: float = 0.0
 var _dmg_timer: float = 0.0
 
 
-var _weapon_kick_angle: Vector3 = Vector3.ZERO
+# var _weapon_kick_angle: Vector3 = Vector3.ZERO DEPRECATED
+var _recoil_angles: Vector3 = Vector3.ZERO
+var _recoil_velocity: Vector3 = Vector3.ZERO
+
+
 
 var _step_timer: float = 0.0
 
@@ -136,8 +144,14 @@ func calculate_view_offset(delta):
 
 	# apply weapon recoil effect
 	if enable_weapon_recoil_kick:
-		_weapon_kick_angle = _weapon_kick_angle.move_toward(Vector3.ZERO, weapon_decay * delta)
-		angles += _weapon_kick_angle
+		var d = min(delta, 0.05)
+		var angle_max = deg_to_rad(recoil_cam_max_angle)
+		for axis in 3:
+			var r = SpringUtil.apply(_recoil_angles[axis], _recoil_velocity[axis], 0.0, d, recoil_cam_stiffness, recoil_cam_damping)
+			_recoil_angles[axis] = clamp(r.x, -angle_max, angle_max)
+			_recoil_velocity[axis] = r.y
+
+		angles += _recoil_angles
 
 
 	# apply headbob effect
@@ -194,9 +208,10 @@ func add_damage_kick(pitch_amount: float, roll_amount: float, source: Vector3) -
 
 # weapon recoil
 func add_weapon_recoil(pitch: float, yaw: float, roll: float) -> void:
-	_weapon_kick_angle.x += deg_to_rad(pitch)
-	_weapon_kick_angle.y += deg_to_rad(randf_range(-yaw, yaw))
-	_weapon_kick_angle.z += deg_to_rad(randf_range(-roll, roll))
+	_recoil_angles.x += deg_to_rad(pitch)
+	
+	_recoil_angles.y += deg_to_rad(randf_range(-yaw, yaw))
+	_recoil_angles.z += deg_to_rad(randf_range(-roll, roll))
 
 
 # screen shake

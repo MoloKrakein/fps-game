@@ -203,6 +203,7 @@ aim_sway_multiplier = 0.18
 look_lag_divisor = 30.0
 look_lag_rot_max = 30.0
 look_lag_pos_scale = 0.3
+bob_amplitude = Vector2(0.05, 0.012)
 bob_max_speed = 5.0
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]

@@ -45,6 +45,14 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var bob_stiffness: float = 60.0
 @export var bob_damping: float = 10.0
 
+
+@export_group("Weapon Recoil Settings")
+@export var enable_recoil: bool = true
+@export var recoil_model_stillness:float = 200.0
+@export var recoil_model_damping: float = 10.0
+@export var recoil_model_max_angle: float = 50.0
+@export var recoil_pitch_max : float = 0.4
+
 # Cached Data to prevent Singleton Bottlenecks
 var active_weapon_data: WeaponData
 
@@ -97,6 +105,18 @@ var _camera_rotation_rate: Vector3 = Vector3.ZERO
 var _strafe_tilt: float = 0.0
 var _strafe_tilt_velocity: float = 0.0
 
+
+# recoil variables
+var _recoil_z:float = 0.0
+var _recoil_z_velocity: float = 0.0
+var _recoil_pitch:float = 0.0
+var _recoil_pitch_velocity: float = 0.0
+# var _recoil_yaw:float = 0.0
+# var _recoil_yaw_velocity: float = 0.0
+# var _recoil_x:float = 0.0
+# var _recoil_x_velocity
+# var _recoil_y:float = 0.0
+# var _recoil_y_velocity: float = 0.0
 
 
 var aim_tween: Tween
@@ -229,7 +249,14 @@ func fire_weapon() -> void:
 
 	if current_fire_mode == Weapon.WeaponFireMode.BURST and burst_shots_remaining <= 0:
 		trigger_held = false
-		
+	
+	# recoil effect
+	if camera != null and current_weapon != null:
+		camera.add_weapon_recoil(current_weapon.recoil_cam_pitch, current_weapon.recoil_cam_yaw, current_weapon.recoil_cam_roll)
+
+	if enable_recoil:
+		_add_model_recoil()
+
 	if current_weapon.is_hitscan:
 		_perform_hitscan_fire()
 	else:
@@ -265,6 +292,33 @@ func execute_reload() -> void:
 	if active_weapon_data.ammo_in_magazine >= mag_capacity:
 		return
 		
+	# var needed: int = mag_capacity - active_weapon_data.ammo_in_magazine
+	# var transfer: int = min(needed, active_weapon_data.reserve_ammo)
+	
+	# active_weapon_data.ammo_in_magazine += transfer
+	# active_weapon_data.reserve_ammo -= transfer
+
+	# if current_weapon.is_reload_per_bullet:
+	# 	reload_per_bullet(delta)
+	# else:
+	reload_magazine()
+
+	# if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
+	# 	_cycle_weapon()
+	# update_weapon_ui()
+
+# handle normal reload logic, put all bullets at once with magazine
+func reload_magazine() -> void:
+	if not can_reload():
+		return
+
+	if current_weapon == null or active_weapon_data == null:
+		return
+
+	var mag_capacity: int = current_weapon.mags_ammo
+	if active_weapon_data.ammo_in_magazine >= mag_capacity:
+		return
+		
 	var needed: int = mag_capacity - active_weapon_data.ammo_in_magazine
 	var transfer: int = min(needed, active_weapon_data.reserve_ammo)
 	
@@ -273,6 +327,34 @@ func execute_reload() -> void:
 
 	if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
 		_cycle_weapon()
+	update_weapon_ui()
+
+# handle reload per bullet logic, put 1 bullet at the time, and check if the player is still holding the reload button
+func reload_per_bullet(delta: float) -> void:
+	if not can_reload():
+		return
+
+	if current_weapon == null or active_weapon_data == null:
+		return
+
+	if active_weapon_data.ammo_in_magazine >= current_weapon.mags_ammo:
+		return
+
+	var reload_time_per_bullet: float = current_weapon.reload_time / current_weapon.mags_ammo
+	reload_timer_ui(reload_time_per_bullet)
+
+	# Use a timer to handle the reload per bullet logic
+	var reload_timer: float = 0.0
+	reload_timer += delta
+
+	if reload_timer >= reload_time_per_bullet:
+		reload_timer = 0.0
+		active_weapon_data.ammo_in_magazine += 1
+		active_weapon_data.reserve_ammo -= 1
+
+		if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
+			_cycle_weapon()
+
 	update_weapon_ui()
 #endregion
 
@@ -625,6 +707,26 @@ func _update_crouch_stance(delta:float) -> void:
 	_current_crouch_pos = _current_crouch_pos.lerp(target_pos, crouch_transition_speed * delta)
 	_current_crouch_rot = _current_crouch_rot.lerp(target_rot, crouch_transition_speed * delta)
 
+func _add_model_recoil() -> void:
+	if not enable_recoil or current_weapon_model == null:
+		return
+	_recoil_z += current_weapon.recoil_weapon_kick
+	_recoil_pitch += deg_to_rad(current_weapon.recoil_weapon_rise)
+
+func _update_model_recoil(delta: float) -> Vector3:
+	if not enable_recoil or current_weapon_model == null:
+		return Vector3.ZERO
+
+	var rz = SpringUtil.apply(_recoil_z, _recoil_z_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
+	var rp = SpringUtil.apply(_recoil_pitch, _recoil_pitch_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
+
+	_recoil_z = clamp(rz.x,-recoil_model_max_angle, recoil_model_max_angle)
+	_recoil_z_velocity = rz.y
+	_recoil_pitch = clamp(rp.x, -recoil_pitch_max, recoil_pitch_max)
+	_recoil_pitch_velocity = rp.y
+
+	return Vector3(_recoil_pitch, 0.0, _recoil_z)
+
 func _apply_offsets(delta: float) -> void:
 	var idle_offset: Vector3 = _update_idle_sway(delta)
 	var look_offset: Vector3 = _update_look_sway(delta)
@@ -633,8 +735,14 @@ func _apply_offsets(delta: float) -> void:
 
 	_update_crouch_stance(delta)
 
-	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos
-	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot
+	var recoil_pos = Vector3.ZERO
+	var recoil_pitch = 0.0
+	if enable_recoil:
+		recoil_pos = _update_model_recoil(delta)
+		recoil_pitch = _recoil_pitch
+
+	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos + recoil_pos
+	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot + Vector3(recoil_pitch,0.0,0.0)
 
 
 

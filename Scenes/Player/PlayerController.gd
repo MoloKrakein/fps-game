@@ -150,13 +150,13 @@ func _handle_tiredness(delta: float, is_moving: bool) -> void:
 
 	if is_moving:
 		if is_sprinting:
-			rate = 15.0 # Tires out very fast while sprinting
+			rate = 25.0 # Tires out very fast while sprinting
 		elif is_crouching:
 			rate = -5.0 # Slowly recovers while crouch-walking (tactical!)
 		else:
 			rate = 5.0 # Normal walking slowly increases tiredness
 	else:
-		if is_crouching:
+		if is_crouching and not is_sprinting and not is_sliding:
 			rate = -20.0 # Rapid recovery while idle and crouched
 		else:
 			rate = -10.0 # Normal recovery while idle and standing

@@ -33,12 +33,21 @@ enum WeaponAmmoType {
 @export var max_ammo: int = 90
 # @export var ammo_per_clip: int = 7 #for future use, if we want to implement a reload system with clips
 @export var is_hitscan: bool = true
+# shotgun / revolver reload per bullet, other weapons reload all bullets at once
+@export var is_reload_per_bullet: bool = false
+
+@export_group("Recoil Control")
+@export var recoil_cam_pitch: float = 1.0
+@export var recoil_cam_yaw: float = 0.25
+@export var recoil_cam_roll: float = 0.0
+@export var recoil_cam_recovery_speed: float = 5.0
+@export var recoil_weapon_kick: float = 0.02
+@export var recoil_weapon_rise: float = 8.0
 
 @export_group("Fire Control")
 @export var fire_rate_rpm: float = 600.0
 @export var fire_rate: float = 0.1 # Legacy seconds-per-shot fallback.
 @export var burst_shot_count: int = 3
-@export var recoil: float = 1.0
 @export var shoot_range: float = 100.0
 @export_range(0,100) var accuracy: float = 100
 @export_range(0, 1) var spread_angle: float = 0.0
