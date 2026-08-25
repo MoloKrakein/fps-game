@@ -61,6 +61,7 @@ func unlock_weapon(slot: int, weapon_resource: Weapon) -> void:
 	if slot in weapons:
 		weapons[slot].weapon = weapon_resource
 		weapons[slot].is_unlocked = true
+		weapons[slot].fire_mode = weapon_resource.fire_mode
 		weapons[slot].reserve_ammo = weapon_resource.max_ammo
 		EventBus.weapon_ammo_changed.emit(weapons[slot].ammo_in_magazine, weapons[slot].reserve_ammo)
 

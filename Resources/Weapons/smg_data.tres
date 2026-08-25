@@ -10,5 +10,5 @@ is_unlocked = true
 ammo_in_magazine = 32
 reserve_ammo = 900
 is_loaded = true
-fire_mode = 3
+fire_mode = 1
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"

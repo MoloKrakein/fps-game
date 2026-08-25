@@ -145,6 +145,32 @@ func _ready() -> void:
 	player = get_tree().get_first_node_in_group("player") as PlayerController
 	call_deferred("update_weapon_ui")
 
+func _sync_cached_state_from_active_data() -> void:
+	if active_weapon_data == null:
+		return
+
+	current_ammo = active_weapon_data.ammo_in_magazine
+	reserve_ammo = active_weapon_data.reserve_ammo
+	is_loaded = active_weapon_data.is_loaded
+
+func _set_and_persist_fire_mode(mode: Weapon.WeaponFireMode) -> void:
+	current_fire_mode = mode
+	if active_weapon_data != null:
+		active_weapon_data.fire_mode = mode
+
+func _resolve_initial_fire_mode_for_weapon_data() -> Weapon.WeaponFireMode:
+	if current_weapon == null:
+		return Weapon.WeaponFireMode.SEMI_AUTO
+
+	if active_weapon_data == null:
+		return current_weapon.fire_mode
+
+	var mode: Weapon.WeaponFireMode = active_weapon_data.fire_mode
+	if mode == Weapon.WeaponFireMode.BURST and not current_weapon.has_burst_mode:
+		mode = current_weapon.fire_mode
+
+	return mode
+
 	
 
 func _process(delta: float) -> void:
@@ -182,13 +208,13 @@ func toggle_fire_mode() -> void:
 	match current_fire_mode:
 		Weapon.WeaponFireMode.SEMI_AUTO:
 			if current_weapon.has_burst_mode:
-				current_fire_mode = Weapon.WeaponFireMode.BURST
+				_set_and_persist_fire_mode(Weapon.WeaponFireMode.BURST)
 			else:
-				current_fire_mode = Weapon.WeaponFireMode.FULL_AUTO
+				_set_and_persist_fire_mode(Weapon.WeaponFireMode.FULL_AUTO)
 		Weapon.WeaponFireMode.BURST:
-			current_fire_mode = Weapon.WeaponFireMode.FULL_AUTO
+			_set_and_persist_fire_mode(Weapon.WeaponFireMode.FULL_AUTO)
 		Weapon.WeaponFireMode.FULL_AUTO:
-			current_fire_mode = Weapon.WeaponFireMode.SEMI_AUTO
+			_set_and_persist_fire_mode(Weapon.WeaponFireMode.SEMI_AUTO)
 
 	reset_trigger()
 
@@ -204,7 +230,13 @@ func can_fire() -> bool:
 	if current_weapon == null or active_weapon_data == null:
 		return false
 
-	if not active_weapon_data.is_loaded or fire_timer > 0.0:
+	if fire_timer > 0.0:
+		return false
+
+	if current_weapon.is_open_bolt:
+		if active_weapon_data.ammo_in_magazine <= 0:
+			return false
+	elif not active_weapon_data.is_loaded:
 		return false
 
 	match current_fire_mode:
@@ -237,7 +269,7 @@ func fire_weapon() -> void:
 		return
 		
 	fire_timer = current_weapon.get_fire_interval_seconds()
-
+	# Increase tiredness by 0.5 units per shot
 	match current_fire_mode:
 		Weapon.WeaponFireMode.SEMI_AUTO:
 			shots_fired_this_trigger = 1
@@ -263,19 +295,28 @@ func fire_weapon() -> void:
 		_perform_hitscan_fire()
 	else:
 		_perform_projectile_fire()
-
+	player.increase_tiredness(1.5) 
 	_cycle_weapon()
 
 func _cycle_weapon() -> void:
 	# Bouncer logic + Cached data
 	if current_weapon == null or active_weapon_data == null:
 		return
-		
+
+	if current_weapon.is_open_bolt:
+		# Open-bolt weapons do not keep a separate chambered round.
+		if active_weapon_data.ammo_in_magazine > 0:
+			active_weapon_data.ammo_in_magazine -= 1
+		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+		update_weapon_ui()
+		return
+
 	active_weapon_data.is_loaded = false
 
 	if active_weapon_data.ammo_in_magazine > 0:
 		active_weapon_data.ammo_in_magazine -= 1
 		active_weapon_data.is_loaded = true
+	
 
 	update_weapon_ui()
 
@@ -300,14 +341,47 @@ func execute_reload() -> void:
 	# active_weapon_data.ammo_in_magazine += transfer
 	# active_weapon_data.reserve_ammo -= transfer
 
-	# if current_weapon.is_reload_per_bullet:
-	# 	reload_per_bullet(delta)
-	# else:
-	reload_magazine()
+	if current_weapon.is_reload_per_bullet:
+		reload_single_round()
+	else:
+		reload_magazine()
 
 	# if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
 	# 	_cycle_weapon()
 	# update_weapon_ui()
+
+func get_single_round_reload_time() -> float:
+	if current_weapon == null:
+		return 0.0
+
+	if current_weapon.mags_ammo <= 0:
+		return 0.0
+
+	return current_weapon.reload_time / float(current_weapon.mags_ammo)
+
+func reload_single_round() -> void:
+	if not can_reload():
+		return
+
+	if current_weapon == null or active_weapon_data == null:
+		return
+
+	if active_weapon_data.reserve_ammo <= 0:
+		return
+
+	if active_weapon_data.ammo_in_magazine >= current_weapon.mags_ammo:
+		return
+
+	active_weapon_data.ammo_in_magazine += 1
+	active_weapon_data.reserve_ammo -= 1
+
+	if current_weapon.is_open_bolt:
+		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+	elif not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
+		_cycle_weapon()
+		return
+
+	update_weapon_ui()
 
 # handle normal reload logic, put all bullets at once with magazine
 func reload_magazine() -> void:
@@ -323,7 +397,14 @@ func reload_magazine() -> void:
 		
 	var needed: int = mag_capacity - active_weapon_data.ammo_in_magazine
 	var transfer: int = min(needed, active_weapon_data.reserve_ammo)
-	
+
+	if current_weapon.is_open_bolt:
+		active_weapon_data.ammo_in_magazine += transfer
+		active_weapon_data.reserve_ammo -= transfer
+		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+		update_weapon_ui()
+		return
+
 	active_weapon_data.ammo_in_magazine += transfer
 	active_weapon_data.reserve_ammo -= transfer
 
@@ -332,32 +413,9 @@ func reload_magazine() -> void:
 	update_weapon_ui()
 
 # handle reload per bullet logic, put 1 bullet at the time, and check if the player is still holding the reload button
-func reload_per_bullet(delta: float) -> void:
-	if not can_reload():
-		return
-
-	if current_weapon == null or active_weapon_data == null:
-		return
-
-	if active_weapon_data.ammo_in_magazine >= current_weapon.mags_ammo:
-		return
-
-	var reload_time_per_bullet: float = current_weapon.reload_time / current_weapon.mags_ammo
-	reload_timer_ui(reload_time_per_bullet)
-
-	# Use a timer to handle the reload per bullet logic
-	var reload_timer: float = 0.0
-	reload_timer += delta
-
-	if reload_timer >= reload_time_per_bullet:
-		reload_timer = 0.0
-		active_weapon_data.ammo_in_magazine += 1
-		active_weapon_data.reserve_ammo -= 1
-
-		if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
-			_cycle_weapon()
-
-	update_weapon_ui()
+func reload_per_bullet(_delta: float) -> void:
+	# Legacy compatibility wrapper. Reload state now drives one shell per reload input.
+	reload_single_round()
 #endregion
 
 #region Weapon Model
@@ -395,6 +453,9 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	current_weapon = weapon_data.weapon
 	# 2. CACHE the active data immediately so _process loops don't have to query the Manager
 	active_weapon_data = weapon_data 
+	_sync_cached_state_from_active_data()
+	_set_and_persist_fire_mode(_resolve_initial_fire_mode_for_weapon_data())
+	reset_trigger()
 
 	
 	if current_weapon_model:
@@ -504,6 +565,7 @@ func aim_canted() -> void:
 		# var target_pos: Vector3 = current_weapon.canted_sight_position
 		# var target_rot: Vector3 = current_weapon.canted_sight_rotation
 		EventBus.change_visibility_of_crosshair.emit(false)
+		player.cam_effects.apply_ads_fov(current_weapon.aim_fov)
 		tween_weapon_to_position(current_weapon.canted_sight_position, current_weapon.canted_sight_rotation)
 
 func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3) -> void:
@@ -531,14 +593,14 @@ func initialize_weapon_data(weapon_data: WeaponData) -> void:
 		return
 
 	active_weapon_data = weapon_data
-	current_ammo = weapon_data.ammo_in_magazine
-	reserve_ammo = weapon_data.reserve_ammo
-	is_loaded = weapon_data.is_loaded
+	_sync_cached_state_from_active_data()
+	_set_and_persist_fire_mode(_resolve_initial_fire_mode_for_weapon_data())
 
 func update_weapon_ui() -> void:
 	# 1. Check if the manager exists yet
 	if active_weapon_data == null:
 		return
+	_sync_cached_state_from_active_data()
 	var _reload_time: float = 0.0
 	if current_weapon != null:
 		EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo)
@@ -714,15 +776,24 @@ func _update_crouch_stance(delta:float) -> void:
 func _add_model_recoil() -> void:
 	if not enable_recoil or current_weapon_model == null:
 		return
-	_recoil_z += current_weapon.recoil_weapon_kick
-	_recoil_pitch += deg_to_rad(current_weapon.recoil_weapon_rise)
+	var _tiredness_multiplier: float = 1.0
+	if player != null and player._player_max_tiredness > 0.0:
+		var fatigue_factor = clamp(player._player_current_tiredness / player._player_max_tiredness, 0.0, 1.0)
+		_tiredness_multiplier += (fatigue_factor * 0.4) # Up to 3x recoil when fully exhausted
+	_recoil_z += current_weapon.recoil_weapon_kick * _tiredness_multiplier
+	_recoil_pitch += deg_to_rad(current_weapon.recoil_weapon_rise) * _tiredness_multiplier
 
-	var random_horizontal_sway = current_weapon.recoil_weapon_rise * 0.5
+	var random_horizontal_sway = current_weapon.recoil_weapon_rise * 0.5 * _tiredness_multiplier
 	_recoil_yaw += deg_to_rad(randf_range(-random_horizontal_sway, random_horizontal_sway))
 
 func _update_model_recoil(delta: float) -> Vector3:
 	if not enable_recoil or current_weapon_model == null:
 		return Vector3.ZERO
+
+
+		# _recoil_z *= recoil_multiplier
+		# _recoil_pitch *= recoil_multiplier
+		# _recoil_yaw *= recoil_multiplier
 
 	var rz = SpringUtil.apply(_recoil_z, _recoil_z_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
 	var rp = SpringUtil.apply(_recoil_pitch, _recoil_pitch_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)

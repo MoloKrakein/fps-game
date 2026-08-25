@@ -164,6 +164,10 @@ func _handle_tiredness(delta: float, is_moving: bool) -> void:
 	# Apply the rate and clamp it between 0 and Max
 	_player_current_tiredness += rate * delta
 	_player_current_tiredness = clamp(_player_current_tiredness, 0.0, _player_max_tiredness)
+
+func increase_tiredness(amount: float) -> void:
+	_player_current_tiredness += amount
+	_player_current_tiredness = clamp(_player_current_tiredness, 0.0, _player_max_tiredness)
 #endregion
 
 

@@ -58,9 +58,11 @@ var _recoil_velocity: Vector3 = Vector3.ZERO
 var _step_timer: float = 0.0
 
 var _base_fov: float = 90.0
+var _aim_fov: float = 90.0
 var _target_slide_roll: float = 0.0
 var _target_slide_pitch: float = 0.0
 var _fov_tween: Tween
+var _fov_aim_tween: Tween
 
 var _current_run_pitch: float = 0.0
 var _current_run_roll: float = 0.0
@@ -69,8 +71,11 @@ var _screen_shake_tween: Tween = null
 const MIN_SHAKE_INTENSITY: float = 0.05
 const MAX_SHAKE_INTENSITY: float = 0.5
 
+
+
 func _ready() -> void:
 	_base_fov = fov
+	_aim_fov = _base_fov
 
 func _process(delta: float) -> void:
 	calculate_view_offset(delta)
@@ -166,10 +171,15 @@ func calculate_view_offset(delta):
 		offset.y += headbob_height
 
 	# apply slide effect
+	var target_fov = _base_fov
+	if enable_slide_effect and player.is_sliding:
+		target_fov = slide_fov
+	if player.weapon_controller and player.weapon_controller.is_aiming:
+		target_fov = _aim_fov
+	fov = lerp(fov, target_fov, delta * fov_transition_speed)
+
 	if enable_slide_effect:
 		if player.is_sliding:
-			fov = lerp(fov, slide_fov, delta * fov_transition_speed)
-
 			var cam_forward = -global_transform.basis.z
 			var cam_right = global_transform.basis.x
 
@@ -179,7 +189,6 @@ func calculate_view_offset(delta):
 			_target_slide_roll =  sideway_intensity * deg_to_rad(slide_roll)
 			_target_slide_pitch = forward_intensity * deg_to_rad(slide_pitch)
 		else:
-			fov = lerp(fov, _base_fov, delta * fov_transition_speed)
 			_target_slide_roll = lerp(_target_slide_roll, 0.0, delta * fov_transition_speed)
 			_target_slide_pitch = lerp(_target_slide_pitch, 0.0, delta * fov_transition_speed)
 
@@ -249,13 +258,25 @@ func _change_fov(target_fov: float) -> void:
 	_fov_tween.set_ease(Tween.EASE_OUT)
 	_fov_tween.set_trans(Tween.TRANS_SINE)
 
-	_fov_tween.tween_property(self, "fov", target_fov,0.5)
+	_fov_tween.tween_property(self, "fov", target_fov, 0.5)
+
+	
 
 func apply_ads_fov(target_fov: float) -> void:
-	_change_fov(target_fov)
+	if _fov_tween:
+		_fov_tween.kill()
+	if _fov_aim_tween:
+		_fov_aim_tween.kill()
+
+	_aim_fov = target_fov
 
 func reset_fov() -> void:
-	_change_fov(_base_fov)
+	if _fov_tween:
+		_fov_tween.kill()
+	if _fov_aim_tween:
+		_fov_aim_tween.kill()
+
+	_aim_fov = _base_fov
 
 
 func get_bob_phase() -> float:

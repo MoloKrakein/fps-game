@@ -3,21 +3,28 @@ extends WeaponState
 
 
 func _on_reload_state_state_entered() -> void:
-	# if not weapon_controller.can_reload():
-	# 	weapon_controller.weapon_state_chart.send_event("onReloadFinish")
+	if not weapon_controller or weapon_controller.current_weapon == null:
+		return
+
+	if not weapon_controller.can_reload():
+		weapon_controller.weapon_state_chart.send_event("onReloadFinish")
+		weapon_controller.is_reloading = false
+		return
 
 	weapon_controller.is_reloading = true
-	# print("State Chart: Entered Reloading State")
-	# 1. Get the reload time from your weapon stats
-	var reload_time = weapon_controller.current_weapon.reload_time
+	# For per-bullet weapons, each reload input inserts a single shell.
+	var reload_time: float = weapon_controller.current_weapon.reload_time
+	if weapon_controller.current_weapon.is_reload_per_bullet:
+		reload_time = weapon_controller.get_single_round_reload_time()
+
 	weapon_controller.reload_timer_ui(reload_time)
 	
-	# 2. Wait for the reload to finish
+	# Wait for this reload step to finish.
 	await get_tree().create_timer(reload_time).timeout
 	
-	# 3. Tell the controller to refill the bullets
+	# Perform one reload action (one shell for per-bullet weapons).
 	weapon_controller.execute_reload()
 	
-	# 4. Tell the state chart we are done, so it can go back to Idle
+	# Finish this reload state entry; additional shells require another reload input.
 	weapon_controller.weapon_state_chart.send_event("onReloadFinish")
 	weapon_controller.is_reloading = false

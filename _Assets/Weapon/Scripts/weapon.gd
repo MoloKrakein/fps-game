@@ -56,6 +56,7 @@ enum WeaponAmmoType {
 @export var fire_mode: WeaponFireMode = WeaponFireMode.SEMI_AUTO
 @export var can_change_fire_mode: bool = false
 @export var has_burst_mode: bool = false
+@export var is_open_bolt: bool = false
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
 @export var projectile_speed: float = 50.0
 # @export var is_projectile_tracer: bool = false

@@ -20,5 +20,6 @@ func _on_idle_state_state_physics_processing(_delta: float) -> void:
 		weapon_controller.weapon_state_chart.send_event("onReload")
 
 	# Only go to empty state if there are no rounds in the magazine and no round chambered
-	if weapon_controller.current_ammo <= 0 and not weapon_controller.is_loaded:
+	var weapon_data: WeaponData = weapon_controller.active_weapon_data
+	if weapon_data != null and weapon_data.ammo_in_magazine <= 0 and not weapon_data.is_loaded:
 		weapon_controller.weapon_state_chart.send_event("onEmpty")
