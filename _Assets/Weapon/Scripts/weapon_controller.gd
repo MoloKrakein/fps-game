@@ -309,11 +309,12 @@ func fire_weapon() -> void:
 	else:
 		_perform_projectile_fire()
 	player.increase_tiredness(1.5) 
+	_ejecting_bullet_case()
+
 	_cycle_weapon()
 
 func _cycle_weapon() -> void:
 	# Bouncer logic + Cached data
-	_ejecting_bullet_case()
 	if current_weapon == null or active_weapon_data == null:
 		return
 
@@ -569,11 +570,12 @@ func _ejecting_bullet_case() -> void:
 	if casing_scene == null:
 		# print("No bullet casing scene defined for the current weapon.")
 		return
+	# spawn the casing scene and set its position to the ejection port and scale it to the weapon's bullet_case_scale
 	var casing: BulletCasing = casing_scene.instantiate() as BulletCasing
-	# set collision layer and mask for the casing to avoid immediate collision with the player
 
 	get_tree().current_scene.add_child(casing)
 	casing.global_transform = casing_position.global_transform
+	casing.scale = current_weapon.bullet_case_scale
 	var right_dir: Vector3 = casing.global_transform.basis.x
 	var up_dir: Vector3 = casing.global_transform.basis.y
 	var forward_dir: Vector3 = -casing.global_transform.basis.z

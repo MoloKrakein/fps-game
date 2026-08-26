@@ -89,6 +89,7 @@ enum WeaponAmmoType {
 @export var weapon_position: Vector3 = Vector3(0.2, -0.2, -0.3)
 @export var weapon_rotation: Vector3 = Vector3(0, 0, 0)
 @export var weapon_scale: Vector3 = Vector3(1, 1, 1)
+@export var bullet_case_scale: Vector3 = Vector3(1, 1, 1)
 
 
 const METERS_PER_WORLD_UNIT: float = 1.0

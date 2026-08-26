@@ -24,4 +24,5 @@ projectile_scene = ExtResource("1_rsge2")
 bullet_case_scene = ExtResource("1_auceo")
 weapon_position = Vector3(0.115, -0.403, -0.625)
 weapon_rotation = Vector3(0, 0, 0.3)
+bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

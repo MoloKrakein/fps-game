@@ -10,7 +10,6 @@
 [ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Assets/Player/components/interaction_raycast.gd" id="4_h8ma5"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
-[ext_resource type="PackedScene" uid="uid://bisdgbfcek7ee" path="res://Art/Assets/Weapon/Pistol/smg_model.tscn" id="6_mwii3"]
 [ext_resource type="Script" uid="uid://ds0atxnivefam" path="res://_Assets/Components/ragdoll_kicker.gd" id="7_enij7"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
@@ -46,12 +45,12 @@
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
 [sub_resource type="Environment" id="Environment_5yekf"]
-background_mode = 5
+background_mode = 4
 reflected_light_source = 2
 ssr_enabled = true
-
-[sub_resource type="Compositor" id="Compositor_riqys"]
-compositor_effects = Array[CompositorEffect]([null])
+ssil_enabled = true
+fog_enabled = true
+volumetric_fog_density = 0.1
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enij7"]
 radius = 1.0058594
@@ -124,8 +123,7 @@ component_mouse_capture = NodePath("../Component/MouseCapture")
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.5983944)
 environment = SubResource("Environment_5yekf")
-compositor = SubResource("Compositor_riqys")
-fov = 80.0
+fov = 90.0
 script = ExtResource("4_eksi1")
 player = NodePath("../..")
 max_roll = 1.5
@@ -133,15 +131,12 @@ slide_pitch = 4.5
 slide_roll = 6.0
 slide_fov = 125.0
 
-[node name="SmgModel" parent="CameraController/Cam" unique_id=1004586577 instance=ExtResource("6_mwii3")]
-transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, -0.24, -0.525)
-visible = false
-
 [node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5676575)
 
 [node name="SpotLight3D" type="SpotLight3D" parent="CameraController/Cam/ShootPos" unique_id=1148951692]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5676575)
+visible = false
 light_energy = 1.862
 light_indirect_energy = 1.479
 spot_range = 20.0

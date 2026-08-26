@@ -2,9 +2,6 @@ class_name BulletCasing extends RigidBody3D
 @export var lifetime: float = 5.0
 @export var speed_threshold: float = 4.0 # Speed needed for max stretch
 
-@onready var mesh_instance: MeshInstance3D = $mesh
-var base_scale: Vector3
-@export var max_stretch: float = 2.5
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
