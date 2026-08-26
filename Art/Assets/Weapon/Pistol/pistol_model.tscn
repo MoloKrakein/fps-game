@@ -91,6 +91,7 @@ particles_anim_loop = false
 
 [sub_resource type="QuadMesh" id="QuadMesh_riqys"]
 material = SubResource("StandardMaterial3D_sn0t7")
+size = Vector2(0.2, 0.2)
 
 [node name="PistolModel" type="Node3D" unique_id=1425760719]
 
@@ -125,7 +126,7 @@ light = NodePath("OmniLight3D")
 [node name="GPUParticles3D" type="GPUParticles3D" parent="Muzzle" unique_id=25292793]
 emitting = false
 amount = 20
-lifetime = 0.05
+lifetime = 0.01
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_6f8o3")
