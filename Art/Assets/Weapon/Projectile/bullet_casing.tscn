@@ -72,7 +72,7 @@ collision_mask = 9
 physics_material_override = SubResource("PhysicsMaterial_5yekf")
 gravity_scale = 3.0
 script = ExtResource("1_raipx")
-lifetime = 50.0
+lifetime = 30.0
 metadata/collision_preset_name = &"ragdoll"
 metadata/collision_preset_id = &"7381442230917582739"
 
