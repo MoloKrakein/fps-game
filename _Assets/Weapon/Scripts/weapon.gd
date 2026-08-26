@@ -79,6 +79,16 @@ enum WeaponAmmoType {
 @export var canted_sight_position: Vector3 = Vector3(0, 0, 0)
 @export var canted_sight_rotation: Vector3 = Vector3(0, 0, 0)
 
+@export_category("Muzzle Effects")
+@export var is_muzzle_flash_enabled: bool = true
+@export var muzzle_process_material: ParticleProcessMaterial
+@export var muzzle_flash_mesh: Mesh
+@export var muzzle_light_color: Color = Color(1, 0.8, 0.5)
+@export var muzzle_light_energy: float = 2.0
+@export var muzzle_light_duration: float = 0.05
+@export var muzzle_flash_scale: float = 0.2
+
+
 
 @export_category("Weapon Model")
 @export_group("Model Setting")

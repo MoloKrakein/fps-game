@@ -132,6 +132,8 @@ var _vlag_y_velocity: float = 0.0
 var _prev_camera_y: float = 0.0
 var _vlag_seeded: bool = false
 
+var _muzzle_flash: MuzzleFlash
+
 var aim_tween: Tween
 const AIM_SPEED: float = 0.2
 
@@ -308,9 +310,13 @@ func fire_weapon() -> void:
 		_perform_hitscan_fire()
 	else:
 		_perform_projectile_fire()
-	player.increase_tiredness(1.5) 
-	_ejecting_bullet_case()
+	player.increase_tiredness(1.5)
 
+	_ejecting_bullet_case()
+	if _muzzle_flash != null:
+		_muzzle_flash.flash(current_weapon.muzzle_light_color, current_weapon.muzzle_light_energy, current_weapon.muzzle_light_duration)
+	else:
+		print("Muzzle flash not found on weapon model.")
 	_cycle_weapon()
 
 func _cycle_weapon() -> void:
@@ -460,6 +466,11 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 		var ejection_port:Node3D = current_weapon_model.get_node_or_null("EjectionPort") as Node3D
 		if muzzle != null:
 			shoot_position = muzzle
+			var found := current_weapon_model.find_children("*", "MuzzleFlash",true,false)
+			_muzzle_flash = found[0] if not found.is_empty() else null
+			print("Muzzle flash found: ", _muzzle_flash != null)
+			if _muzzle_flash:
+				_muzzle_flash.configure(current_weapon)
 		if ejection_port != null:
 			casing_position = ejection_port
 
