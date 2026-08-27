@@ -66,6 +66,7 @@ var active_weapon_data: WeaponData
 
 var player: PlayerController
 var current_weapon_model: Node3D
+var weapon_animation_player: WeaponAnimation
 var current_ammo: int
 var reserve_ammo: int = 0
 var fire_timer: float = 0.0
@@ -210,9 +211,14 @@ func start_trigger() -> void:
 	trigger_held = true
 	if current_fire_mode == Weapon.WeaponFireMode.BURST and burst_shots_remaining <= 0:
 		burst_shots_remaining = get_burst_shot_count()
+	if weapon_animation_player != null:
+		weapon_animation_player.set_trigger_pressed(true)
+	
 
 func stop_trigger() -> void:
 	trigger_held = false
+	if weapon_animation_player != null:
+		weapon_animation_player.set_trigger_pressed(false)
 	if current_fire_mode != Weapon.WeaponFireMode.BURST:
 		reset_trigger()
 
@@ -317,6 +323,8 @@ func fire_weapon() -> void:
 		_muzzle_flash.flash(current_weapon.muzzle_light_color, current_weapon.muzzle_light_energy, current_weapon.muzzle_light_duration)
 	else:
 		print("Muzzle flash not found on weapon model.")
+	if weapon_animation_player != null:
+		weapon_animation_player.play_animation("Fire")
 	_cycle_weapon()
 
 func _cycle_weapon() -> void:
@@ -462,6 +470,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 		_bob_x_velocity = 0.0
 		_bob_y_velocity = 0.0
 
+
 		var muzzle: Node3D = current_weapon_model.get_node_or_null("Muzzle") as Node3D
 		var ejection_port:Node3D = current_weapon_model.get_node_or_null("EjectionPort") as Node3D
 		if muzzle != null:
@@ -473,6 +482,12 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 				_muzzle_flash.configure(current_weapon)
 		if ejection_port != null:
 			casing_position = ejection_port
+		
+		weapon_animation_player = current_weapon_model.get_node_or_null("WeaponAnimation") as WeaponAnimation
+		if weapon_animation_player == null:
+			print("WeaponAnimation node not found in the weapon model.")
+		else:
+			print("WeaponAnimation node found and assigned.")
 
 
 func switch_weapon(weapon_data: WeaponData) -> void:
@@ -932,7 +947,5 @@ func _apply_offsets(delta: float) -> void:
 
 	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos + recoil_pos + vertical_lag_offset
 	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot + recoil_rot
-
-
 
 #endregion
