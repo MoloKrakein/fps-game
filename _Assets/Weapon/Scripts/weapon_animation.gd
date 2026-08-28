@@ -13,15 +13,15 @@ func play_animation(animation_name: String) -> void:
 	
 	match animation_name:
 		"Fire":
-			weapon_animation_tree.set("parameters/BoltOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+			weapon_animation_tree.set("parameters/FireOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 		"Reload":
 			weapon_animation_tree.set("parameters/Reload/active", true)
 		"Idle":
 			weapon_animation_tree.set("parameters/Idle/active", true)
 		"Empty":
-			weapon_animation_tree.set("parameters/OpenBolt/request", true)
+			set_bolt_position(true)
 		"Loaded":
-			weapon_animation_tree.set("parameters/CloseBolt/request", false)
+			set_bolt_position(false)
 		# if no match, print a warning
 		_:
 			print("Animation name not recognized: ", animation_name)
@@ -34,3 +34,10 @@ func set_trigger_pressed(is_pressed: bool) -> void:
 		return
 	var target = 1.0 if is_pressed else 0.0
 	weapon_animation_tree.set("parameters/TriggerBlend/blend_amount", target)
+
+func set_bolt_position(is_open: bool) -> void:
+	if not weapon_animation_tree:
+		print("AnimationTree is not assigned. Cannot set bolt position.")
+		return
+	var target = 1.0 if is_open else 0.0
+	weapon_animation_tree.set("parameters/BoltPosition/blend_amount", target)

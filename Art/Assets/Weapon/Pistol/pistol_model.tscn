@@ -36,24 +36,33 @@ particles_anim_loop = false
 material = SubResource("StandardMaterial3D_sn0t7")
 size = Vector2(0.2, 0.2)
 
-[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_uo56h"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2kfvb"]
+animation = &"BoltOpen"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_cbvsw"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uo56h"]
 animation = &"CloseBolt"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_uo56h"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_rjpr8"]
 animation = &"BoltOpen"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(-392.44452, 24.483368)
+graph_offset = Vector2(-893.13654, 59.98224)
 nodes/output/position = Vector2(680, 120)
-nodes/BoltOneShot/node = SubResource("AnimationNodeOneShot_uo56h")
-nodes/BoltOneShot/position = Vector2(240, 120)
+nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_uo56h")
+nodes/FireOneShot/position = Vector2(240, 120)
 nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_uo56h")
-nodes/CloseBolt/position = Vector2(-300, 180)
+nodes/CloseBolt/position = Vector2(-720, 80)
 nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_rjpr8")
-nodes/OpenBolt/position = Vector2(-60, 320)
-node_connections = [&"output", 0, &"BoltOneShot", &"BoltOneShot", 0, &"CloseBolt", &"BoltOneShot", 1, &"OpenBolt"]
+nodes/OpenBolt/position = Vector2(-280, 400)
+nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_cbvsw")
+nodes/BoltPosition/position = Vector2(-360, 80)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_2kfvb")
+nodes/Animation/position = Vector2(-800, 280)
+node_connections = [&"output", 0, &"FireOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation"]
 
 [node name="PistolModel" type="Node3D" unique_id=1425760719]
 
@@ -105,8 +114,9 @@ metadata/_custom_type_script = "uid://csp53xj462vmj"
 root_node = NodePath("../mk4")
 tree_root = SubResource("AnimationNodeBlendTree_bhunq")
 anim_player = NodePath("../mk4/AnimationPlayer")
-parameters/BoltOneShot/active = false
-parameters/BoltOneShot/internal_active = false
-parameters/BoltOneShot/request = 0
+parameters/FireOneShot/active = false
+parameters/FireOneShot/internal_active = false
+parameters/FireOneShot/request = 0
+parameters/BoltPosition/blend_amount = 0.0
 
 [editable path="mk4"]

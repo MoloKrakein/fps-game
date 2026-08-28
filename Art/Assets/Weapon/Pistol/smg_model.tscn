@@ -137,31 +137,31 @@ center_offset = Vector3(0.155, 0.01, 0.02)
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3vu8r"]
 animation = &"Empty"
 
-[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_7lkid"]
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_ojklw"]
+filters = ["Armature/Skeleton3D:Bone", "Armature/Skeleton3D:Charging", "Armature/Skeleton3D:Trigger"]
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_44ltg"]
-animation = &"HoldTrigger"
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_c8wk2"]
+animation = &"Empty"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_7lkid"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ugyo2"]
 animation = &"Idle"
 
-[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_ojklw"]
-filters = ["Armature/Skeleton3D:Bone", "Armature/Skeleton3D:Charging", "Armature/Skeleton3D:Trigger"]
-
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_sn0t7"]
-graph_offset = Vector2(-335.0024, 72.92937)
+graph_offset = Vector2(-501.2307, -61.26596)
 nodes/output/position = Vector2(560, 60)
 nodes/Idle/node = SubResource("AnimationNodeAnimation_ugyo2")
-nodes/Idle/position = Vector2(-400, 120)
-nodes/TriggerBlend/node = SubResource("AnimationNodeBlend2_ojklw")
-nodes/TriggerBlend/position = Vector2(-120, 120)
-nodes/HoldTrigger/node = SubResource("AnimationNodeAnimation_44ltg")
-nodes/HoldTrigger/position = Vector2(-420, 300)
-nodes/BoltOneShot/node = SubResource("AnimationNodeOneShot_7lkid")
-nodes/BoltOneShot/position = Vector2(200, 60)
+nodes/Idle/position = Vector2(-520, 20)
+nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_ojklw")
+nodes/BoltPosition/position = Vector2(-120, 40)
 nodes/BoltMove/node = SubResource("AnimationNodeAnimation_3vu8r")
-nodes/BoltMove/position = Vector2(40, 400)
-node_connections = [&"output", 0, &"BoltOneShot", &"TriggerBlend", 0, &"Idle", &"TriggerBlend", 1, &"HoldTrigger", &"BoltOneShot", 0, &"TriggerBlend", &"BoltOneShot", 1, &"BoltMove"]
+nodes/BoltMove/position = Vector2(0, 440)
+nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_7lkid")
+nodes/FireOneShot/position = Vector2(200, 60)
+nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_c8wk2")
+nodes/CloseBolt/position = Vector2(-520, 240)
+node_connections = [&"output", 0, &"FireOneShot", &"BoltPosition", 0, &"Idle", &"BoltPosition", 1, &"CloseBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"BoltMove"]
 
 [node name="SmgModel" type="Node3D" unique_id=1004586577]
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
@@ -244,9 +244,9 @@ weapon_animation_tree = NodePath("../AnimationTree")
 root_node = NodePath("../m15-betatest")
 tree_root = SubResource("AnimationNodeBlendTree_sn0t7")
 anim_player = NodePath("../m15-betatest/AnimationPlayer")
-parameters/TriggerBlend/blend_amount = 0.0
-parameters/BoltOneShot/active = false
-parameters/BoltOneShot/internal_active = false
-parameters/BoltOneShot/request = 0
+parameters/BoltPosition/blend_amount = 0.0
+parameters/FireOneShot/active = false
+parameters/FireOneShot/internal_active = false
+parameters/FireOneShot/request = 0
 
 [editable path="m15-betatest"]

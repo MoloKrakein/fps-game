@@ -328,7 +328,7 @@ func fire_weapon() -> void:
 	if weapon_animation_player != null:
 		weapon_animation_player.play_animation("Fire")
 		# check if the weapon is empty after firing and play the empty animation if so
-		if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine <= 0:
+		if not active_weapon_data.is_loaded or active_weapon_data.ammo_in_magazine <= 0:
 			weapon_animation_player.play_animation("Empty")
 
 
@@ -349,11 +349,21 @@ func _cycle_weapon() -> void:
 		return
 
 	active_weapon_data.is_loaded = false
+	if weapon_animation_player != null:
+		if active_weapon_data.is_loaded:
+			weapon_animation_player.play_animation("Loaded")
+		else:
+			weapon_animation_player.play_animation("Empty")
 
 	if active_weapon_data.ammo_in_magazine > 0:
 		active_weapon_data.ammo_in_magazine -= 1
 		active_weapon_data.is_loaded = true
-	
+		if weapon_animation_player != null:
+			if active_weapon_data.is_loaded:
+				weapon_animation_player.play_animation("Loaded")
+			else:
+				weapon_animation_player.play_animation("Empty")
+		
 
 
 	update_weapon_ui()
