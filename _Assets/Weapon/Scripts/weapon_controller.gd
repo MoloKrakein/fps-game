@@ -286,7 +286,9 @@ func can_reload() -> bool:
 	return true
 
 func fire_weapon() -> void:
+
 	if not can_fire():
+
 		return
 		
 	fire_timer = current_weapon.get_fire_interval_seconds()
@@ -325,6 +327,12 @@ func fire_weapon() -> void:
 		print("Muzzle flash not found on weapon model.")
 	if weapon_animation_player != null:
 		weapon_animation_player.play_animation("Fire")
+		# check if the weapon is empty after firing and play the empty animation if so
+		if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine <= 0:
+			weapon_animation_player.play_animation("Empty")
+
+
+
 	_cycle_weapon()
 
 func _cycle_weapon() -> void:
@@ -346,6 +354,8 @@ func _cycle_weapon() -> void:
 		active_weapon_data.ammo_in_magazine -= 1
 		active_weapon_data.is_loaded = true
 	
+
+
 	update_weapon_ui()
 
 func execute_reload() -> void:
