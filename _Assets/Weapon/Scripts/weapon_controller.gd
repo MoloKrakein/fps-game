@@ -345,24 +345,26 @@ func _cycle_weapon() -> void:
 		if active_weapon_data.ammo_in_magazine > 0:
 			active_weapon_data.ammo_in_magazine -= 1
 		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+		if weapon_animation_player != null:
+			if active_weapon_data.is_loaded:
+				weapon_animation_player.play_animation("Loaded")
+			else:
+				weapon_animation_player.play_animation("Empty")
 		update_weapon_ui()
 		return
 
 	active_weapon_data.is_loaded = false
+
+	if active_weapon_data.ammo_in_magazine > 0:
+		active_weapon_data.ammo_in_magazine -= 1
+		active_weapon_data.is_loaded = true
+		
 	if weapon_animation_player != null:
 		if active_weapon_data.is_loaded:
 			weapon_animation_player.play_animation("Loaded")
 		else:
 			weapon_animation_player.play_animation("Empty")
 
-	if active_weapon_data.ammo_in_magazine > 0:
-		active_weapon_data.ammo_in_magazine -= 1
-		active_weapon_data.is_loaded = true
-		if weapon_animation_player != null:
-			if active_weapon_data.is_loaded:
-				weapon_animation_player.play_animation("Loaded")
-			else:
-				weapon_animation_player.play_animation("Empty")
 		
 
 
