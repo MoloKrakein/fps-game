@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://cs7xd43kmv5cg"]
+
+[ext_resource type="Script" uid="uid://dlvl4srer712l" path="res://Art/Assets/Weapon/Projectile/bullet_casing.gd" id="1_ne3gm"]
+[ext_resource type="PackedScene" uid="uid://cl8qvsrjserr7" path="res://Art/3D/Blender/buckshot_shell_case.glb" id="2_ne3gm"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_5yekf"]
+rough = true
+bounce = 0.05
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_qov6q"]
+points = PackedVector3Array(-0.140625, 0.1875, -0.037689045, -0.140625, 0.1875, 0.037661508, -0.10296349, 0.1875, -0.10296349, -0.12501529, -0.375, -0.033504426, -0.10296349, 0.1875, 0.102935955, -0.12501529, -0.375, 0.033476904, -0.037689045, 0.1875, -0.140625, -0.033504426, -0.375, -0.12501529, -0.09151086, -0.375, -0.09151086, -0.037689045, 0.1875, 0.140625, -0.09151086, -0.375, 0.09148334, -0.033504426, -0.375, 0.12498775, 0.037661508, 0.1875, -0.140625, 0.033476904, -0.375, -0.12501529, 0.037661508, 0.1875, 0.140625, 0.033476904, -0.375, 0.12498775, 0.102935955, 0.1875, -0.10296349, 0.09148334, -0.375, -0.09151086, 0.102935955, 0.1875, 0.102935955, 0.09148334, -0.375, 0.09148334, 0.140625, 0.1875, -0.037689045, 0.12498775, -0.375, -0.033504426, 0.140625, 0.1875, 0.037661508, 0.12498775, -0.375, 0.033476904)
+
+[node name="Buckshot Casing" type="RigidBody3D" unique_id=692806909]
+transform = Transform3D(-1.4901161e-07, 0, -1, 0, 1, 0, 1, 0, -1.4901161e-07, 0, 0, 0)
+collision_layer = 8
+collision_mask = 9
+physics_material_override = SubResource("PhysicsMaterial_5yekf")
+gravity_scale = 3.0
+script = ExtResource("1_ne3gm")
+lifetime = 30.0
+metadata/collision_preset_name = &"ragdoll"
+metadata/collision_preset_id = &"7381442230917582739"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1270955628]
+transform = Transform3D(-3.2127872e-08, -0.955, 0, 0, 0, 0.735, -0.735, 4.174437e-08, 0, -0.04874796, -0.010416657, 7.264012e-09)
+shape = SubResource("ConvexPolygonShape3D_qov6q")
+
+[node name="blockbench_export" parent="." unique_id=1981456482 instance=ExtResource("2_ne3gm")]
+transform = Transform3D(-3.2127872e-08, 0, 0.955, 0, 0.735, 0, -0.735, 0, -4.1744375e-08, -0.04874796, -0.010416657, 7.264012e-09)
+
+[editable path="blockbench_export"]

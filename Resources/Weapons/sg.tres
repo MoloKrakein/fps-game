@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://csw2i3ljsxa6g"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_awtbi"]
+[ext_resource type="PackedScene" uid="uid://cs7xd43kmv5cg" path="res://Art/Assets/Weapon/Projectile/buckshot_casing.tscn" id="1_dv3g3"]
 [ext_resource type="PackedScene" uid="uid://cfdj0j3pd1bfv" path="res://Art/Assets/Weapon/Projectile/buckshot.tscn" id="1_i6r2f"]
 [ext_resource type="PackedScene" uid="uid://6baebp0xgdtr" path="res://Art/Assets/Weapon/SG/sg_model.tscn" id="3_dv3g3"]
 
@@ -11,7 +12,7 @@ weapon_type = 3
 is_hitscan = false
 is_reload_per_bullet = true
 recoil_cam_pitch = 4.31
-recoil_cam_yaw = 1.9300000000000002
+recoil_cam_yaw = 1.93
 recoil_cam_roll = 0.165
 recoil_weapon_rise = 12.0
 fire_rate_rpm = 300.0
@@ -26,6 +27,8 @@ canted_sight_position = Vector3(0.03, -0.135, -0.345)
 canted_sight_rotation = Vector3(0, 0, 0.7889586)
 weapon_model = ExtResource("3_dv3g3")
 projectile_scene = ExtResource("1_i6r2f")
+bullet_case_scene = ExtResource("1_dv3g3")
 weapon_position = Vector3(0.044, -0.227, -0.378)
 weapon_scale = Vector3(0.6, 0.6, 0.6)
+bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"
