@@ -27,3 +27,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.0017185211)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16608262, -1.2482733)
+
+[node name="EjectionPort" type="Node3D" parent="." unique_id=458913044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.015829578, 0.14830841, 0.07614788)
