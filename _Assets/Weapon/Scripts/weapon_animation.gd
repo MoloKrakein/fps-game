@@ -1,6 +1,6 @@
 class_name WeaponAnimation extends Node
 @export var weapon_animation_tree: AnimationTree
-
+@export var weapon_bolt_time: float = 0.5
 
 func _ready():
 	if weapon_animation_tree == null:
@@ -39,5 +39,15 @@ func set_bolt_position(is_open: bool) -> void:
 	if not weapon_animation_tree:
 		print("AnimationTree is not assigned. Cannot set bolt position.")
 		return
-	var target = 1.0 if is_open else 0.0
-	weapon_animation_tree.set("parameters/BoltPosition/blend_amount", target)
+	var bolt_tween = create_tween()
+	bolt_tween.set_trans(Tween.TRANS_SINE)
+	bolt_tween.set_ease(Tween.EASE_OUT)
+	bolt_tween.tween_property(weapon_animation_tree, "parameters/BoltPosition/blend_amount", 1.0 if is_open else 0.0, weapon_bolt_time)
+	# use for loop to gradually change the blend amount over time
+	# for i in range(10):
+	# 	var target = 1.0 if is_open else 0.0
+	# 	var blend_amount = lerp(weapon_animation_tree.get("parameters/BoltPosition/blend_amount"), target, 0.1)
+	# 	weapon_animation_tree.set("parameters/BoltPosition/blend_amount", blend_amount)
+	# 	await get_tree().create_timer(weapon_bolt_time / 10).timeout
+		
+	# weapon_animation_tree.set("parameters/BoltPosition/blend_amount", target)

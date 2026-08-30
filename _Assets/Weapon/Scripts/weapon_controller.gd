@@ -366,7 +366,7 @@ func _cycle_weapon() -> void:
 			weapon_animation_player.play_animation("Empty")
 
 		
-
+	
 
 	update_weapon_ui()
 

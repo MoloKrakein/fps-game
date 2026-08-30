@@ -2,6 +2,92 @@
 
 [ext_resource type="PackedScene" uid="uid://d4gwq7u5r2w8c" path="res://Art/3D/Blender/AutoSG.glb" id="1_rcajw"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="2_j04es"]
+[ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="2_s6qqo"]
+[ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_d1fxt"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o5dd6"]
+angle_min = -179.99998
+angle_max = 180.00002
+direction = Vector3(0, 0, -1)
+spread = 25.0
+initial_velocity_min = 0.39999998
+initial_velocity_max = 1.1999999
+gravity = Vector3(0, 0, 0)
+scale_min = 0.59999996
+scale_max = 1.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sn0t7"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 0.73333335, 0, 1)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_opw17"]
+material = SubResource("StandardMaterial3D_sn0t7")
+size = Vector2(0.2, 0.2)
+
+[sub_resource type="Curve" id="Curve_rto42"]
+_limits = [0.0, 200.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_5yekf"]
+curve = SubResource("Curve_rto42")
+
+[sub_resource type="Gradient" id="Gradient_oorb8"]
+offsets = PackedFloat32Array(0, 0.9916667)
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 0.627451)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_6f8o3"]
+gradient = SubResource("Gradient_oorb8")
+
+[sub_resource type="Curve" id="Curve_h11yq"]
+_data = [Vector2(0.018796988, 0), 0.0, 0.0, 0, 0, Vector2(0.99248123, 0.97959185), -2.6731603, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_qr0ht"]
+curve = SubResource("Curve_h11yq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_i5ycf"]
+emission_shape = 1
+emission_sphere_radius = 1.0
+angle_min = -14.9999895
+angle_max = 15.0000105
+direction = Vector3(0, 0, -1)
+initial_velocity_min = 0.5
+initial_velocity_max = 1.5
+gravity = Vector3(0, 0.5, 0)
+damping_min = 1.0
+damping_max = 2.0
+scale_curve = SubResource("CurveTexture_qr0ht")
+color_ramp = SubResource("GradientTexture1D_6f8o3")
+anim_speed_min = 0.099999994
+anim_speed_max = 1.0
+anim_speed_curve = SubResource("CurveTexture_5yekf")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4udhu"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.69411767)
+albedo_texture = ExtResource("3_d1fxt")
+disable_receive_shadows = true
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+proximity_fade_enabled = true
+proximity_fade_distance = 0.1
+distance_fade_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_xraxb"]
+material = SubResource("StandardMaterial3D_4udhu")
+size = Vector2(0.5, 0.5)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_s6qqo"]
 animation = &"OpenBolt"
@@ -17,19 +103,19 @@ animation = &"CloseBolt"
 animation = &"OpenBolt"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(246.97809, -21.076889)
+graph_offset = Vector2(118.97809, -25.076889)
 nodes/output/position = Vector2(1280, 120)
 nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_o5dd6")
 nodes/CloseBolt/position = Vector2(280, 120)
 nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_rto42")
 nodes/OpenBolt/position = Vector2(260, 360)
-nodes/Blend2/node = SubResource("AnimationNodeBlend2_d1fxt")
-nodes/Blend2/position = Vector2(560, 140)
-nodes/OneShot/node = SubResource("AnimationNodeOneShot_opw17")
-nodes/OneShot/position = Vector2(920, 160)
+nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_d1fxt")
+nodes/BoltPosition/position = Vector2(560, 140)
+nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_opw17")
+nodes/FireOneShot/position = Vector2(920, 160)
 nodes/Animation/node = SubResource("AnimationNodeAnimation_s6qqo")
 nodes/Animation/position = Vector2(580, 440)
-node_connections = [&"output", 0, &"OneShot", &"Blend2", 0, &"CloseBolt", &"Blend2", 1, &"OpenBolt", &"OneShot", 0, &"Blend2", &"OneShot", 1, &"Animation"]
+node_connections = [&"output", 0, &"FireOneShot", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"Animation"]
 
 [node name="AutoSg" type="Node3D" unique_id=1588667708]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4716842, 0.4094907)
@@ -40,24 +126,54 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -
 [node name="Skeleton3D" parent="AutoSG/Reclaimer18_ARM" parent_id_path=PackedInt32Array(997309688, 275331868) index="0" unique_id=1093887165]
 bones/16/position = Vector3(-0.0060792174, 0.09655931, 0.011667757)
 
+[node name="other\\shell_smd" parent="AutoSG/Reclaimer18_ARM/Skeleton3D" index="5" unique_id=1247209251]
+visible = false
+
 [node name="EjectionPort" type="Node3D" parent="." unique_id=462009279]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22620049, -0.1264405, -1.0135167)
 
-[node name="Muzzle" type="Node3D" parent="." unique_id=528181029]
+[node name="Muzzle" type="Node3D" parent="." unique_id=528181029 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18115225, -4.4252825)
+script = ExtResource("2_s6qqo")
+particles = NodePath("GPUParticles3D")
+smoke_particles = NodePath("Smoke")
+light = NodePath("OmniLight3D")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Muzzle" unique_id=841261694]
+emitting = false
+amount = 20
+lifetime = 0.01
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_o5dd6")
+draw_pass_1 = SubResource("QuadMesh_opw17")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=1278765606]
+
+[node name="Smoke" type="GPUParticles3D" parent="Muzzle" unique_id=178766007]
+emitting = false
+amount = 5
+lifetime = 0.08
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_i5ycf")
+draw_pass_1 = SubResource("QuadMesh_xraxb")
 
 [node name="WeaponAnimation" type="Node" parent="." unique_id=1300042056 node_paths=PackedStringArray("weapon_animation_tree")]
 script = ExtResource("2_j04es")
 weapon_animation_tree = NodePath("../AnimationTree")
+weapon_bolt_time = 0.2
 metadata/_custom_type_script = "uid://csp53xj462vmj"
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=766457758]
 root_node = NodePath("../AutoSG")
 tree_root = SubResource("AnimationNodeBlendTree_bhunq")
 anim_player = NodePath("../AutoSG/AnimationPlayer")
-parameters/Blend2/blend_amount = 0.0
-parameters/OneShot/active = false
-parameters/OneShot/internal_active = false
-parameters/OneShot/request = 0
+parameters/BoltPosition/blend_amount = 0.0
+parameters/FireOneShot/active = false
+parameters/FireOneShot/internal_active = false
+parameters/FireOneShot/request = 0
 
 [editable path="AutoSG"]

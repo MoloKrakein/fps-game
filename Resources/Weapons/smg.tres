@@ -21,7 +21,6 @@ accuracy = 60.0
 reload_time = 2.4
 fire_mode = 1
 can_change_fire_mode = true
-is_open_bolt = true
 projectile_speed = 1200.0
 aim_ADS_position = Vector3(0, -0.258, -0.695)
 canted_sight_position = Vector3(0.235, -0.268, -0.67)

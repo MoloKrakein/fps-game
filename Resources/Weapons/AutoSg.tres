@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://dq11wk7ikhrks"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_7t6ir"]
-[ext_resource type="PackedScene" uid="uid://cl8qvsrjserr7" path="res://Art/3D/Blender/buckshot_shell_case.glb" id="1_c5m1e"]
+[ext_resource type="PackedScene" uid="uid://cs7xd43kmv5cg" path="res://Art/Assets/Weapon/Projectile/buckshot_casing.tscn" id="1_c5m1e"]
+[ext_resource type="PackedScene" uid="uid://cfdj0j3pd1bfv" path="res://Art/Assets/Weapon/Projectile/buckshot.tscn" id="2_8mopf"]
 [ext_resource type="PackedScene" uid="uid://bmco7vsh8f1cy" path="res://Art/3D/AutoSg.tscn" id="3_8mopf"]
 
 [resource]
@@ -10,8 +11,14 @@ weapon_name = "AutoSG"
 weapon_type = 3
 damage = 50.0
 max_ammo = 800
-recoil_cam_roll = 0.4
-recoil_weapon_rise = 15.0
+is_hitscan = false
+is_reload_per_bullet = true
+recoil_cam_pitch = 8.495
+recoil_cam_yaw = 10.45
+recoil_cam_roll = 7.195
+recoil_cam_recovery_speed = 10.28
+recoil_weapon_kick = 0.06
+recoil_weapon_rise = 17.105
 fire_rate_rpm = 200.0
 accuracy = 60.935
 spread_angle = 0.313
@@ -19,6 +26,19 @@ pellet_count = 8
 fire_mode = 1
 can_change_fire_mode = true
 projectile_speed = 800.0
+aim_accuracy_modifier = 0.0
+aim_sway = 1.07
+aim_recoil_reduction = 0.985
+aim_sway_amount = 0.905
+aim_tilt_amount = 0.945
+aim_ADS_position = Vector3(0, -0.097, -0.348)
+canted_sight_position = Vector3(-0.275, -0.135, -0.345)
+canted_sight_rotation = Vector3(0, 0, 0.7889586)
+muzzle_flash_scale = 1.6949999999999998
 weapon_model = ExtResource("3_8mopf")
+projectile_scene = ExtResource("2_8mopf")
 bullet_case_scene = ExtResource("1_c5m1e")
+weapon_position = Vector3(0.044, -0.227, -0.378)
+weapon_scale = Vector3(0.4, 0.4, 0.4)
+bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"
