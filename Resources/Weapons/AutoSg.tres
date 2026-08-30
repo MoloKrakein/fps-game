@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://dq11wk7ikhrks"]
+
+[ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_7t6ir"]
+[ext_resource type="PackedScene" uid="uid://cl8qvsrjserr7" path="res://Art/3D/Blender/buckshot_shell_case.glb" id="1_c5m1e"]
+[ext_resource type="PackedScene" uid="uid://bmco7vsh8f1cy" path="res://Art/3D/AutoSg.tscn" id="3_8mopf"]
+
+[resource]
+script = ExtResource("1_7t6ir")
+weapon_name = "AutoSG"
+weapon_type = 3
+damage = 50.0
+max_ammo = 800
+recoil_cam_roll = 0.4
+recoil_weapon_rise = 15.0
+fire_rate_rpm = 200.0
+accuracy = 60.935
+spread_angle = 0.313
+pellet_count = 8
+fire_mode = 1
+can_change_fire_mode = true
+projectile_speed = 800.0
+weapon_model = ExtResource("3_8mopf")
+bullet_case_scene = ExtResource("1_c5m1e")
+metadata/_custom_type_script = "uid://djccd7pdwygtl"

@@ -9,6 +9,7 @@
 [ext_resource type="Resource" uid="uid://b7asglgx28t27" path="res://Resources/Weapons/pistol_data.tres" id="4_mai8y"]
 [ext_resource type="Resource" uid="uid://b4wuvyceoofh6" path="res://Resources/Weapons/sg_data.tres" id="5_76v2p"]
 [ext_resource type="Resource" uid="uid://c7li8s4pv7rdi" path="res://Resources/Weapons/smg_data.tres" id="6_m1efj"]
+[ext_resource type="Resource" uid="uid://b15yby6glemy0" path="res://Resources/Weapons/AutoSg_data.tres" id="7_mai8y"]
 
 [node name="MainScene" type="Node" unique_id=1881302021]
 
@@ -23,7 +24,8 @@ script = ExtResource("2_huasi")
 weapons = Dictionary[int, ExtResource("3_m1efj")]({
 1: ExtResource("4_mai8y"),
 2: ExtResource("5_76v2p"),
-3: ExtResource("6_m1efj")
+3: ExtResource("6_m1efj"),
+4: ExtResource("7_mai8y")
 })
 player = NodePath("../../CurrentLevel/PlayerController")
 

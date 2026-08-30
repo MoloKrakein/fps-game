@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://bmco7vsh8f1cy"]
+
+[ext_resource type="PackedScene" uid="uid://d4gwq7u5r2w8c" path="res://Art/3D/Blender/AutoSG.glb" id="1_rcajw"]
+[ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="2_j04es"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_s6qqo"]
+animation = &"OpenBolt"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_d1fxt"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_o5dd6"]
+animation = &"CloseBolt"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_opw17"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_rto42"]
+animation = &"OpenBolt"
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
+graph_offset = Vector2(246.97809, -21.076889)
+nodes/output/position = Vector2(1280, 120)
+nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_o5dd6")
+nodes/CloseBolt/position = Vector2(280, 120)
+nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_rto42")
+nodes/OpenBolt/position = Vector2(260, 360)
+nodes/Blend2/node = SubResource("AnimationNodeBlend2_d1fxt")
+nodes/Blend2/position = Vector2(560, 140)
+nodes/OneShot/node = SubResource("AnimationNodeOneShot_opw17")
+nodes/OneShot/position = Vector2(920, 160)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_s6qqo")
+nodes/Animation/position = Vector2(580, 440)
+node_connections = [&"output", 0, &"OneShot", &"Blend2", 0, &"CloseBolt", &"Blend2", 1, &"OpenBolt", &"OneShot", 0, &"Blend2", &"OneShot", 1, &"Animation"]
+
+[node name="AutoSg" type="Node3D" unique_id=1588667708]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4716842, 0.4094907)
+
+[node name="AutoSG" parent="." unique_id=997309688 instance=ExtResource("1_rcajw")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -1.2681296, -1.1747072)
+
+[node name="Skeleton3D" parent="AutoSG/Reclaimer18_ARM" parent_id_path=PackedInt32Array(997309688, 275331868) index="0" unique_id=1093887165]
+bones/16/position = Vector3(-0.0060792174, 0.09655931, 0.011667757)
+
+[node name="EjectionPort" type="Node3D" parent="." unique_id=462009279]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22620049, -0.1264405, -1.0135167)
+
+[node name="Muzzle" type="Node3D" parent="." unique_id=528181029]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18115225, -4.4252825)
+
+[node name="WeaponAnimation" type="Node" parent="." unique_id=1300042056 node_paths=PackedStringArray("weapon_animation_tree")]
+script = ExtResource("2_j04es")
+weapon_animation_tree = NodePath("../AnimationTree")
+metadata/_custom_type_script = "uid://csp53xj462vmj"
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=766457758]
+root_node = NodePath("../AutoSG")
+tree_root = SubResource("AnimationNodeBlendTree_bhunq")
+anim_player = NodePath("../AutoSG/AnimationPlayer")
+parameters/Blend2/blend_amount = 0.0
+parameters/OneShot/active = false
+parameters/OneShot/internal_active = false
+parameters/OneShot/request = 0
+
+[editable path="AutoSG"]
