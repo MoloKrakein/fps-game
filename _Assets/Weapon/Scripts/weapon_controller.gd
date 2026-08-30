@@ -847,12 +847,26 @@ func _update_weapon_bob(delta: float) -> Vector3:
 	if is_aiming:
 		bob_multiplier = 0.08
 
+	# 1. Isolate the Fatigue Factor (0.0 to 1.0)
+	var tiredness_factor: float = 0.0
+	if player._player_current_tiredness > 0.0:
+		tiredness_factor = clamp(player._player_current_tiredness / player._player_max_tiredness, 0.0, 1.0)
+
 	if speed > 0.1 and not player.is_sliding:
 		var speed_factor = clamp(speed / bob_max_speed, 0.0, 1.0)
 		var angle = phase * TAU
 
-		target_x = sin(angle) * bob_amplitude.x * speed_factor * bob_multiplier
-		target_y = -abs(sin(angle)) * bob_amplitude.y * speed_factor * bob_multiplier
+		# 2. Scale up the amplitude for heavier footsteps
+		# At 100% fatigue, the weapon bounces 80% higher and sways 50% wider
+		var exhausted_amp_x = bob_amplitude.x * (1.0 + (tiredness_factor * 0.5))
+		var exhausted_amp_y = bob_amplitude.y * (1.0 + (tiredness_factor * 0.8))
+
+		# 3. Introduce the "Limp" 
+		# A half-speed sine wave that throws the gun slightly off-balance when tired
+		var limp_wobble = sin(angle * 0.5) * (bob_amplitude.x * tiredness_factor * 0.6)
+
+		target_x = (sin(angle) * exhausted_amp_x * speed_factor * bob_multiplier) + limp_wobble
+		target_y = -abs(sin(angle)) * exhausted_amp_y * speed_factor * bob_multiplier
 
 	var result_x: Vector2 = SpringUtil.apply(_bob_x, _bob_x_velocity, target_x, delta, bob_stiffness, bob_damping)
 	_bob_x = result_x.x
@@ -861,6 +875,8 @@ func _update_weapon_bob(delta: float) -> Vector3:
 	var result_y: Vector2 = SpringUtil.apply(_bob_y, _bob_y_velocity, target_y, delta, bob_stiffness, bob_damping)
 	_bob_y = result_y.x
 	_bob_y_velocity = result_y.y
+
+	return Vector3(_bob_x, _bob_y, 0.0)
 
 
 

@@ -56,8 +56,9 @@ func _spawn_impact_effect(hit_position: Vector3) -> void:
 	# print("Spawn impact effect at position: ", hit_position, " with normal: ", hit_normal)
 	var marker = MeshInstance3D.new()
 	var ball = SphereMesh.new()
-	ball.radius = 0.5
-	ball.height = 0.5
+	ball.radius = 0.1
+	ball.height = 0.1
+
 	marker.mesh = ball
 
 	var material = StandardMaterial3D.new()
@@ -68,7 +69,7 @@ func _spawn_impact_effect(hit_position: Vector3) -> void:
 	marker.global_transform.origin = hit_position
 
 
-	get_tree().create_timer(0.5).timeout.connect(marker.queue_free)
+	get_tree().create_timer(1.0).timeout.connect(marker.queue_free)
 
 func _show_trail_effect() -> void:
 	if trail_effect:
