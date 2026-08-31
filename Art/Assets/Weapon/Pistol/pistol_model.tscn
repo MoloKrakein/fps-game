@@ -79,9 +79,12 @@ layers = 2
 mesh = SubResource("BoxMesh_vx3u4")
 
 [node name="mk4" parent="." unique_id=897042309 instance=ExtResource("1_nj3sb")]
-transform = Transform3D(0.095, 0, 0, 0, 0.095, 0, 0, 0, 0.095, 0, -0.1095089, -0.21262756)
+transform = Transform3D(0.095, 0, 0, 0, 0.095, 0, 0, 0, 0.095, 0, 0.13903746, 0.08988565)
 
-[node name="Skeleton3D" parent="mk4/Armature" parent_id_path=PackedInt32Array(897042309, 1232572924) index="0" unique_id=879472890]
+[node name="Armature" parent="mk4" index="0" unique_id=856923044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Skeleton3D" parent="mk4/Armature" index="0" unique_id=2125492776]
 bones/1/position = Vector3(0.0022497238, 2.1231215, 0.54827464)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
