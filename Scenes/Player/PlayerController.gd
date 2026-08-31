@@ -11,6 +11,7 @@ class_name PlayerController extends CharacterBody3D
 @export var crouch_check: ShapeCast3D
 @export var interaction_raycast: RayCast3D
 @export var cam_effects: CamEffects
+@export var grab_controller: GrabController
 @export var step_handler: StepHandlerComponent
 @export_category("Movement")
 # @export var speed: float = 0.1
@@ -60,6 +61,10 @@ var is_crouching: bool = false
 var is_sprinting: bool = false
 var is_sliding: bool = false
 
+var _is_holding_drop: bool = false
+var _drop_hold_time: float = 0.0
+const THROW_HOLD_THRESHOLD: float = 0.5 # Time in seconds to hold the drop button before throwing
+
 
 func _ready() -> void:
 	health_component.damage_taken.connect(_on_damage_taken)
@@ -94,6 +99,11 @@ func _physics_process(delta: float) -> void:
 	
 	# player dirrection
 
+	if _is_holding_drop and grab_controller.held_object:
+		_drop_hold_time += delta
+		if _drop_hold_time >= THROW_HOLD_THRESHOLD:
+			grab_controller.try_throw()
+			_is_holding_drop = false
 
 	if _current_slide_cooldown > 0.0:
 		_current_slide_cooldown -= delta
@@ -292,6 +302,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	var health_component = get_node_or_null("HealthComponent")
 	if health_component and event.is_action_pressed("test1"):
 		health_component.take_damage(50)
+
+	if event.is_action_pressed("action_use"):
+		grab_controller.try_grab()
+
+	if event.is_action_pressed("action_drop"):
+		_is_holding_drop = true
+		_drop_hold_time = 0.0
+
+	if event.is_action_released("action_drop"):
+			if _is_holding_drop and grab_controller.held_object:
+				grab_controller.try_drop()
+			_is_holding_drop = false
 
 
 
