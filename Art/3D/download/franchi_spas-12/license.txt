@@ -1,0 +1,8 @@
+Model Information:
+* title:	Franchi SPAS-12
+* source:	https://sketchfab.com/3d-models/franchi-spas-12-6796092519464cc58527db42e865b2b0
+* author:	FamousUnityHubSoldier (https://sketchfab.com/FamousUnityHubSoldier)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
