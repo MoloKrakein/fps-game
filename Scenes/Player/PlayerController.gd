@@ -113,6 +113,8 @@ func _physics_process(delta: float) -> void:
 		on_airbone_time += delta
 	else:
 		on_airbone_time = 0.0
+	
+	if 
 
 	var speed_modifier: float = sprint_modifier + crouch_modifier
 	speed = default_speed + speed_modifier + slide_modifier
@@ -154,6 +156,18 @@ func _physics_process(delta: float) -> void:
 
 	if is_on_floor():
 		step_handler.handle_step_climbing()
+	for i in get_slide_collision_count():
+		var collision = get_slide_collision(i)
+		var collider = collision.get_collider()
+
+		if collider is RigidBody3D:
+			var push_force = 15.0
+
+			var push_dir = -collision.get_normal()
+			collider.apply_central_impulse(push_dir * push_force)
+
+
+
 
 func _handle_tiredness(delta: float, is_moving: bool) -> void:
 	var rate: float = 0.0
@@ -314,7 +328,3 @@ func _unhandled_input(event: InputEvent) -> void:
 			if _is_holding_drop and grab_controller.held_object:
 				grab_controller.try_drop()
 			_is_holding_drop = false
-
-
-
-
