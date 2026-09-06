@@ -27,10 +27,11 @@ class_name PlayerController extends CharacterBody3D
 @export var fall_damage_multiplier: float = 2.0
 
 @export_category("Sliding")
-@export var slide_duration: float = 1.0
-@export var slide_power: float = 10.0
+@export var base_slide_duration: float = 1.0
+@export var base_slide_power: float = 10.0
 @export var slide_cooldown: float = 1.0
 @export var min_slide_momentum: float = 4.0
+@export var max_slide_momentum: float = 12.0
 
 @export_category("Settings")
 @export var isToggleCrouch: bool = false
@@ -52,6 +53,10 @@ var previous_velocity: Vector3 = Vector3.ZERO
 var current_player_rotation: float = 0.0
 var impact_velocity: float = 0.0
 var on_airbone_time: float = 0.0
+
+var current_slide_duration: float = 0.0
+var current_slide_power: float = 0.0
+
 # stamina system just for visual purposes
 var _player_current_tiredness: float = 0
 var _player_max_tiredness: float = 100
@@ -63,6 +68,7 @@ var is_sliding: bool = false
 
 var _is_holding_drop: bool = false
 var _drop_hold_time: float = 0.0
+var _hold_item_mass: float = 0.0
 const THROW_HOLD_THRESHOLD: float = 0.5 # Time in seconds to hold the drop button before throwing
 
 
@@ -114,10 +120,16 @@ func _physics_process(delta: float) -> void:
 	else:
 		on_airbone_time = 0.0
 	
-	if 
+	if grab_controller:
+		if grab_controller.held_object:
+			_hold_item_mass = grab_controller.object_weight * -1.0
+		else:
+			_hold_item_mass = 0.0
 
-	var speed_modifier: float = sprint_modifier + crouch_modifier
-	speed = default_speed + speed_modifier + slide_modifier
+
+	var speed_modifier: float = sprint_modifier + crouch_modifier + (_hold_item_mass * 0.5) # Adjust the multiplier as needed for balance
+	var raw_speed: float = default_speed + speed_modifier + slide_modifier
+	speed = maxf(0.5, raw_speed)
 
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
@@ -154,8 +166,9 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor() and y_velocity_before_on_floor < 0.0:
 		impact_velocity = y_velocity_before_on_floor
 
-	if is_on_floor():
+	if is_on_floor() and (not is_sliding or on_airbone_time > 0.0):
 		step_handler.handle_step_climbing()
+
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
@@ -244,9 +257,19 @@ func start_slide() -> void:
 	_slide_direction = Vector3(velocity.x, 0, velocity.z).normalized()
 	standing_col.disabled = true
 	crouching_col.disabled = false
-	slide_modifier = slide_power
-	# disable wasd movement input while sliding
-	disable_movement()
+	disable_movement() # Ensure WASD is locked as previously discussed
+	
+	# Calculate the momentum multiplier
+	var horizontal_speed = Vector2(velocity.x, velocity.z).length()
+	horizontal_speed = clampf(horizontal_speed, min_slide_momentum, max_slide_momentum)
+	
+	var momentum_multiplier = horizontal_speed / min_slide_momentum
+	
+	# Generate this specific slide's stats based on the multiplier
+	current_slide_duration = base_slide_duration * momentum_multiplier
+	current_slide_power = base_slide_power * momentum_multiplier
+	
+	slide_modifier = current_slide_power
 
 	
 func can_slide() -> bool:

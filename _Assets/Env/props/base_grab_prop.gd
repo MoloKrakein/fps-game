@@ -1,10 +1,13 @@
 class_name BaseGrabProp extends RigidBody3D
 
+signal force_dropped
+
 @export var pull_power: float = 15.0
 @export var throw_power: float = 15.0
 
 var is_held: bool = false
 var hold_target: Marker3D = null
+var weight: float = 1.0
 
 
 func _physics_process(delta: float) -> void:
@@ -15,20 +18,21 @@ func _physics_process(delta: float) -> void:
 
         if space_state.intersect_ray(query):
             drop()
+            force_dropped.emit()
             return
 
         var distance = global_position.distance_to(hold_target.global_position)
 
         if distance > 5.0:
             drop()
+            force_dropped.emit()
             return
 
-        var weight_modifier = 1.0 / max(mass, 1.0)
         var direction = global_position.direction_to(hold_target.global_position)
   
 
-        var spring_vel = direction * (distance * pull_power * weight_modifier)
-        linear_velocity = linear_velocity.lerp(spring_vel, (10.0 * weight_modifier) * delta)
+        var spring_vel = direction * (distance * pull_power)
+        linear_velocity = linear_velocity.lerp(spring_vel, 10.0 * delta)
   
 
 func grab(target_marker: Marker3D) -> void:
@@ -36,13 +40,19 @@ func grab(target_marker: Marker3D) -> void:
     hold_target = target_marker
     gravity_scale = 0.0
     angular_damp = 5.0
+    weight = get_weight()
 
 func drop() -> void:
     is_held = false
     hold_target = null
     gravity_scale = 1.0
     angular_damp = 0.0
+    weight = 0.0
 
 func throw(throw_direction: Vector3) -> void:
     drop()
     apply_central_impulse(throw_direction * throw_power)
+
+
+func get_weight() -> float:
+    return mass

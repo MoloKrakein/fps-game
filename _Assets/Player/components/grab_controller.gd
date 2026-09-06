@@ -6,6 +6,7 @@ class_name GrabController extends Node
 @export var cam: Camera3D
 
 var held_object: BaseGrabProp = null
+var object_weight: float = 0.0
 
 
 func try_grab() -> void:
@@ -13,8 +14,11 @@ func try_grab() -> void:
 		var target = interaction_ray.get_collider()
 		if target is BaseGrabProp:
 			held_object = target
+			object_weight = held_object.get_weight()
 			held_object.grab(hold_position)
 			interaction_state_chart.send_event("onGrab")
+			if not held_object.force_dropped.is_connected(_on_prop_force_dropped):
+				held_object.force_dropped.connect(_on_prop_force_dropped)
 		else:
 			interaction_state_chart.send_event("onDrop")
 			print("Target is not a BaseGrabProp: ", target)
@@ -22,7 +26,6 @@ func try_grab() -> void:
 func try_throw() -> void:
 	if held_object:
 		var throw_direction = -cam.global_transform.basis.z.normalized()
-
 		var obj_throw = held_object
 		try_drop()
 		
@@ -30,6 +33,8 @@ func try_throw() -> void:
 
 func try_drop() -> void:
 	if held_object:
+		if held_object.force_dropped.is_connected(_on_prop_force_dropped):
+			held_object.force_dropped.disconnect(_on_prop_force_dropped)
 		held_object.drop()
 		held_object = null
 		interaction_state_chart.send_event("onDrop")
@@ -63,3 +68,6 @@ func _on_holding_prop_state_entered() -> void:
 			# held_object.set_collision_enabled(false)
 		else:
 			interaction_state_chart.send_event("onDrop")
+
+func _on_prop_force_dropped() -> void:
+	try_drop()

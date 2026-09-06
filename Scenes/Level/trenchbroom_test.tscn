@@ -8,9 +8,10 @@
 [ext_resource type="Material" uid="uid://djafcqpfc375v" path="res://trenchbroom/textures/concrete_2_Bl.tres" id="5_kx581"]
 [ext_resource type="Material" uid="uid://drynfh17kagf" path="res://trenchbroom/textures/concrete_1.tres" id="7_bvu62"]
 [ext_resource type="Material" uid="uid://ctsjbdy3yd4xd" path="res://trenchbroom/textures/Wire Fence.tres" id="7_mrt38"]
-[ext_resource type="Material" uid="uid://dmtcalmo4sedy" path="res://trenchbroom/textures/backroom-ass-wallpaper.tres" id="9_6b8y7"]
+[ext_resource type="Texture2D" uid="uid://cgq1wu2e72g3v" path="res://trenchbroom/textures/backroom-ass-floor.png" id="7_rtku8"]
+[ext_resource type="Texture2D" uid="uid://ctilnu1eix4rf" path="res://Art/concrete-detail-test.png" id="8_qo5hl"]
+[ext_resource type="Texture2D" uid="uid://bnhojh1uj03p6" path="res://trenchbroom/textures/backroom-ass-wallpaper.png" id="9_ighri"]
 [ext_resource type="Material" uid="uid://cwr1qj5g5mqkf" path="res://trenchbroom/textures/backroom-ass-celing.tres" id="9_kuhr5"]
-[ext_resource type="Material" uid="uid://b650wgea1b8dy" path="res://trenchbroom/textures/backroom-ass-floor.tres" id="10_6b8y7"]
 [ext_resource type="PackedScene" uid="uid://b7slawfhohc4c" path="res://Scenes/Level/pickups/ammo_pickup.tscn" id="10_b1bvi"]
 [ext_resource type="PackedScene" uid="uid://dy7cjm0lujfkn" path="res://Scenes/Level/pickups/weapon_pickup.tscn" id="10_mrt38"]
 [ext_resource type="Script" uid="uid://cl32yfvelp6iy" path="res://_Assets/Env/pickups/ammo_pickup.gd" id="11_kmrk6"]
@@ -31,6 +32,24 @@ geometry_source_geometry_mode = 1
 geometry_source_group_name = &"level_geometry"
 agent_height = 2.0
 agent_max_climb = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_njbhx"]
+albedo_texture = ExtResource("7_rtku8")
+metallic_specular = 0.0
+detail_enabled = true
+detail_mask = ExtResource("8_qo5hl")
+detail_blend_mode = 3
+detail_albedo = ExtResource("8_qo5hl")
+texture_filter = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3o7rg"]
+albedo_texture = ExtResource("9_ighri")
+metallic_specular = 0.0
+detail_enabled = true
+detail_mask = ExtResource("8_qo5hl")
+detail_blend_mode = 3
+detail_albedo = ExtResource("8_qo5hl")
+texture_filter = 2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rtku8"]
 albedo_texture = ExtResource("12_v83en")
@@ -92,7 +111,7 @@ _surfaces = [{
 "format": 34359742487,
 "index_count": 162,
 "index_data": PackedByteArray("AAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcAGAAZABoAGAAaABsAHAAdAB4AHAAeAB8AIAAhACIAIAAiACMAJAAlACYAJAAmACcAKAApACoAKAAqACsALAAtAC4ALAAuAC8AMAAxADIAMAAyADMANAA1ADYANAA2ADcAOAA5ADoAOAA6ADsAPAA9AD4APAA+AD8AQABBAEIAQABCAEMARABFAEYARABGAEcASABJAEoASABKAEsATABNAE4ATABOAE8AUABRAFIAUABSAFMAVABVAFYAVABWAFcAWABZAFoAWABaAFsAXABdAF4AXABeAF8AYABhAGIAYABiAGMAZABlAGYAZABmAGcAaABpAGoAaABqAGsA"),
-"material": ExtResource("10_6b8y7"),
+"material": SubResource("StandardMaterial3D_njbhx"),
 "name": "backroom-ass-floor",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -104,7 +123,7 @@ _surfaces = [{
 "format": 34359742487,
 "index_count": 276,
 "index_data": PackedByteArray("AAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcAGAAZABoAGAAaABsAHAAdAB4AHAAeAB8AIAAhACIAIAAiACMAJAAlACYAJAAmACcAKAApACoAKAAqACsALAAtAC4ALAAuAC8AMAAxADIAMAAyADMANAA1ADYANAA2ADcAOAA5ADoAOAA6ADsAPAA9AD4APAA+AD8AQABBAEIAQABCAEMARABFAEYARABGAEcASABJAEoASABKAEsATABNAE4ATABOAE8AUABRAFIAUABSAFMAVABVAFYAVABWAFcAWABZAFoAWABaAFsAXABdAF4AXABeAF8AYABhAGIAYABiAGMAZABlAGYAZABmAGcAaABpAGoAaABqAGsAbABtAG4AbABuAG8AcABxAHIAcAByAHMAdAB1AHYAdAB2AHcAeAB5AHoAeAB6AHsAfAB9AH4AfwCAAIEAggCDAIQAhQCGAIcAiACJAIoAiACKAIsAjACNAI4AjACOAI8AkACRAJIAkACSAJMAlACVAJYAlACWAJcAmACZAJoAmACaAJsAnACdAJ4AnACeAJ8AoAChAKIAoACiAKMApAClAKYApACmAKcAqACpAKoAqACqAKsArACtAK4ArACuAK8AsACxALIAsACyALMAtAC1ALYAtAC2ALcAuAC5ALoAuAC6ALsA"),
-"material": ExtResource("9_6b8y7"),
+"material": SubResource("StandardMaterial3D_3o7rg"),
 "name": "backroom-ass-wallpaper",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
