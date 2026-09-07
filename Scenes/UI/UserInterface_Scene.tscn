@@ -89,6 +89,11 @@ grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
 
+[node name="ChamberIndicator" type="ColorRect" parent="AmmoContainer" unique_id=1657171669]
+unique_name_in_owner = true
+layout_mode = 2
+color = Color(1, 0, 0.16470589, 0.23921569)
+
 [node name="AmmoBar" type="ProgressBar" parent="AmmoContainer" unique_id=1612725676]
 unique_name_in_owner = true
 layout_mode = 2

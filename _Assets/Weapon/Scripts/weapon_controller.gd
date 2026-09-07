@@ -195,6 +195,9 @@ func _process(delta: float) -> void:
 	_apply_offsets(delta)
 	if Input.is_action_just_pressed("combat_switch_fire_mode"):
 		toggle_fire_mode()
+	# if Input.is_action_just_pressed("combat_rack_gun"):
+	# 	if current_weapon != null and current_weapon.is_open_bolt:
+	# 		_cycle_weapon()
 #endregion
 
 #region Trigger & Fire Mode
@@ -657,6 +660,7 @@ func aim_hipfire() -> void:
 
 func aim_ads() -> void:
 	if current_weapon:
+		EventBus.change_visibility_of_crosshair.emit(false)
 		accuracy_modifier = current_weapon.aim_accuracy_modifier
 		# player.cam_effects.apply_ads_fov(current_weapon.aim_fov,1)
 		player.cam_effects.apply_ads_fov(current_weapon.aim_fov)
@@ -706,6 +710,7 @@ func update_weapon_ui() -> void:
 	var _reload_time: float = 0.0
 	if current_weapon != null:
 		EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo)
+		EventBus.weapon_chamber_status.emit(active_weapon_data.is_loaded)
 
 func reload_timer_ui(reload_time: float) -> void:
 	if active_weapon_data == null:

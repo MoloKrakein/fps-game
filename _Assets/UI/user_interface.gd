@@ -5,6 +5,7 @@ class_name UserInterface extends CanvasLayer
 @onready var health_bar: ProgressBar = %HealthBar
 @onready var armor_bar: ProgressBar = %ArmorBar
 @onready var reload_timer_bar: ProgressBar = %AmmoBar
+@onready var chamber_indicator: ColorRect = %ChamberIndicator
 
 @onready var current_ammo_label: Label = %CurrentAmmoLabel
 @onready var reserved_ammo_label: Label = %ReservedAmmoLabel
@@ -16,7 +17,8 @@ func _ready() -> void:
     EventBus.player_health_changed.connect(set_health_value)
     EventBus.player_armor_changed.connect(set_armor_value)
     EventBus.weapon_ammo_changed.connect(set_ammo_values)
-
+    EventBus.weapon_chamber_status.connect(set_chamber_visual)
+    EventBus.change_visibility_of_crosshair.connect(set_crosshair_visibility)
 
 func set_health_value(health: float, max_health: float) -> void:
     if health_bar:
@@ -66,5 +68,13 @@ func set_crosshair_visibility(_is_visible: bool) -> void:
     if crosshair:
         crosshair.visible = _is_visible
 
+func set_chamber_visual(is_chambered: bool) -> void:
+    if not chamber_indicator: return
+    
+    # Green if a bullet is ready, Red if empty
+    if is_chambered:
+        chamber_indicator.color = Color("#00ff2a3d")
+    else:
+        chamber_indicator.color = Color("#ff002a3d")
 # initialize the UI elements with default values
 # func _ready() -> void:
