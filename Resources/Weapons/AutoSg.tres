@@ -39,6 +39,5 @@ weapon_model = ExtResource("3_8mopf")
 projectile_scene = ExtResource("2_8mopf")
 bullet_case_scene = ExtResource("1_c5m1e")
 weapon_position = Vector3(0.044, -0.227, -0.378)
-weapon_scale = Vector3(0.4, 0.4, 0.4)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

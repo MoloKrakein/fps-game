@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bmco7vsh8f1cy"]
 
-[ext_resource type="PackedScene" uid="uid://d4gwq7u5r2w8c" path="res://Art/3D/Blender/AutoSG.glb" id="1_rcajw"]
+[ext_resource type="PackedScene" uid="uid://bm5s4c7ejoxvk" path="res://Art/3D/Blender/auto-s12.glb" id="1_d1fxt"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="2_j04es"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="2_s6qqo"]
 [ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_d1fxt"]
@@ -90,20 +90,20 @@ material = SubResource("StandardMaterial3D_4udhu")
 size = Vector2(0.5, 0.5)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_s6qqo"]
-animation = &"OpenBolt"
+animation = &"Bolt_Open"
 
 [sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_d1fxt"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_o5dd6"]
-animation = &"CloseBolt"
+animation = &"Bolt_Closed"
 
 [sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_opw17"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_rto42"]
-animation = &"OpenBolt"
+animation = &"Bolt_Open"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(118.97809, -25.076889)
+graph_offset = Vector2(73.653564, 101.35098)
 nodes/output/position = Vector2(1280, 120)
 nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_o5dd6")
 nodes/CloseBolt/position = Vector2(280, 120)
@@ -120,20 +120,20 @@ node_connections = [&"output", 0, &"FireOneShot", &"BoltPosition", 0, &"CloseBol
 [node name="AutoSg" type="Node3D" unique_id=1588667708]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4716842, 0.4094907)
 
-[node name="AutoSG" parent="." unique_id=997309688 instance=ExtResource("1_rcajw")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -1.2681296, -1.1747072)
+[node name="auto-s12" parent="." unique_id=1747288993 instance=ExtResource("1_d1fxt")]
+transform = Transform3D(1.43, 0, 0, 0, 1.43, 0, 0, 0, 1.43, 0, -0.45527112, -0.94514364)
 
-[node name="Skeleton3D" parent="AutoSG/Reclaimer18_ARM" parent_id_path=PackedInt32Array(997309688, 275331868) index="0" unique_id=1093887165]
-bones/16/position = Vector3(-0.0060792174, 0.09655931, 0.011667757)
+[node name="Skeleton3D" parent="auto-s12/Armature" parent_id_path=PackedInt32Array(1747288993, 1661612390) index="0" unique_id=1589232431]
+bones/5/rotation = Quaternion(-2.6692543e-08, 2.6692543e-08, 0.7071068, 0.7071068)
 
-[node name="other\\shell_smd" parent="AutoSG/Reclaimer18_ARM/Skeleton3D" index="5" unique_id=1247209251]
-visible = false
+[node name="Trigger_2" parent="auto-s12/Armature/Skeleton3D" index="4" unique_id=280103473]
+transform = Transform3D(0, -1, -3.5527137e-15, 1, 0, 7.549791e-08, -7.549791e-08, 3.5527137e-15, 1, 0.4849774, 0.21663862, -0.15906414)
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=462009279]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22620049, -0.1264405, -1.0135167)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=528181029 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18115225, -4.4252825)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.38372204, -1.7819787)
 script = ExtResource("2_s6qqo")
 particles = NodePath("GPUParticles3D")
 smoke_particles = NodePath("Smoke")
@@ -168,12 +168,12 @@ weapon_bolt_time = 0.2
 metadata/_custom_type_script = "uid://csp53xj462vmj"
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=766457758]
-root_node = NodePath("../AutoSG")
+root_node = NodePath("../auto-s12")
 tree_root = SubResource("AnimationNodeBlendTree_bhunq")
-anim_player = NodePath("../AutoSG/AnimationPlayer")
+anim_player = NodePath("../auto-s12/AnimationPlayer")
 parameters/BoltPosition/blend_amount = 0.0
 parameters/FireOneShot/active = false
 parameters/FireOneShot/internal_active = false
 parameters/FireOneShot/request = 0
 
-[editable path="AutoSG"]
+[editable path="auto-s12"]
