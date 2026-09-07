@@ -12,9 +12,18 @@ func _on_sliding_state_physics_processing(delta: float) -> void:
 	_slide_timer -= delta
 	player_controller.camera.update_camera_height(delta, -2)
 
-	# 3. Use the dynamic variables to calculate friction decay
 	player_controller.slide_modifier = player_controller.current_slide_power * (_slide_timer / player_controller.current_slide_duration)
+
+	# 1. Calculate exactly how long we have been sliding
+	var time_in_slide = player_controller.current_slide_duration - _slide_timer
 	
+	# 2. The Grace Period: Only allow cancel if 150ms have passed
+	if time_in_slide > 0.001:
+		if Input.is_action_just_pressed("move_crouch") and player_controller.is_sliding:
+			# 3. Just send the event! The State Chart's exited function handles the cleanup.
+			player_controller.state_chart.send_event("onStanding")
+			return # Skip the rest of the frame so it transitions cleanly
+
 	if _slide_timer <= 0.0:
 		player_controller.state_chart.send_event("onCrouching")
 

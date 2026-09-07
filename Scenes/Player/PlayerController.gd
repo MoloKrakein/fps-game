@@ -289,6 +289,7 @@ func end_slide() -> void:
 	crouching_col.disabled = true
 	_slide_direction = Vector3.ZERO
 	_current_slide_cooldown = slide_cooldown
+	slide_modifier = 0.0
 
 	# cam_effects._animate_fov(cam_effects._base_fov, 0.5)
 #endregion

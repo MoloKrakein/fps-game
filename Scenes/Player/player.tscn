@@ -81,7 +81,6 @@ jump_velocity = 3.5
 fall_velocity_threshold = -7.0
 fall_damage_multiplier = 0.45
 base_slide_power = 1.0
-slide_cooldown = 1.6
 max_slide_momentum = 5.0
 metadata/collision_preset_name = &"Player"
 metadata/collision_preset_id = &"2726797477598543100"
