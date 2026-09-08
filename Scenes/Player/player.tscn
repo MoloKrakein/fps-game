@@ -63,15 +63,6 @@ process_priority = -9
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_mtuoh")
-default_speed = 1.0
-sprint_speed = 3.5
-acceleration = 3.0
-deceleration = 20.0
-jump_velocity = 3.5
-fall_velocity_threshold = -7.0
-fall_damage_multiplier = 0.45
-base_slide_power = 1.0
-max_slide_momentum = 5.0
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
 weapon_controller = NodePath("Component/WeaponController")
@@ -82,6 +73,15 @@ interaction_raycast = NodePath("CameraController/Cam/InteractionRaycast")
 cam_effects = NodePath("CameraController/Cam")
 grab_controller = NodePath("Component/GrabController")
 step_handler = NodePath("Component/StepHandler")
+default_speed = 1.0
+sprint_speed = 3.5
+acceleration = 3.0
+deceleration = 20.0
+jump_velocity = 3.5
+fall_velocity_threshold = -7.0
+fall_damage_multiplier = 0.45
+base_slide_power = 1.0
+max_slide_momentum = 5.0
 metadata/collision_preset_name = &"Player"
 metadata/collision_preset_id = &"2726797477598543100"
 
@@ -157,7 +157,7 @@ debug_shape_thickness = 5
 script = ExtResource("4_h8ma5")
 
 [node name="HoldPropPos" type="Marker3D" parent="CameraController/Cam" unique_id=407412408]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8348626, 0.034930766, -0.9799448)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8348626, 0.034930766, -1.1499147)
 
 [node name="BodyKicker" type="Area3D" parent="." unique_id=428381360 node_paths=PackedStringArray("actor")]
 visible = false
