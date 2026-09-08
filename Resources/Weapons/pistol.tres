@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_0sgi0"]
 [ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/bullet_casing.tscn" id="1_auceo"]
+[ext_resource type="PackedScene" uid="uid://dr0q2hevdy3wl" path="res://Art/Assets/Weapon/Projectile/live_bullet_casing_9mm.tscn" id="1_fevg7"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="1_rsge2"]
 [ext_resource type="PackedScene" uid="uid://d0547qfi2hk3r" path="res://Art/Assets/Weapon/Pistol/pistol_model.tscn" id="2_kmy37"]
 
@@ -24,6 +25,7 @@ muzzle_flash_scale = 0.02
 weapon_model = ExtResource("2_kmy37")
 projectile_scene = ExtResource("1_rsge2")
 bullet_case_scene = ExtResource("1_auceo")
+alive_bullet_scene = ExtResource("1_fevg7")
 weapon_position = Vector3(0.115, -0.403, -0.625)
 weapon_rotation = Vector3(0, 0, 0.3)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)
