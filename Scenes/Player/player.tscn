@@ -165,12 +165,11 @@ collision_mask = 9
 script = ExtResource("7_enij7")
 actor = NodePath("..")
 kick_force = 15.0
-<<<<<<< HEAD
 metadata/collision_preset_name = &"__custom__"
 =======
 metadata/collision_preset_name = &"ragdoll"
 metadata/collision_preset_id = &"7381442230917582739"
->>>>>>> 6e47b1ebd6fd4f7414b00b5820ac78ce47e23e96
+
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="BodyKicker" unique_id=1147680536]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4625994, 0)

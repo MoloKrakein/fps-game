@@ -13,11 +13,9 @@ func _on_prop_destroyed() -> void:
 	if debris_scene:
 		# set the debris size scene to match the parent size
 		var debris = debris_scene.instantiate()
-<<<<<<< HEAD
+
 		debris.scale = get_parent().scale
-=======
-		# put the debris scene in rigidbody root
->>>>>>> 6e47b1ebd6fd4f7414b00b5820ac78ce47e23e96
+
 		get_tree().root.add_child(debris)
 
 		# Match the parent's physical position
