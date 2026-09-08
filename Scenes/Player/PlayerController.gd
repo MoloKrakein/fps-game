@@ -166,15 +166,14 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor() and y_velocity_before_on_floor < 0.0:
 		impact_velocity = y_velocity_before_on_floor
 
-	if is_on_floor() and (not is_sliding or on_airbone_time > 0.0):
-		step_handler.handle_step_climbing()
-
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
+		if is_on_floor() and (not is_sliding or on_airbone_time >= 0.0) and collider is not RigidBody3D:
+			step_handler.handle_step_climbing()
 
 		if collider is RigidBody3D:
-			var push_force = 15.0
+			var push_force = 5.0
 
 			var push_dir = -collision.get_normal()
 			collider.apply_central_impulse(push_dir * push_force)
