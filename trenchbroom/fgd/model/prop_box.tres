@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="FuncGodotFGDModelPointClass" format=3 uid="uid://dncqk2bff0lbt"]
+
+[ext_resource type="Script" uid="uid://d1nwwgcrner8b" path="res://addons/func_godot/src/fgd/func_godot_fgd_point_class_display_descriptor.gd" id="1_gt17f"]
+[ext_resource type="Script" uid="uid://ldfqjtq0br35" path="res://addons/func_godot/src/fgd/func_godot_fgd_model_point_class.gd" id="2_1ruwj"]
+[ext_resource type="PackedScene" uid="uid://8ua11t6s4q3e" path="res://_Assets/Env/props/wooden_box.tscn" id="2_on6se"]
+
+[resource]
+script = ExtResource("2_1ruwj")
+target_map_editor = 1
+generate_size_property = true
+scene_file = ExtResource("2_on6se")
+classname = "prop_wooden_box"
+description = "wooden box"
+meta_properties = Dictionary[String, Variant]({
+"color": Color(0.8, 0.8, 0.8, 1),
+"model": "{\"path\": \"trenchbroom/models/prop_wooden_box.glb\", \"scale\": 32.0 }",
+"size": AABB(-6, -8, 0, 6, 4, 12)
+})
+metadata/_custom_type_script = "uid://ldfqjtq0br35"

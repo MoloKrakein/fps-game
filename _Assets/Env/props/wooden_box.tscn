@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://8ua11t6s4q3e"]
+
+[ext_resource type="Script" uid="uid://b3sbgd030kjar" path="res://_Assets/Env/props/base_grab_prop.gd" id="1_h5y0n"]
+[ext_resource type="PackedScene" uid="uid://d3bb2qbm57t8m" path="res://Art/3D/Blender/prop/WoodenBox.gltf" id="2_icarf"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_4lw20"]
+points = PackedVector3Array(0.125, 0.375, 0.1875, 0.125, 0.375, -0.1875, -0.25, 0.375, 0.1875, 0.125, 0, 0.1875, 0.125, 0, -0.1875, -0.25, 0.375, -0.1875, -0.25, 0, 0.1875, -0.25, 0, -0.1875)
+
+[node name="WoodenBox" type="RigidBody3D" unique_id=1805821197]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
+mass = 37.204
+freeze_mode = 1
+script = ExtResource("1_h5y0n")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1220728940]
+shape = SubResource("ConvexPolygonShape3D_4lw20")
+
+[node name="blockbench_export" parent="." unique_id=1792599270 instance=ExtResource("2_icarf")]
+
+[editable path="blockbench_export"]

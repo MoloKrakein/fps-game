@@ -6,10 +6,12 @@
 [ext_resource type="Resource" uid="uid://dvi50rwvko2iy" path="res://trenchbroom/fgd/point/func_light.tres" id="3_aypyt"]
 [ext_resource type="Resource" uid="uid://c8j7ujv4ha64m" path="res://trenchbroom/fgd/model/office_light_celling.tres" id="4_sx14s"]
 [ext_resource type="Resource" uid="uid://co3qorg5dexp8" path="res://trenchbroom/fgd/model/item_pistol_ammo_pickup.tres" id="5_bwf20"]
+[ext_resource type="Resource" uid="uid://dncqk2bff0lbt" path="res://trenchbroom/fgd/model/prop_box.tres" id="6_8dika"]
+[ext_resource type="Resource" uid="uid://cb5njh147dyp3" path="res://trenchbroom/fgd/model/item_diamond.tres" id="7_p6tcb"]
 
 [resource]
 script = ExtResource("2_rrhqs")
 fgd_name = "FPS_game"
 base_fgd_files = Array[Resource]([ExtResource("1_pt5he")])
-entity_definitions = Array[Resource]([ExtResource("2_aypyt"), ExtResource("3_aypyt"), ExtResource("4_sx14s"), ExtResource("5_bwf20")])
+entity_definitions = Array[Resource]([ExtResource("2_aypyt"), ExtResource("3_aypyt"), ExtResource("4_sx14s"), ExtResource("5_bwf20"), ExtResource("6_8dika"), ExtResource("7_p6tcb")])
 metadata/_custom_type_script = "uid://drlmgulwbjwqu"
