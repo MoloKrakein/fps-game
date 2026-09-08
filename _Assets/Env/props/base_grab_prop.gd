@@ -8,10 +8,7 @@ signal force_dropped
 var is_held: bool = false
 var hold_target: Marker3D = null
 var weight: float = 1.0
-<<<<<<< HEAD
 
-=======
->>>>>>> d94bbbb (Smg and Prop Handle)
 
 func _physics_process(delta: float) -> void:
     if is_held and is_instance_valid(hold_target):
@@ -37,9 +34,6 @@ func _physics_process(delta: float) -> void:
         var spring_vel = direction * (distance * pull_power)
         linear_velocity = linear_velocity.lerp(spring_vel, 10.0 * delta)
   
-
-func get_held_object_weight() -> float:
-    return weight
 
 func grab(target_marker: Marker3D) -> void:
     is_held = true
