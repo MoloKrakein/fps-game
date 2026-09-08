@@ -11,13 +11,10 @@ func _ready() -> void:
 
 func _on_prop_destroyed() -> void:
 	if debris_scene:
-		# set the debris size scene to match the parent size
 		var debris = debris_scene.instantiate()
-
-		debris.scale = get_parent().scale
-
+		# put the debris scene in rigidbody root
 		get_tree().root.add_child(debris)
-
+		
 		# Match the parent's physical position
 		debris.global_position = get_parent().global_position 
 		debris.global_rotation = get_parent().global_rotation
