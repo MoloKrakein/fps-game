@@ -95,6 +95,7 @@ enum WeaponAmmoType {
 @export var weapon_model: PackedScene
 @export var projectile_scene: PackedScene
 @export var bullet_case_scene: PackedScene
+@export var alive_bullet_scene: PackedScene
 @export_group("Other Model Setting")
 @export var weapon_position: Vector3 = Vector3(0.2, -0.2, -0.3)
 @export var weapon_rotation: Vector3 = Vector3(0, 0, 0)

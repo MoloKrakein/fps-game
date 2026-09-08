@@ -1,14 +1,8 @@
 [gd_scene format=3 uid="uid://d0547qfi2hk3r"]
 
-[ext_resource type="PackedScene" uid="uid://bbejgcnioj0rb" path="res://Art/3D/Blender/mk4.glb" id="1_nj3sb"]
+[ext_resource type="PackedScene" uid="uid://chbn144y1yp60" path="res://Art/3D/Blender/mk57.glb" id="1_uo56h"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="1_w2u2j"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="3_uo56h"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_o08ba"]
-size = Vector3(1, 1, 5.1365967)
-
-[sub_resource type="BoxMesh" id="BoxMesh_vx3u4"]
-size = Vector3(1, 2.0807495, 1)
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
 angle_min = -179.99998
@@ -37,20 +31,20 @@ material = SubResource("StandardMaterial3D_uo56h")
 size = Vector2(0.2, 0.2)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2kfvb"]
-animation = &"BoltOpen"
+animation = &"Open_bolt"
 
 [sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_cbvsw"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uo56h"]
-animation = &"CloseBolt"
+animation = &"Close_bolt"
 
 [sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_uo56h"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_rjpr8"]
-animation = &"BoltOpen"
+animation = &"Open_bolt"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(-667.8915, -20.242943)
+graph_offset = Vector2(-967.4468, 132.23367)
 nodes/output/position = Vector2(680, 120)
 nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_uo56h")
 nodes/FireOneShot/position = Vector2(240, 120)
@@ -66,26 +60,14 @@ node_connections = [&"output", 0, &"FireOneShot", &"FireOneShot", 0, &"BoltPosit
 
 [node name="PistolModel" type="Node3D" unique_id=1425760719]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=598771468]
-transform = Transform3D(0.342, 0, 0, 0, 0.342, 0, 0, 0, 0.342, 0, 0, 0)
-visible = false
-layers = 2
-mesh = SubResource("BoxMesh_o08ba")
+[node name="mk57" parent="." unique_id=1019266233 instance=ExtResource("1_uo56h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08635038, -0.115241945)
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=364735078]
-transform = Transform3D(0.342, 0, 0, 0, 0.342, 0, 0, 0, 0.342, 0, -0.5187572, 0.7113452)
-visible = false
-layers = 2
-mesh = SubResource("BoxMesh_vx3u4")
+[node name="Skeleton3D" parent="mk57/Armature" parent_id_path=PackedInt32Array(1019266233, 257383561) index="0" unique_id=1509516285]
+bones/2/position = Vector3(0.009498219, 0.29897547, 0.03508698)
 
-[node name="mk4" parent="." unique_id=897042309 instance=ExtResource("1_nj3sb")]
-transform = Transform3D(0.095, 0, 0, 0, 0.095, 0, 0, 0, 0.095, 0, 0.13903746, 0.08988565)
-
-[node name="Armature" parent="mk4" index="0" unique_id=856923044]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-
-[node name="Skeleton3D" parent="mk4/Armature" index="0" unique_id=2125492776]
-bones/1/position = Vector3(0.0022497238, 2.1231215, 0.54827464)
+[node name="Slider_2" parent="mk57/Armature/Skeleton3D" index="1" unique_id=1295093142]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009498219, 0.29897547, 0.03508698)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17425191, -0.6091657)
@@ -115,12 +97,12 @@ weapon_bolt_time = 0.2
 metadata/_custom_type_script = "uid://csp53xj462vmj"
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=834356458]
-root_node = NodePath("../mk4")
+root_node = NodePath("../mk57")
 tree_root = SubResource("AnimationNodeBlendTree_bhunq")
-anim_player = NodePath("../mk4/AnimationPlayer")
+anim_player = NodePath("../mk57/AnimationPlayer")
 parameters/FireOneShot/active = false
 parameters/FireOneShot/internal_active = false
 parameters/FireOneShot/request = 0
 parameters/BoltPosition/blend_amount = 0.0
 
-[editable path="mk4"]
+[editable path="mk57"]

@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" uid="uid://b3sbgd030kjar" path="res://_Assets/Env/props/base_grab_prop.gd" id="1_h5y0n"]
 [ext_resource type="PackedScene" uid="uid://d3bb2qbm57t8m" path="res://Art/3D/Blender/prop/WoodenBox.gltf" id="2_icarf"]
+[ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="3_b8mgc"]
+[ext_resource type="Script" uid="uid://bdi24n7vkgjnf" path="res://_Assets/Env/scripts/breakable_component.gd" id="4_4qc7n"]
+[ext_resource type="PackedScene" uid="uid://dcjlkrbi28u85" path="res://Art/3D/Blender/prop/Scenes/woodenbox_broken.tscn" id="5_b8mgc"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_4lw20"]
 points = PackedVector3Array(0.125, 0.375, 0.1875, 0.125, 0.375, -0.1875, -0.25, 0.375, 0.1875, 0.125, 0, 0.1875, 0.125, 0, -0.1875, -0.25, 0.375, -0.1875, -0.25, 0, 0.1875, -0.25, 0, -0.1875)
@@ -16,5 +19,17 @@ script = ExtResource("1_h5y0n")
 shape = SubResource("ConvexPolygonShape3D_4lw20")
 
 [node name="blockbench_export" parent="." unique_id=1792599270 instance=ExtResource("2_icarf")]
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1243159039]
+script = ExtResource("3_b8mgc")
+max_health = 1.0
+metadata/_custom_type_script = "uid://dtyhxdhs168m"
+
+[node name="BrakeableComponent" type="Node" parent="." unique_id=637742328 node_paths=PackedStringArray("health_component")]
+script = ExtResource("4_4qc7n")
+brake_force = 2.0
+health_component = NodePath("../HealthComponent")
+debris_scene = ExtResource("5_b8mgc")
+metadata/_custom_type_script = "uid://bdi24n7vkgjnf"
 
 [editable path="blockbench_export"]

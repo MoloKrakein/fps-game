@@ -195,10 +195,9 @@ func _process(delta: float) -> void:
 	_apply_offsets(delta)
 	if Input.is_action_just_pressed("combat_switch_fire_mode"):
 		toggle_fire_mode()
-	# if Input.is_action_just_pressed("combat_rack_gun"):
-	# 	if current_weapon != null and current_weapon.is_open_bolt:
-	# 		_cycle_weapon()
-#endregion
+	if Input.is_action_just_pressed("combat_rack_gun"):
+		rack_slide() 
+# endregion
 
 #region Trigger & Fire Mode
 func get_burst_shot_count() -> int:
@@ -368,10 +367,19 @@ func _cycle_weapon() -> void:
 		else:
 			weapon_animation_player.play_animation("Empty")
 
-		
-	
-
 	update_weapon_ui()
+
+func rack_slide() -> void:
+	# print("Racking slide. Ammo in magazine: ", active_weapon_data.ammo_in_magazine, " Is loaded: ", active_weapon_data.is_loaded)
+	if current_weapon == null or active_weapon_data == null:
+		return
+	if not active_weapon_data.ammo_in_magazine > 0:
+		return
+	_ejecting_bullet_case("alive")
+	# play animation
+	if weapon_animation_player != null:
+		weapon_animation_player.play_animation("Fire")
+	_cycle_weapon()
 
 func execute_reload() -> void:
 	if not can_reload():
@@ -461,8 +469,8 @@ func reload_magazine() -> void:
 	active_weapon_data.ammo_in_magazine += transfer
 	active_weapon_data.reserve_ammo -= transfer
 
-	if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
-		_cycle_weapon()
+	# if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
+	# 	_cycle_weapon()
 	update_weapon_ui()
 
 # handle reload per bullet logic, put 1 bullet at the time, and check if the player is still holding the reload button
@@ -613,11 +621,17 @@ func _perform_projectile_fire() -> void:
 		projectile.look_at(projectile.global_position + direction, Vector3.UP)
 		projectile.setup(projectile_velocity, damage)
 
-func _ejecting_bullet_case() -> void:
+func _ejecting_bullet_case(casing_type="empty") -> void:
 	if current_weapon == null or casing_position == null:
 		# print("No current weapon or casing position available for bullet casing ejection.")
 		return
-	var casing_scene = current_weapon.bullet_case_scene
+	var casing_scene = null
+	# fill casing scene based on casing_type if empty, then use the default casing scene from the weapon if alive, then use the alive scene
+	if casing_type == "empty":
+		casing_scene = current_weapon.bullet_case_scene
+	elif casing_type == "alive":
+		casing_scene = current_weapon.alive_bullet_scene
+
 	if casing_scene == null:
 		# print("No bullet casing scene defined for the current weapon.")
 		return

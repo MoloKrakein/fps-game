@@ -128,14 +128,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.5983944)
 environment = SubResource("Environment_5yekf")
 fov = 90.0
 script = ExtResource("4_eksi1")
+player = NodePath("../..")
 max_roll = 1.5
 slide_pitch = 4.5
 slide_roll = 6.0
 slide_fov = 125.0
-player = NodePath("../..")
 
 [node name="SmgModel" parent="CameraController/Cam" unique_id=1004586577 instance=ExtResource("6_mwii3")]
-transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0.006221235, -0.25546837, -0.65980077)
+transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, -0.323, 0.03)
 visible = false
 
 [node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
@@ -157,15 +157,20 @@ debug_shape_thickness = 5
 script = ExtResource("4_h8ma5")
 
 [node name="HoldPropPos" type="Marker3D" parent="CameraController/Cam" unique_id=407412408]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8348626, 0.034930766, -0.9799448)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8348626, 0.034930766, -1.1499147)
 
 [node name="BodyKicker" type="Area3D" parent="." unique_id=428381360 node_paths=PackedStringArray("actor")]
-collision_layer = 9
-collision_mask = 8
+collision_layer = 8
+collision_mask = 9
 script = ExtResource("7_enij7")
 actor = NodePath("..")
 kick_force = 15.0
+<<<<<<< HEAD
 metadata/collision_preset_name = &"__custom__"
+=======
+metadata/collision_preset_name = &"ragdoll"
+metadata/collision_preset_id = &"7381442230917582739"
+>>>>>>> 6e47b1ebd6fd4f7414b00b5820ac78ce47e23e96
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="BodyKicker" unique_id=1147680536]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4625994, 0)
@@ -204,17 +209,19 @@ script = ExtResource("2_xpcdj")
 
 [node name="StepHandler" type="Node" parent="Component" unique_id=1782951827 node_paths=PackedStringArray("player")]
 script = ExtResource("23_jincj")
-<<<<<<< HEAD
 player = NodePath("../..")
 max_step_height = 0.75
-=======
-max_step_height = 0.6
-player = NodePath("../..")
->>>>>>> d94bbbb (Smg and Prop Handle)
 
 [node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position", "casing_position", "camera", "cam_rig")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("33_1agin")
+weapon_model_parent = NodePath("../../CameraController/Cam")
+weapon_state_chart = NodePath("../../WeaponStateChart")
+reticle = NodePath("../../UI/Reticle")
+shoot_position = NodePath("../../CameraController/Cam/ShootPos")
+casing_position = NodePath("../../CameraController/Cam/ShootPos")
+camera = NodePath("../../CameraController/Cam")
+cam_rig = NodePath("../../CameraController")
 crouch_rot_offset = Vector3(0, 0, 0.262)
 idle_sway_frequency = 0.4
 idle_sway_amplitude = Vector2(0.015, 0.01)
@@ -228,13 +235,6 @@ look_lag_rot_max = 30.0
 look_lag_pos_scale = 0.3
 bob_amplitude = Vector2(0.05, 0.012)
 bob_max_speed = 5.0
-weapon_model_parent = NodePath("../../CameraController/Cam")
-weapon_state_chart = NodePath("../../WeaponStateChart")
-reticle = NodePath("../../UI/Reticle")
-shoot_position = NodePath("../../CameraController/Cam/ShootPos")
-casing_position = NodePath("../../CameraController/Cam/ShootPos")
-camera = NodePath("../../CameraController/Cam")
-cam_rig = NodePath("../../CameraController")
 
 [node name="GrabController" type="Node" parent="Component" unique_id=1472151820 node_paths=PackedStringArray("interaction_ray", "hold_position", "interaction_state_chart", "cam")]
 script = ExtResource("14_2aanf")

@@ -1,4 +1,4 @@
-class_name BrakeableComponent extends Node
+class_name BreakeableComponent extends Node
 @export var brake_force: float = 10.0
 @export var health_component: HealthComponent
 @export var debris_scene: PackedScene
@@ -13,11 +13,20 @@ func _on_prop_destroyed() -> void:
 	if debris_scene:
 		# set the debris size scene to match the parent size
 		var debris = debris_scene.instantiate()
+<<<<<<< HEAD
 		debris.scale = get_parent().scale
+=======
+		# put the debris scene in rigidbody root
+>>>>>>> 6e47b1ebd6fd4f7414b00b5820ac78ce47e23e96
 		get_tree().root.add_child(debris)
 
 		# Match the parent's physical position
 		debris.global_position = get_parent().global_position 
+		debris.global_rotation = get_parent().global_rotation
+		# if debris is Node3D:
+		# 	var force_direction = Vector3(randf() - 0.5, randf(), randf() - 0.5).normalized()
+		# 	debris.apply_central_impulse(force_direction * brake_force)
+
 		
 	# Delete the parent physics body (the crate/barrel)
 	get_parent().queue_free()
