@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_vslle"]
 [ext_resource type="PackedScene" uid="uid://bps200c3a6dly" path="res://Art/3D/Blender/m15-betatest.glb" id="4_jhoge"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="5_c8wk2"]
+[ext_resource type="PackedScene" uid="uid://sjbhyef1d7rb" path="res://Art/3D/Blender/m15.glb" id="6_3vu8r"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vslle"]
 angle_min = -360.0
@@ -135,21 +136,21 @@ size = Vector2(0.505, 0.15)
 center_offset = Vector3(0.155, 0.01, 0.02)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3vu8r"]
-animation = &"Empty"
+animation = &"Bolt_Close"
 
 [sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_ojklw"]
 filters = ["Armature/Skeleton3D:Bone", "Armature/Skeleton3D:Charging", "Armature/Skeleton3D:Trigger"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_c8wk2"]
-animation = &"Empty"
+animation = &"Bolt_Close"
 
 [sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_7lkid"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ugyo2"]
-animation = &"Idle"
+animation = &"Bolt_Charged"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_sn0t7"]
-graph_offset = Vector2(-501.2307, -61.26596)
+graph_offset = Vector2(-474.84448, 53.215607)
 nodes/output/position = Vector2(560, 60)
 nodes/Idle/node = SubResource("AnimationNodeAnimation_ugyo2")
 nodes/Idle/position = Vector2(-520, 20)
@@ -167,7 +168,7 @@ node_connections = [&"output", 0, &"FireOneShot", &"BoltPosition", 0, &"Idle", &
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=227635064 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
-transform = Transform3D(0.9999417, 0.009721402, 0.0046989457, -0.009678353, 0.9999118, -0.009100334, -0.0047869855, 0.009054332, 0.99994755, 0.013740976, 0.918395, -2.036882)
+transform = Transform3D(0.9999417, 0.009721402, 0.0046989457, -0.009678353, 0.9999118, -0.009100334, -0.0047869855, 0.009054332, 0.99994755, -0.12537159, 1.0019037, -2.3965423)
 script = ExtResource("1_mf45t")
 particles = NodePath("MuzzleFlash")
 smoke_particles = NodePath("Smoke")
@@ -199,30 +200,13 @@ draw_pass_1 = SubResource("QuadMesh_riqys")
 
 [node name="m15-betatest" parent="." unique_id=1966989449 instance=ExtResource("4_jhoge")]
 transform = Transform3D(-0.9, 0, 1.3589622e-07, 0, 0.9, 0, -1.3589622e-07, 0, -0.9, 0, 0, 1.0091136)
+visible = false
 
-[node name="Armature" parent="m15-betatest" index="0" unique_id=2047274107]
+[node name="Armature" parent="m15-betatest" index="0" unique_id=687645128]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.5545578, 1.5221102e-07, -0.4773149, 0.98066103)
 
-[node name="Skeleton3D" parent="m15-betatest/Armature" index="0" unique_id=1059421968]
-bones/0/position = Vector3(0, 0, 0)
-bones/2/position = Vector3(0.0004837635, 1.8711536, 0.27008945)
-bones/4/rotation = Quaternion(-2.6692543e-08, -2.6692543e-08, -0.7071068, 0.7071068)
-bones/5/position = Vector3(-2.6409426e-16, -1.6006906, 0.00251674)
-
-[node name="Charging" parent="m15-betatest/Armature/Skeleton3D" index="0" unique_id=775214120]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0004837635, 1.8711536, 0.27008945)
-
-[node name="Trigger" parent="m15-betatest/Armature/Skeleton3D" index="1" unique_id=229848165]
-transform = Transform3D(0, 1, 3.5527137e-15, -1, 0, 7.549791e-08, 7.549791e-08, 3.5527137e-15, 1, -0.24348937, 1.1574035, 0.37810996)
-
-[node name="Bone" parent="m15-betatest/Armature/Skeleton3D" index="2" unique_id=766972234]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-
-[node name="Magazine" parent="m15-betatest/Armature/Skeleton3D" index="3" unique_id=261158313]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6409426e-16, -1.6006906, 0.00251674)
-
 [node name="EjectionPort" type="Node3D" parent="." unique_id=919837844 node_paths=PackedStringArray("smoke_particles")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28161508, 1.0376446, 0.07117531)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0010569347, 1.0679153, -0.09360546)
 script = ExtResource("1_mf45t")
 smoke_particles = NodePath("Smoke")
 
@@ -241,12 +225,19 @@ script = ExtResource("5_c8wk2")
 weapon_animation_tree = NodePath("../AnimationTree")
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=1000692367]
-root_node = NodePath("../m15-betatest")
+root_node = NodePath("../m15")
 tree_root = SubResource("AnimationNodeBlendTree_sn0t7")
-anim_player = NodePath("../m15-betatest/AnimationPlayer")
+anim_player = NodePath("../m15/AnimationPlayer")
 parameters/BoltPosition/blend_amount = 0.0
 parameters/FireOneShot/active = false
 parameters/FireOneShot/internal_active = false
 parameters/FireOneShot/request = 0
 
+[node name="m15" parent="." unique_id=353675407 instance=ExtResource("6_3vu8r")]
+transform = Transform3D(4.513, 0, 0, 0, 4.705, 0, 0, 0, 4.705, 0, -1.821, -0.176)
+
+[node name="Suppressor" parent="m15/Armature/Skeleton3D/Root" parent_id_path=PackedInt32Array(353675407, 945600531) index="5" unique_id=1389869397]
+visible = false
+
 [editable path="m15-betatest"]
+[editable path="m15"]
