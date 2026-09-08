@@ -1,5 +1,7 @@
 [gd_scene format=4 uid="uid://bqj10illg3gai"]
 
+[ext_resource type="Script" uid="uid://b0j6mesxnuqqo" path="res://_Assets/Env/props/broken_prop.gd" id="1_d8hq4"]
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_27kfn"]
 resource_name = "Material"
 cull_mode = 2
@@ -358,6 +360,7 @@ points = PackedVector3Array(1.5282706, 0.4286375, -0.20027182, 1.5151995, 0.4286
 
 [node name="table_broken" type="Node3D" unique_id=286567406]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+script = ExtResource("1_d8hq4")
 
 [node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=1340607759]
 collision_layer = 9
