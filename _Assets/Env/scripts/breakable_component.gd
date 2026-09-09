@@ -18,6 +18,8 @@ func _on_prop_destroyed() -> void:
 		# Match the parent's physical position
 		debris.global_position = get_parent().global_position 
 		debris.global_rotation = get_parent().global_rotation
+		# set the scale of the debris to match the parent
+		debris.scale = get_parent().scale
 		# if debris is Node3D:
 		# 	var force_direction = Vector3(randf() - 0.5, randf(), randf() - 0.5).normalized()
 		# 	debris.apply_central_impulse(force_direction * brake_force)
