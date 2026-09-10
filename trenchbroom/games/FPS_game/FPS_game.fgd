@@ -47,6 +47,8 @@
 
 @PointClass color(204 204 204) model({"path": "trenchbroom/models/item_ammo_pistol.glb", "scale": 32.0 }) size(-10.0 -4.0 0.0, 10.0 10.0 8.0) = item_ammo_pistol : "pistol ammo" []
 
-@PointClass size(-6.0 -8.0 0.0, 6.0 4.0 12.0) color(204 204 204) model({"path": "trenchbroom/models/prop_wooden_box.glb", "scale": 32.0 }) = prop_wooden_box : "wooden box" []
+@PointClass color(204 204 204) model({"path": "trenchbroom/models/prop_wooden_box.glb", "scale": 32.0 }) size(-6.0 -8.0 0.0, 6.0 4.0 12.0) = prop_wooden_box : "wooden box" []
 
-@PointClass size(-8.0 -8.0 2.0, 8.0 8.0 22.0) color(204 204 204) model({"path": "trenchbroom/models/prop_diamond.glb", "scale": 32.0 }) = prop_diamond : "diamond" []
+@PointClass color(204 204 204) model({"path": "trenchbroom/models/prop_diamond.glb", "scale": 32.0 }) size(-8.0 -8.0 2.0, 8.0 8.0 22.0) = prop_diamond : "diamond" []
+
+@SolidClass color(204 204 204) = movement_door : "Rotating open close door" []

@@ -8,10 +8,11 @@
 [ext_resource type="Resource" uid="uid://co3qorg5dexp8" path="res://trenchbroom/fgd/model/item_pistol_ammo_pickup.tres" id="5_bwf20"]
 [ext_resource type="Resource" uid="uid://dncqk2bff0lbt" path="res://trenchbroom/fgd/model/prop_box.tres" id="6_8dika"]
 [ext_resource type="Resource" uid="uid://cb5njh147dyp3" path="res://trenchbroom/fgd/model/item_diamond.tres" id="7_p6tcb"]
+[ext_resource type="Resource" uid="uid://b0lbhc2dw56tl" path="res://trenchbroom/fgd/solid/func_door_rotate.tres" id="8_p6tcb"]
 
 [resource]
 script = ExtResource("2_rrhqs")
 fgd_name = "FPS_game"
 base_fgd_files = Array[Resource]([ExtResource("1_pt5he")])
-entity_definitions = Array[Resource]([ExtResource("2_aypyt"), ExtResource("3_aypyt"), ExtResource("4_sx14s"), ExtResource("5_bwf20"), ExtResource("6_8dika"), ExtResource("7_p6tcb")])
+entity_definitions = Array[Resource]([ExtResource("2_aypyt"), ExtResource("3_aypyt"), ExtResource("4_sx14s"), ExtResource("5_bwf20"), ExtResource("6_8dika"), ExtResource("7_p6tcb"), ExtResource("8_p6tcb")])
 metadata/_custom_type_script = "uid://drlmgulwbjwqu"

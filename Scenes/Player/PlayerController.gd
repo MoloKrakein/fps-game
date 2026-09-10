@@ -341,6 +341,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		health_component.take_damage(50)
 
 	if event.is_action_pressed("action_use"):
+		interaction_raycast.force_raycast_update()
+		interaction_raycast.interact()
 		grab_controller.try_grab()
 
 	if event.is_action_pressed("action_drop"):
