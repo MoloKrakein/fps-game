@@ -1,61 +1,19 @@
 [gd_resource type="Resource" script_class="FuncGodotFGDSolidClass" format=3 uid="uid://b0lbhc2dw56tl"]
 
 [ext_resource type="Script" uid="uid://5cow84q03m6a" path="res://addons/func_godot/src/fgd/func_godot_fgd_solid_class.gd" id="1_deh0r"]
-
-[sub_resource type="GDScript" id="GDScript_ausfd"]
-script/source = "extends AnimatableBody3D
-
-# Maps directly to a 'hinge_side' key in TrenchBroom
-@export var hinge_side: String = \"x+\" 
-@export var swing_angle: float = 90.0
-@export var swing_speed: float = 0.5
-
-var is_open: bool = false
-var base_rotation: Vector3
-var door_tween: Tween
-
-func _ready() -> void:
-    # 1. Find the mesh FuncGodot generated
-    var meshes = find_children(\"*\", \"MeshInstance3D\")
-    if meshes.is_empty(): return
-    
-    # 2. Get the exact dimensions of your TrenchBroom brush
-    var extents = meshes[0].mesh.get_aabb().size / 2.0
-    var pivot_offset = Vector3.ZERO
-    
-    # 3. Determine which corner becomes the hinge
-    match hinge_side.to_lower():
-        \"x+\": pivot_offset.x = extents.x
-        \"x-\": pivot_offset.x = -extents.x
-        \"z+\": pivot_offset.z = extents.z
-        \"z-\": pivot_offset.z = -extents.z
-        
-    # 4. Shift all children (Mesh and Collision) away from the center
-    # This forces the root node's (0,0,0) position to sit exactly on the chosen edge
-    for child in get_children():
-        if child is Node3D:
-            child.position -= pivot_offset
-            
-    base_rotation = rotation_degrees
-
-func interact() -> void:
-    is_open = !is_open
-    var target_rot = base_rotation
-    
-    if is_open:
-        target_rot.y += swing_angle
-        
-    if door_tween:
-        door_tween.kill()
-        
-    door_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-    door_tween.tween_property(self, \"rotation_degrees\", target_rot, swing_speed)
-"
+[ext_resource type="Script" uid="uid://b74htl4cqrefx" path="res://_Assets/Env/Maps/scripts/interaction_door.gd" id="2_ausfd"]
 
 [resource]
 script = ExtResource("1_deh0r")
-script_class = SubResource("GDScript_ausfd")
+script_class = ExtResource("2_ausfd")
 classname = "movement_door"
 description = "Rotating open close door"
+class_properties = Dictionary[String, Variant]({
+"angle": 90.0,
+"auto_close": true,
+"close_delay": 2.0,
+"hinge": "left",
+"speed": 90.0
+})
 node_class = "AnimatableBody3D"
 metadata/_custom_type_script = "uid://5cow84q03m6a"

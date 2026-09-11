@@ -20,7 +20,8 @@
 [ext_resource type="Material" uid="uid://dn3th2vb2aydd" path="res://trenchbroom/textures/Pool Tiles.tres" id="13_e8byd"]
 [ext_resource type="PackedScene" uid="uid://b4bqkfy3ay7um" path="res://Scenes/Level/pickups/health_pickup.tscn" id="14_k325q"]
 [ext_resource type="PackedScene" uid="uid://8ua11t6s4q3e" path="res://_Assets/Env/props/wooden_box.tscn" id="17_ighri"]
-[ext_resource type="Script" uid="uid://c3blk7u857k2m" path="res://_Assets/Env/trigger_volume.gd" id="18_v83en"]
+[ext_resource type="Script" uid="uid://b74htl4cqrefx" path="res://_Assets/Env/Maps/scripts/interaction_door.gd" id="18_rtku8"]
+[ext_resource type="Script" uid="uid://c3blk7u857k2m" path="res://_Assets/Env/Maps/scripts/trigger_volume.gd" id="18_v83en"]
 [ext_resource type="PackedScene" uid="uid://co8w6qa27hwwc" path="res://_Assets/Env/props/unbreakable_diamond.tscn" id="19_e8byd"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_o08ba"]
@@ -32,12 +33,12 @@ geometry_source_group_name = &"level_geometry"
 agent_height = 2.0
 agent_max_climb = 0.7
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e8byd"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rtku8"]
 albedo_texture = ExtResource("12_v83en")
 metallic_specular = 0.0
 texture_filter = 2
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_rtku8"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_qo5hl"]
 _surfaces = [{
 "aabb": AABB(-15.5, -0.5, -5.5, 49, 12.5, 16.5),
 "attribute_data": PackedByteArray("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AAAgwACAp8EAACBAAAC+wAAAMEAAAL7AAAAwQAAAXMAAACBAAABcwAAAhkEAAFzAAABwQQAAXMAAAHBBAAC+wAAAhkEAAL7AAACGwQAAXMAAAHDBAABcwAAAcMEAAKA+AACGwQAAoD4AAIC/AACgPgAAMMAAAKA+AAAwwAAAXMAAAIC/AABcwAAAgD8AAJbBAACAPwCAp8EAADBAAICnwQAAMEAAAJbBAACAvwAAlsEAADDAAACWwQAAMMAAgKfBAACAvwCAp8EAAIA/AABcwAAAMEAAAFzAAAAwQAAAoD4AAIA/AACgPgAAhkEAAKA+AABwQQAAoD4AAHBBAABcwAAAhkEAAFzAAAC8wAAAQMAAALjAAABAwAAAuMAAABjAAAC8wAAAGMAAADBAAAAYwAAAAAAAABjAAAAAAAAAQMAAADBAAABAwAAAMMAAALjAAAAwwAAAvMAAAAAAAAC8wAAAAAAAALjAAAAwQAAAuMAAAAAAAAC4wAAAAAAAALzAAAAwQAAAvMAAADDAAABAwAAAAAAAAEDAAAAAAAAAGMAAADDAAAAYwAAAvEAAABjAAAC4QAAAGMAAALhAAABAwAAAvEAAAEDAAAC8wAAAKMAAAIDAAAAowAAAgMAAABjAAAC8wAAAGMAAAAAAAAAYwAAAAL4AABjAAAAAvgAAKMAAAAAAAAAowAAAAAAAAIDAAAAAAAAAvMAAAAA+AAC8wAAAAD4AAIDAAAAAAAAAgMAAAAC+AACAwAAAAL4AALzAAAAAAAAAvMAAAAAAAAAowAAAAD4AACjAAAAAPgAAGMAAAAAAAAAYwAAAvEAAABjAAACAQAAAGMAAAIBAAAAowAAAvEAAACjA"),
@@ -140,7 +141,7 @@ _surfaces = [{
 "format": 34359742487,
 "index_count": 306,
 "index_data": PackedByteArray("AAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcAGAAZABoAGAAaABsAHAAdAB4AHAAeAB8AIAAhACIAIAAiACMAJAAlACYAJAAmACcAKAApACoAKAAqACsALAAtAC4ALAAuAC8AMAAxADIAMAAyADMANAA1ADYANAA2ADcAOAA5ADoAOAA6ADsAPAA9AD4APAA+AD8AQABBAEIAQABCAEMARABFAEYARABGAEcASABJAEoASABKAEsATABNAE4ATABOAE8AUABRAFIAUABSAFMAVABVAFYAVABWAFcAWABZAFoAWABaAFsAXABdAF4AXABeAF8AYABhAGIAYABiAGMAZABlAGYAZABmAGcAaABpAGoAaABqAGsAbABtAG4AbABuAG8AcABxAHIAcAByAHMAdAB1AHYAdAB2AHcAeAB5AHoAeAB6AHsAfAB9AH4AfAB+AH8AgACBAIIAgACCAIMAhACFAIYAhACGAIcAiACJAIoAiACKAIsAjACNAI4AjACOAI8AkACRAJIAkACSAJMAlACVAJYAlACWAJcAmACZAJoAmACaAJsAnACdAJ4AnACeAJ8AoAChAKIAoACiAKMApAClAKYApACmAKcAqACpAKoAqACqAKsArACtAK4ArACuAK8AsACxALIAsACyALMAtAC1ALYAtAC2ALcAuAC5ALoAuAC6ALsAvAC9AL4AvAC+AL8AwADBAMIAwADCAMMAxADFAMYAxADGAMcAyADJAMoAyADKAMsA"),
-"material": SubResource("StandardMaterial3D_e8byd"),
+"material": SubResource("StandardMaterial3D_rtku8"),
 "name": "__TB_empty",
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
@@ -172,264 +173,205 @@ _surfaces = [{
 "vertex_data": PackedByteArray("AAAgQgAAIEEAADhBAAAgQgAAIEEAAGDBAAAgQgAAGEEAAGDBAAAgQgAAGEEAADhBAAAgQgAAGEEAADhBAAAgQgAAGEEAAGDBAAAgQgAAgD8AAGDBAAAgQgAAgD8AADhBAAB0QgAAwD8AAEDBAAAgQgAAwD8AAEDBAAAgQgAAIEEAAEDBAAB0QgAAIEEAAEDBAABuQgAAIEEAABhBAAAgQgAAIEEAABhBAAAgQgAAAD8AABhBAABuQgAAAD8AABhBAABuQgAAwD8AADhBAABuQgAAwD8AAEDBAABuQgAAIEEAAEDBAABuQgAAIEEAADhBAAAgQgAAwD8AABhBAAAgQgAAwD8AAEjBAAB0QgAAwD8AAEjBAAB0QgAAwD8AABhBAAAgQgAAIEEAADhBAAAgQgAAIEEAAGDBAAAgQgAAGEEAAGDBAAAgQgAAGEEAADhB////f/////////9//////////3//////////f/////////9//////////3//////////f/////////9///////9//3////+//3//f////7//f/9/////v/9//3////+//////wAA/7//////AAD/v/////8AAP+//////wAA/78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//v/9/////f/+//3////9//7//f////3//v/9/////f/+/////f/////////9//////////3//////////f/////8=")
 }]
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_qo5hl"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ighri"]
 points = PackedVector3Array(-11.5, -0.5, 7.5000005, -11.5, 3.5, 1.5000002, -15.499999, -0.5, 7.5000005, -15.5, 3.5, 1.5000002, -11.5, -0.5, 1.0000001, -15.5, -0.5, 1.0000001)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ighri"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_njbhx"]
 points = PackedVector3Array(33.5, 2, 2, 33.5, -0.5, 2, 4, 2, 2, 4, -0.5, 2, 33.5, 2, -2, 33.5, -0.5, -2, 4, 2, -2, 4, -0.5, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_njbhx"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3o7rg"]
 points = PackedVector3Array(18, 3.5, 2.5, 18, -0.5, 2.5, 8, 3.5, 2.5, 8, -0.5, 2.5, 18, 3.5, 1.5, 18, -0.5, 1.5, 8, 3.5, 1.5, 8, -0.5, 1.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3o7rg"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_er5wn"]
 points = PackedVector3Array(17.499998, 4, 2, 18, 3.5000002, 2, 8.5, 4, 2, 8, 3.5000002, 2, 17.499998, 4, -2, 18, 3.5000002, -2, 8.5, 4, -2, 8, 3.5000002, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_er5wn"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5xg2b"]
 points = PackedVector3Array(18, 3.5, -1.5, 18, -0.5, -1.5, 8, 3.5, -1.5, 8, -0.5, -1.5, 18, 3.5, -2.5, 18, -0.5, -2.5, 8, 3.5, -2.5, 8, -0.5, -2.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5xg2b"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_inrsn"]
 points = PackedVector3Array(17.499998, 4, 2.5, 18, 3.5000002, 2.5, 8.5, 4, 2.5, 8, 3.5000002, 2.5, 17.499998, 4, 2, 18, 3.5000002, 2, 8.5, 4, 2, 8, 3.5000002, 2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_inrsn"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_fygku"]
 points = PackedVector3Array(17.499998, 4, -2, 18, 3.5000002, -2, 8.5, 4, -2, 8, 3.5000002, -2, 17.499998, 4, -2.5, 18, 3.5000002, -2.5, 8.5, 4, -2.5, 8, 3.5000002, -2.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_fygku"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_yeem7"]
 points = PackedVector3Array(34.5, -0.5, 11.5, 34.5, -1, 11.5, -16, -0.5, 11.5, -16, -1, 11.5, 34.5, -0.5, -14.5, 34.5, -1, -14.5, -16, -0.5, -14.5, -16, -1, -14.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_yeem7"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_thpti"]
 points = PackedVector3Array(-15.5, 20.5, 12, -15.5, -0.5, 12, -16.5, 20.5, 12, -16.5, -0.5, 12, -15.5, 20.5, -14, -15.5, -0.5, -14, -16.5, 20.5, -14, -16.5, -0.5, -14)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_thpti"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_elsp0"]
 points = PackedVector3Array(33.5, 20.5, -14, 33.5, -0.5, -14, -16, 20.5, -14, -16, -0.5, -14, 33.5, 20.5, -14.5, 33.5, -0.5, -14.5, -16, 20.5, -14.5, -16, -0.5, -14.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_elsp0"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_1oa70"]
 points = PackedVector3Array(34.5, 9.5, 11.5, 34.5, -0.5, 11.5, 33.5, 9.5, 11.5, 33.5, -0.5, 11.5, 34.5, 9.5, -14, 34.5, -0.5, -14, 33.5, 9.5, -14, 33.5, -0.5, -14)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_1oa70"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_60ow2"]
 points = PackedVector3Array(34.5, 20.5, 11.5, 34.5, -0.5, 11.5, -15.5, 20.5, 11.5, -15.5, -0.5, 11.5, 34.5, 20.5, 11, 34.5, -0.5, 11, -15.5, 20.5, 11, -15.5, -0.5, 11)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_60ow2"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kb2uv"]
 points = PackedVector3Array(22, 2.5, 2, 22, 2, 2, 21.5, 2.5, 2, 21.5, 2, 2, 22, 2.5, -2, 22, 2, -2, 21.5, 2.5, -2, 21.5, 2, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kb2uv"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3jn8h"]
 points = PackedVector3Array(22.5, 3, 2, 22.5, 2, 2, 22, 3, 2, 22, 2, 2, 22.5, 3, -2, 22.5, 2, -2, 22, 3, -2, 22, 2, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3jn8h"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_4vcll"]
 points = PackedVector3Array(23, 3.5, 2, 23, 2, 2, 22.5, 3.5, 2, 22.5, 2, 2, 23, 3.5, -2, 23, 2, -2, 22.5, 3.5, -2, 22.5, 2, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_4vcll"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_orv5d"]
 points = PackedVector3Array(23.5, 4, 2, 23.5, 2, 2, 23, 4, 2, 23, 2, 2, 23.5, 4, -2, 23.5, 2, -2, 23, 4, -2, 23, 2, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_orv5d"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lja1l"]
 points = PackedVector3Array(24, 4.5, 2, 24, 2, 2, 23.5, 4.5, 2, 23.5, 2, 2, 24, 4.5, -2, 24, 2, -2, 23.5, 4.5, -2, 23.5, 2, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lja1l"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ig648"]
 points = PackedVector3Array(24.5, 5, 2, 24.5, 2, 2, 24, 5, 2, 24, 2, 2, 24.5, 5, -2, 24.5, 2, -2, 24, 5, -2, 24, 2, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ig648"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_7x5bc"]
 points = PackedVector3Array(33.5, 5.5, 2, 33.5, 2, 2, 24.5, 5.5, 2, 24.5, 2, 2, 33.5, 5.5, -2, 33.5, 2, -2, 24.5, 5.5, -2, 24.5, 2, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_7x5bc"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_7lp4t"]
 points = PackedVector3Array(33.5, 6, -1.5, 33.5, 5.5, -1.5, 30, 6, -1.5, 30, 5.5, -1.5, 33.5, 6, -2, 33.5, 5.5, -2, 30, 6, -2, 30, 5.5, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_7lp4t"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ft67i"]
 points = PackedVector3Array(33.5, 6.5, -2, 33.5, 5.5, -2, 30, 6.5, -2, 30, 5.5, -2, 33.5, 6.5, -2.5, 33.5, 5.5, -2.5, 30, 6.5, -2.5, 30, 5.5, -2.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ft67i"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_nqquu"]
 points = PackedVector3Array(33.5, 7, -2.5, 33.5, 5.5, -2.5, 30, 7, -2.5, 30, 5.5, -2.5, 33.5, 7, -3, 33.5, 5.5, -3, 30, 7, -3, 30, 5.5, -3)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_nqquu"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_drhyv"]
 points = PackedVector3Array(33.5, 7.5, -3, 33.5, 5.5, -3, 30, 7.5, -3, 30, 5.5, -3, 33.5, 7.5, -3.5, 33.5, 5.5, -3.5, 30, 7.5, -3.5, 30, 5.5, -3.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_drhyv"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_uuv3p"]
 points = PackedVector3Array(33.5, 8, -3.5, 33.5, 5.5, -3.5, 30, 8, -3.5, 30, 5.5, -3.5, 33.5, 8, -4, 33.5, 5.5, -4, 30, 8, -4, 30, 5.5, -4)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_uuv3p"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mxvrx"]
 points = PackedVector3Array(33.5, 8.5, -4, 33.5, 5.5, -4, 30, 8.5, -4, 30, 5.5, -4, 33.5, 8.5, -4.5, 33.5, 5.5, -4.5, 30, 8.5, -4.5, 30, 5.5, -4.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mxvrx"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_m8b02"]
 points = PackedVector3Array(33.5, 9, -4.5, 33.5, 5.5, -4.5, 30, 9, -4.5, 30, 5.5, -4.5, 33.5, 9, -5, 33.5, 5.5, -5, 30, 9, -5, 30, 5.5, -5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_m8b02"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_vgt6v"]
 points = PackedVector3Array(33.5, 9.5, -5, 33.5, 5.5, -5, 30, 9.5, -5, 30, 5.5, -5, 33.5, 9.5, -5.5, 33.5, 5.5, -5.5, 30, 9.5, -5.5, 30, 5.5, -5.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_vgt6v"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_f0vas"]
 points = PackedVector3Array(33.5, 5.5, -2, 33.5, -0.5, -2, 30, 5.5, -2, 30, -0.5, -2, 33.5, 5.5, -5.5, 33.5, -0.5, -5.5, 30, 5.5, -5.5, 30, -0.5, -5.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_f0vas"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_u3ql1"]
 points = PackedVector3Array(-11, 3.5, -3.5, -11, -0.5, -3.5, -15.5, 3.5, -3.5, -15.5, -0.5, -3.5, -11, 3.5, -5.5, -11, -0.5, -5.5, -15.5, 3.5, -5.5, -15.5, -0.5, -5.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_u3ql1"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_qx43e"]
 points = PackedVector3Array(-11, 3.5, -10, -11, -0.5, -10, -15.5, 3.5, -10, -15.5, -0.5, -10, -11, 3.5, -12, -11, -0.5, -12, -15.5, 3.5, -12, -15.5, -0.5, -12)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_qx43e"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_0bgds"]
 points = PackedVector3Array(-4, -0.5, -10, -4, 4, -10, -6.4999995, -0.5, -10.000001, -7, 3.5, -10, -4, -0.5, -12, -4, 4, -12, -6.4999995, -0.5, -12, -7, 3.5, -12)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_0bgds"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5eufo"]
 points = PackedVector3Array(2, 3.5, -2, 0, 3.5, -2, 2, -0.5, -2, 0, -0.5, -2, 2, 4.0000005, -9.500001, 0, 4.0000005, -9.500001, 2, -0.5, -9, 0, -0.5, -9)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5eufo"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_h5uoe"]
 points = PackedVector3Array(4, 2, 2, 4, -0.5, 2, 3, 2, 2, 3, -0.5, 2, 4, 2, -2, 4, -0.5, -2, 3, 2, -2, 3, -0.5, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_h5uoe"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jtpnj"]
 points = PackedVector3Array(3, 3.5, 2, 3, -0.5, 2, 0, 3.5, 2, 0, -0.5, 2, 3, 3.5, -2, 3, -0.5, -2, 0, 3.5, -2, 0, -0.5, -2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jtpnj"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_057pp"]
 points = PackedVector3Array(2, -0.5, -9, 2, 4.0000005, -9.5, 0, -0.5, -9, 0, 4.0000005, -9.5, 2, -0.5, -12, 2, 2.5000007, -12, 0, -0.5, -12, 0, 2.5000007, -12)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_057pp"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_pbhlx"]
 points = PackedVector3Array(33.5, 9.5, -5.5, 33.5, 9, -5.5, 23, 9.5, -5.5, 23, 9, -5.5, 33.5, 9.5, -14, 33.5, 9, -14, 23, 9.5, -14, 23, 9, -14)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_pbhlx"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ctkrj"]
 points = PackedVector3Array(30, 9.5, 11, 30, 9, 11, 23, 9.5, 11, 23, 9, 11, 30, 9.5, -5.5, 30, 9, -5.5, 23, 9.5, -5.5, 23, 9, -5.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ctkrj"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_uxb0g"]
 points = PackedVector3Array(33.5, 9.5, 11.5, 33.5, 9, 11.5, 30, 9.5, 11.5, 30, 9, 11.5, 33.5, 9.5, 1.5, 33.5, 9, 1.5, 30, 9.5, 1.5, 30, 9, 1.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_uxb0g"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_q38tm"]
 points = PackedVector3Array(23, 9.5, 0, 23, 9, 0, 16, 9.5, 0, 16, 9, 0, 23, 9.5, -14, 23, 9, -14, 16, 9.5, -14, 16, 9, -14)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_q38tm"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_nci46"]
 points = PackedVector3Array(23.5, 12, 11, 23.5, 9.5, 11, 23, 12, 11, 23, 9.5, 11, 23.5, 12, 0, 23.5, 9.5, 0, 23, 12, 0, 23, 9.5, 0)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_nci46"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_36sp4"]
 points = PackedVector3Array(23.5, 10.5, 0, 23.5, 9.5, 0, 16, 10.5, 0, 16, 9.5, 0, 23.5, 10.5, -0.5, 23.5, 9.5, -0.5, 16, 10.5, -0.5, 16, 9.5, -0.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_36sp4"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_wyy7w"]
 points = PackedVector3Array(2, 2.5, -12, 2, -0.5, -12, 0, 2.5, -12, 0, -0.5, -12, 2, 2.5, -14, 2, -0.5, -14, 0, 2.5, -14, 0, -0.5, -14)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_wyy7w"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kbnaf"]
 points = PackedVector3Array(2.4999998, 2.5, -12, 7.9999995, -0.5, -12, 2, 2.5, -12, 2, -0.5, -12, 2.4999998, 2.5, -14, 7.9999995, -0.5, -14, 2, 2.5, -14, 2, -0.5, -14)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kbnaf"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_x3ibt"]
 points = PackedVector3Array(33.5, 5, 11.500001, 33.5, -0.5, 11.500001, 18, 5, 11, 18, -0.5, 11, 33.5, 5, 2, 33.5, -0.5, 2, 18, 5, 2, 18, -0.5, 2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_x3ibt"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3tcks"]
 points = PackedVector3Array(33.5, 5.5, 11, 33.5, 5, 11, 18, 5.5, 11, 18, 5, 11, 33.5, 5.5, 2, 33.5, 5, 2, 18, 5.5, 2, 18, 5, 2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3tcks"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ner4a"]
 points = PackedVector3Array(33.5, 6, 2.5, 33.5, 5.5, 2.5, 18, 6, 2.5, 18, 5.5, 2.5, 33.5, 6, 2, 33.5, 5.5, 2, 18, 6, 2, 18, 5.5, 2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ner4a"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_qbvos"]
 points = PackedVector3Array(18.5, 6, 11, 18.5, 5.5, 11, 18, 6, 11, 18, 5.5, 11, 18.5, 6, 2.5, 18.5, 5.5, 2.5, 18, 6, 2.5, 18, 5.5, 2.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_qbvos"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lhq4p"]
 points = PackedVector3Array(33.5, 8.5, 2.5, 33.5, 6, 2.5, 18, 8.5, 2.5, 18, 6, 2.5, 33.5, 8.5, 2, 33.5, 6, 2, 18, 8.5, 2, 18, 6, 2)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_lhq4p"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_iyh5l"]
 points = PackedVector3Array(18.5, 8.5, 11, 18.5, 6, 11, 18, 8.5, 11, 18, 6, 11, 18.5, 8.5, 2.5, 18.5, 6, 2.5, 18, 8.5, 2.5, 18, 6, 2.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_iyh5l"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ayl22"]
 points = PackedVector3Array(34.5, 21, 11.5, 34.5, 20.5, 11.5, -16, 21, 11.5, -16, 20.5, 11.5, 34.5, 21, -14.5, 34.5, 20.5, -14.5, -16, 21, -14.5, -16, 20.5, -14.5)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ayl22"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_j3vav"]
 points = PackedVector3Array(34.5, 20.5, 1.5, 34.5, 9.5, 1.5, 33.5, 20.5, 1.5, 33.5, 9.5, 1.5, 34.5, 20.5, -14, 34.5, 9.5, -14, 33.5, 20.5, -14, 33.5, 9.5, -14)
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_j3vav"]
-points = PackedVector3Array(40, 10, 11.5, 40, 9.5, 11.5, 34.5, 10, 11.5, 34.5, 9.5, 11.5, 40, 10, -14, 40, 9.5, -14, 34.5, 10, -14, 34.5, 9.5, -14)
-
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_venvy"]
-points = PackedVector3Array(61, 21, 11.5, 61, 10, 11.5, 34.5, 21, 11.5, 34.5, 10, 11.5, 61, 21, 11, 61, 10, 11, 34.5, 21, 11, 34.5, 10, 11)
+points = PackedVector3Array(40, 10, 11.5, 40, 9.5, 11.5, 34.5, 10, 11.5, 34.5, 9.5, 11.5, 40, 10, -14, 40, 9.5, -14, 34.5, 10, -14, 34.5, 9.5, -14)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_hhsjw"]
-points = PackedVector3Array(60.5, 21, 11, 60.5, 20.5, 11, 34.5, 21, 11, 34.5, 20.5, 11, 60.5, 21, -14.5, 60.5, 20.5, -14.5, 34.5, 21, -14.5, 34.5, 20.5, -14.5)
+points = PackedVector3Array(61, 21, 11.5, 61, 10, 11.5, 34.5, 21, 11.5, 34.5, 10, 11.5, 61, 21, 11, 61, 10, 11, 34.5, 21, 11, 34.5, 10, 11)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_bq77g"]
-points = PackedVector3Array(61, 20.5, -13.5, 61, 10, -13.5, 34.5, 20.5, -13.5, 34.5, 10, -13.5, 61, 20.5, -14, 61, 10, -14, 34.5, 20.5, -14, 34.5, 10, -14)
+points = PackedVector3Array(60.5, 21, 11, 60.5, 20.5, 11, 34.5, 21, 11, 34.5, 20.5, 11, 60.5, 21, -14.5, 60.5, 20.5, -14.5, 34.5, 21, -14.5, 34.5, 20.5, -14.5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_yatul"]
-points = PackedVector3Array(40, 9.5, 11.5, 40, 1, 11.5, 39.5, 9.5, 11.5, 39.5, 1, 11.5, 40, 9.5, -14, 40, 1, -14, 39.5, 9.5, -14, 39.5, 1, -14)
+points = PackedVector3Array(61, 20.5, -13.5, 61, 10, -13.5, 34.5, 20.5, -13.5, 34.5, 10, -13.5, 61, 20.5, -14, 61, 10, -14, 34.5, 20.5, -14, 34.5, 10, -14)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_x3ba6"]
-points = PackedVector3Array(61, 10, -12, 61, 1.5, -12, 40, 10, -12, 40, 1.5, -12, 61, 10, -14, 61, 1.5, -14, 40, 10, -14, 40, 1.5, -14)
+points = PackedVector3Array(40, 9.5, 11.5, 40, 1, 11.5, 39.5, 9.5, 11.5, 39.5, 1, 11.5, 40, 9.5, -14, 40, 1, -14, 39.5, 9.5, -14, 39.5, 1, -14)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_sj3yl"]
-points = PackedVector3Array(59.5, 10, 11.5, 59.5, 0.5, 11.5, 40, 10, 11.5, 40, 0.5, 11.5, 59.5, 10, 9.5, 59.5, 0.5, 9.5, 40, 10, 9.5, 40, 0.5, 9.5)
+points = PackedVector3Array(61, 10, -12, 61, 1.5, -12, 40, 10, -12, 40, 1.5, -12, 61, 10, -14, 61, 1.5, -14, 40, 10, -14, 40, 1.5, -14)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_r52dw"]
-points = PackedVector3Array(61, 10, 11.5, 61, 1.5, 11.5, 59.5, 10, 11.5, 59.5, 1.5, 11.5, 61, 10, -12, 61, 1.5, -12, 59.5, 10, -12, 59.5, 1.5, -12)
+points = PackedVector3Array(59.5, 10, 11.5, 59.5, 0.5, 11.5, 40, 10, 11.5, 40, 0.5, 11.5, 59.5, 10, 9.5, 59.5, 0.5, 9.5, 40, 10, 9.5, 40, 0.5, 9.5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_dcfba"]
-points = PackedVector3Array(61, 1.5, 9.5, 61, 1, 9.5, 40, 1.5, 9.5, 40, 1, 9.5, 61, 1.5, -12.5, 61, 1, -12.5, 40, 1.5, -12.5, 40, 1, -12.5)
+points = PackedVector3Array(61, 10, 11.5, 61, 1.5, 11.5, 59.5, 10, 11.5, 59.5, 1.5, 11.5, 61, 10, -12, 61, 1.5, -12, 59.5, 10, -12, 59.5, 1.5, -12)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_b05nm"]
-points = PackedVector3Array(61, 20.5, -0.5, 61, 10, -0.5, 60.5, 20.5, -0.5, 60.5, 10, -0.5, 61, 20.5, -13.5, 61, 10, -13.5, 60.5, 20.5, -13.5, 60.5, 10, -13.5)
+points = PackedVector3Array(61, 1.5, 9.5, 61, 1, 9.5, 40, 1.5, 9.5, 40, 1, 9.5, 61, 1.5, -12.5, 61, 1, -12.5, 40, 1.5, -12.5, 40, 1, -12.5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_fccif"]
-points = PackedVector3Array(61, 20.5, 11, 61, 10, 11, 60.5, 20.5, 11, 60.5, 10, 11, 61, 20.5, -0.5, 61, 10, -0.5, 60.5, 20.5, -0.5, 60.5, 10, -0.5)
+points = PackedVector3Array(61, 20.5, -0.5, 61, 10, -0.5, 60.5, 20.5, -0.5, 60.5, 10, -0.5, 61, 20.5, -13.5, 61, 10, -13.5, 60.5, 20.5, -13.5, 60.5, 10, -13.5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ynylq"]
-points = PackedVector3Array(40, 10, 11.5, 40, 9.5, 11.5, 34.5, 10, 11.5, 34.5, 9.5, 11.5, 40, 10, -14, 40, 9.5, -14, 34.5, 10, -14, 34.5, 9.5, -14)
+points = PackedVector3Array(61, 20.5, 11, 61, 10, 11, 60.5, 20.5, 11, 60.5, 10, 11, 61, 20.5, -0.5, 61, 10, -0.5, 60.5, 20.5, -0.5, 60.5, 10, -0.5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_1ym74"]
-points = PackedVector3Array(8.5, 4, 11, 8.5, -0.5, 11, 8, 4, 11, 8, -0.5, 11, 8.5, 4, 8, 8.5, -0.5, 8, 8, 4, 8, 8, -0.5, 8)
+points = PackedVector3Array(40, 10, 11.5, 40, 9.5, 11.5, 34.5, 10, 11.5, 34.5, 9.5, 11.5, 40, 10, -14, 40, 9.5, -14, 34.5, 10, -14, 34.5, 9.5, -14)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_w38ld"]
+points = PackedVector3Array(8.5, 4, 11, 8.5, -0.5, 11, 8, 4, 11, 8, -0.5, 11, 8.5, 4, 8, 8.5, -0.5, 8, 8, 4, 8, 8, -0.5, 8)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_1lnn5"]
 points = PackedVector3Array(8.5, 4, 6, 8.5, -0.5, 6, 8, 4, 6, 8, -0.5, 6, 8.5, 4, 2.5, 8.5, -0.5, 2.5, 8, 4, 2.5, 8, -0.5, 2.5)
 
-[sub_resource type="GDScript" id="GDScript_ausfd"]
-script/source = "extends AnimatableBody3D
-
-@export var hinge_side: String = \"x+\" 
-@export var swing_angle: float = 90.0
-@export var swing_speed: float = 0.5
-
-var is_open: bool = false
-var base_transform: Transform3D
-var pivot_point: Vector3
-var door_tween: Tween
-var current_angle: float = 0.0
-
-func _ready() -> void:
-    # Wait one frame for FuncGodot to generate the brushes
-    await get_tree().process_frame 
-    
-    var meshes = find_children(\"*\", \"MeshInstance3D\")
-    if meshes.is_empty(): return
-    
-    var extents = meshes[0].mesh.get_aabb().size / 2.0
-    
-    # Calculate the hinge offset in local space
-    match hinge_side.to_lower():
-        \"x+\": pivot_point = Vector3(extents.x, 0, 0)
-        \"x-\": pivot_point = Vector3(-extents.x, 0, 0)
-        \"z+\": pivot_point = Vector3(0, 0, extents.z)
-        \"z-\": pivot_point = Vector3(0, 0, -extents.z)
-        
-    # Store the pristine starting transform
-    base_transform = transform
-
-func interact() -> void:
-    is_open = !is_open
-    var target_angle = deg_to_rad(swing_angle) if is_open else 0.0
-    
-    if door_tween: 
-        door_tween.kill()
-        
-    door_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-    # Pass our current angle and target angle into the orbital math function
-    door_tween.tween_method(_rotate_around_pivot, current_angle, target_angle, swing_speed)
-
-func _rotate_around_pivot(angle: float) -> void:
-    current_angle = angle
-    
-    var new_transform = base_transform
-    # 1. Shift the mathematical origin to the hinge corner
-    new_transform = new_transform.translated_local(pivot_point)
-    # 2. Rotate the door around that new hinge corner
-    new_transform = new_transform.rotated_local(Vector3.UP, angle)
-    # 3. Shift the origin back so the door visually stays in the doorframe
-    new_transform = new_transform.translated_local(-pivot_point)
-    
-    # Apply the result
-    transform = new_transform
-    print(transform)
-"
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_1lnn5"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_srrx4"]
 _surfaces = [{
-"aabb": AABB(-0.125, -1.625, -1, 0.25, 3.25, 2),
-"attribute_data": PackedByteArray("AAClwQAA3MAAAKDBAADcwAAAoMEAAKA/AAClwQAAoD8AAKBBAACgPwAAcEEAAKA/AABwQQAA3MAAAKBBAADcwAAAoMEAAKDBAACgwQAApcEAAHDBAAClwQAAcMEAAKDBAACgQQAAoMEAAHBBAACgwQAAcEEAAKXBAACgQQAApcEAAKDBAADcwAAAcMEAANzAAABwwQAAoD8AAKDBAACgPwAApUEAAKA/AACgQQAAoD8AAKBBAADcwAAApUEAANzA"),
+"aabb": AABB(-0.125, -1.375, -1, 0.25, 2.75, 2),
+"attribute_data": PackedByteArray("AAClwQAAtMAAAKDBAAC0wAAAoMEAAKA/AAClwQAAoD8AAKBBAACgPwAAcEEAAKA/AABwQQAAtMAAAKBBAAC0wAAAoMEAAKDBAACgwQAApcEAAHDBAAClwQAAcMEAAKDBAACgQQAAoMEAAHBBAACgwQAAcEEAAKXBAACgQQAApcEAAKDBAAC0wAAAcMEAALTAAABwwQAAoD8AAKDBAACgPwAApUEAAKA/AACgQQAAoD8AAKBBAAC0wAAApUEAALTA"),
 "format": 34359742487,
 "index_count": 36,
 "index_data": PackedByteArray("AAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcA"),
@@ -438,11 +380,11 @@ _surfaces = [{
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
 "vertex_count": 24,
-"vertex_data": PackedByteArray("AAAAPgAA0D8AAIC/AAAAvgAA0D8AAIC/AAAAvgAA0L8AAIC/AAAAPgAA0L8AAIC/AAAAvgAA0L8AAIA/AAAAvgAA0L8AAIC/AAAAvgAA0D8AAIC/AAAAvgAA0D8AAIA/AAAAvgAA0L8AAIA/AAAAPgAA0L8AAIA/AAAAPgAA0L8AAIC/AAAAvgAA0L8AAIC/AAAAvgAA0D8AAIA/AAAAvgAA0D8AAIC/AAAAPgAA0D8AAIC/AAAAPgAA0D8AAIA/AAAAPgAA0D8AAIA/AAAAPgAA0D8AAIC/AAAAPgAA0L8AAIC/AAAAPgAA0L8AAIA/AAAAPgAA0L8AAIA/AAAAvgAA0L8AAIA/AAAAvgAA0D8AAIA/AAAAPgAA0D8AAIA//////wAA/7//////AAD/v/////8AAP+//////wAA/78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//v/9/AAD//////38AAP//////fwAA//////9/AAD//////3////9//7//f////3//v/9/////f/+//3////9//7////9//////////3//////////f/////////9///////9//3////+//3//f////7//f/9/////v/9//3////+/")
+"vertex_data": PackedByteArray("AAAAPgAAsD8AAIC/AAAAvgAAsD8AAIC/AAAAvgAAsL8AAIC/AAAAPgAAsL8AAIC/AAAAvgAAsL8AAIA/AAAAvgAAsL8AAIC/AAAAvgAAsD8AAIC/AAAAvgAAsD8AAIA/AAAAvgAAsL8AAIA/AAAAPgAAsL8AAIA/AAAAPgAAsL8AAIC/AAAAvgAAsL8AAIC/AAAAvgAAsD8AAIA/AAAAvgAAsD8AAIC/AAAAPgAAsD8AAIC/AAAAPgAAsD8AAIA/AAAAPgAAsD8AAIA/AAAAPgAAsD8AAIC/AAAAPgAAsL8AAIC/AAAAPgAAsL8AAIA/AAAAPgAAsL8AAIA/AAAAvgAAsL8AAIA/AAAAvgAAsD8AAIA/AAAAPgAAsD8AAIA//////wAA/7//////AAD/v/////8AAP+//////wAA/78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//v/9/AAD//////38AAP//////fwAA//////9/AAD//////3////9//7//f////3//v/9/////f/+//3////9//7////9//////////3//////////f/////////9///////9//3////+//3//f////7//f/9/////v/9//3////+/")
 }]
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_srrx4"]
-points = PackedVector3Array(0.125, 1.625, 1, 0.125, -1.625, 1, -0.125, 1.625, 1, -0.125, -1.625, 1, 0.125, 1.625, -1, 0.125, -1.625, -1, -0.125, 1.625, -1, -0.125, -1.625, -1)
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ukkn7"]
+points = PackedVector3Array(0.125, 1.375, 1, 0.125, -1.375, 1, -0.125, 1.375, 1, -0.125, -1.375, 1, 0.125, 1.375, -1, 0.125, -1.375, -1, -0.125, 1.375, -1, -0.125, -1.375, -1)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7emvt"]
 sky_top_color = Color(0.6687995, 0.81252944, 0.85646063, 1)
@@ -497,229 +439,229 @@ local_map_file = "uid://kl8hehg3hyio"
 map_settings = ExtResource("2_53ep7")
 metadata/_custom_type_script = "uid://cwu5cf7a0awcd"
 
-[node name="entity_0_worldspawn" type="StaticBody3D" parent="FuncGodotMap" unique_id=200745923]
+[node name="entity_0_worldspawn" type="StaticBody3D" parent="FuncGodotMap" unique_id=1932232457]
 collision_mask = 0
 
-[node name="entity_0_mesh_instance" type="MeshInstance3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=998586991]
-mesh = SubResource("ArrayMesh_rtku8")
+[node name="entity_0_mesh_instance" type="MeshInstance3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1463059556]
+mesh = SubResource("ArrayMesh_qo5hl")
 
-[node name="entity_0_brush_0_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1774273470]
-shape = SubResource("ConvexPolygonShape3D_qo5hl")
-
-[node name="entity_0_brush_1_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=75499565]
+[node name="entity_0_brush_0_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1242176393]
 shape = SubResource("ConvexPolygonShape3D_ighri")
 
-[node name="entity_0_brush_2_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=796390924]
+[node name="entity_0_brush_1_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1571084649]
 shape = SubResource("ConvexPolygonShape3D_njbhx")
 
-[node name="entity_0_brush_3_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=477924399]
+[node name="entity_0_brush_2_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=205093109]
 shape = SubResource("ConvexPolygonShape3D_3o7rg")
 
-[node name="entity_0_brush_4_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2047519700]
+[node name="entity_0_brush_3_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=808777400]
 shape = SubResource("ConvexPolygonShape3D_er5wn")
 
-[node name="entity_0_brush_5_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=476200361]
+[node name="entity_0_brush_4_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1911184969]
 shape = SubResource("ConvexPolygonShape3D_5xg2b")
 
-[node name="entity_0_brush_6_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1028572617]
+[node name="entity_0_brush_5_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=220763163]
 shape = SubResource("ConvexPolygonShape3D_inrsn")
 
-[node name="entity_0_brush_7_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1606524273]
+[node name="entity_0_brush_6_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2026359892]
 shape = SubResource("ConvexPolygonShape3D_fygku")
 
-[node name="entity_0_brush_8_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=524882404]
+[node name="entity_0_brush_7_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1154384907]
 shape = SubResource("ConvexPolygonShape3D_yeem7")
 
-[node name="entity_0_brush_9_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=348854130]
+[node name="entity_0_brush_8_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=598344618]
 shape = SubResource("ConvexPolygonShape3D_thpti")
 
-[node name="entity_0_brush_10_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1095530691]
+[node name="entity_0_brush_9_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1576926890]
 shape = SubResource("ConvexPolygonShape3D_elsp0")
 
-[node name="entity_0_brush_11_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=47722685]
+[node name="entity_0_brush_10_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=307587241]
 shape = SubResource("ConvexPolygonShape3D_1oa70")
 
-[node name="entity_0_brush_12_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=839272839]
+[node name="entity_0_brush_11_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=393357062]
 shape = SubResource("ConvexPolygonShape3D_60ow2")
 
-[node name="entity_0_brush_13_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=332246750]
+[node name="entity_0_brush_12_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2065776711]
 shape = SubResource("ConvexPolygonShape3D_kb2uv")
 
-[node name="entity_0_brush_14_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1081086271]
+[node name="entity_0_brush_13_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2044173846]
 shape = SubResource("ConvexPolygonShape3D_3jn8h")
 
-[node name="entity_0_brush_15_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=652073947]
+[node name="entity_0_brush_14_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=384886201]
 shape = SubResource("ConvexPolygonShape3D_4vcll")
 
-[node name="entity_0_brush_16_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1627215392]
+[node name="entity_0_brush_15_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2016968518]
 shape = SubResource("ConvexPolygonShape3D_orv5d")
 
-[node name="entity_0_brush_17_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1625103576]
+[node name="entity_0_brush_16_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=527450668]
 shape = SubResource("ConvexPolygonShape3D_lja1l")
 
-[node name="entity_0_brush_18_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1349603140]
+[node name="entity_0_brush_17_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1200604692]
 shape = SubResource("ConvexPolygonShape3D_ig648")
 
-[node name="entity_0_brush_19_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1862728529]
+[node name="entity_0_brush_18_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1713478762]
 shape = SubResource("ConvexPolygonShape3D_7x5bc")
 
-[node name="entity_0_brush_20_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1379907899]
+[node name="entity_0_brush_19_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=728145440]
 shape = SubResource("ConvexPolygonShape3D_7lp4t")
 
-[node name="entity_0_brush_21_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1005077208]
+[node name="entity_0_brush_20_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1710883850]
 shape = SubResource("ConvexPolygonShape3D_ft67i")
 
-[node name="entity_0_brush_22_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1500736450]
+[node name="entity_0_brush_21_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=105916958]
 shape = SubResource("ConvexPolygonShape3D_nqquu")
 
-[node name="entity_0_brush_23_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=672517365]
+[node name="entity_0_brush_22_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1383658336]
 shape = SubResource("ConvexPolygonShape3D_drhyv")
 
-[node name="entity_0_brush_24_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1199201825]
+[node name="entity_0_brush_23_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1000741544]
 shape = SubResource("ConvexPolygonShape3D_uuv3p")
 
-[node name="entity_0_brush_25_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1935649870]
+[node name="entity_0_brush_24_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=425634532]
 shape = SubResource("ConvexPolygonShape3D_mxvrx")
 
-[node name="entity_0_brush_26_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=134330729]
+[node name="entity_0_brush_25_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1781711355]
 shape = SubResource("ConvexPolygonShape3D_m8b02")
 
-[node name="entity_0_brush_27_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=640279951]
+[node name="entity_0_brush_26_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1282344510]
 shape = SubResource("ConvexPolygonShape3D_vgt6v")
 
-[node name="entity_0_brush_28_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=636835407]
+[node name="entity_0_brush_27_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=289654217]
 shape = SubResource("ConvexPolygonShape3D_f0vas")
 
-[node name="entity_0_brush_29_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=762900039]
+[node name="entity_0_brush_28_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=937138897]
 shape = SubResource("ConvexPolygonShape3D_u3ql1")
 
-[node name="entity_0_brush_30_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1651147183]
+[node name="entity_0_brush_29_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=862104380]
 shape = SubResource("ConvexPolygonShape3D_qx43e")
 
-[node name="entity_0_brush_31_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=175693332]
+[node name="entity_0_brush_30_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=379087213]
 shape = SubResource("ConvexPolygonShape3D_0bgds")
 
-[node name="entity_0_brush_32_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=353820454]
+[node name="entity_0_brush_31_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=796799093]
 shape = SubResource("ConvexPolygonShape3D_5eufo")
 
-[node name="entity_0_brush_33_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=752837778]
+[node name="entity_0_brush_32_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=724547695]
 shape = SubResource("ConvexPolygonShape3D_h5uoe")
 
-[node name="entity_0_brush_34_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=507899848]
+[node name="entity_0_brush_33_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=704588525]
 shape = SubResource("ConvexPolygonShape3D_jtpnj")
 
-[node name="entity_0_brush_35_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1240490540]
+[node name="entity_0_brush_34_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1670608499]
 shape = SubResource("ConvexPolygonShape3D_057pp")
 
-[node name="entity_0_brush_36_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1294804408]
+[node name="entity_0_brush_35_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2141831906]
 shape = SubResource("ConvexPolygonShape3D_pbhlx")
 
-[node name="entity_0_brush_37_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=826642259]
+[node name="entity_0_brush_36_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1685008759]
 shape = SubResource("ConvexPolygonShape3D_ctkrj")
 
-[node name="entity_0_brush_38_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1954311641]
+[node name="entity_0_brush_37_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=453038921]
 shape = SubResource("ConvexPolygonShape3D_uxb0g")
 
-[node name="entity_0_brush_39_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1424477296]
+[node name="entity_0_brush_38_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=421286500]
 shape = SubResource("ConvexPolygonShape3D_q38tm")
 
-[node name="entity_0_brush_40_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1117804321]
+[node name="entity_0_brush_39_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1343223187]
 shape = SubResource("ConvexPolygonShape3D_nci46")
 
-[node name="entity_0_brush_41_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=998551329]
+[node name="entity_0_brush_40_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1414627426]
 shape = SubResource("ConvexPolygonShape3D_36sp4")
 
-[node name="entity_0_brush_42_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=109610557]
+[node name="entity_0_brush_41_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1401439411]
 shape = SubResource("ConvexPolygonShape3D_wyy7w")
 
-[node name="entity_0_brush_43_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1833036287]
+[node name="entity_0_brush_42_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=730630415]
 shape = SubResource("ConvexPolygonShape3D_kbnaf")
 
-[node name="entity_0_brush_44_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1820520171]
+[node name="entity_0_brush_43_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=648394148]
 shape = SubResource("ConvexPolygonShape3D_x3ibt")
 
-[node name="entity_0_brush_45_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1026262232]
+[node name="entity_0_brush_44_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=607082748]
 shape = SubResource("ConvexPolygonShape3D_3tcks")
 
-[node name="entity_0_brush_46_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2096867744]
+[node name="entity_0_brush_45_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=266600760]
 shape = SubResource("ConvexPolygonShape3D_ner4a")
 
-[node name="entity_0_brush_47_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1710368793]
+[node name="entity_0_brush_46_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=257398638]
 shape = SubResource("ConvexPolygonShape3D_qbvos")
 
-[node name="entity_0_brush_48_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2022388616]
+[node name="entity_0_brush_47_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=713653434]
 shape = SubResource("ConvexPolygonShape3D_lhq4p")
 
-[node name="entity_0_brush_49_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=876629141]
+[node name="entity_0_brush_48_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=902846909]
 shape = SubResource("ConvexPolygonShape3D_iyh5l")
 
-[node name="entity_0_brush_50_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1378412764]
+[node name="entity_0_brush_49_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=759370177]
 shape = SubResource("ConvexPolygonShape3D_ayl22")
 
-[node name="entity_0_brush_51_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=78689540]
+[node name="entity_0_brush_50_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1347924912]
 shape = SubResource("ConvexPolygonShape3D_j3vav")
 
-[node name="entity_0_brush_52_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=355572282]
+[node name="entity_0_brush_51_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=911244528]
 shape = SubResource("ConvexPolygonShape3D_venvy")
 
-[node name="entity_0_brush_53_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1694024198]
+[node name="entity_0_brush_52_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=484148547]
 shape = SubResource("ConvexPolygonShape3D_hhsjw")
 
-[node name="entity_0_brush_54_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=544032026]
+[node name="entity_0_brush_53_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1845255633]
 shape = SubResource("ConvexPolygonShape3D_bq77g")
 
-[node name="entity_0_brush_55_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1531967010]
+[node name="entity_0_brush_54_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=590176857]
 shape = SubResource("ConvexPolygonShape3D_yatul")
 
-[node name="entity_0_brush_56_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1477306742]
+[node name="entity_0_brush_55_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1460805666]
 shape = SubResource("ConvexPolygonShape3D_x3ba6")
 
-[node name="entity_0_brush_57_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=938484456]
+[node name="entity_0_brush_56_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=566950904]
 shape = SubResource("ConvexPolygonShape3D_sj3yl")
 
-[node name="entity_0_brush_58_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=656200894]
+[node name="entity_0_brush_57_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1790354532]
 shape = SubResource("ConvexPolygonShape3D_r52dw")
 
-[node name="entity_0_brush_59_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2048227028]
+[node name="entity_0_brush_58_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1548638302]
 shape = SubResource("ConvexPolygonShape3D_dcfba")
 
-[node name="entity_0_brush_60_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=782411396]
+[node name="entity_0_brush_59_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1454097237]
 shape = SubResource("ConvexPolygonShape3D_b05nm")
 
-[node name="entity_0_brush_61_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=939717593]
+[node name="entity_0_brush_60_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=2018365912]
 shape = SubResource("ConvexPolygonShape3D_fccif")
 
-[node name="entity_0_brush_62_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=824515881]
+[node name="entity_0_brush_61_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1894678336]
 shape = SubResource("ConvexPolygonShape3D_ynylq")
 
-[node name="entity_0_brush_63_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=615765381]
+[node name="entity_0_brush_62_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1525216353]
 shape = SubResource("ConvexPolygonShape3D_1ym74")
 
-[node name="entity_0_brush_64_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=655566335]
+[node name="entity_0_brush_63_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=1083785768]
 shape = SubResource("ConvexPolygonShape3D_w38ld")
+
+[node name="entity_0_brush_64_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_0_worldspawn" unique_id=838345942]
+shape = SubResource("ConvexPolygonShape3D_1lnn5")
 
 [node name="entity_1_office_celling_lamp" parent="FuncGodotMap" unique_id=1708216938 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 19.90625, 8.9375, -6)
 
-[node name="entity_2_office_celling_lamp" parent="FuncGodotMap" unique_id=870845131 instance=ExtResource("11_r01ad")]
+[node name="entity_2_office_celling_lamp" parent="FuncGodotMap" unique_id=1336554549 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 25.59375, 8.9375, -11)
 
-[node name="entity_3_office_celling_lamp" parent="FuncGodotMap" unique_id=1797216287 instance=ExtResource("11_r01ad")]
+[node name="entity_3_office_celling_lamp" parent="FuncGodotMap" unique_id=962699459 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 20.09375, 20.46875, -6)
 
-[node name="entity_4_office_celling_lamp" parent="FuncGodotMap" unique_id=396429786 instance=ExtResource("11_r01ad")]
+[node name="entity_4_office_celling_lamp" parent="FuncGodotMap" unique_id=1173044473 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -4.09375, 20.46875, 2)
 
-[node name="entity_5_office_celling_lamp" parent="FuncGodotMap" unique_id=1911325722 instance=ExtResource("11_r01ad")]
+[node name="entity_5_office_celling_lamp" parent="FuncGodotMap" unique_id=975397963 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -4.40625, 20.46875, -6.5)
 
-[node name="entity_6_office_celling_lamp" parent="FuncGodotMap" unique_id=1878190925 instance=ExtResource("11_r01ad")]
+[node name="entity_6_office_celling_lamp" parent="FuncGodotMap" unique_id=1643838624 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 19.59375, 20.46875, 7.5)
 
 [node name="entity_7_item_ammo_pistol" parent="FuncGodotMap" unique_id=990496783 instance=ExtResource("10_b1bvi")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 22.125, 9.5, -10.8125)
 
-[node name="entity_8_office_celling_lamp" parent="FuncGodotMap" unique_id=1489733222 instance=ExtResource("11_r01ad")]
+[node name="entity_8_office_celling_lamp" parent="FuncGodotMap" unique_id=1064587020 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 47.09375, 20.46875, 1)
 
 [node name="entity_9_prop_diamond" parent="FuncGodotMap" unique_id=1412987810 instance=ExtResource("19_e8byd")]
@@ -728,21 +670,23 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 28.2
 [node name="entity_10_prop_wooden_box" parent="FuncGodotMap" unique_id=1805821197 instance=ExtResource("17_ighri")]
 transform = Transform3D(-5, 0, -4.371139e-07, 0, 5, 0, 4.371139e-07, 0, -5, 23.25, 9.5, -1.8125)
 
-[node name="entity_11_prop_wooden_box" parent="FuncGodotMap" unique_id=876897302 instance=ExtResource("17_ighri")]
+[node name="entity_11_prop_wooden_box" parent="FuncGodotMap" unique_id=1463301686 instance=ExtResource("17_ighri")]
 transform = Transform3D(-5, 0, -4.371139e-07, 0, 5, 0, 4.371139e-07, 0, -5, 21.25, 9.5, -3.8125)
 
-[node name="entity_12_prop_wooden_box" parent="FuncGodotMap" unique_id=1205509368 instance=ExtResource("17_ighri")]
+[node name="entity_12_prop_wooden_box" parent="FuncGodotMap" unique_id=79934159 instance=ExtResource("17_ighri")]
 transform = Transform3D(-5, 0, -4.371139e-07, 0, 5, 0, 4.371139e-07, 0, -5, 22.875, 11.625, 0.1875)
 
-[node name="entity_13_movement_door" type="AnimatableBody3D" parent="FuncGodotMap" unique_id=1961980397]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.125, 1.125, 7)
-script = SubResource("GDScript_ausfd")
+[node name="entity_13_movement_door" type="AnimatableBody3D" parent="FuncGodotMap" unique_id=1219281772]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.125, 0.875, 7)
+script = ExtResource("18_rtku8")
+open_angle = 100.0
+hinge_offset = Vector3(0, 0, 1)
 
-[node name="entity_13_mesh_instance" type="MeshInstance3D" parent="FuncGodotMap/entity_13_movement_door" unique_id=1852108275]
-mesh = SubResource("ArrayMesh_1lnn5")
+[node name="entity_13_mesh_instance" type="MeshInstance3D" parent="FuncGodotMap/entity_13_movement_door" unique_id=1894390229]
+mesh = SubResource("ArrayMesh_srrx4")
 
-[node name="entity_13_brush_0_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_13_movement_door" unique_id=620131121]
-shape = SubResource("ConvexPolygonShape3D_srrx4")
+[node name="entity_13_brush_0_collision_shape" type="CollisionShape3D" parent="FuncGodotMap/entity_13_movement_door" unique_id=1493377548]
+shape = SubResource("ConvexPolygonShape3D_ukkn7")
 
 [node name="Environment" type="Node3D" parent="." unique_id=460171190]
 

@@ -51,4 +51,15 @@
 
 @PointClass color(204 204 204) model({"path": "trenchbroom/models/prop_diamond.glb", "scale": 32.0 }) size(-8.0 -8.0 2.0, 8.0 8.0 22.0) = prop_diamond : "diamond" []
 
-@SolidClass color(204 204 204) = movement_door : "Rotating open close door" []
+@SolidClass color(204 204 204) = movement_door : "Rotating open close door" 
+[
+	angle(float) : "" : "90.0"
+	auto_close(choices) : "" : 1 = 
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	close_delay(float) : "" : "2.0"
+	hinge(string) : "" : "left"
+	speed(float) : "" : "90.0"
+]
