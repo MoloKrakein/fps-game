@@ -156,7 +156,7 @@ filter_enabled = true
 filters = ["Armature/Skeleton3D:Body", "Armature/Skeleton3D:Dummy", "Armature/Skeleton3D:Mags_2"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_sn0t7"]
-graph_offset = Vector2(-398, 90)
+graph_offset = Vector2(-352.14224, 36.078003)
 nodes/output/position = Vector2(520, 60)
 nodes/Idle/node = SubResource("AnimationNodeAnimation_ugyo2")
 nodes/Idle/position = Vector2(-520, 20)
@@ -178,7 +178,7 @@ node_connections = [&"output", 0, &"ReloadOneShot", &"BoltPosition", 0, &"Idle",
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=227635064 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
-transform = Transform3D(0.9999417, 0.009721402, 0.0046989457, -0.009678353, 0.9999118, -0.009100334, -0.0047869855, 0.009054332, 0.99994755, -0.12537159, 1.0019037, -2.3965423)
+transform = Transform3D(0.9999417, 0.009721402, 0.0046989457, -0.009678353, 0.9999118, -0.009100334, -0.0047869855, 0.009054332, 0.99994755, -0.12537159, 1.0190798, -2.4445875)
 script = ExtResource("1_mf45t")
 particles = NodePath("MuzzleFlash")
 smoke_particles = NodePath("Smoke")
@@ -243,37 +243,40 @@ parameters/ReloadOneShot/request = 0
 [node name="m15" parent="." unique_id=353675407 instance=ExtResource("6_3vu8r")]
 transform = Transform3D(4.513, 0, 0, 0, 4.705, 0, 0, 0, 4.705, 0, -1.821, -0.176)
 
-[node name="Skeleton3D" parent="m15/Armature" parent_id_path=PackedInt32Array(353675407, 973775796) index="0" unique_id=1728973101]
+[node name="Skeleton3D" parent="m15/Armature" parent_id_path=PackedInt32Array(353675407, 540559804) index="0" unique_id=844443551]
 bones/1/position = Vector3(5.1389915e-09, -0.00092455745, -0.1501376)
 bones/1/rotation = Quaternion(2.2351745e-08, -3.6228847e-23, 4.440893e-16, 1)
 bones/2/position = Vector3(-4.717033e-16, 0.55343944, 2.2156241e-08)
-bones/3/position = Vector3(5.8025158e-08, -0.09640622, -0.41002345)
-bones/3/rotation = Quaternion(0.7039083, -5.3290705e-15, 2.4093755e-08, 0.7102909)
-bones/4/position = Vector3(0.108849786, -1.4459229, 2.0651112)
-bones/4/rotation = Quaternion(0.7078465, 1.2547613e-15, 2.4228557e-08, 0.7063663)
+bones/3/position = Vector3(-9.8617754e-08, -1.6811519, 2.8811557)
+bones/3/rotation = Quaternion(-3.1432863e-23, -8.961397e-25, 3.5527137e-15, 1)
+bones/4/position = Vector3(1.117793e-15, -0.46072894, -5.260757e-09)
+bones/4/rotation = Quaternion(-3.5972887e-09, -3.7998275e-23, 1.9784845e-16, 1)
 
-[node name="bolt" parent="m15/Armature/Skeleton3D" index="0" unique_id=822850156]
+[node name="bolt" parent="m15/Armature/Skeleton3D" index="0" unique_id=1792908015]
 transform = Transform3D(1, -4.0622295e-16, 3.4228545e-08, -1.5778161e-15, 1, 5.7964463e-08, -3.4228545e-08, -5.7964463e-08, 1, -2.6952006e-17, 0.55343944, -5.941814e-09)
 
-[node name="Bolt" parent="m15/Armature/Skeleton3D/bolt" index="0" unique_id=840465721]
+[node name="Bolt" parent="m15/Armature/Skeleton3D/bolt" index="0" unique_id=158911734]
 transform = Transform3D(1, 0, 0, 0, 0.9999999, 0, 0, 0, 0.9999999, -0.016234115, 0.038787544, 0.03970041)
 
-[node name="Dummy" parent="m15/Armature/Skeleton3D" index="1" unique_id=191310012]
-transform = Transform3D(1, 0, 3.422853e-08, 3.4227135e-08, 0.009026281, -0.9999593, -3.0895464e-10, 0.9999593, 0.009026281, 4.3990653e-08, -0.09640623, -0.41002345)
+[node name="Dummy_2" parent="m15/Armature/Skeleton3D" index="1" unique_id=123630225]
+transform = Transform3D(1, -6.869693e-15, 3.4228545e-08, 5.1319143e-15, 1, 5.0769884e-08, -3.4228545e-08, -5.0769884e-08, 1, 1.37667655e-14, -1.6811517, 2.8811557)
 
-[node name="Mags_2" parent="m15/Armature/Skeleton3D" index="2" unique_id=2137390310]
-transform = Transform3D(1, 0, 3.4228545e-08, 3.4228467e-08, -0.0020933836, -0.99999785, 7.165468e-11, 0.99999785, -0.0020933836, 0.10884985, -1.4459227, 2.0651112)
+[node name="Mags_2" parent="m15/Armature/Skeleton3D" index="2" unique_id=1043198493]
+transform = Transform3D(1, -4.0622268e-16, 3.4228545e-08, -1.5778163e-15, 1, 5.7964463e-08, -3.4228545e-08, -5.7964463e-08, 1, 3.8502613e-16, -0.4607289, 1.8130399e-08)
 
-[node name="Root_001" parent="m15/Armature/Skeleton3D" index="3" unique_id=1457820741]
+[node name="Root_001" parent="m15/Armature/Skeleton3D" index="3" unique_id=104674069]
 transform = Transform3D(3.878585e-15, 1, 1.14549294e-07, -1, -6.051388e-15, 1.7097129e-07, 1.7097129e-07, -1.14549294e-07, 1, -0.35253382, 0.53079623, -0.12487915)
 
-[node name="Body" parent="m15/Armature/Skeleton3D" index="4" unique_id=614238027]
+[node name="Body" parent="m15/Armature/Skeleton3D" index="4" unique_id=2124426033]
 transform = Transform3D(1, 2.3573414e-16, 3.4228545e-08, -1.9735133e-15, 1, 5.0769884e-08, -3.4228545e-08, -5.0769884e-08, 1, -4.440892e-16, 1.5483238e-08, 0)
 
-[node name="Stockp2" parent="m15/Armature/Skeleton3D/Body" index="4" unique_id=1599629088]
+[node name="Stockp2" parent="m15/Armature/Skeleton3D/Body" index="4" unique_id=405618253]
 visible = false
 
-[node name="Suppressor" parent="m15/Armature/Skeleton3D/Body" index="5" unique_id=478203782]
+[node name="Suppressor" parent="m15/Armature/Skeleton3D/Body" index="5" unique_id=585815166]
 visible = false
+
+[node name="AnimationPlayer" parent="m15" index="4" unique_id=1965154059]
+speed_scale = 0.716
 
 [editable path="m15"]
