@@ -1,6 +1,6 @@
 extends WeaponState
 # Attach this to your ReloadingState node in the State Chart
-
+var timer: float = 0.0
 
 func _on_reload_state_state_entered() -> void:
 	if not weapon_controller or weapon_controller.current_weapon == null:
@@ -11,9 +11,14 @@ func _on_reload_state_state_entered() -> void:
 		weapon_controller.is_reloading = false
 		return
 
+	if weapon_controller.weapon_animation_player != null:
+		timer = weapon_controller.weapon_animation_player.get_animation_length("Reload")
+		weapon_controller.weapon_animation_player.play_animation("Reload")
+
 	weapon_controller.is_reloading = true
 	# For per-bullet weapons, each reload input inserts a single shell.
-	var reload_time: float = weapon_controller.current_weapon.reload_time
+	# var reload_time: float = weapon_controller.current_weapon.reload_time
+	var reload_time: float = timer
 	if weapon_controller.current_weapon.is_reload_per_bullet:
 		reload_time = weapon_controller.get_single_round_reload_time()
 

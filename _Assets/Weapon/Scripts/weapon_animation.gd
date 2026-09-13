@@ -1,7 +1,7 @@
 class_name WeaponAnimation extends Node
 @export var weapon_animation_tree: AnimationTree
 @export var weapon_bolt_time: float = 0.5
-
+@export var animation_player: AnimationPlayer
 func _ready():
 	if weapon_animation_tree == null:
 		print("AnimationTree not assigned in WeaponAnimation script.")
@@ -21,6 +21,8 @@ func play_animation(animation_name: String) -> void:
 			weapon_animation_tree.set("parameters/RackOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 		"Idle":
 			weapon_animation_tree.set("parameters/Idle/active", true)
+		"Equip":
+			weapon_animation_tree.set("parameters/EquipOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 		"Empty":
 			set_bolt_position(true)
 		"Loaded":
@@ -54,3 +56,19 @@ func set_bolt_position(is_open: bool) -> void:
 	# 	await get_tree().create_timer(weapon_bolt_time / 10).timeout
 		
 	# weapon_animation_tree.set("parameters/BoltPosition/blend_amount", target)
+
+func get_animation_length(animation_name: String) -> float:
+	if not weapon_animation_tree:
+		print("AnimationTree is not assigned. Cannot get animation length.")
+		return 0.0
+	
+	if animation_player == null:
+		print("AnimationPlayer not found in AnimationTree.")
+		return 0.0
+	
+	var animation = animation_player.get_animation(animation_name)
+	if animation == null:
+		print("Animation not found: ", animation_name)
+		return 0.0
+	print("Animation length for ", animation_name, ": ", animation.length)
+	return animation.length

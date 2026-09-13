@@ -342,18 +342,18 @@ func _cycle_weapon() -> void:
 	if current_weapon == null or active_weapon_data == null:
 		return
 
-	if current_weapon.is_open_bolt:
-		# Open-bolt weapons do not keep a separate chambered round.
-		if active_weapon_data.ammo_in_magazine > 0:
-			active_weapon_data.ammo_in_magazine -= 1
-		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
-		if weapon_animation_player != null:
-			if active_weapon_data.is_loaded:
-				weapon_animation_player.play_animation("Loaded")
-			else:
-				weapon_animation_player.play_animation("Empty")
-		update_weapon_ui()
-		return
+	# if current_weapon.is_open_bolt:
+	# 	# Open-bolt weapons do not keep a separate chambered round.
+	# 	if active_weapon_data.ammo_in_magazine > 0:
+	# 		active_weapon_data.ammo_in_magazine -= 1
+	# 	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+	# 	if weapon_animation_player != null:
+	# 		if active_weapon_data.is_loaded:
+	# 			weapon_animation_player.play_animation("Loaded")
+	# 		else:
+	# 			weapon_animation_player.play_animation("Empty")
+	# 	update_weapon_ui()
+	# 	return
 
 	active_weapon_data.is_loaded = false
 
@@ -389,8 +389,7 @@ func execute_reload() -> void:
 
 	reset_trigger()
 
-	if weapon_animation_player != null:
-		weapon_animation_player.play_animation("Reload")
+
 
 	if current_weapon == null or active_weapon_data == null:
 		return
@@ -526,12 +525,15 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 		if weapon_animation_player == null:
 			print("WeaponAnimation node not found in the weapon model.")
 		else:
-			print("WeaponAnimation node found and assigned.")
+			# print("WeaponAnimation node found and assigned.")
+			weapon_animation_player.play_animation("Equip")
 
 
 func switch_weapon(weapon_data: WeaponData) -> void:
 	if is_reloading:
 		return
+	# check if the weapon data have equip animation, if so, play it and wait for it to finish before switching the weapon
+	
 	# 1. Update current weapon
 	current_weapon = weapon_data.weapon
 	# 2. CACHE the active data immediately so _process loops don't have to query the Manager
