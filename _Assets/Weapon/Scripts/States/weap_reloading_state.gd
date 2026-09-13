@@ -13,7 +13,7 @@ func _on_reload_state_state_entered() -> void:
 
 	if weapon_controller.weapon_animation_player != null:
 		timer = weapon_controller.weapon_animation_player.get_animation_length("Reload")
-		weapon_controller.weapon_animation_player.play_animation("Reload")
+		weapon_controller.weapon_animation_player.reload_weapon_animation("empty_reload" if not weapon_controller.active_weapon_data.is_loaded else "loaded_reload")
 
 	weapon_controller.is_reloading = true
 	# For per-bullet weapons, each reload input inserts a single shell.

@@ -32,6 +32,20 @@ func play_animation(animation_name: String) -> void:
 			print("Animation name not recognized: ", animation_name)
 
 
+func reload_weapon_animation(reload_type: String = "empty_reload") -> void:
+	if not weapon_animation_tree:
+		print("AnimationTree is not assigned. Cannot play reload animation.")
+		return
+	
+	match reload_type:
+		"empty_reload":
+			weapon_animation_tree.set("parameters/ReloadBlend/blend_amount", 1.0)
+			weapon_animation_tree.set("parameters/ReloadOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+			print("Empty reload animation triggered.")
+		"loaded_reload":
+			weapon_animation_tree.set("parameters/ReloadBlend/blend_amount", 0.0)
+			weapon_animation_tree.set("parameters/ReloadOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+			print("Loaded reload animation triggered.")
 
 func set_trigger_pressed(is_pressed: bool) -> void:
 	if not weapon_animation_tree:
@@ -56,6 +70,13 @@ func set_bolt_position(is_open: bool) -> void:
 	# 	await get_tree().create_timer(weapon_bolt_time / 10).timeout
 		
 	# weapon_animation_tree.set("parameters/BoltPosition/blend_amount", target)
+
+# blend for reload for determining it is empty reload or not
+func set_reload_blend(blend_value: float) -> void:
+	if not weapon_animation_tree:
+		print("AnimationTree is not assigned. Cannot set reload blend.")
+		return
+	weapon_animation_tree.set("parameters/ReloadBlend/blend_amount", blend_value)
 
 func get_animation_length(animation_name: String) -> float:
 	if not weapon_animation_tree:
