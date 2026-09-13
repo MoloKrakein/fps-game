@@ -43,9 +43,16 @@ animation = &"Close_bolt"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_rjpr8"]
 animation = &"Open_bolt"
 
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_rjpr8"]
+filter_enabled = true
+filters = ["Armature/Skeleton3D:Body_2", "Armature/Skeleton3D:Mags_2", "Armature/Skeleton3D:dummy_2"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cbvsw"]
+animation = &"Reload"
+
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(-967.4468, 132.23367)
-nodes/output/position = Vector2(680, 120)
+graph_offset = Vector2(91.784546, 148.86963)
+nodes/output/position = Vector2(820, 140)
 nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_uo56h")
 nodes/FireOneShot/position = Vector2(240, 120)
 nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_uo56h")
@@ -56,18 +63,30 @@ nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_cbvsw")
 nodes/BoltPosition/position = Vector2(-360, 80)
 nodes/Animation/node = SubResource("AnimationNodeAnimation_2kfvb")
 nodes/Animation/position = Vector2(-800, 280)
-node_connections = [&"output", 0, &"FireOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation"]
+nodes/reload/node = SubResource("AnimationNodeAnimation_cbvsw")
+nodes/reload/position = Vector2(189.54953, 616.3724)
+nodes/ReloadOneShot/node = SubResource("AnimationNodeOneShot_rjpr8")
+nodes/ReloadOneShot/position = Vector2(559.14954, 228.07239)
+node_connections = [&"output", 0, &"ReloadOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"reload"]
 
 [node name="PistolModel" type="Node3D" unique_id=1425760719]
 
 [node name="mk57" parent="." unique_id=1019266233 instance=ExtResource("1_uo56h")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08635038, -0.115241945)
 
-[node name="Skeleton3D" parent="mk57/Armature" parent_id_path=PackedInt32Array(1019266233, 257383561) index="0" unique_id=1509516285]
-bones/2/position = Vector3(0.009498219, 0.29897547, 0.03508698)
+[node name="Skeleton3D" parent="mk57/Armature" parent_id_path=PackedInt32Array(1019266233, 1138276911) index="0" unique_id=1788143626]
+bones/2/position = Vector3(-0.00020536873, -0.40755942, 0.80467546)
+bones/3/position = Vector3(-0.00020536873, -0.10753402, 0.019377027)
+bones/4/position = Vector3(0, 0.20658359, 0.016428765)
 
-[node name="Slider_2" parent="mk57/Armature/Skeleton3D" index="1" unique_id=1295093142]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009498219, 0.29897547, 0.03508698)
+[node name="dummy_2" parent="mk57/Armature/Skeleton3D" index="0" unique_id=1988789447]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00929285, -0.31516755, 0.8203803)
+
+[node name="Mags_2" parent="mk57/Armature/Skeleton3D" index="1" unique_id=957733279]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00929285, -0.015142135, 0.035081852)
+
+[node name="Slider_2" parent="mk57/Armature/Skeleton3D" index="2" unique_id=634191236]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009498219, 0.29897547, 0.03213359)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17425191, -0.6091657)
@@ -104,5 +123,8 @@ parameters/FireOneShot/active = false
 parameters/FireOneShot/internal_active = false
 parameters/FireOneShot/request = 0
 parameters/BoltPosition/blend_amount = 0.0
+parameters/ReloadOneShot/active = false
+parameters/ReloadOneShot/internal_active = false
+parameters/ReloadOneShot/request = 0
 
 [editable path="mk57"]

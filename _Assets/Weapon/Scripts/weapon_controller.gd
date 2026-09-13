@@ -389,6 +389,8 @@ func execute_reload() -> void:
 
 	reset_trigger()
 
+	if weapon_animation_player != null:
+		weapon_animation_player.play_animation("Reload")
 
 	if current_weapon == null or active_weapon_data == null:
 		return
@@ -412,6 +414,8 @@ func execute_reload() -> void:
 	# if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
 	# 	_cycle_weapon()
 	# update_weapon_ui()
+
+
 
 func get_single_round_reload_time() -> float:
 	if current_weapon == null:
