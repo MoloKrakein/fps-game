@@ -67,10 +67,13 @@ func _handle_hit(result: Dictionary, data: Weapon) -> void:
 
 	if hit_target.has_method("take_damage"):
 		var final_damage = data.damage
+		
 		if hit_target.is_in_group("head"):
 			final_damage *= data.headshot_multiplier
-		hit_target.take_damage(final_damage, data.armor_penetration)
-
+			
+		# Push 'self' into argument 2, and the penetration float into argument 5
+		hit_target.take_damage(final_damage, self, false, false, data.armor_penetration)
+		
 	if hit_target is RigidBody3D:
 		var push_dir = -shoot_position.global_transform.basis.z
 		var force = data.get("impact_force")

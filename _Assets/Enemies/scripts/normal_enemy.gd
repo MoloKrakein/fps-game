@@ -176,8 +176,8 @@ func _on_detection_range_body_entered(body: Node3D) -> void:
 
 func on_triggered() -> void:
 	# print("Saw Player")
-	state_chart.send_event("toFollow")
-	# state_chart.send_event("toAttack")
+	# state_chart.send_event("toFollow")
+	state_chart.send_event("toAttack")
 
 func on_trigger(player) -> void:
 	# print("Saw Player")

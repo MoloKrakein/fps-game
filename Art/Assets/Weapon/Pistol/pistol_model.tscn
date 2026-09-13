@@ -68,7 +68,7 @@ animation = &"Rack"
 animation = &"Reload"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(-300.60495, 412.89685)
+graph_offset = Vector2(-14.011475, 13.936157)
 nodes/output/position = Vector2(1440, 180)
 nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_uo56h")
 nodes/FireOneShot/position = Vector2(240, 120)
@@ -81,7 +81,7 @@ nodes/BoltPosition/position = Vector2(-360, 80)
 nodes/Animation/node = SubResource("AnimationNodeAnimation_2kfvb")
 nodes/Animation/position = Vector2(-800, 280)
 nodes/reload/node = SubResource("AnimationNodeAnimation_cbvsw")
-nodes/reload/position = Vector2(-40, 560)
+nodes/reload/position = Vector2(-100, 560)
 nodes/ReloadOneShot/node = SubResource("AnimationNodeOneShot_rjpr8")
 nodes/ReloadOneShot/position = Vector2(500, 120)
 nodes/rack/node = SubResource("AnimationNodeAnimation_k02rg")
@@ -93,7 +93,7 @@ nodes/EquipOneShot/position = Vector2(1100, 80)
 nodes/equiped/node = SubResource("AnimationNodeAnimation_2ib5x")
 nodes/equiped/position = Vector2(840, 480)
 nodes/EmptyReload/node = SubResource("AnimationNodeAnimation_qkr1u")
-nodes/EmptyReload/position = Vector2(-80, 840)
+nodes/EmptyReload/position = Vector2(-160, 740)
 nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_enst8")
 nodes/ReloadBlend/position = Vector2(180, 560)
 node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"rack", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"equiped", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload"]
@@ -166,5 +166,8 @@ parameters/EquipOneShot/active = false
 parameters/EquipOneShot/internal_active = false
 parameters/EquipOneShot/request = 0
 parameters/ReloadBlend/blend_amount = 0.0
+
+[node name="Magazine" type="Node3D" parent="." unique_id=2029134148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
 
 [editable path="mk57"]

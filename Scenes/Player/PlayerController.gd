@@ -82,6 +82,9 @@ func _on_health_component_health_changed(new_health: float, max_health: float) -
 
 func _on_damage_taken(damage_amount: float) -> void:
 	EventBus.player_damage_taken.emit(damage_amount)
+	if cam_effects:
+		var intensity = clamp(damage_amount / 100.0, 0.1, 0.6)
+		cam_effects.add_screen_shake(intensity, 0.35)
 
 func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
 	print("Armor changed: ", new_armor, " / ", max_armor)
@@ -313,9 +316,20 @@ func apply_fall_damage() -> void:
 	var damage_amount = calculate_fall_damage()
 
 	if damage_amount > 0.0:
-		var health_component = get_node_or_null("HealthComponent")
+		# var health_component = get_node_or_null("HealthComponent")
 		if health_component:
 			health_component.take_damage(damage_amount)
+
+func take_damage(amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, penetration: float = 0.0) -> void:
+	if health_component:
+		health_component.take_damage(amount, null, false, false, penetration)
+	if cam_effects and source:
+        # Scale shake intensity based on damage
+		var intensity = clamp(amount / 100.0, 0.1, 0.6)
+		cam_effects.add_screen_shake(intensity, 0.35)
+        
+        # Feed the enemy's exact 3D position into your directional math!
+		cam_effects.add_damage_kick(15.0, 5.0, source.global_position)
 
 #endregion
 
