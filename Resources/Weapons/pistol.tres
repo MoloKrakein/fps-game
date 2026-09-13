@@ -13,7 +13,6 @@ is_hitscan = false
 recoil_weapon_rise = 2.0
 accuracy = 78.218
 projectile_speed = 1000.0
-aim_fov = 30.0
 vertical_lag_multiplier = 3.635
 aim_accuracy_modifier = 100.0
 aim_tilt_amount = 0.05

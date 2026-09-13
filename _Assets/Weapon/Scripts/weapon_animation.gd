@@ -17,6 +17,8 @@ func play_animation(animation_name: String) -> void:
 		"Reload":
 			weapon_animation_tree.set("parameters/ReloadOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 			print("Reload animation triggered.")
+		"Rack":
+			weapon_animation_tree.set("parameters/RackOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 		"Idle":
 			weapon_animation_tree.set("parameters/Idle/active", true)
 		"Empty":

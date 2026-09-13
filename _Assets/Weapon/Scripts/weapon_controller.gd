@@ -379,8 +379,8 @@ func rack_slide() -> void:
 		_ejecting_bullet_case("alive")
 	
 	# play animation
-	if weapon_animation_player != null:
-		weapon_animation_player.play_animation("Fire")
+	if weapon_animation_player != null and active_weapon_data.is_loaded:
+		weapon_animation_player.play_animation("Rack")
 	_cycle_weapon()
 
 func execute_reload() -> void:
