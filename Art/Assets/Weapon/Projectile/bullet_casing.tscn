@@ -12,7 +12,7 @@ points = PackedVector3Array(0.07877081, -1.5422702e-05, 0.19483373, 0.07607212, 
 
 [node name="Bullet Casing" type="RigidBody3D" unique_id=692806909]
 transform = Transform3D(-1.4901161e-07, 0, -1, 0, 1, 0, 1, 0, -1.4901161e-07, 0, 0, 0)
-collision_layer = 9
+collision_layer = 8
 collision_mask = 9
 physics_material_override = SubResource("PhysicsMaterial_5yekf")
 gravity_scale = 3.0

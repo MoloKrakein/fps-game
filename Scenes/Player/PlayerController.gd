@@ -319,6 +319,9 @@ func apply_fall_damage() -> void:
 		# var health_component = get_node_or_null("HealthComponent")
 		if health_component:
 			health_component.take_damage(damage_amount)
+		# if cam_effects:
+		# 	var intensity = clamp(damage_amount / 100.0, 0.1, 0.6)
+		# 	cam_effects.add_fall_kick(intensity)
 
 func take_damage(amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, penetration: float = 0.0) -> void:
 	if health_component:

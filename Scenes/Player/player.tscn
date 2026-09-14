@@ -3,14 +3,12 @@
 [ext_resource type="Script" uid="uid://kxvoo2aa83f8" path="res://Scenes/Player/PlayerController.gd" id="1_mtuoh"]
 [ext_resource type="Script" uid="uid://cpa8hpwwdko5m" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
 [ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="2_2jnj1"]
-[ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Assets/UI/reticle.gd" id="2_a3d8c"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
 [ext_resource type="Script" uid="uid://dly6myqcou03q" path="res://_Assets/Player/cam_effects.gd" id="4_eksi1"]
 [ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Assets/Player/components/interaction_raycast.gd" id="4_h8ma5"]
 [ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
 [ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
-[ext_resource type="PackedScene" uid="uid://bisdgbfcek7ee" path="res://Art/Assets/Weapon/Pistol/smg_model.tscn" id="6_mwii3"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
 [ext_resource type="Script" uid="uid://b4ce2h8s1ankj" path="res://_Assets/Player/components/player_physics.gd" id="9_2aanf"]
@@ -46,17 +44,9 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
-[sub_resource type="Environment" id="Environment_5yekf"]
-background_mode = 4
-ambient_light_source = 3
-ambient_light_color = Color(0, 0, 0, 0.050980393)
-reflected_light_source = 2
-ssr_enabled = true
-volumetric_fog_density = 0.1
-
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "grab_controller", "step_handler") groups=["player"]]
 process_priority = -9
-collision_layer = 2
+collision_layer = 8
 collision_mask = 3
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
@@ -78,8 +68,7 @@ fall_velocity_threshold = -7.0
 fall_damage_multiplier = 0.45
 base_slide_power = 1.0
 max_slide_momentum = 5.0
-metadata/collision_preset_name = &"Player"
-metadata/collision_preset_id = &"2726797477598543100"
+metadata/collision_preset_name = &"__custom__"
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1115016750]
 script = ExtResource("2_2jnj1")
@@ -123,7 +112,6 @@ component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.5983944)
-environment = SubResource("Environment_5yekf")
 fov = 90.0
 script = ExtResource("4_eksi1")
 player = NodePath("../..")
@@ -131,10 +119,6 @@ max_roll = 1.5
 slide_pitch = 4.5
 slide_roll = 6.0
 slide_fov = 125.0
-
-[node name="SmgModel" parent="CameraController/Cam" unique_id=1004586577 instance=ExtResource("6_mwii3")]
-transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, -0.323, 0.03)
-visible = false
 
 [node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5676575)
@@ -157,37 +141,12 @@ script = ExtResource("4_h8ma5")
 [node name="HoldPropPos" type="Marker3D" parent="CameraController/Cam" unique_id=407412408]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8348626, 0.034930766, -1.1499147)
 
-[node name="UI" type="Control" parent="." unique_id=533540372]
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
-
-[node name="Reticle" type="CenterContainer" parent="UI" unique_id=1182719863]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("2_a3d8c")
-
 [node name="Component" type="Node" parent="." unique_id=2093724721]
 
 [node name="PlayerPhysics" type="Node" parent="Component" unique_id=1025167660 node_paths=PackedStringArray("controller")]
 script = ExtResource("9_2aanf")
 controller = NodePath("../..")
-force_multiplier = 20.0
+force_multiplier = 2.0
 metadata/_custom_type_script = "uid://b4ce2h8s1ankj"
 
 [node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
@@ -203,7 +162,7 @@ script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("33_1agin")
 weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
-reticle = NodePath("../../UI/Reticle")
+reticle = NodePath("")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")

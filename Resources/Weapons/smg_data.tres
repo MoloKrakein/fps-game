@@ -7,7 +7,7 @@
 script = ExtResource("1_peuoo")
 weapon = ExtResource("2_10xtv")
 is_unlocked = true
-ammo_in_magazine = 15
+ammo_in_magazine = 900
 reserve_ammo = 900
 is_loaded = true
 fire_mode = 1

@@ -203,6 +203,7 @@ func calculate_view_offset(delta):
 func add_fall_kick(amount: float) -> void:
 	_fall_value = deg_to_rad(amount)
 	_fall_timer = fall_time
+	
 
 # damage kick
 func add_damage_kick(pitch_amount: float, roll_amount: float, source: Vector3) -> void:
