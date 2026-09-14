@@ -84,7 +84,7 @@ func _on_damage_taken(damage_amount: float) -> void:
 	EventBus.player_damage_taken.emit(damage_amount)
 	if cam_effects:
 		var intensity = clamp(damage_amount / 100.0, 0.1, 0.6)
-		cam_effects.add_screen_shake(intensity, 0.35)
+
 
 func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
 	print("Armor changed: ", new_armor, " / ", max_armor)
@@ -175,11 +175,11 @@ func _physics_process(delta: float) -> void:
 		if is_on_floor() and (not is_sliding or on_airbone_time >= 0.0) and collider is not RigidBody3D:
 			step_handler.handle_step_climbing()
 
-		if collider is RigidBody3D:
-			var push_force = 5.0
+		# if collider is RigidBody3D:
+		# 	var push_force = 5.0
 
-			var push_dir = -collision.get_normal()
-			collider.apply_central_impulse(push_dir * push_force)
+		# 	var push_dir = -collision.get_normal()
+		# 	collider.apply_central_impulse(push_dir * push_force)
 
 
 

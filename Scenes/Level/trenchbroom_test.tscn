@@ -423,6 +423,10 @@ volumetric_fog_sky_affect = 0.894
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_vx3u4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o08ba"]
+
 [node name="TrenchbroomTest" type="Node3D" unique_id=25843268]
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=766720942]
@@ -722,6 +726,15 @@ metadata/_custom_type_script = "uid://c3blk7u857k2m"
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/TriggerVolume" unique_id=473621308]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.8093433, 1.0853336)
 shape = SubResource("BoxShape3D_bhunq")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="Environment" unique_id=14149935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.302109, 15.917177, -7.0208917)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/RigidBody3D" unique_id=1875032829]
+mesh = SubResource("BoxMesh_vx3u4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/RigidBody3D" unique_id=901210568]
+shape = SubResource("BoxShape3D_o08ba")
 
 [node name="Weapon" parent="." unique_id=418274648 instance=ExtResource("10_mrt38")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.653402, 2.8730125, -0.15212488)

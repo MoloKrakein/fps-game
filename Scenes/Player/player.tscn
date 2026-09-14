@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://bisdgbfcek7ee" path="res://Art/Assets/Weapon/Pistol/smg_model.tscn" id="6_mwii3"]
 [ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
 [ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
+[ext_resource type="Script" uid="uid://b4ce2h8s1ankj" path="res://_Assets/Player/components/player_physics.gd" id="9_2aanf"]
 [ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
 [ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
 [ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Assets/Player/States/idle_state.gd" id="11_74mp2"]
@@ -182,6 +183,12 @@ grow_vertical = 2
 script = ExtResource("2_a3d8c")
 
 [node name="Component" type="Node" parent="." unique_id=2093724721]
+
+[node name="PlayerPhysics" type="Node" parent="Component" unique_id=1025167660 node_paths=PackedStringArray("controller")]
+script = ExtResource("9_2aanf")
+controller = NodePath("../..")
+force_multiplier = 20.0
+metadata/_custom_type_script = "uid://b4ce2h8s1ankj"
 
 [node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
 script = ExtResource("2_xpcdj")

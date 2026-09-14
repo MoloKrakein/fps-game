@@ -10,7 +10,7 @@ rough = true
 points = PackedVector3Array(-0.25, -1.2233853e-05, -0.25, -0.12504894, -0.125, -0.12504894, -0.25, -1.2233853e-05, 0.25, -4.8935413e-05, 0.5, -4.8935413e-05, 0.25, -1.2233853e-05, -0.25, -0.12504894, -0.125, 0.124951065, 0.124951065, -0.125, -0.12504894, 0.25, -1.2233853e-05, 0.25, 0.124951065, -0.125, 0.124951065)
 
 [node name="DiamondUnbreakable" type="RigidBody3D" unique_id=1412987810]
-collision_layer = 8
+collision_layer = 9
 mass = 4.939
 physics_material_override = SubResource("PhysicsMaterial_5yekf")
 script = ExtResource("1_5kobu")
