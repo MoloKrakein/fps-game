@@ -679,8 +679,6 @@ transform = Transform3D(-5, 0, -4.371139e-07, 0, 5, 0, 4.371139e-07, 0, -5, 22.8
 [node name="entity_13_movement_door" type="AnimatableBody3D" parent="FuncGodotMap" unique_id=1219281772]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.125, 0.875, 7)
 script = ExtResource("18_rtku8")
-open_angle = 100.0
-hinge_offset = Vector3(0, 0, 1)
 
 [node name="entity_13_mesh_instance" type="MeshInstance3D" parent="FuncGodotMap/entity_13_movement_door" unique_id=1894390229]
 mesh = SubResource("ArrayMesh_srrx4")

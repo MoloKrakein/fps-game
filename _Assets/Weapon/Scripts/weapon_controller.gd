@@ -373,11 +373,9 @@ func rack_slide() -> void:
 	# print("Racking slide. Ammo in magazine: ", active_weapon_data.ammo_in_magazine, " Is loaded: ", active_weapon_data.is_loaded)
 	if current_weapon == null or active_weapon_data == null:
 		return
-	# if not active_weapon_data.ammo_in_magazine > 0 and not active_weapon_data.is_loaded:
-	# 	return
-	if active_weapon_data.is_loaded:
-		_ejecting_bullet_case("alive")
-	
+	if not active_weapon_data.ammo_in_magazine > 0:
+		return
+	_ejecting_bullet_case("alive")
 	# play animation
 	if weapon_animation_player != null and active_weapon_data.is_loaded:
 		weapon_animation_player.play_animation("Rack")
@@ -441,11 +439,11 @@ func reload_single_round() -> void:
 	active_weapon_data.ammo_in_magazine += 1
 	active_weapon_data.reserve_ammo -= 1
 
-	# if current_weapon.is_open_bolt:
-	# 	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
-	# elif not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
-	# 	_cycle_weapon()
-	# 	return
+	if current_weapon.is_open_bolt:
+		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+	elif not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
+		_cycle_weapon()
+		return
 
 	update_weapon_ui()
 
