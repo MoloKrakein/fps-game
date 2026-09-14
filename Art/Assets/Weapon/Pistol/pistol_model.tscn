@@ -103,21 +103,21 @@ node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosi
 [node name="mk57" parent="." unique_id=1019266233 instance=ExtResource("1_uo56h")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08635038, -0.115241945)
 
-[node name="Skeleton3D" parent="mk57/Armature" parent_id_path=PackedInt32Array(1019266233, 724609601) index="0" unique_id=97467811]
+[node name="Skeleton3D" parent="mk57/Armature" parent_id_path=PackedInt32Array(1019266233, 965201715) index="0" unique_id=1132647354]
 bones/2/position = Vector3(-0.00020536873, -0.40755942, 0.80467546)
 bones/3/position = Vector3(-0.00020536873, -0.10753402, 0.019377027)
 bones/4/position = Vector3(0, 0.20658359, 0.016428765)
 
-[node name="dummy_2" parent="mk57/Armature/Skeleton3D" index="0" unique_id=1903346912]
+[node name="dummy_2" parent="mk57/Armature/Skeleton3D" index="0" unique_id=1591868828]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00929285, -0.31516755, 0.8203803)
 
-[node name="Mags_2" parent="mk57/Armature/Skeleton3D" index="1" unique_id=1789551807]
+[node name="Mags_2" parent="mk57/Armature/Skeleton3D" index="1" unique_id=408421027]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00929285, -0.015142135, 0.035081852)
 
-[node name="Slider_2" parent="mk57/Armature/Skeleton3D" index="2" unique_id=126521275]
+[node name="Slider_2" parent="mk57/Armature/Skeleton3D" index="2" unique_id=3746399]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009498219, 0.29897547, 0.03213359)
 
-[node name="Slider" parent="mk57/Armature/Skeleton3D/Slider_2" index="0" unique_id=2002302054]
+[node name="Slider" parent="mk57/Armature/Skeleton3D/Slider_2" index="0" unique_id=2126121848]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009498219, -0.037297428, -0.24386115)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
