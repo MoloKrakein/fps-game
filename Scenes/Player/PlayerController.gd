@@ -329,7 +329,7 @@ func take_damage(amount: float, source: Node3D = null, is_headshot: bool = false
 	if cam_effects and source:
         # Scale shake intensity based on damage
 		var intensity = clamp(amount / 100.0, 0.1, 0.6)
-		cam_effects.add_screen_shake(intensity, 0.35)
+		cam_effects.add_screen_shake(intensity, 0.05)
         
         # Feed the enemy's exact 3D position into your directional math!
 		cam_effects.add_damage_kick(15.0, 5.0, source.global_position)

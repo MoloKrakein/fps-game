@@ -46,7 +46,7 @@
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "grab_controller", "step_handler") groups=["player"]]
 process_priority = -9
-collision_layer = 8
+collision_layer = 11
 collision_mask = 3
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
@@ -132,6 +132,7 @@ spot_range = 20.0
 
 [node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
 transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)
+visible = false
 target_position = Vector3(0, -1.745, 0)
 collision_mask = 9
 debug_shape_custom_color = Color(0.9588106, 0, 0.51712954, 1)
@@ -157,12 +158,11 @@ script = ExtResource("23_jincj")
 player = NodePath("../..")
 max_step_height = 0.75
 
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "reticle", "shoot_position", "casing_position", "camera", "cam_rig")]
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position", "casing_position", "camera", "cam_rig")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("33_1agin")
 weapon_model_parent = NodePath("../../CameraController/Cam")
 weapon_state_chart = NodePath("../../WeaponStateChart")
-reticle = NodePath("")
 shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")

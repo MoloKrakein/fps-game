@@ -196,7 +196,7 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 		state_chart.send_event("toFollow")
 		return
 
-	# 1. Stop moving
+	# 1. Stop moving and plant feet to shoot
 	navigation_agent.velocity = Vector3.ZERO
 
 	# 2. Rotate the Enemy Body Left/Right (Yaw) safely keeping Y flat
@@ -210,10 +210,12 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 		var target_rot = atan2(flat_direction.x, flat_direction.z)
 		rotation.y = lerp_angle(rotation.y, target_rot, 15.0 * delta)
 
-	# 3. Rotate the Shoot Position Up/Down/All-Around using Quaternions
+	# 3. Rotate the Shoot Position (The Gun/Raycast) safely
 	if is_instance_valid(enemy_shoot_component.shoot_position):
-		# Aim at the center of the player, not their toes (adjust the +1.0 if needed)
-		var aim_target_position = target.global_position + Vector3(0.0, 1.0, 0.0) 
+		
+		# THE FIX: Target the center mass directly. 
+		# (If they shoot your feet now, change it to Vector3(0.0, 0.5, 0.0) instead of 1.0)
+		var aim_target_position = target.global_position 
 		
 		var shoot_pos = enemy_shoot_component.shoot_position
 		var aim_direction = (aim_target_position - shoot_pos.global_position).normalized()
@@ -221,7 +223,7 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 		if aim_direction.length_squared() > 0.001:
 			var target_basis = Basis.looking_at(aim_direction, Vector3.UP)
 			
-			# Use Quaternions to prevent scaling/stretching crashes!
+			# Quaternions prevent the scaling/stretching crashes during fast tracking
 			var current_quat = shoot_pos.global_basis.orthonormalized().get_rotation_quaternion()
 			var target_quat = target_basis.get_rotation_quaternion()
 			

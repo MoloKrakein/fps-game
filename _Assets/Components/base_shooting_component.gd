@@ -11,6 +11,7 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn")
 
 # --- State Variables ---
 var fire_timer: float = 0.0
+var external_accuracy_multiplier: float = 1.0 # This is used to modify the weapon's accuracy from outside the weapon (e.g., player perks, enemy debuffs, etc.)
 
 #region Lifecycle
 func _process(delta: float) -> void:
@@ -50,7 +51,24 @@ func _handle_ammo_consumption() -> bool:
 func _fire_hitscan(data: Weapon) -> void:
 	var space_state = get_world_3d().direct_space_state
 	var start_pos = shoot_position.global_position
-	var end_pos = start_pos + (-shoot_position.global_transform.basis.z * data.shoot_range)
+	
+	var forward = -shoot_position.global_transform.basis.z
+	
+	# 1. Calculate the spread (Matches your WeaponController math)
+	# A perfectly accurate gun (100.0) has 0 spread.
+	var base_spread: float = (100.0 - data.accuracy) / 1000.0 
+	var final_spread: float = base_spread * external_accuracy_multiplier
+	
+	# 2. Randomize X and Y offsets based on the final spread
+	var acc_x: float = randf_range(-final_spread, final_spread)
+	var acc_y: float = randf_range(-final_spread, final_spread)
+	
+	# 3. Apply offsets relative to the barrel's actual rotation
+	var right = shoot_position.global_transform.basis.x
+	var up = shoot_position.global_transform.basis.y
+	var direction = (forward + (right * acc_x) + (up * acc_y)).normalized()
+	
+	var end_pos = start_pos + (direction * data.shoot_range)
 	
 	var query = PhysicsRayQueryParameters3D.create(start_pos, end_pos)
 	if shooter_body:
