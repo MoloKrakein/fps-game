@@ -13,7 +13,7 @@ class_name PlayerController extends CharacterBody3D
 @export var cam_effects: CamEffects
 @export var grab_controller: GrabController
 @export var step_handler: StepHandlerComponent
-@export var ammo_counter_ui: MeshInstance3D
+
 @export_category("Movement")
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1
@@ -75,7 +75,8 @@ const THROW_HOLD_THRESHOLD: float = 0.5 # Time in seconds to hold the drop butto
 
 func _ready() -> void:
 	health_component.damage_taken.connect(_on_damage_taken)
-	# ammo_counter_ui.
+	# if ammo_counter_ui:
+	# 	ammo_counter_ui.position = weapon_controller.get_weapon_position()
 	_initilize_ui()
 
 func _on_health_component_health_changed(new_health: float, max_health: float) -> void:

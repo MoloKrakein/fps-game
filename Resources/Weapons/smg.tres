@@ -32,6 +32,6 @@ bullet_case_scene = ExtResource("1_mgcc5")
 alive_bullet_scene = ExtResource("1_vkwdw")
 weapon_position = Vector3(0.115, -0.403, -0.625)
 weapon_rotation = Vector3(0, 0, 0.3)
-weapon_scale = Vector3(0.16, 0.16, 0.16)
+weapon_scale = Vector3(0.2, 0.2, 0.2)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

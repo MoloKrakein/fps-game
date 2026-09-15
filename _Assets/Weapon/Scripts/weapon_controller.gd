@@ -12,6 +12,8 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var shoot_position_offset: Vector3 = Vector3.ZERO
 @export	var camera: CamEffects
 @export var cam_rig: CameraController
+@export var ammo_counter_ui: MeshInstance3D
+@export var ammo_counter_ui_offset: Vector3 = Vector3(0, 0, 0.5)
 
 @export_group("Weapon Animations Settings")
 @export_category("Crouch Stance Settings")
@@ -61,6 +63,8 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var recoil_model_max_angle: float = 50.0
 @export var recoil_pitch_max : float = 0.4
 
+
+#region local Variables
 # Cached Data to prevent Singleton Bottlenecks
 var active_weapon_data: WeaponData
 
@@ -146,6 +150,7 @@ var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
 var burst_shots_remaining: int = 0
 const DEFAULT_BURST_SHOTS_PER_TRIGGER: int = 3
+#endregion
 
 #region Lifecycle
 func _ready() -> void:
@@ -198,6 +203,10 @@ func _process(delta: float) -> void:
 		toggle_fire_mode()
 	if Input.is_action_just_pressed("combat_rack_gun"):
 		rack_slide() 
+
+	if ammo_counter_ui:
+		ammo_counter_ui.position = get_weapon_position() + ammo_counter_ui_offset
+	
 # endregion
 
 #region Trigger & Fire Mode
@@ -529,6 +538,8 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 			# print("WeaponAnimation node found and assigned.")
 			weapon_animation_player.play_animation("Equip")
 
+			# player.ammo_counter_ui.position = current_weapon_model.position
+
 func get_weapon_position() -> Vector3:
 	if current_weapon_model != null:
 		return current_weapon_model.position
@@ -611,8 +622,8 @@ func _perform_projectile_fire() -> void:
 		return
 
 	var forward: Vector3 = -shoot_position.global_transform.basis.z
-	# var accuracy_spread: float = (100.0 - current_weapon.accuracy) / 1000.0
-	var accuracy_spread: float = get_effective_spread()
+	var accuracy_spread: float = (100.0 - current_weapon.accuracy) / 1000.0
+	# var accuracy_spread: float = get_effective_spread()
 	accuracy_modifier = stance_accuracy_modifier * accuracy_modifier * dynamic_accuracy_spread * current_weapon.aim_accuracy_modifier
 	for i in range(current_weapon.pellet_count):
 		var projectile: Projectile = current_weapon.projectile_scene.instantiate() as Projectile
@@ -721,7 +732,8 @@ func get_effective_spread() -> float:
 			move_penalty = 2.0 # Sprint penalty
 		elif speed > 0.5:
 			move_penalty = 1.3 # Walking penalty
-
+	if is_aiming:
+		move_penalty *= 0.5 # Aiming reduces movement penalty
 	# 3. Combine base, stance, skills, movement, and bloom
 	var total_spread = (base_spread * stance_accuracy_modifier * accuracy_modifier * move_penalty) + dynamic_accuracy_spread
 	return maxf(0.0, total_spread)

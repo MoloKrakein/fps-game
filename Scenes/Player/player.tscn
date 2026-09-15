@@ -45,15 +45,16 @@
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o08ba"]
+billboard_mode = 1
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_o08ba"]
 material = SubResource("StandardMaterial3D_o08ba")
-size = Vector2(0.115, 0.05)
+size = Vector2(0.17, 0.095)
+orientation = 2
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "grab_controller", "step_handler") groups=["player"]]
 process_priority = -9
-collision_layer = 11
-collision_mask = 3
+collision_layer = 10
 script = ExtResource("1_mtuoh")
 camera = NodePath("CameraController")
 state_chart = NodePath("StateChart")
@@ -117,7 +118,7 @@ player_controller = NodePath("..")
 component_mouse_capture = NodePath("../Component/MouseCapture")
 
 [node name="UI_mesh" type="MeshInstance3D" parent="CameraController" unique_id=917226605]
-transform = Transform3D(1, 0, 0, 0, 0.102692485, -0.9947131, 0, 0.9947131, 0.102692485, -0.107934795, -0.13768831, -0.80805606)
+transform = Transform3D(-4.371139e-08, -0.9947131, -0.102692485, 0, 0.1026925, -0.99471325, 1.0000001, -4.3480295e-08, -4.4888315e-09, -0.107934795, -0.13768831, -0.7878852)
 mesh = SubResource("PlaneMesh_o08ba")
 skeleton = NodePath("../Cam")
 
@@ -169,7 +170,7 @@ script = ExtResource("23_jincj")
 player = NodePath("../..")
 max_step_height = 0.75
 
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position", "casing_position", "camera", "cam_rig")]
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position", "casing_position", "camera", "cam_rig", "ammo_counter_ui")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("33_1agin")
 weapon_model_parent = NodePath("../../CameraController/Cam")
@@ -178,6 +179,8 @@ shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")
 cam_rig = NodePath("../../CameraController")
+ammo_counter_ui = NodePath("../../CameraController/UI_mesh")
+ammo_counter_ui_offset = Vector3(-0.2, 0, 0)
 crouch_rot_offset = Vector3(0, 0, 0.262)
 idle_sway_frequency = 0.4
 idle_sway_amplitude = Vector2(0.015, 0.01)
