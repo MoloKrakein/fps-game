@@ -44,6 +44,12 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o08ba"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_o08ba"]
+material = SubResource("StandardMaterial3D_o08ba")
+size = Vector2(0.115, 0.05)
+
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "grab_controller", "step_handler") groups=["player"]]
 process_priority = -9
 collision_layer = 11
@@ -109,6 +115,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.613845, 0)
 script = ExtResource("1_xpcdj")
 player_controller = NodePath("..")
 component_mouse_capture = NodePath("../Component/MouseCapture")
+
+[node name="UI_mesh" type="MeshInstance3D" parent="CameraController" unique_id=917226605]
+transform = Transform3D(1, 0, 0, 0, 0.102692485, -0.9947131, 0, 0.9947131, 0.102692485, -0.107934795, -0.13768831, -0.80805606)
+mesh = SubResource("PlaneMesh_o08ba")
+skeleton = NodePath("../Cam")
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.5983944)

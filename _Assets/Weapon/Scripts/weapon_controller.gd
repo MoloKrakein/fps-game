@@ -529,6 +529,10 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 			# print("WeaponAnimation node found and assigned.")
 			weapon_animation_player.play_animation("Equip")
 
+func get_weapon_position() -> Vector3:
+	if current_weapon_model != null:
+		return current_weapon_model.position
+	return Vector3.ZERO
 
 func switch_weapon(weapon_data: WeaponData) -> void:
 	if is_reloading:

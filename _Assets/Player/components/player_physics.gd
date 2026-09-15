@@ -8,11 +8,11 @@ class_name PlayerPhysics extends Node
 var collision_shape: CollisionShape3D
 
 # func _ready() -> void:
-# 	collision_shape = CollisionShape3D.new()
+# 	collision_shape = CollisionShape3D.new()	
 # 	collision_shape.shape = BoxShape3D.new()
 # 	collision_shape.position = controller.position
 # 	call_deferred("add_child", collision_shape)
-# 	collision_shape.set_owner(controller.get_tree().get_root())
+# 	collision_shape.set_owner(controller.	get_tree().get_root())
 # 	collision_shape.collision_layer = 4
 # 	collision_shape.collision_mask = 0
 # 	collision_shape.connect("body_entered",Callable(self,"_on_body_entered"))
