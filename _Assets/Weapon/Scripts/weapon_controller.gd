@@ -82,6 +82,9 @@ var weapon_start_rotation: Vector3
 var current_stance_pos: Vector3
 var current_stance_rot: Vector3
 
+var stance_accuracy_modifier: float = 1.0
+var accuracy_modifier: float = 1.0
+var dynamic_accuracy_spread: float = 0.0
 # Crouch variables
 var _current_crouch_pos: Vector3 = Vector3.ZERO
 var _current_crouch_rot: Vector3 = Vector3.ZERO
@@ -137,8 +140,6 @@ var _muzzle_flash: MuzzleFlash
 
 var aim_tween: Tween
 const AIM_SPEED: float = 0.2
-
-var accuracy_modifier: float = 1.0
 
 var current_fire_mode: Weapon.WeaponFireMode
 var shots_fired_this_trigger: int = 0
@@ -567,7 +568,8 @@ func _perform_hitscan_fire() -> void:
 
 	var space_state: PhysicsDirectSpaceState3D = shoot_position.get_world_3d().direct_space_state
 	var from: Vector3 = shoot_position.global_transform.origin + shoot_position_offset
-	var accuracy_spread: float = (100.0 - current_weapon.accuracy) / 1000.0 
+	# var accuracy_spread: float = (100.0 - current_weapon.accuracy) / 1000.0 
+	var accuracy_spread: float = get_effective_spread()
 	var forward: Vector3 = -shoot_position.global_transform.basis.z
 
 	# The internal loop variables are now fully typed
@@ -605,8 +607,9 @@ func _perform_projectile_fire() -> void:
 		return
 
 	var forward: Vector3 = -shoot_position.global_transform.basis.z
-	var accuracy_spread: float = (100.0 - current_weapon.accuracy) / 1000.0
-
+	# var accuracy_spread: float = (100.0 - current_weapon.accuracy) / 1000.0
+	var accuracy_spread: float = get_effective_spread()
+	accuracy_modifier = stance_accuracy_modifier * accuracy_modifier * dynamic_accuracy_spread * current_weapon.aim_accuracy_modifier
 	for i in range(current_weapon.pellet_count):
 		var projectile: Projectile = current_weapon.projectile_scene.instantiate() as Projectile
 		get_tree().current_scene.add_child(projectile)
@@ -693,9 +696,31 @@ func aim_canted() -> void:
 		# var target_pos: Vector3 = current_weapon.canted_sight_position
 		# var target_rot: Vector3 = current_weapon.canted_sight_rotation
 		EventBus.change_visibility_of_crosshair.emit(false)
-		player.cam_effects.apply_ads_fov(current_weapon.aim_fov)
+		player.cam_effects.apply_ads_fov(current_weapon.canted_sight_fov)
 		tween_weapon_to_position(current_weapon.canted_sight_position, current_weapon.canted_sight_rotation)
 
+func get_effective_spread() -> float:
+	if current_weapon == null:
+		return 0.0
+	
+	# 1. Base spread from weapon (and attachments)
+	# var base_spread: float = (100.0 - get_effective_stat("accuracy")) / 1000.0
+	var base_spread: float = (100.0 - current_weapon.accuracy) / 1000.0
+	
+	# 2. Movement penalty
+	var move_penalty: float = 1.0
+	if player != null:
+		var speed = player.velocity.length()
+		if not player.is_on_floor():
+			move_penalty = 3.5 # In-air jump penalty
+		elif speed > 5.0:
+			move_penalty = 2.0 # Sprint penalty
+		elif speed > 0.5:
+			move_penalty = 1.3 # Walking penalty
+
+	# 3. Combine base, stance, skills, movement, and bloom
+	var total_spread = (base_spread * stance_accuracy_modifier * accuracy_modifier * move_penalty) + dynamic_accuracy_spread
+	return maxf(0.0, total_spread)
 func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3) -> void:
 	if current_weapon_model == null:
 		return
@@ -714,6 +739,8 @@ func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3
 
 	# aim_tween.tween_property(current_weapon_model, "position", target_position, AIM_SPEED)
 	# aim_tween.tween_property(current_weapon_model, "rotation", target_rotation, AIM_SPEED)
+
+
 #endregion
 
 func initialize_weapon_data(weapon_data: WeaponData) -> void:

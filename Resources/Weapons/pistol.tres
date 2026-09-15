@@ -9,15 +9,17 @@
 [resource]
 script = ExtResource("1_0sgi0")
 weapon_name = "MK57"
+damage = 30.0
 max_ammo = 900
 is_hitscan = false
 recoil_weapon_rise = 2.0
 accuracy = 78.218
 projectile_speed = 1000.0
 aim_fov = 80.0
-aim_accuracy_modifier = 100.0
+aim_accuracy_modifier = 99.445
 aim_tilt_amount = 0.05
 aim_ADS_position = Vector3(0, -0.225, -0.305)
+canted_sight_fov = 85.0
 canted_sight_position = Vector3(0.04, -0.218, -0.305)
 canted_sight_rotation = Vector3(0, 0, 0.7889586)
 muzzle_light_duration = 0.01
