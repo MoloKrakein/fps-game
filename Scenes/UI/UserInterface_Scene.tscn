@@ -78,6 +78,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_halmm")
 value = 70.0
 
 [node name="AmmoContainer" type="PanelContainer" parent="." unique_id=386732142]
+visible = false
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0

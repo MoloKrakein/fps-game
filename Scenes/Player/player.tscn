@@ -35,6 +35,8 @@
 [ext_resource type="Script" uid="uid://c4ugr8wbr6sn" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_ads_state.gd" id="27_1agin"]
 [ext_resource type="Script" uid="uid://dm1430qubtqlq" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_canted_state.gd" id="28_2jnj1"]
 [ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="33_1agin"]
+[ext_resource type="Script" uid="uid://ddm6c8g4gwqes" path="res://_Assets/UI/user_interface.gd" id="36_2aanf"]
+[ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Assets/UI/reticle.gd" id="37_m6ahd"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -44,13 +46,49 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
+[sub_resource type="ViewportTexture" id="ViewportTexture_enij7"]
+viewport_path = NodePath("CameraController/UI_mesh/SubViewport")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o08ba"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+albedo_texture = SubResource("ViewportTexture_enij7")
 billboard_mode = 1
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_o08ba"]
+resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_o08ba")
-size = Vector2(0.17, 0.095)
+size = Vector2(0.275, 0.095)
 orientation = 2
+
+[sub_resource type="Theme" id="Theme_o08ba"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vx3u4"]
+bg_color = Color(0.11776582, 8.0643076e-05, 0.38011408, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bors"]
+bg_color = Color(0.16300386, 0.6169165, 0.99999994, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7emvt"]
+bg_color = Color(0.35, 0.105000004, 0.11316666, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_halmm"]
+bg_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sn0t7"]
+bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_bhunq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+thickness = 3
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_riqys"]
+color = Color(0, 0, 1, 1)
+thickness = 3
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "grab_controller", "step_handler") groups=["player"]]
 process_priority = -9
@@ -121,6 +159,105 @@ component_mouse_capture = NodePath("../Component/MouseCapture")
 transform = Transform3D(-4.371139e-08, -0.9947131, -0.102692485, 0, 0.1026925, -0.99471325, 1.0000001, -4.3480295e-08, -4.4888315e-09, -0.107934795, -0.13768831, -0.7878852)
 mesh = SubResource("PlaneMesh_o08ba")
 skeleton = NodePath("../Cam")
+
+[node name="SubViewport" type="SubViewport" parent="CameraController/UI_mesh" unique_id=2114022942]
+transparent_bg = true
+size = Vector2i(145, 41)
+
+[node name="UserInterface" type="CanvasLayer" parent="CameraController/UI_mesh/SubViewport" unique_id=2116638828]
+script = ExtResource("36_2aanf")
+
+[node name="Reticle" type="CenterContainer" parent="CameraController/UI_mesh/SubViewport/UserInterface" unique_id=1535928905]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="ReticleDraw" type="Control" parent="CameraController/UI_mesh/SubViewport/UserInterface/Reticle" unique_id=1678006504]
+visible = false
+layout_mode = 2
+script = ExtResource("37_m6ahd")
+DOT_SCALE = 5.0
+GAP_ANGLE = 50.0
+SEGMENTS = 1
+CENTER_DOT_RADIUS = 0.2
+metadata/_edit_lock_ = true
+
+[node name="BarContainer" type="PanelContainer" parent="CameraController/UI_mesh/SubViewport/UserInterface" unique_id=361265110]
+visible = false
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -85.0
+offset_right = 275.0
+offset_bottom = -1.0
+grow_vertical = 0
+
+[node name="ArmorBar" type="ProgressBar" parent="CameraController/UI_mesh/SubViewport/UserInterface/BarContainer" unique_id=1626262654]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme = SubResource("Theme_o08ba")
+theme_override_styles/background = SubResource("StyleBoxFlat_vx3u4")
+theme_override_styles/fill = SubResource("StyleBoxFlat_6bors")
+value = 80.0
+
+[node name="HealthBar" type="ProgressBar" parent="CameraController/UI_mesh/SubViewport/UserInterface/BarContainer" unique_id=1716491587]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_7emvt")
+theme_override_styles/fill = SubResource("StyleBoxFlat_halmm")
+value = 70.0
+
+[node name="AmmoContainer" type="PanelContainer" parent="CameraController/UI_mesh/SubViewport/UserInterface" unique_id=386732142]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -145.0
+offset_top = -41.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
+
+[node name="ChamberIndicator" type="ColorRect" parent="CameraController/UI_mesh/SubViewport/UserInterface/AmmoContainer" unique_id=1657171669]
+unique_name_in_owner = true
+layout_mode = 2
+color = Color(1, 0, 0.16470589, 0.23921569)
+
+[node name="AmmoBar" type="ProgressBar" parent="CameraController/UI_mesh/SubViewport/UserInterface/AmmoContainer" unique_id=1612725676]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxLine_bhunq")
+theme_override_styles/fill = SubResource("StyleBoxLine_riqys")
+value = 100.0
+rounded = true
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CameraController/UI_mesh/SubViewport/UserInterface/AmmoContainer" unique_id=1166870338]
+layout_mode = 2
+alignment = 1
+
+[node name="CurrentAmmoLabel" type="Label" parent="CameraController/UI_mesh/SubViewport/UserInterface/AmmoContainer/HBoxContainer" unique_id=1555833833]
+unique_name_in_owner = true
+layout_mode = 2
+text = "000"
+
+[node name="Separator" type="Label" parent="CameraController/UI_mesh/SubViewport/UserInterface/AmmoContainer/HBoxContainer" unique_id=354271008]
+layout_mode = 2
+text = "/"
+
+[node name="ReservedAmmoLabel" type="Label" parent="CameraController/UI_mesh/SubViewport/UserInterface/AmmoContainer/HBoxContainer" unique_id=385965612]
+unique_name_in_owner = true
+layout_mode = 2
+text = "9999"
 
 [node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.5983944)
