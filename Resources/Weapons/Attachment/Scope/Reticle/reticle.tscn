@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://d2d67es7hovrb"]
+
+[node name="Node2D" type="Node2D" unique_id=1434229546]
+
+[node name="Line2D" type="Line2D" parent="." unique_id=1148221373]
+points = PackedVector2Array(512, 256, 0, 256)
+
+[node name="Line2D2" type="Line2D" parent="." unique_id=217292504]
+points = PackedVector2Array(256, 0, 256, 512)

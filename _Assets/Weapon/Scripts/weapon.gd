@@ -92,6 +92,7 @@ enum WeaponAmmoType {
 
 
 @export_category("Weapon Model")
+@export var ammo_display_offset: Vector3 = Vector3(0, 0, 0.5)
 @export_group("Model Setting")
 @export var weapon_model: PackedScene
 @export var projectile_scene: PackedScene

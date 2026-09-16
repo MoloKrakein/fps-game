@@ -1,0 +1,129 @@
+[gd_scene format=4 uid="uid://61bx40wnr1gc"]
+
+[ext_resource type="PackedScene" uid="uid://dkd83f1ej4xlh" path="res://Art/3D/Blender/Weapon/attachment/acog_scope.gltf" id="1_ywwve"]
+[ext_resource type="Material" uid="uid://l88nst5hi2lf" path="res://Art/Materials/scope_glass.material" id="2_ebv3f"]
+[ext_resource type="PackedScene" uid="uid://d2d67es7hovrb" path="res://Resources/Weapons/Attachment/Scope/Reticle/reticle.tscn" id="2_xkwwo"]
+[ext_resource type="Shader" uid="uid://c3yj4mxisrqka" path="res://Art/Shader/ScopeShader/scope.gdshader" id="3_8g36r"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glslj"]
+resource_name = "material_0"
+transparency = 2
+alpha_scissor_threshold = 0.05
+alpha_antialiasing_mode = 0
+cull_mode = 2
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_tfgg2"]
+_surfaces = [{
+"aabb": AABB(-0.4375, -0.145855, 0.0719375, 1e-05, 0.193625, 0.193625),
+"format": 34896613377,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAgABAAMABAABAAAAAwABAAUABgABAAQABQABAAcACAABAAYABwABAAkACgABAAgACQABAAsADAABAAoACwABAAwA"),
+"name": "material_0",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 13,
+"vertex_data": PackedByteArray("AABLIksiAAAAAP9//38AAAAAAACzXQAAAAAAAEuiAAAAALNdAAAAAAAASyKz3QAAAABLogAAAAAAALNd//8AAAAAs91LIgAAAABLov//AAAAAP//s10AAAAAs92z3QAAAAD//0uiAAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_y048i"]
+resource_name = "blockbench_export_mesh2"
+_surfaces = [{
+"aabb": AABB(-0.4375, -0.145855, 0.0719375, 1e-05, 0.193625, 0.193625),
+"attribute_data": PackedByteArray("p2nTLP9P0yw4Zv8fqFnTPP8/0zw4Vv8vyFhILf8/pCbIWP8f/x+naf8f/0/TLDhm/w+oWf8P/z/THDhW/x/IWKQm/z9ILchY/y//H6dJ/x9vM9Ms/x//D6g5/w9wI9Mc/x//H8g4pCb/H0gt0yz/L9Msp0n/H28z0yz/L9MsqEn/H28zSC3/H6QmyDj/H/8f"),
+"format": 34896613399,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAwAEAAUABgAHAAgACQAKAAsADAANAA4ADwAQABEAEgATABQAFQAWABcAGAAZABoAGwAcAB0AHgAfACAAIQAiACMA"),
+"material": SubResource("StandardMaterial3D_glslj"),
+"name": "material_0",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 36,
+"vertex_data": PackedByteArray("AABLIksiqukAAP9//3+q6QAAAACzXarpAACzXQAAdvgAAP9//392+AAASyJLInb4AABLogAA//8AAP9//3///wAAs10AAP//AACz3UsiqukAAP9//3+q6QAAS6IAAKrpAAD//7Ndd/gAAP9//393+AAAs91LInf4AAD//0ui//8AAP9//3///wAA//+zXf//AACz3bPdqukAAP9//3+q6QAA//9LoqrpAABLov//dvgAAP9//392+AAAs92z3Xb4AACzXf////8AAP9//3///wAAS6L/////AABLIrPdqukAAP9//3+q6QAAs13//6rpAAAAAEuid/gAAP9//393+AAASyKz3Xf4AAAAALNd//8AAP9//3///wAAAABLov//+kr1lfpK9ZX6SvWV80Pnh/ND54fzQ+eH/z//f/8//3//P/9/+0r2lftK9pX7SvaV80Pmh/ND5ofzQ+aH/z//f/8//3//P/9/+kr1lfpK9ZX6SvWV80Pnh/ND54fzQ+eH/z//f/8//3//P/9/+0r2lftK9pX7SvaV80Pmh/ND5ofzQ+aH/z//f/8//3//P/9/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_tfgg2")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ywwve"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("3_8g36r")
+shader_parameter/scope_radius = 0.025
+shader_parameter/reticle_depth = 2.0
+shader_parameter/parallax_factor = 0.1
+shader_parameter/view_edge_fade_factor = 0.05
+shader_parameter/eyebox_position = 0.15
+shader_parameter/eyebox_tolerance = 0.005
+shader_parameter/eyebox_fade_distance = 0.05
+shader_parameter/shadow_inner_radius = 1.0
+shader_parameter/shadow_fade_factor = 0.2
+shader_parameter/shadow_movement_factor = 1.0
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_6f8o3"]
+viewport_path = NodePath("display/ReticleView")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_qr0ht"]
+viewport_path = NodePath("display/ScopeView")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sn0t7"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("3_8g36r")
+shader_parameter/reticle_texture = SubResource("ViewportTexture_6f8o3")
+shader_parameter/scope_texture = SubResource("ViewportTexture_qr0ht")
+shader_parameter/scope_radius = 0.1
+shader_parameter/reticle_depth = 0.845
+shader_parameter/parallax_factor = 0.1
+shader_parameter/view_edge_fade_factor = 0.05
+shader_parameter/eyebox_position = 0.15
+shader_parameter/eyebox_tolerance = 0.05
+shader_parameter/eyebox_fade_distance = 0.05
+shader_parameter/shadow_inner_radius = 1.0
+shader_parameter/shadow_fade_factor = 0.2
+shader_parameter/shadow_movement_factor = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_bhunq"]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_sn0t7")
+size = Vector2(0.3, 0.25)
+orientation = 2
+
+[node name="Node3D" type="Node3D" unique_id=694394248]
+
+[node name="blockbench_export" parent="." unique_id=1290800655 instance=ExtResource("1_ywwve")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="cylinder_selection" parent="blockbench_export" index="1" unique_id=1918593276]
+surface_material_override/0 = ExtResource("2_ebv3f")
+
+[node name="display" type="Node3D" parent="." unique_id=1787843111]
+
+[node name="DisplayMesh" type="MeshInstance3D" parent="display" unique_id=825921561]
+transform = Transform3D(-4.371139e-08, -1, 0, 0, 0, 1, -1, 4.371139e-08, 0, -0.049042504, 0.01875, -0.11875)
+material_override = ExtResource("2_ebv3f")
+mesh = SubResource("ArrayMesh_y048i")
+skeleton = NodePath("")
+surface_material_override/0 = SubResource("ShaderMaterial_ywwve")
+
+[node name="ReticleView" type="SubViewport" parent="display" unique_id=772853350]
+transparent_bg = true
+use_hdr_2d = true
+
+[node name="Node2D" parent="display/ReticleView" unique_id=1434229546 instance=ExtResource("2_xkwwo")]
+
+[node name="ScopeView" type="SubViewport" parent="display" unique_id=323996123]
+use_hdr_2d = true
+
+[node name="Camera3D" type="Camera3D" parent="display/ScopeView" unique_id=1578499935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)
+fov = 5.9
+
+[node name="RemoteTransform3D" type="RemoteTransform3D" parent="display" unique_id=2089060351]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)
+remote_path = NodePath("../ScopeView/Camera3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="display" unique_id=1532520152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1935789, 0.31091052)
+mesh = SubResource("PlaneMesh_bhunq")
+
+[editable path="blockbench_export"]

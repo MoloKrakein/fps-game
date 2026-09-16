@@ -13,7 +13,7 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export	var camera: CamEffects
 @export var cam_rig: CameraController
 @export var ammo_counter_ui: MeshInstance3D
-@export var ammo_counter_ui_offset: Vector3 = Vector3(0, 0, 0.5)
+# @export var ammo_counter_ui_offset: Vector3 = Vector3(0, 0, 0.5)
 
 @export_group("Weapon Animations Settings")
 @export_category("Crouch Stance Settings")
@@ -205,7 +205,7 @@ func _process(delta: float) -> void:
 		rack_slide() 
 
 	if ammo_counter_ui:
-		ammo_counter_ui.position = get_weapon_position() + ammo_counter_ui_offset
+		ammo_counter_ui.position = get_weapon_position() + current_weapon.ammo_display_offset
 	
 # endregion
 

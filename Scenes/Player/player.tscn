@@ -216,15 +216,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_halmm")
 value = 70.0
 
 [node name="AmmoContainer" type="PanelContainer" parent="CameraController/UI_mesh/SubViewport/UserInterface" unique_id=386732142]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -145.0
-offset_top = -41.0
-grow_horizontal = 0
-grow_vertical = 0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
 
 [node name="ChamberIndicator" type="ColorRect" parent="CameraController/UI_mesh/SubViewport/UserInterface/AmmoContainer" unique_id=1657171669]
@@ -317,7 +313,6 @@ casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")
 cam_rig = NodePath("../../CameraController")
 ammo_counter_ui = NodePath("../../CameraController/UI_mesh")
-ammo_counter_ui_offset = Vector3(-0.2, 0, 0)
 crouch_rot_offset = Vector3(0, 0, 0.262)
 idle_sway_frequency = 0.4
 idle_sway_amplitude = Vector2(0.015, 0.01)
