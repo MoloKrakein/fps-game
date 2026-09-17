@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://br62nk21xm7fu"]
+
+[ext_resource type="Shader" uid="uid://ckgi24q120wo3" path="res://Scenes/post_processing/post_processing_layer.gdshader" id="1_5bkpo"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bhunq"]
+shader = ExtResource("1_5bkpo")
+shader_parameter/contrast = 1.38999998010672
+shader_parameter/brightness = -0.010000007227110003
+shader_parameter/saturation = 1.1499999742952
+shader_parameter/shadow_tint = Color(0.057069324, 0.42460775, 1.0199997, 1)
+shader_parameter/highlight_tint = Color(0.5798557, 0.7129656, 1.0077611, 1)
+shader_parameter/color_split = 0.2
+shader_parameter/color_steps = 12.0
+shader_parameter/posterize_strength = 0.22
+shader_parameter/dither_strength = 0.025
+shader_parameter/grain_strength = 0.022
+shader_parameter/grain_scale = 900.0
+shader_parameter/sharpen_strength = 0.4499999899416
+shader_parameter/chromatic_aberration = 0.0
+shader_parameter/chromatic_edge_falloff = 2.0
+shader_parameter/vignette_strength = 0.16
+shader_parameter/vignette_radius = 0.78
+shader_parameter/vignette_softness = 0.35
+shader_parameter/edge_strength = 0.0999999977648
+shader_parameter/edge_threshold = 0.47999998927104
+shader_parameter/pixelation = 1.0
+
+[node name="PostProcessingLayer" type="CanvasLayer" unique_id=1547687983]
+layer = 9
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1099157815]
+material = SubResource("ShaderMaterial_bhunq")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

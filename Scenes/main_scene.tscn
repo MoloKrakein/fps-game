@@ -10,6 +10,23 @@
 [ext_resource type="Resource" uid="uid://b4wuvyceoofh6" path="res://Resources/Weapons/sg_data.tres" id="5_76v2p"]
 [ext_resource type="Resource" uid="uid://c7li8s4pv7rdi" path="res://Resources/Weapons/smg_data.tres" id="6_m1efj"]
 [ext_resource type="Resource" uid="uid://b15yby6glemy0" path="res://Resources/Weapons/AutoSg_data.tres" id="7_mai8y"]
+[ext_resource type="PackedScene" uid="uid://br62nk21xm7fu" path="res://Scenes/post_processing/post_processing_layer.tscn" id="10_76v2p"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_76v2p"]
+viewport_path = NodePath("CameraController/UI_mesh/SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_drdnd"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+albedo_texture = SubResource("ViewportTexture_76v2p")
+billboard_mode = 1
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ioaeq"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_drdnd")
+size = Vector2(0.275, 0.095)
+orientation = 2
 
 [node name="MainScene" type="Node" unique_id=1881302021]
 
@@ -37,6 +54,14 @@ player = NodePath("../../CurrentLevel/PlayerController")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.809613, 5.8104715, 0.61031055)
 default_speed = 6.0
 
+[node name="UI_mesh" parent="CurrentLevel/PlayerController/CameraController" parent_id_path=PackedInt32Array(1796224466, 642708642) index="0" unique_id=917226605]
+mesh = SubResource("PlaneMesh_ioaeq")
+
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]
 
+[node name="PostProcessingLayer" parent="." unique_id=1547687983 instance=ExtResource("10_76v2p")]
+
 [node name="UserInterface" parent="." unique_id=2116638828 instance=ExtResource("2_jv6wh")]
+
+[editable path="CurrentLevel/PlayerController"]
+[editable path="PostProcessingLayer"]
