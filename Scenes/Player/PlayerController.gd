@@ -356,10 +356,16 @@ func _on_player_dead() -> void:
 
 #region Debugging
 func _unhandled_input(event: InputEvent) -> void:
+	var _enable_input = true
 	# shoot ur self debug
-	var health_component = get_node_or_null("HealthComponent")
-	if health_component and event.is_action_pressed("test1"):
-		health_component.take_damage(50)
+	# var health_component = get_node_or_null("HealthComponent")
+	if _enable_input and event.is_action_pressed("test1"):
+		# disable player input and movement and free the mouse cursor
+		_enable_input = false
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	elif not _enable_input and event.is_action_pressed("test1"):
+		_enable_input = true
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 	if event.is_action_pressed("action_use"):
 		interaction_raycast.force_raycast_update()

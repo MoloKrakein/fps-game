@@ -59,9 +59,11 @@ mesh = SubResource("PlaneMesh_ioaeq")
 
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]
 
-[node name="PostProcessingLayer" parent="." unique_id=1547687983 instance=ExtResource("10_76v2p")]
-
 [node name="UserInterface" parent="." unique_id=2116638828 instance=ExtResource("2_jv6wh")]
+layer = 100
+
+[node name="PostProcessingLayer" parent="." unique_id=1547687983 instance=ExtResource("10_76v2p")]
+visible = false
 
 [editable path="CurrentLevel/PlayerController"]
 [editable path="PostProcessingLayer"]

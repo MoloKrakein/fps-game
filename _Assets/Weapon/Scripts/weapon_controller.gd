@@ -141,6 +141,7 @@ var _prev_camera_y: float = 0.0
 var _vlag_seeded: bool = false
 
 var _muzzle_flash: MuzzleFlash
+# var _ammo_counter_position: Vector3 = Vector3.ZERO
 
 var aim_tween: Tween
 const AIM_SPEED: float = 0.2
@@ -204,8 +205,7 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("combat_rack_gun"):
 		rack_slide() 
 
-	if ammo_counter_ui:
-		ammo_counter_ui.position = get_weapon_position() + current_weapon.ammo_display_offset
+
 	
 # endregion
 
@@ -337,6 +337,9 @@ func fire_weapon() -> void:
 		_muzzle_flash.flash(current_weapon.muzzle_light_color, current_weapon.muzzle_light_energy, current_weapon.muzzle_light_duration)
 	else:
 		print("Muzzle flash not found on weapon model.")
+
+
+
 	if weapon_animation_player != null:
 		weapon_animation_player.play_animation("Fire")
 		# check if the weapon is empty after firing and play the empty animation if so
@@ -521,6 +524,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 
 		var muzzle: Node3D = current_weapon_model.get_node_or_null("Muzzle") as Node3D
 		var ejection_port:Node3D = current_weapon_model.get_node_or_null("EjectionPort") as Node3D
+		var ammo_counter_position: Node3D = current_weapon_model.get_node_or_null("AmmoCounterPosition") as Node3D
 		if muzzle != null:
 			shoot_position = muzzle
 			var found := current_weapon_model.find_children("*", "MuzzleFlash",true,false)
@@ -530,7 +534,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 				_muzzle_flash.configure(current_weapon)
 		if ejection_port != null:
 			casing_position = ejection_port
-		
+		# if
 		weapon_animation_player = current_weapon_model.get_node_or_null("WeaponAnimation") as WeaponAnimation
 		if weapon_animation_player == null:
 			print("WeaponAnimation node not found in the weapon model.")
@@ -539,6 +543,17 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 			weapon_animation_player.play_animation("Equip")
 
 			# player.ammo_counter_ui.position = current_weapon_model.position
+		# if there is a ammo counter, set the mesh instance as child of the weapon model and set its position to the ammo counter position
+		if ammo_counter_position != null:
+			if ammo_counter_ui != null:
+				ammo_counter_ui.get_parent().remove_child(ammo_counter_ui)
+				ammo_counter_position.add_child(ammo_counter_ui)
+				ammo_counter_ui.position = Vector3.ZERO
+				# print("Ammo counter UI attached to weapon model.")
+			else:
+				print("Ammo counter UI not assigned in WeaponController.")
+		else:
+			print("AmmoCounterPosition node not found in the weapon model.")
 
 func get_weapon_position() -> Vector3:
 	if current_weapon_model != null:
