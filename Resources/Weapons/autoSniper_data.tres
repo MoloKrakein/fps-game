@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://bulqjfu7p4m6d"]
+
+[ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="1_iydnr"]
+[ext_resource type="Resource" uid="uid://bjohgrqcs2d67" path="res://Resources/Weapons/autoSniper.tres" id="2_1b6n4"]
+
+[resource]
+script = ExtResource("1_iydnr")
+weapon = ExtResource("2_1b6n4")
+is_unlocked = true
+ammo_in_magazine = 100
+reserve_ammo = 100
+is_loaded = true
+metadata/_custom_type_script = "uid://qd0wv6hu5uby"

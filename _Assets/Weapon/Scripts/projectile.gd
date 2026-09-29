@@ -13,7 +13,7 @@ func _ready() -> void:
 	# connect("body_entered", self, "_on_body_entered")
 	body_entered.connect(_on_body_entered)
 	_show_trail_effect()
-	get_tree().create_timer(5.0).timeout.connect(queue_free)
+	get_tree().create_timer(90.0).timeout.connect(queue_free)
 
 
 

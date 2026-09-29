@@ -2,174 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://chbn144y1yp60" path="res://Art/3D/Blender/mk57.glb" id="1_uo56h"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="1_w2u2j"]
-[ext_resource type="PackedScene" uid="uid://61bx40wnr1gc" path="res://Resources/Weapons/Attachment/Scope/Acog.tscn" id="2_2kfvb"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="3_uo56h"]
-
-[sub_resource type="Shader" id="Shader_2ib5x"]
-code = "shader_type spatial;
-render_mode unshaded, blend_mix, cull_back, depth_draw_opaque, shadows_disabled;
-
-
-const vec3 BLACK = vec3(0.0);
-
-/** Viewport texture from a 2D Scene that will become the reticle */
-uniform sampler2D reticle_texture: repeat_disable;
-/** Viewport texture from a 3D Camera that will become the scope's view */
-uniform sampler2D scope_texture: repeat_disable;
-/** Radius for the scope's physical outer radius */
-uniform float scope_radius = 0.025;
-/** Depth before the reticle appears */
-uniform float reticle_depth = 2.0;
-uniform float parallax_factor: hint_range(0.0, .3, 0.001) = 0.1;
-uniform float view_edge_fade_factor: hint_range(0.0, 0.5, 0.001) = .05;
-
-
-group_uniforms Eyebox;
-/**
-Position of eyebox. When the eye is this distance away it is considered perfect */
-uniform float eyebox_position = .15;
-/**
-Forgiveness for user eye positioning. Allows a +- tolerance around \"eyebox_position\" */
-uniform float eyebox_tolerance = 0.005;
-/** Specify the distance over which the scope shadow will fade to black */
-uniform float eyebox_fade_distance = 0.05;
-
-
-group_uniforms Scope_Shadow;
-/**
-Percent of the scope that will display before the scope shadow's fade starts.
-0.0 is fully dark, 1.0 is fully displayed (except for the scope shadow's fade).*/
-uniform float shadow_inner_radius: hint_range(0.0, 1.0, 0.01) = 1.0;
-/**
-Factor for the eyebox's scope shadow */
-uniform float shadow_fade_factor = 0.2;
-
-/**
-Changes how sensitive the scope-shadow is to movement */
-uniform float shadow_movement_factor: hint_range(0.5, 1.0, 0.01) = 1.0;
-
-
-varying vec3 view;
-
-
-// \"Pushes\" the scope uv into the scope making it appear deeper inside the scope.
-// Returns altered UV
-vec2 get_depth_effect(vec2 uv, vec3 direcion, float depth) {
-	vec2 result = uv - direcion.xy * (depth * 2.0);
-	result -= vec2(0.5);
-	result *= 0.5;
-	return result + 0.5;
-}
-
-
-// Creates the scope shadow effect
-// Returns color
-vec3 get_scope_shadow_effect(vec2 uv, vec4 scope_sample, vec3 view_dir, float eye_distance) {
-	float delta = eye_distance - eyebox_position;
-
-	vec2 eye_offset = view_dir.xy / -shadow_movement_factor;
-	//((uv - vec2(0.5)) / 2.0)
-	vec2 shifted_uv = uv - eye_offset;
-	float dist = length((shifted_uv - vec2(0.5)) * 2.0);
-
-	// Fade logic for close / far
-	float fade_near = smoothstep(-eyebox_tolerance, -eyebox_tolerance - eyebox_fade_distance, delta);
-	float fade_far  = smoothstep( eyebox_tolerance,  eyebox_tolerance + eyebox_fade_distance, delta);
-	float distance_fade = max(fade_near, fade_far);
-
-	// Scale scope shadow radius to distance
-	float dynamic_radius = mix(0.0, shadow_inner_radius, 1.0 - distance_fade);
-	float inner = dynamic_radius - shadow_fade_factor;
-	float outer = dynamic_radius;
-	float fade = smoothstep(inner, outer, dist);
-
-	return mix(scope_sample.rgb, BLACK, fade);
-}
-
-
-// Scope viewport edge fade
-// Returns color
-vec3 get_scope_edge_fade_effect(vec2 adj_uv, vec4 scope_sample) {
-	vec2 center_uv = vec2(0.5);
-	float dist = length(adj_uv - center_uv);
-
-	float fade_edge_end = 0.5;
-	float fade_edge_start = fade_edge_end - view_edge_fade_factor;
-	float fade_edge = smoothstep(fade_edge_start, fade_edge_end, dist);
-	return mix(scope_sample.rgb, BLACK, fade_edge);
-}
-
-
-float get_in_bounds_factor(vec2 uv) {
-	const float lower = 0.01;
-	const float upper = 0.99;
-	return step(lower, uv.x) * step(uv.x, upper) * step(lower, uv.y) * step(uv.y, upper);
-}
-
-
-void vertex() {
-	view = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz - (MODELVIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-}
-
-
-void fragment() {
-	float eye_distance = length(NODE_POSITION_WORLD - CAMERA_POSITION_WORLD);
-	vec3 view_dir = normalize(normalize(-VERTEX + EYE_OFFSET) * mat3(TANGENT, -BINORMAL, NORMAL));
-
-	// Inside of scope
-	if (length(view) <= scope_radius) {
-		vec2 adj_uv = get_depth_effect(UV, view_dir, reticle_depth);
-
-		// This setup seems to cause a parallax-like effect
-		// minimize using parallax_factor
-		vec2 parallax_uv = mix(adj_uv, UV, parallax_factor);
-
-		vec4 scope_sample = texture(scope_texture, adj_uv);
-		scope_sample.rgb = get_scope_shadow_effect(UV, scope_sample, view_dir, eye_distance);
-		scope_sample.rgb = get_scope_edge_fade_effect(adj_uv, scope_sample);
-
-		vec4 reticle_sample = texture(reticle_texture, parallax_uv);
-
-		// Mask to in-bounds to discard reticle sample \"stretching to infinity\" at edge of UV
-		reticle_sample.a *= get_in_bounds_factor(adj_uv);
-
-		ALPHA = 1.0;
-		ALBEDO = mix(scope_sample.rgb, reticle_sample.rgb, reticle_sample.a);
-
-	// Outside radius: Discard to make a perfect circle
-	} else {
-		discard;
-	}
-}"
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_rjpr8"]
-viewport_path = NodePath("display/ReticleView")
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_2kfvb"]
-viewport_path = NodePath("display/ScopeView")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_cbvsw"]
-resource_local_to_scene = true
-render_priority = 0
-shader = SubResource("Shader_2ib5x")
-shader_parameter/reticle_texture = SubResource("ViewportTexture_rjpr8")
-shader_parameter/scope_texture = SubResource("ViewportTexture_2kfvb")
-shader_parameter/scope_radius = 0.05
-shader_parameter/reticle_depth = 0.845
-shader_parameter/parallax_factor = 0.1
-shader_parameter/view_edge_fade_factor = 0.05
-shader_parameter/eyebox_position = 0.295
-shader_parameter/eyebox_tolerance = 0.05
-shader_parameter/eyebox_fade_distance = 0.05
-shader_parameter/shadow_inner_radius = 1.0
-shader_parameter/shadow_fade_factor = 0.2
-shader_parameter/shadow_movement_factor = 1.0
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_k02rg"]
-resource_local_to_scene = true
-material = SubResource("ShaderMaterial_cbvsw")
-size = Vector2(0.3, 0.25)
-orientation = 2
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
 angle_min = -179.99998
@@ -287,18 +120,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009498219, 0.29897547, 0.03
 [node name="Slider" parent="mk57/Armature/Skeleton3D/Slider_2" index="0" unique_id=2126121848]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009498219, -0.037297428, -0.24386115)
 
-[node name="Node3D" parent="mk57/Armature/Skeleton3D/Body_2/Body" parent_id_path=PackedInt32Array(1019266233, 2058779006) index="0" unique_id=694394248 instance=ExtResource("2_2kfvb")]
-transform = Transform3D(0.43, -5.967449e-17, 0, -5.967449e-17, 0.43, 0, 0, 0, 0.43, -4.1532974e-08, 0.12674722, 0.2304835)
-
-[node name="DisplayMesh" parent="mk57/Armature/Skeleton3D/Body_2/Body/Node3D/display" parent_id_path=PackedInt32Array(694394248, 1787843111) index="0" unique_id=825921561]
-surface_material_override/0 = null
-
-[node name="Camera3D" parent="mk57/Armature/Skeleton3D/Body_2/Body/Node3D/display/ScopeView" parent_id_path=PackedInt32Array(694394248, 323996123) index="0" unique_id=1578499935]
-transform = Transform3D(0.43, -3.2037497e-09, 8.0093745e-09, 3.2037497e-09, 0.43, -3.2037497e-09, -8.0093745e-09, 3.2037497e-09, 0.43, -6.035674e-08, 0.27936846, -0.059596054)
-
-[node name="MeshInstance3D" parent="mk57/Armature/Skeleton3D/Body_2/Body/Node3D/display" parent_id_path=PackedInt32Array(694394248, 1787843111) index="4" unique_id=1532520152]
-mesh = SubResource("PlaneMesh_k02rg")
-
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17425191, -0.6091657)
 script = ExtResource("1_w2u2j")
@@ -350,8 +171,6 @@ parameters/ReloadBlend/blend_amount = 0.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="." unique_id=1112189428]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12364544, 0.08972253, 0.04992429)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17605399, 0.022764817, 0.04992429)
 
 [editable path="mk57"]
-[editable path="mk57/Armature/Skeleton3D/Body_2/Body/Node3D"]
-[editable path="mk57/Armature/Skeleton3D/Body_2/Body/Node3D/blockbench_export"]
