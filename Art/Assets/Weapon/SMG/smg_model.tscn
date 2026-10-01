@@ -265,6 +265,9 @@ explosiveness = 0.84
 process_material = SubResource("ParticleProcessMaterial_sn0t7")
 draw_pass_1 = SubResource("QuadMesh_bhunq")
 
+[node name="AmmoCounterPosition" type="Node3D" parent="EjectionPort" unique_id=1728137422]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3832011, -0.68148375, 0.04992429)
+
 [node name="WeaponAnimation" type="Node" parent="." unique_id=1878486645 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
 script = ExtResource("5_c8wk2")
 weapon_animation_tree = NodePath("../AnimationTree")

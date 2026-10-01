@@ -26,3 +26,5 @@ mesh = SubResource("PlaneMesh_o08ba")
 size = Vector2i(141, 39)
 
 [node name="Control" parent="SubViewport" unique_id=1625207807 instance=ExtResource("1_gmndq")]
+
+[editable path="SubViewport/Control"]

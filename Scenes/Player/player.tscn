@@ -45,13 +45,13 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_2aanf"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_mwii3"]
 viewport_path = NodePath("SubViewport")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m6ahd"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2aanf"]
 resource_local_to_scene = true
 shading_mode = 0
-albedo_texture = SubResource("ViewportTexture_2aanf")
+albedo_texture = SubResource("ViewportTexture_mwii3")
 
 [node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "grab_controller", "step_handler") groups=["player"]]
 process_priority = -9
@@ -128,6 +128,12 @@ slide_pitch = 4.5
 slide_roll = 6.0
 slide_fov = 125.0
 
+[node name="GUI" parent="CameraController/Cam" unique_id=1724784573 instance=ExtResource("12_mwii3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.47112072, 0.5983944)
+
+[node name="MeshInstance3D" parent="CameraController/Cam/GUI" index="0" unique_id=1036909162]
+material_override = SubResource("StandardMaterial3D_2aanf")
+
 [node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5676575)
 
@@ -175,7 +181,7 @@ shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")
 cam_rig = NodePath("../../CameraController")
-ammo_counter_ui = NodePath("GUI/MeshInstance3D")
+ammo_counter_ui = NodePath("../../CameraController/Cam/GUI/MeshInstance3D")
 crouch_rot_offset = Vector3(0, 0, 0.262)
 idle_sway_frequency = 0.4
 idle_sway_amplitude = Vector2(0.015, 0.01)
@@ -189,11 +195,6 @@ look_lag_rot_max = 30.0
 look_lag_pos_scale = 0.3
 bob_amplitude = Vector2(0.05, 0.012)
 bob_max_speed = 5.0
-
-[node name="GUI" parent="Component/WeaponController" unique_id=1724784573 instance=ExtResource("12_mwii3")]
-
-[node name="MeshInstance3D" parent="Component/WeaponController/GUI" index="0" unique_id=1036909162]
-material_override = SubResource("StandardMaterial3D_m6ahd")
 
 [node name="GrabController" type="Node" parent="Component" unique_id=1472151820 node_paths=PackedStringArray("interaction_ray", "hold_position", "interaction_state_chart", "cam")]
 script = ExtResource("14_2aanf")
@@ -562,4 +563,5 @@ script = ExtResource("28_2jnj1")
 [connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/CantedAimState" to="WeaponStateMachine/Sight/AimingState/CantedAimState" method="_on_canted_aim_state_state_entered"]
 [connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/AimingState/CantedAimState" to="WeaponStateMachine/Sight/AimingState/CantedAimState" method="_on_canted_aim_state_state_physics_processing"]
 
-[editable path="Component/WeaponController/GUI"]
+[editable path="CameraController/Cam/GUI"]
+[editable path="CameraController/Cam/GUI/SubViewport/Control"]

@@ -2,6 +2,36 @@
 
 [ext_resource type="Script" uid="uid://ddm6c8g4gwqes" path="res://_Assets/UI/user_interface.gd" id="1_em0eb"]
 [ext_resource type="Script" uid="uid://05tp5jt6bl2h" path="res://_Assets/UI/reticle.gd" id="1_g8q8s"]
+[ext_resource type="Texture2D" uid="uid://dls8dahgv00ta" path="res://Art/UI/HealthBar/clockBG.png" id="3_p2qy6"]
+[ext_resource type="Texture2D" uid="uid://8ag50kstunba" path="res://Art/UI/HealthBar/HP Fill.svg" id="4_a3ewi"]
+[ext_resource type="Texture2D" uid="uid://bdamabxhbdice" path="res://Art/UI/HealthBar/ArmorRing.svg" id="5_ksybn"]
+[ext_resource type="FontFile" uid="uid://n4l4ux5ylwuv" path="res://Art/UI/fonts/ibm plex mono/IBMPlexMono-Regular.ttf" id="6_a3ewi"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_o08ba"]
+texture = ExtResource("3_p2qy6")
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_j7jkr"]
+load_path = "res://.godot/imported/ArmorRing.svg-ea393917e10ed59f5677d3c8ad9444b2.editor.ctex"
+
+[sub_resource type="LabelSettings" id="LabelSettings_8v7al"]
+font = ExtResource("6_a3ewi")
+font_size = 32
+font_color = Color(0.6156863, 1, 0, 1)
+outline_size = 5
+outline_color = Color(0, 0.54901963, 0.03529412, 1)
+shadow_size = 12
+shadow_color = Color(0.336045, 0.43, 0.1849, 0.27450982)
+shadow_offset = Vector2(0.43, -0.12)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ksybn"]
+font = ExtResource("6_a3ewi")
+font_size = 32
+font_color = Color(0, 1, 0.7647059, 1)
+outline_size = 5
+outline_color = Color(0, 0.42745098, 0.54901963, 1)
+shadow_size = 12
+shadow_color = Color(0, 0.3777927, 0.2802618, 0.56078434)
+shadow_offset = Vector2(0.43, -0.12)
 
 [sub_resource type="Theme" id="Theme_o08ba"]
 
@@ -52,25 +82,144 @@ SEGMENTS = 1
 CENTER_DOT_RADIUS = 0.2
 metadata/_edit_lock_ = true
 
-[node name="BarContainer" type="PanelContainer" parent="." unique_id=361265110]
+[node name="Control" type="Control" parent="." unique_id=1353835014]
+layout_mode = 3
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -85.0
-offset_right = 275.0
-offset_bottom = -1.0
+offset_left = 3.525
+offset_top = -68.125
+offset_right = 43.525
+offset_bottom = -28.125
 grow_vertical = 0
+scale = Vector2(1.32, 1.32)
 
-[node name="ArmorBar" type="ProgressBar" parent="BarContainer" unique_id=1626262654]
+[node name="BarContainer" type="PanelContainer" parent="Control" unique_id=361265110]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -15.79
+offset_top = -190.165
+offset_right = 195.21
+offset_bottom = 20.835007
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxTexture_o08ba")
+
+[node name="Control" type="Control" parent="Control/BarContainer" unique_id=556637019]
+layout_mode = 2
+offset_transform_enabled = true
+
+[node name="HealthCBar" type="TextureProgressBar" parent="Control/BarContainer/Control" unique_id=533348750]
+layout_mode = 0
+offset_right = 211.0
+offset_bottom = 211.0
+offset_transform_enabled = true
+offset_transform_position = Vector2(-7.25, 17.17)
+offset_transform_scale = Vector2(0.665, 0.665)
+value = 100.0
+fill_mode = 3
+texture_under = ExtResource("4_a3ewi")
+texture_progress = ExtResource("4_a3ewi")
+tint_under = Color(0.92, 0.13799998, 0.13799998, 0.5137255)
+tint_progress = Color(0.105882354, 0.27450982, 0, 1)
+
+[node name="ArmorCBar" type="TextureProgressBar" parent="Control/BarContainer/Control" unique_id=967356414]
+layout_mode = 0
+offset_right = 211.0
+offset_bottom = 211.0
+offset_transform_enabled = true
+offset_transform_position = Vector2(-11.165, 14.155)
+offset_transform_scale = Vector2(0.65, 0.65)
+value = 93.0
+fill_mode = 4
+texture_under = ExtResource("5_ksybn")
+texture_progress = SubResource("CompressedTexture2D_j7jkr")
+tint_under = Color(0.039215688, 0.20784314, 0.3647059, 1)
+tint_progress = Color(0, 0.8392157, 0.9843137, 1)
+
+[node name="Control" type="Control" parent="Control/BarContainer/Control" unique_id=1956050568]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HP" type="Label" parent="Control/BarContainer/Control/Control" unique_id=1664001065]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -56.016823
+offset_top = -31.755457
+offset_right = 1.9831772
+offset_bottom = 10.244543
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.6156863, 1, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.6166667, 1, 0, 0.23529412)
+theme_override_colors/font_outline_color = Color(0, 0.54901963, 0.03529412, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/outline_size = 4
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/font = ExtResource("6_a3ewi")
+theme_override_font_sizes/font_size = 32
+text = "100"
+label_settings = SubResource("LabelSettings_8v7al")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="Armor" type="Label" parent="Control/BarContainer/Control/Control" unique_id=675428485]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -27.228945
+offset_top = 14.456661
+offset_right = 30.771053
+offset_bottom = 56.456665
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.6156863, 1, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.6166667, 1, 0, 0.23529412)
+theme_override_colors/font_outline_color = Color(0, 0.54901963, 0.03529412, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/outline_size = 4
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/font = ExtResource("6_a3ewi")
+theme_override_font_sizes/font_size = 32
+text = "100"
+label_settings = SubResource("LabelSettings_ksybn")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="ArmorBar" type="ProgressBar" parent="Control/BarContainer" unique_id=1626262654]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme = SubResource("Theme_o08ba")
 theme_override_styles/background = SubResource("StyleBoxFlat_vx3u4")
 theme_override_styles/fill = SubResource("StyleBoxFlat_6bors")
 value = 80.0
 
-[node name="HealthBar" type="ProgressBar" parent="BarContainer" unique_id=1716491587]
+[node name="HealthBar" type="ProgressBar" parent="Control/BarContainer" unique_id=1716491587]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/background = SubResource("StyleBoxFlat_7emvt")
