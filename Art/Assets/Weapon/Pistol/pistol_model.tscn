@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://d0547qfi2hk3r"]
 
+[ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_2kfvb"]
 [ext_resource type="PackedScene" uid="uid://chbn144y1yp60" path="res://Art/3D/Blender/mk57.glb" id="1_uo56h"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="1_w2u2j"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="3_uo56h"]
@@ -99,7 +100,10 @@ nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_enst8")
 nodes/ReloadBlend/position = Vector2(180, 560)
 node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"rack", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"equiped", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload"]
 
-[node name="PistolModel" type="Node3D" unique_id=1425760719]
+[node name="PistolModel" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket")]
+script = ExtResource("1_2kfvb")
+muzzle_socket = NodePath("Muzzle")
+ejection_socket = NodePath("EjectionPort")
 
 [node name="mk57" parent="." unique_id=1019266233 instance=ExtResource("1_uo56h")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08635038, -0.115241945)
