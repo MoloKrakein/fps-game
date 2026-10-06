@@ -13,20 +13,12 @@
 [ext_resource type="PackedScene" uid="uid://br62nk21xm7fu" path="res://Scenes/post_processing/post_processing_layer.tscn" id="10_76v2p"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_76v2p"]
-viewport_path = NodePath("CameraController/UI_mesh/SubViewport")
+viewport_path = NodePath("SubViewport")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_drdnd"]
 resource_local_to_scene = true
-transparency = 1
 shading_mode = 0
 albedo_texture = SubResource("ViewportTexture_76v2p")
-billboard_mode = 1
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_ioaeq"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_drdnd")
-size = Vector2(0.275, 0.095)
-orientation = 2
 
 [node name="MainScene" type="Node" unique_id=1881302021]
 
@@ -54,16 +46,36 @@ player = NodePath("../../CurrentLevel/PlayerController")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.809613, 5.8104715, 0.61031055)
 default_speed = 6.0
 
-[node name="UI_mesh" parent="CurrentLevel/PlayerController/CameraController" parent_id_path=PackedInt32Array(1796224466, 642708642) index="0" unique_id=917226605]
-mesh = SubResource("PlaneMesh_ioaeq")
+[node name="HealthComponent" parent="CurrentLevel/PlayerController" index="0" unique_id=1115016750]
+start_with_armor = true
+
+[node name="MeshInstance3D" parent="CurrentLevel/PlayerController/CameraController/Cam/GUI" parent_id_path=PackedInt32Array(1796224466, 1724784573) index="0" unique_id=1036909162]
+material_override = SubResource("StandardMaterial3D_drdnd")
 
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]
-
-[node name="UserInterface" parent="." unique_id=2116638828 instance=ExtResource("2_jv6wh")]
-layer = 100
 
 [node name="PostProcessingLayer" parent="." unique_id=1547687983 instance=ExtResource("10_76v2p")]
 visible = false
 
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=285879250]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1828947772]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1366, 720)
+render_target_update_mode = 4
+
+[node name="UserInterface" parent="SubViewportContainer/SubViewport" unique_id=2116638828 instance=ExtResource("2_jv6wh")]
+layer = 100
+
 [editable path="CurrentLevel/PlayerController"]
+[editable path="CurrentLevel/PlayerController/CameraController/Cam/GUI"]
+[editable path="CurrentLevel/PlayerController/CameraController/Cam/GUI/SubViewport/Control"]
 [editable path="PostProcessingLayer"]
+[editable path="SubViewportContainer/SubViewport/UserInterface"]

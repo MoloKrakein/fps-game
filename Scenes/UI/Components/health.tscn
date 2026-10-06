@@ -1,0 +1,156 @@
+[gd_scene format=3 uid="uid://dmhwitbjkvxqe"]
+
+[ext_resource type="Texture2D" uid="uid://dls8dahgv00ta" path="res://Art/UI/HealthBar/clockBG.png" id="1_ojetp"]
+[ext_resource type="Texture2D" uid="uid://8ag50kstunba" path="res://Art/UI/HealthBar/HP Fill.svg" id="2_66inn"]
+[ext_resource type="Texture2D" uid="uid://bdamabxhbdice" path="res://Art/UI/HealthBar/ArmorRing.svg" id="3_xnysg"]
+[ext_resource type="FontFile" uid="uid://n4l4ux5ylwuv" path="res://Art/UI/fonts/ibm plex mono/IBMPlexMono-Regular.ttf" id="4_ooy7q"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_4eex4"]
+texture = ExtResource("1_ojetp")
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_pqm0h"]
+load_path = "res://.godot/imported/ArmorRing.svg-ea393917e10ed59f5677d3c8ad9444b2.editor.ctex"
+
+[sub_resource type="LabelSettings" id="LabelSettings_xn7l7"]
+font = ExtResource("4_ooy7q")
+font_size = 24
+font_color = Color(0.6156863, 1, 0, 1)
+outline_size = 5
+outline_color = Color(0, 0.54901963, 0.03529412, 1)
+shadow_size = 12
+shadow_color = Color(0.336045, 0.43, 0.1849, 0.27450982)
+shadow_offset = Vector2(0.43, -0.12)
+
+[sub_resource type="LabelSettings" id="LabelSettings_e3jft"]
+font = ExtResource("4_ooy7q")
+font_size = 24
+font_color = Color(0, 1, 0.7647059, 1)
+outline_size = 5
+outline_color = Color(0, 0.42745098, 0.54901963, 1)
+shadow_size = 12
+shadow_color = Color(0, 0.3777927, 0.2802618, 0.56078434)
+
+[node name="Health" type="Node2D" unique_id=119950259]
+light_mask = 0
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1567879828]
+
+[node name="BarContainer" type="PanelContainer" parent="." unique_id=711652400]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -4.2424254
+offset_top = -23.0
+offset_right = 163.1818
+offset_bottom = 144.42422
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxTexture_4eex4")
+
+[node name="Control" type="Control" parent="." unique_id=1850368153]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -5.0
+offset_top = -20.212128
+offset_right = 162.42422
+offset_bottom = 147.2121
+
+[node name="HealthBar" type="TextureProgressBar" parent="Control" unique_id=1136953933]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 34.09091
+offset_top = 48.484863
+offset_right = 232.09091
+offset_bottom = 246.48486
+scale = Vector2(0.44, 0.44)
+step = 0.3
+value = 99.9
+fill_mode = 3
+texture_under = ExtResource("2_66inn")
+texture_progress = ExtResource("2_66inn")
+tint_under = Color(0.92, 0.13799998, 0.13799998, 0.5137255)
+tint_progress = Color(0.105882354, 0.27450982, 0, 1)
+
+[node name="ArmorBar" type="TextureProgressBar" parent="Control" unique_id=1853803960]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 31.060608
+offset_top = 43.939392
+offset_right = 242.06061
+offset_bottom = 254.93939
+scale = Vector2(0.44, 0.44)
+step = 0.5
+fill_mode = 4
+texture_under = ExtResource("3_xnysg")
+texture_progress = SubResource("CompressedTexture2D_pqm0h")
+tint_under = Color(0.039215688, 0.20784314, 0.3647059, 1)
+tint_progress = Color(0, 0.8392157, 0.9843137, 1)
+
+[node name="Control" type="Control" parent="Control" unique_id=1125020103]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -7.5757446
+offset_right = -7.5757446
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="lbl_HP" type="Label" parent="Control/Control" unique_id=734584163]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -21.656822
+offset_top = -24.854721
+offset_right = 24.555294
+offset_bottom = 7.145279
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.6156863, 1, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.6166667, 1, 0, 0.23529412)
+theme_override_colors/font_outline_color = Color(0, 0.54901963, 0.03529412, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/outline_size = 4
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/font = ExtResource("4_ooy7q")
+theme_override_font_sizes/font_size = 32
+text = "100"
+label_settings = SubResource("LabelSettings_xn7l7")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="lbl_Armor" type="Label" parent="Control/Control" unique_id=940468798]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -22.414398
+offset_top = 6.2059
+offset_right = 24.489391
+offset_bottom = 38.205902
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.6156863, 1, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.6166667, 1, 0, 0.23529412)
+theme_override_colors/font_outline_color = Color(0, 0.54901963, 0.03529412, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/outline_size = 4
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/font = ExtResource("4_ooy7q")
+theme_override_font_sizes/font_size = 32
+text = "999"
+label_settings = SubResource("LabelSettings_e3jft")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true

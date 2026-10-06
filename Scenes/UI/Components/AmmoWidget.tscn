@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://b74my12veqmaj"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_o08ba"]
+size = Vector3(0.7458496, 1.1933594, 0.10253906)
+
+[node name="AmmoWidget" type="Control" unique_id=1861756098]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=858766562]
+custom_minimum_size = Vector2(250, 400)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1963955476]
+transparent_bg = true
+size = Vector2i(250, 400)
+
+[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport" unique_id=538308428]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="SubViewportContainer/SubViewport" unique_id=133797717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2653929)
+light_energy = 3.194
+light_indirect_energy = 1.903
+light_volumetric_fog_energy = 2.419
+light_size = 0.121
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport" unique_id=1192883592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8950808)
+mesh = SubResource("BoxMesh_o08ba")

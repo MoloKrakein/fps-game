@@ -15,7 +15,7 @@ load_path = "res://.godot/imported/ArmorRing.svg-ea393917e10ed59f5677d3c8ad9444b
 
 [sub_resource type="LabelSettings" id="LabelSettings_8v7al"]
 font = ExtResource("6_a3ewi")
-font_size = 32
+font_size = 24
 font_color = Color(0.6156863, 1, 0, 1)
 outline_size = 5
 outline_color = Color(0, 0.54901963, 0.03529412, 1)
@@ -25,27 +25,12 @@ shadow_offset = Vector2(0.43, -0.12)
 
 [sub_resource type="LabelSettings" id="LabelSettings_ksybn"]
 font = ExtResource("6_a3ewi")
-font_size = 32
+font_size = 24
 font_color = Color(0, 1, 0.7647059, 1)
 outline_size = 5
 outline_color = Color(0, 0.42745098, 0.54901963, 1)
 shadow_size = 12
 shadow_color = Color(0, 0.3777927, 0.2802618, 0.56078434)
-shadow_offset = Vector2(0.43, -0.12)
-
-[sub_resource type="Theme" id="Theme_o08ba"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vx3u4"]
-bg_color = Color(0.11776582, 8.0643076e-05, 0.38011408, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bors"]
-bg_color = Color(0.16300386, 0.6169165, 0.99999994, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7emvt"]
-bg_color = Color(0.35, 0.105000004, 0.11316666, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_halmm"]
-bg_color = Color(1, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sn0t7"]
 bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
@@ -99,70 +84,75 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = -15.79
-offset_top = -190.165
-offset_right = 195.21
-offset_bottom = 20.835007
+offset_left = -7.15
+offset_top = -146.48999
+offset_right = 160.27423
+offset_bottom = 20.934227
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxTexture_o08ba")
 
-[node name="Control" type="Control" parent="Control/BarContainer" unique_id=556637019]
-layout_mode = 2
-offset_transform_enabled = true
+[node name="Control" type="Control" parent="Control" unique_id=556637019]
+anchors_preset = 0
+offset_left = -7.9075747
+offset_top = -102.70212
+offset_right = 159.51665
+offset_bottom = 64.72211
 
-[node name="HealthCBar" type="TextureProgressBar" parent="Control/BarContainer/Control" unique_id=533348750]
+[node name="HealthBar" type="TextureProgressBar" parent="Control/Control" unique_id=533348750]
+unique_name_in_owner = true
 layout_mode = 0
-offset_right = 211.0
-offset_bottom = 211.0
-offset_transform_enabled = true
-offset_transform_position = Vector2(-7.25, 17.17)
-offset_transform_scale = Vector2(0.665, 0.665)
-value = 100.0
+offset_left = 34.09091
+offset_top = 48.484863
+offset_right = 232.09091
+offset_bottom = 246.48486
+scale = Vector2(0.44, 0.44)
+step = 0.3
+value = 99.9
 fill_mode = 3
 texture_under = ExtResource("4_a3ewi")
 texture_progress = ExtResource("4_a3ewi")
 tint_under = Color(0.92, 0.13799998, 0.13799998, 0.5137255)
 tint_progress = Color(0.105882354, 0.27450982, 0, 1)
 
-[node name="ArmorCBar" type="TextureProgressBar" parent="Control/BarContainer/Control" unique_id=967356414]
+[node name="ArmorBar" type="TextureProgressBar" parent="Control/Control" unique_id=967356414]
+unique_name_in_owner = true
 layout_mode = 0
-offset_right = 211.0
-offset_bottom = 211.0
-offset_transform_enabled = true
-offset_transform_position = Vector2(-11.165, 14.155)
-offset_transform_scale = Vector2(0.65, 0.65)
-value = 93.0
+offset_left = 31.060608
+offset_top = 43.939392
+offset_right = 242.06061
+offset_bottom = 254.93939
+scale = Vector2(0.44, 0.44)
+step = 0.5
 fill_mode = 4
 texture_under = ExtResource("5_ksybn")
 texture_progress = SubResource("CompressedTexture2D_j7jkr")
 tint_under = Color(0.039215688, 0.20784314, 0.3647059, 1)
 tint_progress = Color(0, 0.8392157, 0.9843137, 1)
 
-[node name="Control" type="Control" parent="Control/BarContainer/Control" unique_id=1956050568]
+[node name="Control" type="Control" parent="Control/Control" unique_id=1956050568]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = -7.5757446
+offset_right = -7.5757446
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HP" type="Label" parent="Control/BarContainer/Control/Control" unique_id=1664001065]
+[node name="lbl_HP" type="Label" parent="Control/Control/Control" unique_id=1664001065]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -56.016823
-offset_top = -31.755457
-offset_right = 1.9831772
-offset_bottom = 10.244543
+offset_left = -21.656822
+offset_top = -24.854721
+offset_right = 24.555294
+offset_bottom = 7.145279
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.6156863, 1, 0, 1)
@@ -180,17 +170,18 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="Armor" type="Label" parent="Control/BarContainer/Control/Control" unique_id=675428485]
+[node name="lbl_Armor" type="Label" parent="Control/Control/Control" unique_id=675428485]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -27.228945
-offset_top = 14.456661
-offset_right = 30.771053
-offset_bottom = 56.456665
+offset_left = -22.414398
+offset_top = 6.2059
+offset_right = 24.489391
+offset_bottom = 38.205902
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.6156863, 1, 0, 1)
@@ -202,29 +193,11 @@ theme_override_constants/outline_size = 4
 theme_override_constants/shadow_outline_size = 5
 theme_override_fonts/font = ExtResource("6_a3ewi")
 theme_override_font_sizes/font_size = 32
-text = "100"
+text = "999"
 label_settings = SubResource("LabelSettings_ksybn")
 horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
-
-[node name="ArmorBar" type="ProgressBar" parent="Control/BarContainer" unique_id=1626262654]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme = SubResource("Theme_o08ba")
-theme_override_styles/background = SubResource("StyleBoxFlat_vx3u4")
-theme_override_styles/fill = SubResource("StyleBoxFlat_6bors")
-value = 80.0
-
-[node name="HealthBar" type="ProgressBar" parent="Control/BarContainer" unique_id=1716491587]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_styles/background = SubResource("StyleBoxFlat_7emvt")
-theme_override_styles/fill = SubResource("StyleBoxFlat_halmm")
-value = 70.0
 
 [node name="AmmoContainer" type="PanelContainer" parent="." unique_id=386732142]
 visible = false
