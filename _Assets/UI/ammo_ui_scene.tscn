@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://c60g3sobumipj"]
 
+[ext_resource type="Script" uid="uid://dju62k6l3rb6u" path="res://_Assets/UI/scripts/ammo_ui.gd" id="1_bpb05"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs3gw"]
 bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
 border_width_left = 1
@@ -31,6 +33,7 @@ offset_right = 20.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_bpb05")
 
 [node name="AmmoContainer" type="PanelContainer" parent="." unique_id=792378142]
 layout_mode = 1

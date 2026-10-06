@@ -11,6 +11,16 @@ var reload_tween: Tween
 func _ready() -> void:
 	EventBus.weapon_ammo_changed.connect(set_ammo_values)
 	EventBus.weapon_chamber_status.connect(set_chamber_visual)
+	# check if the variables are loaded correctly
+	if not reload_timer_bar:
+		push_error("reload_timer_bar is not assigned in AmmoUI")
+	if not chamber_indicator:
+		push_error("chamber_indicator is not assigned in AmmoUI")
+	if not current_ammo_label:
+		push_error("current_ammo_label is not assigned in AmmoUI")
+	if not reserved_ammo_label:
+		push_error("reserved_ammo_label is not assigned in AmmoUI")
+	
 
 
 
