@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://chbn144y1yp60" path="res://Art/3D/Blender/mk57.glb" id="1_uo56h"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="1_w2u2j"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="3_uo56h"]
+[ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="4_rjpr8"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
 angle_min = -179.99998
@@ -120,6 +121,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009498219, 0.29897547, 0.03
 [node name="Slider" parent="mk57/Armature/Skeleton3D/Slider_2" index="0" unique_id=2126121848]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009498219, -0.037297428, -0.24386115)
 
+[node name="AmmoCounterPosition" type="Node3D" parent="mk57/Armature/Skeleton3D/Body_2" parent_id_path=PackedInt32Array(1019266233, 1096691924) index="0" unique_id=1112189428]
+transform = Transform3D(1, 0, 0, 0, 0.94026315, 0.34044862, 0, -0.34044862, 0.94026315, -0.18555221, 0.064519, 0.0063592717)
+
+[node name="GUI" parent="mk57/Armature/Skeleton3D/Body_2/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_rjpr8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03467934, 0.12306018, 0)
+
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17425191, -0.6091657)
 script = ExtResource("1_w2u2j")
@@ -169,8 +176,5 @@ parameters/ReloadBlend/blend_amount = 0.0
 
 [node name="Magazine" type="Node3D" parent="." unique_id=2029134148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
-
-[node name="AmmoCounterPosition" type="Node3D" parent="." unique_id=1112189428]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17605399, 0.022764817, 0.04992429)
 
 [editable path="mk57"]

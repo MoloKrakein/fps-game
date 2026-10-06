@@ -2,6 +2,10 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs3gw"]
 bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_bpb05"]
 content_margin_left = 0.0
@@ -46,11 +50,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_rs3gw")
 [node name="ChamberIndicator" type="ColorRect" parent="AmmoContainer" unique_id=802200020]
 unique_name_in_owner = true
 layout_mode = 2
-color = Color(1, 0, 0.16470589, 0.23921569)
+color = Color(0.9599507, 0, 0.15825218, 0.69803923)
 
 [node name="AmmoBar" type="ProgressBar" parent="AmmoContainer" unique_id=1669679856]
 unique_name_in_owner = true
 layout_mode = 2
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, -3.375)
 theme_override_styles/background = SubResource("StyleBoxLine_bpb05")
 theme_override_styles/fill = SubResource("StyleBoxLine_sxrdf")
 value = 100.0

@@ -12,7 +12,6 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 @export var shoot_position_offset: Vector3 = Vector3.ZERO
 @export	var camera: CamEffects
 @export var cam_rig: CameraController
-@export var ammo_counter_ui: MeshInstance3D
 # @export var ammo_counter_ui_offset: Vector3 = Vector3(0, 0, 0.5)
 
 @export_group("Weapon Animations Settings")
@@ -524,7 +523,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 
 		var muzzle: Node3D = current_weapon_model.get_node_or_null("Muzzle") as Node3D
 		var ejection_port:Node3D = current_weapon_model.get_node_or_null("EjectionPort") as Node3D
-		var ammo_counter_position: Node3D = current_weapon_model.get_node_or_null("AmmoCounterPosition") as Node3D
+
 		if muzzle != null:
 			shoot_position = muzzle
 			var found := current_weapon_model.find_children("*", "MuzzleFlash",true,false)
@@ -544,16 +543,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 
 			# player.ammo_counter_ui.position = current_weapon_model.position
 		# if there is a ammo counter, set the mesh instance as child of the weapon model and set its position to the ammo counter position
-		if ammo_counter_position != null:
-			if ammo_counter_ui != null:
-				ammo_counter_ui.get_parent().remove_child(ammo_counter_ui)
-				ammo_counter_position.add_child(ammo_counter_ui)
-				ammo_counter_ui.position = Vector3.ZERO
-				# print("Ammo counter UI attached to weapon model.")
-			else:
-				print("Ammo counter UI not assigned in WeaponController.")
-		else:
-			print("AmmoCounterPosition node not found in the weapon model.")
+
 
 func get_weapon_position() -> Vector3:
 	if current_weapon_model != null:

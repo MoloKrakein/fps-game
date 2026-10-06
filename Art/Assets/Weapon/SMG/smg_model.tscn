@@ -4,6 +4,7 @@
 [ext_resource type="Material" uid="uid://bttkkl63jo7ha" path="res://_Assets/VFX/Muzzle_flash.tres" id="2_mf45t"]
 [ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_vslle"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="5_c8wk2"]
+[ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="5_mtaa1"]
 [ext_resource type="PackedScene" uid="uid://sjbhyef1d7rb" path="res://Art/3D/Blender/m15.glb" id="6_3vu8r"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vslle"]
@@ -266,7 +267,9 @@ process_material = SubResource("ParticleProcessMaterial_sn0t7")
 draw_pass_1 = SubResource("QuadMesh_bhunq")
 
 [node name="AmmoCounterPosition" type="Node3D" parent="EjectionPort" unique_id=1728137422]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3832011, -0.68148375, 0.04992429)
+transform = Transform3D(4.429559, 0, 0.06240923, 0, 4.429999, 0, -0.06240923, 0, 4.429559, -0.9164386, -0.112252355, 0.04992429)
+
+[node name="GUI" parent="EjectionPort/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("5_mtaa1")]
 
 [node name="WeaponAnimation" type="Node" parent="." unique_id=1878486645 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
 script = ExtResource("5_c8wk2")
