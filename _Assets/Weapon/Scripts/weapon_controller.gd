@@ -76,6 +76,9 @@ var fire_timer: float = 0.0
 var is_loaded: bool = false
 var is_reloading: bool = false
 var is_aiming: bool = false
+const RELOAD_DOUBLE_TAP_WINDOW: float = 0.28
+var _reload_tap_timer: float = 0.0
+var _reload_tap_pending: bool = false
 
 # Animation and Procedural Weapon Animation Variables
 
@@ -198,11 +201,19 @@ func _resolve_initial_fire_mode_for_weapon_data() -> Weapon.WeaponFireMode:
 func _process(delta: float) -> void:
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)
+	if _reload_tap_pending:
+		_reload_tap_timer -= delta
+		if _reload_tap_timer <= 0.0:
+			_reload_tap_pending = false
+			if weapon_state_chart != null and not is_reloading:
+				weapon_state_chart.send_event("onReload")
 	_apply_offsets(delta)
 	if Input.is_action_just_pressed("combat_switch_fire_mode"):
 		toggle_fire_mode()
 	if Input.is_action_just_pressed("combat_rack_gun"):
 		rack_slide() 
+	if Input.is_action_just_pressed("combat_reload") and not is_reloading:
+		request_reload()
 
 
 	
@@ -385,6 +396,14 @@ func rack_slide() -> void:
 		return
 	# if not active_weapon_data.ammo_in_magazine > 0 and not active_weapon_data.is_loaded:
 	# 	return
+	if not active_weapon_data.is_loaded:
+		if active_weapon_data.ammo_in_magazine > 0:
+			active_weapon_data.is_loaded = true
+			if weapon_animation_player != null:
+				weapon_animation_player.play_animation("Rack")
+			update_weapon_ui()
+		return
+
 	if active_weapon_data.is_loaded:
 		_ejecting_bullet_case("alive")
 	
@@ -392,6 +411,30 @@ func rack_slide() -> void:
 	if weapon_animation_player != null and active_weapon_data.is_loaded:
 		weapon_animation_player.play_animation("Rack")
 	_cycle_weapon()
+
+func request_reload() -> void:
+	if _reload_tap_pending:
+		_reload_tap_pending = false
+		_reload_tap_timer = 0.0
+		dump_magazine_and_reload()
+		return
+
+	_reload_tap_pending = true
+	_reload_tap_timer = RELOAD_DOUBLE_TAP_WINDOW
+
+func dump_magazine_and_reload() -> void:
+	if current_weapon == null or active_weapon_data == null:
+		return
+	if not can_reload():
+		return
+
+	var chamber_was_loaded: bool = active_weapon_data.is_loaded
+	active_weapon_data.ammo_in_magazine = 0
+	# Dumping the magazine does not eject a round already in the chamber.
+	active_weapon_data.is_loaded = chamber_was_loaded
+	update_weapon_ui()
+	if weapon_state_chart != null:
+		weapon_state_chart.send_event("onReload")
 
 func execute_reload() -> void:
 	if not can_reload():
@@ -448,9 +491,11 @@ func reload_single_round() -> void:
 	if active_weapon_data.ammo_in_magazine >= current_weapon.mags_ammo:
 		return
 
+	var was_empty: bool = not active_weapon_data.is_loaded
 	active_weapon_data.ammo_in_magazine += 1
 	active_weapon_data.reserve_ammo -= 1
-	active_weapon_data.is_loaded = true
+	if not was_empty:
+		active_weapon_data.is_loaded = true
 
 	# if current_weapon.is_open_bolt:
 	# 	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
@@ -474,17 +519,20 @@ func reload_magazine() -> void:
 		
 	var needed: int = mag_capacity - active_weapon_data.ammo_in_magazine
 	var transfer: int = min(needed, active_weapon_data.reserve_ammo)
+	var was_empty: bool = not active_weapon_data.is_loaded
 
 	if current_weapon.is_open_bolt:
 		active_weapon_data.ammo_in_magazine += transfer
 		active_weapon_data.reserve_ammo -= transfer
-		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+		if not was_empty:
+			active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
 		update_weapon_ui()
 		return
 
 	active_weapon_data.ammo_in_magazine += transfer
 	active_weapon_data.reserve_ammo -= transfer
-	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+	if not was_empty:
+		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
 
 	# if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
 	# 	_cycle_weapon()
