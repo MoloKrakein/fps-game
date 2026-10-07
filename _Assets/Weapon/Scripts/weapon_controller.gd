@@ -367,11 +367,9 @@ func _cycle_weapon() -> void:
 	# 	update_weapon_ui()
 	# 	return
 
-	active_weapon_data.is_loaded = false
-
 	if active_weapon_data.ammo_in_magazine > 0:
 		active_weapon_data.ammo_in_magazine -= 1
-		active_weapon_data.is_loaded = true
+	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
 		
 	if weapon_animation_player != null:
 		if active_weapon_data.is_loaded:
@@ -452,6 +450,7 @@ func reload_single_round() -> void:
 
 	active_weapon_data.ammo_in_magazine += 1
 	active_weapon_data.reserve_ammo -= 1
+	active_weapon_data.is_loaded = true
 
 	# if current_weapon.is_open_bolt:
 	# 	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
@@ -485,6 +484,7 @@ func reload_magazine() -> void:
 
 	active_weapon_data.ammo_in_magazine += transfer
 	active_weapon_data.reserve_ammo -= transfer
+	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
 
 	# if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine > 0:
 	# 	_cycle_weapon()
@@ -551,7 +551,7 @@ func get_weapon_position() -> Vector3:
 	return Vector3.ZERO
 
 func switch_weapon(weapon_data: WeaponData) -> void:
-	if is_reloading:
+	if is_reloading or weapon_data == null or weapon_data.weapon == null:
 		return
 	# check if the weapon data have equip animation, if so, play it and wait for it to finish before switching the weapon
 	
@@ -562,6 +562,12 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	_sync_cached_state_from_active_data()
 	_set_and_persist_fire_mode(_resolve_initial_fire_mode_for_weapon_data())
 	reset_trigger()
+	fire_timer = 0.0
+
+	# An empty weapon leaves the trigger chart in EmptyState. Weapon swapping
+	# must re-arm the chart for the newly selected weapon.
+	if weapon_state_chart != null:
+		weapon_state_chart.send_event("onIdle")
 
 	
 	if current_weapon_model:

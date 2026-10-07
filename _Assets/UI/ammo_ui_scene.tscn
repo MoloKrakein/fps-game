@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c60g3sobumipj"]
 
 [ext_resource type="Script" uid="uid://dju62k6l3rb6u" path="res://_Assets/UI/scripts/ammo_ui.gd" id="1_bpb05"]
+[ext_resource type="FontFile" uid="uid://n4l4ux5ylwuv" path="res://Art/UI/fonts/ibm plex mono/IBMPlexMono-Regular.ttf" id="2_sxrdf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs3gw"]
 bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
@@ -19,6 +20,10 @@ thickness = 3
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_sxrdf"]
 color = Color(0, 0, 1, 1)
 thickness = 3
+
+[sub_resource type="LabelSettings" id="LabelSettings_ugdwl"]
+font = ExtResource("2_sxrdf")
+font_size = 25
 
 [node name="Control" type="Control" unique_id=1625207807]
 layout_mode = 3
@@ -74,12 +79,21 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 text = "000"
+label_settings = SubResource("LabelSettings_ugdwl")
+horizontal_alignment = 1
+uppercase = true
 
 [node name="Separator" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=824232780]
 layout_mode = 2
 text = "/"
+label_settings = SubResource("LabelSettings_ugdwl")
+horizontal_alignment = 1
+uppercase = true
 
 [node name="ReservedAmmoLabel" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=484344857]
 unique_name_in_owner = true
 layout_mode = 2
 text = "9999"
+label_settings = SubResource("LabelSettings_ugdwl")
+horizontal_alignment = 1
+uppercase = true

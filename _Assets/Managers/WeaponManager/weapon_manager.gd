@@ -8,6 +8,7 @@ var current_weap_slot: int = 1
 func _ready() -> void:
 	add_to_group("weapon_manager")
 	Manager.weapon_manager = self
+	_make_weapon_data_instances_unique()
 
 	for i in range(1, 10):
 		var action_name = "equip_weapon_" + str(i)
@@ -19,6 +20,16 @@ func _ready() -> void:
 	# call_deferred("initialize_starting_weapon",1)
 
 	player.weapon_controller.initialize_weapon_data(weapons.get(current_weap_slot))
+
+func _make_weapon_data_instances_unique() -> void:
+	for slot: int in weapons:
+		var weapon_data: WeaponData = weapons[slot]
+		if weapon_data == null:
+			continue
+
+		# The weapon definition is immutable shared configuration. Only the
+		# per-slot runtime state needs to be a unique resource instance.
+		weapons[slot] = weapon_data.duplicate(false) as WeaponData
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -40,9 +51,12 @@ func equip_weapon(slot: int) -> void:
 
 
 func use_ammo(slot: int, amount: int = 1) -> void:
-	if slot in weapons:
-		weapons[slot].ammo_in_magazine = max(0,weapons[slot].ammo_in_magazine - amount)
-		weapons[slot].reserve_ammo = max(0,weapons[slot].reserve_ammo - amount)
+	if slot not in weapons or amount <= 0:
+		return
+
+	# Reserve ammo is transferred into the magazine during reload, not when a
+	# shot is fired. Deducting both here makes one shot consume two rounds.
+	weapons[slot].ammo_in_magazine = max(0, weapons[slot].ammo_in_magazine - amount)
 
 
 func get_current_ammo() -> int:

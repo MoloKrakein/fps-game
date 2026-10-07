@@ -10,7 +10,12 @@ resource_local_to_scene = true
 transparency = 1
 blend_mode = 1
 shading_mode = 0
+diffuse_mode = 1
+disable_ambient_light = true
+disable_fog = true
+disable_specular_occlusion = true
 albedo_texture = SubResource("ViewportTexture_ab8om")
+billboard_mode = 1
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_o08ba"]
 size = Vector2(0.275, 0.085)

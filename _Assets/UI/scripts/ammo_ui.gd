@@ -60,6 +60,6 @@ func set_chamber_visual(is_chambered: bool) -> void:
 	
 	# Green if a bullet is ready, Red if empty
 	if is_chambered:
-		chamber_indicator.color = Color("#00ff2a3d")
+		chamber_indicator.color = Color("#00ff2aa1")
 	else:
-		chamber_indicator.color = Color("#ff002a3d")
+		chamber_indicator.color = Color("#ff002bb1")
