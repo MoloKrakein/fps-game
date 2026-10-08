@@ -18,7 +18,7 @@ albedo_texture = SubResource("ViewportTexture_ab8om")
 billboard_mode = 1
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_o08ba"]
-size = Vector2(0.275, 0.085)
+size = Vector2(0.36, 0.185)
 orientation = 2
 
 [node name="GUI" type="Node3D" unique_id=1724784573]
@@ -29,7 +29,7 @@ mesh = SubResource("PlaneMesh_o08ba")
 
 [node name="SubViewport" type="SubViewport" parent="." unique_id=1854354564]
 transparent_bg = true
-size = Vector2i(148, 44)
+size = Vector2i(144, 83)
 
 [node name="Control" parent="SubViewport" unique_id=1625207807 instance=ExtResource("1_gmndq")]
 

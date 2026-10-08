@@ -4,6 +4,7 @@ extends Node
 #region UI 
 signal weapon_ammo_changed(current_ammo: int, reserve_ammo: int)
 signal weapon_chamber_status(is_chambered: bool)
+signal weapon_magazine_changed(current_ammo: int, max_ammo_in_magazine: int)
 
 signal player_health_changed(current_health: float, max_health: float)
 signal player_armor_changed(current_armor: float, max_armor: float)

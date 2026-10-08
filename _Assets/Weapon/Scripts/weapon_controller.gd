@@ -835,6 +835,7 @@ func update_weapon_ui() -> void:
 	if current_weapon != null:
 		EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo)
 		EventBus.weapon_chamber_status.emit(active_weapon_data.is_loaded)
+		EventBus.weapon_magazine_changed.emit(active_weapon_data.ammo_in_magazine, current_weapon.mags_ammo)
 
 func reload_timer_ui(reload_time: float) -> void:
 	if active_weapon_data == null:

@@ -2,19 +2,20 @@
 
 [ext_resource type="Script" uid="uid://dju62k6l3rb6u" path="res://_Assets/UI/scripts/ammo_ui.gd" id="1_bpb05"]
 [ext_resource type="FontFile" uid="uid://n4l4ux5ylwuv" path="res://Art/UI/fonts/ibm plex mono/IBMPlexMono-Regular.ttf" id="2_sxrdf"]
-[ext_resource type="Script" uid="uid://x2trwbmuskh" path="res://addons/segmented_bar/segmented_bar.gd" id="3_bqoje"]
+[ext_resource type="Script" uid="uid://cjmmhbp1b5312" path="res://addons/StyleboxFancy/StyleBorder.gd" id="3_pfs31"]
+[ext_resource type="Script" uid="uid://bkl6g25jwb47h" path="res://addons/StyleboxFancy/StyleBoxFancy.gd" id="4_h5cvy"]
+[ext_resource type="Texture2D" uid="uid://dhs1qqxwqauph" path="res://Art/2D/UI/AmmoCounter.png" id="5_h5cvy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs3gw"]
 bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_bpb05"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_sxrdf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-thickness = 3
-
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_sxrdf"]
 color = Color(0, 0, 1, 1)
 thickness = 3
 
@@ -25,6 +26,41 @@ font_size = 32
 [sub_resource type="LabelSettings" id="LabelSettings_ugdwl"]
 font = ExtResource("2_sxrdf")
 font_size = 15
+
+[sub_resource type="StyleBox" id="StyleBox_o08ba"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("4_h5cvy")
+color = Color(0.65, 0.65, 0.65, 0.6627451)
+texture = ExtResource("5_h5cvy")
+texture_stretch_mode = 3
+texture_repeat = 3
+expand_margin_top = 5.0
+anti_aliasing = false
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_46xey"]
+load_path = "res://.godot/imported/AmmoCounter.png-332cf8df6412fd8349d00ec30d182c9f.ctex"
+
+[sub_resource type="StyleBox" id="StyleBox_xk0pb"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("4_h5cvy")
+color = Color(0.98275393, 0.8562144, 0, 1)
+texture = SubResource("CompressedTexture2D_46xey")
+texture_stretch_mode = 3
+texture_repeat = 3
+expand_margin_top = 5.0
+anti_aliasing = false
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
 
 [node name="Control" type="Control" unique_id=1625207807]
 layout_mode = 3
@@ -61,7 +97,10 @@ unique_name_in_owner = true
 layout_mode = 2
 color = Color(0.9599507, 0, 0.15825218, 0.69803923)
 
-[node name="AmmoBar" type="ProgressBar" parent="AmmoContainer" unique_id=1669679856]
+[node name="VBoxContainer" type="VBoxContainer" parent="AmmoContainer" unique_id=974386237]
+layout_mode = 2
+
+[node name="AmmoBar" type="ProgressBar" parent="AmmoContainer/VBoxContainer" unique_id=1669679856]
 unique_name_in_owner = true
 layout_mode = 2
 offset_transform_enabled = true
@@ -71,9 +110,6 @@ theme_override_styles/fill = SubResource("StyleBoxLine_sxrdf")
 value = 100.0
 rounded = true
 show_percentage = false
-
-[node name="VBoxContainer" type="VBoxContainer" parent="AmmoContainer" unique_id=974386237]
-layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="AmmoContainer/VBoxContainer" unique_id=50078941]
 layout_mode = 2
@@ -111,17 +147,12 @@ horizontal_alignment = 1
 vertical_alignment = 2
 uppercase = true
 
-[node name="AmmoBar" type="HBoxContainer" parent="AmmoContainer/VBoxContainer" unique_id=1810533352]
+[node name="Bulletbar" type="ProgressBar" parent="AmmoContainer/VBoxContainer" unique_id=472705408]
+unique_name_in_owner = true
 layout_mode = 2
-alignment = 1
-
-[node name="SegmentedBar" type="HBoxContainer" parent="AmmoContainer/VBoxContainer/AmmoBar" unique_id=1500402795]
-layout_mode = 2
-theme_override_constants/separation = 1
-alignment = 1
-script = ExtResource("3_bqoje")
-foreground_color = Color(0.1833334, 0, 1, 1)
-max_value = 30.0
-value = 30.0
-total_segments = 30
-metadata/_custom_type_script = "uid://x2trwbmuskh"
+theme_override_styles/background = SubResource("StyleBox_o08ba")
+theme_override_styles/fill = SubResource("StyleBox_xk0pb")
+step = 1.0
+value = 14.0
+rounded = true
+show_percentage = false

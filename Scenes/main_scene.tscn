@@ -9,16 +9,8 @@
 [ext_resource type="Resource" uid="uid://b7asglgx28t27" path="res://Resources/Weapons/pistol_data.tres" id="4_mai8y"]
 [ext_resource type="Resource" uid="uid://b4wuvyceoofh6" path="res://Resources/Weapons/sg_data.tres" id="5_76v2p"]
 [ext_resource type="Resource" uid="uid://c7li8s4pv7rdi" path="res://Resources/Weapons/smg_data.tres" id="6_m1efj"]
-[ext_resource type="Resource" uid="uid://bulqjfu7p4m6d" path="res://Resources/Weapons/autoSniper_data.tres" id="7_76v2p"]
+[ext_resource type="Resource" uid="uid://b15yby6glemy0" path="res://Resources/Weapons/AutoSg_data.tres" id="7_76v2p"]
 [ext_resource type="PackedScene" uid="uid://br62nk21xm7fu" path="res://Scenes/post_processing/post_processing_layer.tscn" id="10_76v2p"]
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_76v2p"]
-viewport_path = NodePath("SubViewport")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_drdnd"]
-resource_local_to_scene = true
-shading_mode = 0
-albedo_texture = SubResource("ViewportTexture_76v2p")
 
 [node name="MainScene" type="Node" unique_id=1881302021]
 
@@ -49,9 +41,6 @@ default_speed = 6.0
 [node name="HealthComponent" parent="CurrentLevel/PlayerController" index="0" unique_id=1115016750]
 start_with_armor = true
 
-[node name="MeshInstance3D" parent="CurrentLevel/PlayerController/CameraController/Cam/GUI" parent_id_path=PackedInt32Array(1796224466, 1724784573) index="0" unique_id=1036909162]
-material_override = SubResource("StandardMaterial3D_drdnd")
-
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]
 
 [node name="PostProcessingLayer" parent="." unique_id=1547687983 instance=ExtResource("10_76v2p")]
@@ -75,7 +64,5 @@ render_target_update_mode = 4
 layer = 100
 
 [editable path="CurrentLevel/PlayerController"]
-[editable path="CurrentLevel/PlayerController/CameraController/Cam/GUI"]
-[editable path="CurrentLevel/PlayerController/CameraController/Cam/GUI/SubViewport/Control"]
 [editable path="PostProcessingLayer"]
 [editable path="SubViewportContainer/SubViewport/UserInterface"]

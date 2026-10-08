@@ -129,7 +129,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009498219, -0.037297428, -
 transform = Transform3D(1, 0, 0, 0, 0.94026315, 0.34044862, 0, -0.34044862, 0.94026315, -0.15255034, 0.040331915, -0.045243844)
 
 [node name="GUI" parent="mk57/Armature/Skeleton3D/Body_2/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_rjpr8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03467934, 0.12306018, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.087416366, 0.12306018, -1.8626451e-09)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17425191, -0.6091657)

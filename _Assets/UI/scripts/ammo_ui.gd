@@ -4,13 +4,14 @@ class_name AmmoUI extends Node
 @onready var chamber_indicator: ColorRect = %ChamberIndicator
 @onready var current_ammo_label: Label = %CurrentAmmoLabel
 @onready var reserved_ammo_label: Label = %ReservedAmmoLabel
-
+@onready var bullet_bar: ProgressBar = %Bulletbar
 
 var reload_tween: Tween
 
 func _ready() -> void:
 	EventBus.weapon_ammo_changed.connect(set_ammo_values)
 	EventBus.weapon_chamber_status.connect(set_chamber_visual)
+	EventBus.weapon_magazine_changed.connect(set_bullet_bar_values)
 	# check if the variables are loaded correctly
 	if not reload_timer_bar:
 		push_error("reload_timer_bar is not assigned in AmmoUI")
@@ -20,6 +21,9 @@ func _ready() -> void:
 		push_error("current_ammo_label is not assigned in AmmoUI")
 	if not reserved_ammo_label:
 		push_error("reserved_ammo_label is not assigned in AmmoUI")
+	if not bullet_bar:
+		push_error("bullet_bar is not assigned in AmmoUI")
+
 	
 
 
@@ -29,10 +33,14 @@ func set_ammo_values(current_ammo: int = 0, reserved_ammo: int = 0, reload_time:
 		current_ammo_label.text = str(current_ammo)
 	if reserved_ammo_label:
 		reserved_ammo_label.text = str(reserved_ammo)
-
 	if reload_timer_bar and reload_time > 0.0:
 		set_reload_timer_value(reload_time)
 
+
+func set_bullet_bar_values(current_ammo: int, max_ammo_in_magazine: int) -> void:
+	if bullet_bar:
+		bullet_bar.value = current_ammo
+		bullet_bar.max_value = max_ammo_in_magazine
 		
 func set_reload_timer_value(reload_time: float) -> void:
 	if not reload_timer_bar: return
