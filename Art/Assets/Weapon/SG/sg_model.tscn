@@ -32,7 +32,7 @@ mesh = SubResource("BoxMesh_vx3u4")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.0017185211)
 
 [node name="GUI" parent="Sketchfab_Scene" unique_id=1724784573 instance=ExtResource("3_1la4x")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24569252, 0.13840574, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3398397, 0.13840574, 0)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16608262, -1.2153258)

@@ -2,12 +2,25 @@
 
 [ext_resource type="Script" uid="uid://b3sbgd030kjar" path="res://_Assets/Env/props/base_grab_prop.gd" id="1_5kobu"]
 [ext_resource type="PackedScene" uid="uid://23ylmquanwnl" path="res://Art/3D/Blender/prop/UnbreakableDiamond.gltf" id="2_sheyb"]
+[ext_resource type="Texture2D" uid="uid://c4yrq1kttalwb" path="res://Art/3D/Diamond_texture.png" id="3_sheyb"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_5yekf"]
 rough = true
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5kobu"]
 points = PackedVector3Array(-0.25, -1.2233853e-05, -0.25, -0.12504894, -0.125, -0.12504894, -0.25, -1.2233853e-05, 0.25, -4.8935413e-05, 0.5, -4.8935413e-05, 0.25, -1.2233853e-05, -0.25, -0.12504894, -0.125, 0.124951065, 0.124951065, -0.125, -0.12504894, 0.25, -1.2233853e-05, 0.25, 0.124951065, -0.125, 0.124951065)
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_vx3u4"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_0cluu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o08ba"]
+albedo_texture = ExtResource("3_sheyb")
+metallic = 1.0
+metallic_specular = 1.0
+metallic_texture = SubResource("NoiseTexture2D_vx3u4")
+roughness_texture = SubResource("NoiseTexture2D_0cluu")
+emission = Color(0.5801738, 0.5801738, 0.5801738, 1)
 
 [node name="DiamondUnbreakable" type="RigidBody3D" unique_id=1412987810]
 collision_layer = 8
@@ -22,3 +35,8 @@ transform = Transform3D(-1, 1.2246469e-16, 0, -1.2246469e-16, -1, 0, 0, 0, 1, 0,
 shape = SubResource("ConvexPolygonShape3D_5kobu")
 
 [node name="blockbench_export" parent="." unique_id=1888715914 instance=ExtResource("2_sheyb")]
+
+[node name="pyramid" parent="blockbench_export" index="0" unique_id=378765503]
+surface_material_override/0 = SubResource("StandardMaterial3D_o08ba")
+
+[editable path="blockbench_export"]

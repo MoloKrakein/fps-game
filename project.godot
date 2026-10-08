@@ -54,6 +54,10 @@ model_point_class_save_path="trenchbroom/models"
 player=""
 level_geometry="for level navmesh"
 
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
+
 [input]
 
 move_forward={
