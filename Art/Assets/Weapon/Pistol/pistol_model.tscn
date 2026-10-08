@@ -126,7 +126,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009498219, 0.29897547, 0.03
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009498219, -0.037297428, -0.24386115)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="mk57/Armature/Skeleton3D/Body_2" parent_id_path=PackedInt32Array(1019266233, 1096691924) index="0" unique_id=1112189428]
-transform = Transform3D(1, 0, 0, 0, 0.94026315, 0.34044862, 0, -0.34044862, 0.94026315, 0.025778208, 0.040331915, 0.19931374)
+transform = Transform3D(1, 0, 0, 0, 0.94026315, 0.34044862, 0, -0.34044862, 0.94026315, -0.15255034, 0.040331915, -0.045243844)
 
 [node name="GUI" parent="mk57/Armature/Skeleton3D/Body_2/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_rjpr8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03467934, 0.12306018, 0)

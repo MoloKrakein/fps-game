@@ -2,13 +2,10 @@
 
 [ext_resource type="Script" uid="uid://dju62k6l3rb6u" path="res://_Assets/UI/scripts/ammo_ui.gd" id="1_bpb05"]
 [ext_resource type="FontFile" uid="uid://n4l4ux5ylwuv" path="res://Art/UI/fonts/ibm plex mono/IBMPlexMono-Regular.ttf" id="2_sxrdf"]
+[ext_resource type="Script" uid="uid://x2trwbmuskh" path="res://addons/segmented_bar/segmented_bar.gd" id="3_bqoje"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rs3gw"]
 bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 2
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_bpb05"]
 content_margin_left = 0.0
@@ -21,9 +18,13 @@ thickness = 3
 color = Color(0, 0, 1, 1)
 thickness = 3
 
+[sub_resource type="LabelSettings" id="LabelSettings_sxrdf"]
+font = ExtResource("2_sxrdf")
+font_size = 32
+
 [sub_resource type="LabelSettings" id="LabelSettings_ugdwl"]
 font = ExtResource("2_sxrdf")
-font_size = 25
+font_size = 15
 
 [node name="Control" type="Control" unique_id=1625207807]
 layout_mode = 3
@@ -71,29 +72,56 @@ value = 100.0
 rounded = true
 show_percentage = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="AmmoContainer" unique_id=50078941]
+[node name="VBoxContainer" type="VBoxContainer" parent="AmmoContainer" unique_id=974386237]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="AmmoContainer/VBoxContainer" unique_id=50078941]
 layout_mode = 2
 alignment = 1
 
-[node name="CurrentAmmoLabel" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=301953762]
+[node name="CurrentAmmoLabel" type="Label" parent="AmmoContainer/VBoxContainer/HBoxContainer" unique_id=301953762]
 unique_name_in_owner = true
 layout_mode = 2
 text = "000"
-label_settings = SubResource("LabelSettings_ugdwl")
+label_settings = SubResource("LabelSettings_sxrdf")
 horizontal_alignment = 1
 uppercase = true
 
-[node name="Separator" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=824232780]
+[node name="VBoxContainer" type="VBoxContainer" parent="AmmoContainer/VBoxContainer/HBoxContainer" unique_id=2033435922]
+layout_mode = 2
+alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="AmmoContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1871513958]
+layout_mode = 2
+
+[node name="Seperator" type="Label" parent="AmmoContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=238352716]
 layout_mode = 2
 text = "/"
 label_settings = SubResource("LabelSettings_ugdwl")
 horizontal_alignment = 1
+vertical_alignment = 2
 uppercase = true
 
-[node name="ReservedAmmoLabel" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=484344857]
+[node name="ReservedAmmoLabel" type="Label" parent="AmmoContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=484344857]
 unique_name_in_owner = true
 layout_mode = 2
-text = "9999"
+text = "99999"
 label_settings = SubResource("LabelSettings_ugdwl")
 horizontal_alignment = 1
+vertical_alignment = 2
 uppercase = true
+
+[node name="AmmoBar" type="HBoxContainer" parent="AmmoContainer/VBoxContainer" unique_id=1810533352]
+layout_mode = 2
+alignment = 1
+
+[node name="SegmentedBar" type="HBoxContainer" parent="AmmoContainer/VBoxContainer/AmmoBar" unique_id=1500402795]
+layout_mode = 2
+theme_override_constants/separation = 1
+alignment = 1
+script = ExtResource("3_bqoje")
+foreground_color = Color(0.1833334, 0, 1, 1)
+max_value = 30.0
+value = 30.0
+total_segments = 30
+metadata/_custom_type_script = "uid://x2trwbmuskh"
