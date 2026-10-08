@@ -32,4 +32,4 @@ func _on_reload_state_state_entered() -> void:
 	
 	# Finish this reload state entry; additional shells require another reload input.
 	weapon_controller.weapon_state_chart.send_event("onReloadFinish")
-	weapon_controller.is_reloading = false
+	weapon_controller.finish_reload_step()

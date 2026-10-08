@@ -79,6 +79,7 @@ var is_aiming: bool = false
 const RELOAD_DOUBLE_TAP_WINDOW: float = 0.28
 var _reload_tap_timer: float = 0.0
 var _reload_tap_pending: bool = false
+var _queued_shell_reloads: int = 0
 
 # Animation and Procedural Weapon Animation Variables
 
@@ -413,6 +414,15 @@ func rack_slide() -> void:
 	_cycle_weapon()
 
 func request_reload() -> void:
+	if current_weapon != null and current_weapon.is_reload_per_bullet:
+		_reload_tap_pending = false
+		_reload_tap_timer = 0.0
+		if is_reloading:
+			_queued_shell_reloads += 1
+		elif weapon_state_chart != null:
+			weapon_state_chart.send_event("onReload")
+		return
+
 	if _reload_tap_pending:
 		_reload_tap_pending = false
 		_reload_tap_timer = 0.0
@@ -435,6 +445,13 @@ func dump_magazine_and_reload() -> void:
 	update_weapon_ui()
 	if weapon_state_chart != null:
 		weapon_state_chart.send_event("onReload")
+
+func finish_reload_step() -> void:
+	is_reloading = false
+	if _queued_shell_reloads > 0 and can_reload():
+		_queued_shell_reloads -= 1
+		if weapon_state_chart != null:
+			weapon_state_chart.send_event("onReload")
 
 func execute_reload() -> void:
 	if not can_reload():
