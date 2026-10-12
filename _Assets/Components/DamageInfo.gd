@@ -20,11 +20,10 @@ var impact_position: Vector3 = Vector3.ZERO
 var is_headshot: bool = false
 # Whether the damage was a critical hit. This can be used to apply additional effects or multipliers for critical damage.
 var is_critical: bool = false
-
-
-# specific flags for damage application, these can be used to bypass certain mechanics or apply special effects. For example, bypassing armor or dodge mechanics.
+# Whether the damage bypasses armor.
 var bypass_armor: bool = false
-var bypass_dodge: bool = false
+# Whether the damage bypasses evasion.
+var bypass_evasion: bool = false
 
 func _init(p_damage: float = 0.0, p_attacker: Node = null, p_type: String = "bullet") -> void:
 	raw_damage = p_damage

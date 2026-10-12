@@ -6,6 +6,7 @@ signal damage_taken(damage_amount: float)
 signal armor_changed(new_armor: float, max_armor: float)
 signal on_armor_broken()
 signal died()
+signal attack_dodged()
 
 
 @export var max_health: float = 100.0
@@ -18,10 +19,59 @@ var current_health:float
 var current_armor: float = 0.0
 var is_alive: bool = true
 
+@onready var player_stats_component: PlayerStats = get_parent().get_node("PlayerStats") as PlayerStats
+
+
+func take_damage_with_info(info: DamageInfo) -> void:
+    if not is_alive:
+        return
+    var final_damage: float = info.raw_damage
+
+    # player stats component can modify the damage based on player's stats
+    if player_stats_component:
+        if not info.bypass_evasion:
+            var evasion = player_stats_component.get_stats("evasion_chance", 0.0)
+            if evasion > 0.0 and randf() < evasion:
+                attack_dodged.emit()
+                print(get_parent().name, " dodged the attack!")
+                return # negate the damage if evasion is successful
+
+        var mitigation_percentage = player_stats_component.get_stats("damage_reduction", 0.0)
+        var flat_armor_reduction = player_stats_component.get_stats("flat_armor_reduction", 0.0)
+        final_damage *= (1.0 - mitigation_percentage)
+        final_damage = max(final_damage - flat_armor_reduction,0.0)
+
+    var effective_absorption: float = maxf(0.0, armor_absorption - info.armor_penetration)
+
+    if current_armor > 0.0 and not info.bypass_armor:
+        var armor_damage: float = final_damage * effective_absorption
+        var health_damage: float = final_damage * (1.0 - effective_absorption)
+
+        if current_armor >= armor_damage:
+            current_armor -= armor_damage
+            current_health -= health_damage
+        else:
+            var remaining_damage: float = armor_damage - current_armor
+            armor_damage = current_armor
+            health_damage += remaining_damage
+            
+            current_armor = 0.0
+            on_armor_broken.emit()
+            print(get_parent().name, " armor broken!")
+    else:
+        current_health -= final_damage
+
+    damage_taken.emit(final_damage)
+    health_changed.emit(current_health, max_health)
+
+    if current_health <= 0.0:
+        _handle_death()
+
 
 func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, armor_penetration: float = 0.0) -> void:
     if not is_alive:
         return
+        
     if current_armor > 0.0:
         var effective_absorption: float = maxf(0.0, armor_absorption - armor_penetration)
         var armor_damage: float = damage_amount * effective_absorption
