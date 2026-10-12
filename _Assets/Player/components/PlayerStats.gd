@@ -21,7 +21,7 @@ var stats: Dictionary = {
 var active_flags: Dictionary = {} # Array to hold active behavioral flags for the player, can be used to enable or disable certain abilities or mechanics example: ["double_jump", "reload_while_moving"]
 
 # Helper function to apply stat changes from a skill resource to the player's stats. This function takes a SkillResource object and applies its stat changes based on the skill's tier (BASIC or ADVANCED).
-func get_stats(stats_name: String, default_value: float = 1.0) -> float:
+func get_stat(stats_name: String, default_value: float = 1.0) -> float:
     return stats.get(stats_name, default_value)
 
 func set_stats(stats_name: String, value: float) -> void:
@@ -36,11 +36,11 @@ func set_flag(flag_name: String, value: bool) -> void:
 
 # common function to apply stat changes from a skill resource to the player's stats. This function takes a SkillResource object and applies its stat changes based on the skill's tier (BASIC or ADVANCED).
 func modify_damage(base_damage: float) -> float:
-    var damage_modifier = get_stats("damage_modifier", 1.0)
+    var damage_modifier = get_stat("damage_modifier", 1.0)
     return base_damage * damage_modifier
 
 func modify_recoil(base_recoil: float) -> float:
-    var recoil_stability = get_stats("recoil_stability", 1.0)
+    var recoil_stability = get_stat("recoil_stability", 1.0)
     return base_recoil * recoil_stability
 
 

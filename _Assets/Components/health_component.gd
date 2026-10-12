@@ -19,7 +19,7 @@ var current_health:float
 var current_armor: float = 0.0
 var is_alive: bool = true
 
-@onready var player_stats_component: PlayerStats = get_parent().get_node("PlayerStats") as PlayerStats
+@onready var player_stats_component: PlayerStats = get_parent().get_node_or_null("PlayerStats")
 
 
 func take_damage_with_info(info: DamageInfo) -> void:
@@ -71,7 +71,7 @@ func take_damage_with_info(info: DamageInfo) -> void:
 func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, armor_penetration: float = 0.0) -> void:
     if not is_alive:
         return
-        
+
     if current_armor > 0.0:
         var effective_absorption: float = maxf(0.0, armor_absorption - armor_penetration)
         var armor_damage: float = damage_amount * effective_absorption

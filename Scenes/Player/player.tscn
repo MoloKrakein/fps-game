@@ -23,6 +23,7 @@
 [ext_resource type="Script" uid="uid://b481b5psp66d5" path="res://_Assets/Player/States/standing_state.gd" id="15_ks1b7"]
 [ext_resource type="Script" uid="uid://dyukor5w2gr3g" path="res://_Assets/Player/States/airborne_state.gd" id="16_aqm4k"]
 [ext_resource type="Script" uid="uid://6mv42ee0wqh8" path="res://_Assets/Player/States/crouching_state.gd" id="16_hnuln"]
+[ext_resource type="Script" uid="uid://c1845mf4x4i1g" path="res://_Assets/Player/components/PlayerStats.gd" id="17_mwii3"]
 [ext_resource type="Script" uid="uid://guhkdu35mp0" path="res://_Assets/Player/States/sliding_state.gd" id="19_rcvs5"]
 [ext_resource type="Script" uid="uid://wq07swbsgepb" path="res://_Assets/Weapon/Scripts/weapon_state_machine.gd" id="22_2ahak"]
 [ext_resource type="Script" uid="uid://dtkw3g0e1cx7o" path="res://_Assets/Weapon/Scripts/States/weap_idle_state.gd" id="22_ur3l4"]
@@ -68,6 +69,10 @@ fall_damage_multiplier = 0.45
 base_slide_power = 1.0
 max_slide_momentum = 5.0
 metadata/collision_preset_name = &"__custom__"
+
+[node name="PlayerStats" type="Node" parent="." unique_id=1216481220]
+script = ExtResource("17_mwii3")
+metadata/_custom_type_script = "uid://c1845mf4x4i1g"
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1115016750]
 script = ExtResource("2_2jnj1")
@@ -157,7 +162,7 @@ script = ExtResource("23_jincj")
 player = NodePath("../..")
 max_step_height = 0.75
 
-[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position", "casing_position", "camera", "cam_rig", "ammo_counter_ui")]
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position", "casing_position", "camera", "cam_rig")]
 script = ExtResource("24_qr1w5")
 current_weapon = ExtResource("33_1agin")
 weapon_model_parent = NodePath("../../CameraController/Cam")
@@ -166,7 +171,6 @@ shoot_position = NodePath("../../CameraController/Cam/ShootPos")
 casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")
 cam_rig = NodePath("../../CameraController")
-ammo_counter_ui = NodePath("")
 crouch_rot_offset = Vector3(0, 0, 0.262)
 idle_sway_frequency = 0.4
 idle_sway_amplitude = Vector2(0.015, 0.01)

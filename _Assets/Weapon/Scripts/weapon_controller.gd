@@ -68,6 +68,8 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 var active_weapon_data: WeaponData
 
 var player: PlayerController
+var player_stats_component: PlayerStats
+
 var current_weapon_model: Node3D
 var weapon_animation_player: WeaponAnimation
 var current_ammo: int
@@ -169,6 +171,12 @@ func _ready() -> void:
 	# get active weapon data from the WeaponManager
 	
 	player = get_tree().get_first_node_in_group("player") as PlayerController
+	if player != null:
+		player_stats_component = player.get_node_or_null("PlayerStats") as PlayerStats
+
+	if current_weapon != null:
+		# Inject stats into the weapon for damage calculations
+		current_weapon.stats_component = player_stats_component
 	call_deferred("update_weapon_ui")
 
 func _sync_cached_state_from_active_data() -> void:
@@ -628,6 +636,9 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	_set_and_persist_fire_mode(_resolve_initial_fire_mode_for_weapon_data())
 	reset_trigger()
 	fire_timer = 0.0
+	if current_weapon != null:
+		# Inject stats into the weapon for damage calculations
+		current_weapon.stats_component = player_stats_component
 
 	# An empty weapon leaves the trigger chart in EmptyState. Weapon swapping
 	# must re-arm the chart for the newly selected weapon.
@@ -649,7 +660,7 @@ func _apply_damage_to_target(target: Node3D, damage: float) -> void:
 
 	var health_component = target.get_node_or_null("HealthComponent")
 	if health_component and health_component.has_method("take_damage"):
-		health_component.take_damage(current_weapon.damage, owner)
+		health_component.take_damage(damage, owner)
 #endregion
 
 #region Firing Implementations
@@ -668,12 +679,12 @@ func _perform_hitscan_fire() -> void:
 		var acc_x: float = randf_range(-accuracy_spread, accuracy_spread)
 		var acc_y: float = randf_range(-accuracy_spread, accuracy_spread)
 		var direction: Vector3 = (forward + Vector3(acc_x, acc_y, 0)).normalized()
-		var damage: float = current_weapon.damage
+		var damage: float = current_weapon.get_calculated_damage()
 		if current_weapon.pellet_count > 1:
 			var spread_x: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			var spread_y: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			direction += Vector3(spread_x, spread_y, 0) * shoot_position.global_transform.basis
-			damage = (current_weapon.damage / current_weapon.pellet_count) * 10
+			damage = (current_weapon.get_calculated_damage() / current_weapon.pellet_count) * 10
 		
 		var to: Vector3 = from + direction * current_weapon.shoot_range
 		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
@@ -707,13 +718,13 @@ func _perform_projectile_fire() -> void:
 
 		projectile.global_position = shoot_position.global_position + shoot_position_offset
 		var current_forward: Vector3 = forward
-		var damage: float = current_weapon.damage
+		var damage: float = current_weapon.get_calculated_damage()
 		
 		if current_weapon.pellet_count > 1:
 			var spread_x: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			var spread_y: float = randf_range(-current_weapon.spread_angle, current_weapon.spread_angle)
 			current_forward += Vector3(spread_x, spread_y, 0) * shoot_position.global_transform.basis
-			damage = (current_weapon.damage / current_weapon.pellet_count) * 10
+			damage = (current_weapon.get_calculated_damage() / current_weapon.pellet_count) * 10
 		
 		var acc_x: float = randf_range(-accuracy_spread, accuracy_spread)
 		var acc_y: float = randf_range(-accuracy_spread, accuracy_spread)
@@ -1140,3 +1151,4 @@ func _apply_offsets(delta: float) -> void:
 	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot + recoil_rot
 
 #endregion
+

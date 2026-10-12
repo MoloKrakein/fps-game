@@ -105,8 +105,9 @@ enum WeaponAmmoType {
 @export var bullet_case_scale: Vector3 = Vector3(1, 1, 1)
 
 
-const METERS_PER_WORLD_UNIT: float = 1.0
 
+const METERS_PER_WORLD_UNIT: float = 1.0
+var stats_component: PlayerStats
 
 func get_muzzle_velocity_mps() -> float:
 	return maxf(projectile_speed / METERS_PER_WORLD_UNIT, 0.0)
@@ -129,3 +130,32 @@ func get_fire_interval_seconds() -> float:
 	if rpm <= 0.0:
 		return 0.0
 	return 60.0 / rpm
+
+
+# Dynamic Stats getters, these can be used to modify the weapon's attributes based on player stats or other game mechanics.
+
+func get_calculated_damage() -> float:
+	var final_damage:float = damage
+	if stats_component:
+		final_damage *= stats_component.get_stat("damage_modifier", 1.0)
+	return max(final_damage, 0.0)
+
+func get_calculated_recoil() -> float:
+	var final_recoil:float = recoil_cam_pitch
+	if stats_component:
+		# recoil stability multiplier (example: 0.8 means 20% less recoil, 1.2 means 20% more recoil)
+		final_recoil *= stats_component.get_stat("recoil_stability", 1.0)
+	return max(final_recoil, 0.0)
+
+func get_calculated_reload_speed() -> float:
+	var final_reload_speed:float = reload_time
+	if stats_component:
+		# reload speed multiplier (example: 0.8 means 20% faster reload, 1.2 means 20% slower reload)
+		final_reload_speed *= stats_component.get_stat("reload_speed", 1.0)
+	return max(final_reload_speed, 0.0)
+
+# stats related functions, these can be used to modify the weapon's attributes based on player stats or other game mechanics.
+
+# func get_calculated_damage() -> float:
+# 	var final_damage: float = damage
+# 	# Apply
