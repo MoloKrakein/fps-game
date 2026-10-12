@@ -22,7 +22,6 @@ var is_alive: bool = true
 func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, armor_penetration: float = 0.0) -> void:
     if not is_alive:
         return
-
     if current_armor > 0.0:
         var effective_absorption: float = maxf(0.0, armor_absorption - armor_penetration)
         var armor_damage: float = damage_amount * effective_absorption
