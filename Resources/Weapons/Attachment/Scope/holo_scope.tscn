@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://d1eudckwny0fi"]
+
+[ext_resource type="PackedScene" uid="uid://bv2t5t4kkqksw" path="res://Art/3D/Blender/Weapon/attachment/holo.gltf" id="1_bb2m5"]
+[ext_resource type="Texture2D" uid="uid://ciuf8k3ru3b0e" path="res://Art/3D/Blender/Weapon/attachment/holo_0.png" id="2_q4a0s"]
+[ext_resource type="Shader" uid="uid://b0ymona6un2bx" path="res://Art/Shader/ScopeShader/red_dot.gdshader" id="3_dxpo7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gq31v"]
+resource_name = "material_0"
+transparency = 2
+alpha_scissor_threshold = 0.05
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("2_q4a0s")
+texture_filter = 0
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_1o1tl"]
+_surfaces = [{
+"aabb": AABB(-0.090625, 0.0171875, -0.103125, 0.18125, 0.18437499, 1e-05),
+"format": 34896613377,
+"index_count": 6,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0, 0, 0, 3, 0, 1, 0),
+"name": "material_0",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray(0, 0, 255, 255, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_owc8o"]
+resource_name = "blockbench_export_mesh2"
+_surfaces = [{
+"aabb": AABB(-0.090625, 0.0171875, -0.103125, 0.18125, 0.18437499, 1e-05),
+"attribute_data": PackedByteArray(255, 103, 255, 39, 255, 79, 255, 63, 255, 79, 255, 39, 255, 103, 255, 63),
+"format": 34896613399,
+"index_count": 6,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0, 0, 0, 3, 0, 1, 0),
+"material": SubResource("StandardMaterial3D_gq31v"),
+"name": "material_0",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray(0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 255, 127, 255, 255, 255, 127, 255, 255, 255, 127, 255, 255, 255, 127, 255, 255)
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_1o1tl")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dxpo7"]
+render_priority = 0
+shader = ExtResource("3_dxpo7")
+shader_parameter/reticle_color = Color(0.7262233, 3.4172833e-06, 5.7756904e-07, 1)
+shader_parameter/glass_color = Color(1, 1, 1, 0.1)
+shader_parameter/reticle_emission = 1.0
+shader_parameter/ref_element_size = 0.48999998904751996
+shader_parameter/ref_target_moa = 4.30900020397898
+shader_parameter/poa_use_moa = 0.0
+shader_parameter/poa_subdivision = 1.0
+shader_parameter/poa_elevation = 0
+shader_parameter/poa_windage = 0
+
+[node name="Holo_Scope" type="Node3D" unique_id=400638620]
+
+[node name="blockbench_export" parent="." unique_id=835656906 instance=ExtResource("1_bb2m5")]
+
+[node name="display" type="Node3D" parent="." unique_id=896846035]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, -0.19867913)
+
+[node name="Display Mesh" type="MeshInstance3D" parent="display" unique_id=330208835]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0625, 0)
+mesh = SubResource("ArrayMesh_owc8o")
+skeleton = NodePath("")
+surface_material_override/0 = SubResource("ShaderMaterial_dxpo7")
+
+[editable path="blockbench_export"]
