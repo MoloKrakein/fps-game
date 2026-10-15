@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Attachment" format=3 uid="uid://bft80mdfaslva"]
+
+[ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_gtavo"]
+[ext_resource type="PackedScene" uid="uid://61bx40wnr1gc" path="res://Art/Assets/Weapon/Attachment/Scope/Acog.tscn" id="1_iiqet"]
+
+[resource]
+script = ExtResource("1_gtavo")
+attachment_name = "4X Scope"
+attachment_model = ExtResource("1_iiqet")
+accuracy_bonus = 20.0
+is_optic = true
+metadata/_custom_type_script = "uid://byjrogv1mqm35"

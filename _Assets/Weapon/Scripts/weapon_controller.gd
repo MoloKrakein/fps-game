@@ -1199,3 +1199,91 @@ func get_effective_ads_fov() -> float:
 			if att and att.attachment and att.override_ads_fov > 0.0:
 				return att.override_ads_fov
 	return current_weapon.aim_fov
+
+func equip_attachment(att: Attachment) -> void:
+	if active_weapon_data == null or att == null:
+		print("Cannot equip attachment: active_weapon_data or att is null.")
+		return
+
+	active_weapon_data.equipped_attachment_data[att.slot] = att
+	
+	# Find the socket immediately so we can pass it to the spawn function
+	var socket_name = get_socket_name_for_attachment(att)
+	var socket: Marker3D = current_weapon_model.find_child(socket_name, true, false) as Marker3D
+	if socket != null:
+		spawn_attachment_model(att, socket)
+	
+	print("Equipped attachment: ", att.attachment.name, " in slot: ", att.slot)
+
+func unequip_attachment(slot: Attachment.AttachmentSlot) -> void:
+	if active_weapon_data == null:
+		print("Cannot unequip attachment: active_weapon_data is null.")
+		return
+
+	if not active_weapon_data.equipped_attachment_data.has(slot):
+		print("No attachment found in slot: ", slot)
+		return
+
+	var att = active_weapon_data.equipped_attachment_data[slot]
+	if att != null:
+		active_weapon_data.equipped_attachment_data.erase(slot)
+		remove_attachment_model(att)
+		print("Unequipped attachment: ", att.attachment.name, " from slot: ", slot)
+
+func spawn_attachment_model(att: Attachment, socket: Marker3D) -> void:
+	if att == null or att.attachment == null or socket == null:
+		print("Cannot spawn attachment model: att, att.attachment, or socket is null.")
+		return
+
+	var attachment_instance = att.attachment.attachment_model.instantiate()
+	socket.add_child(attachment_instance)
+	attachment_instance.position = Vector3.ZERO
+	attachment_instance.rotation = Vector3.ZERO
+	attachment_instance.scale = Vector3.ONE
+	print("Spawned attachment model for: ", att.attachment.name) 
+
+func remove_attachment_model(att: Attachment) -> void:
+	if att == null or att.attachment == null:
+		print("Cannot remove attachment model: att or att.attachment is null.")
+		return
+
+	var socket_name: String = get_socket_name_for_attachment(att)
+	var socket: Marker3D = current_weapon_model.find_child(socket_name, true, false) as Marker3D
+	if socket != null:
+		for child in socket.get_children():
+			child.queue_free()
+		print("Removed attachment model for: ", att.attachment.name)
+	else:
+		print("Socket not found for attachment: ", att.attachment.name, " in slot: ", att.slot)
+func _mount_attachments() -> void:
+	if active_weapon_data == null or current_weapon_model == null:
+		return
+
+	for slot in active_weapon_data.equipped_attachment_data:
+		var att: Attachment = active_weapon_data.equipped_attachment_data[slot]
+		if att == null or att.attachment == null:
+			continue
+
+		var socket_name = get_socket_name_for_attachment(att)
+		var socket: Marker3D = current_weapon_model.find_child(socket_name, true, false) as Marker3D
+		
+		if socket != null:
+			spawn_attachment_model(att, socket)
+		else:
+			print("Socket not found for attachment: ", att.attachment.name, " in slot: ", att.slot)
+
+func get_socket_name_for_attachment(att: Attachment) -> String:
+	match att.slot:
+		Attachment.AttachmentSlot.OPTIC:
+			return att.attachment.scope_socket_name
+		Attachment.AttachmentSlot.UNDERBARREL:
+			return att.attachment.underbarrel_socket_name
+		Attachment.AttachmentSlot.MUZZLE:
+			return att.attachment.muzzle_socket_name
+		Attachment.AttachmentSlot.MAGAZINE:
+			return att.attachment.magazine_socket_name
+		Attachment.AttachmentSlot.STOCK:
+			return att.attachment.stock_socket_name
+		Attachment.AttachmentSlot.GRIP:
+			return att.attachment.grip_socket_name
+	return ""

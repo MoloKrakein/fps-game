@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dysct6c1tte8u"
-path.s3tc="res://.godot/imported/dot.png-326c28336df9b9d2c919c79bb5d7bb20.s3tc.ctex"
+path.s3tc="res://.godot/imported/dot.png-0603f051df74df4cea2bd2a5ecf34349.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Resources/Weapons/Attachment/Scope/Reticle/dot.png"
-dest_files=["res://.godot/imported/dot.png-326c28336df9b9d2c919c79bb5d7bb20.s3tc.ctex"]
+source_file="res://Art/Assets/Weapon/Attachment/Scope/Reticle/dot.png"
+dest_files=["res://.godot/imported/dot.png-0603f051df74df4cea2bd2a5ecf34349.s3tc.ctex"]
 
 [params]
 

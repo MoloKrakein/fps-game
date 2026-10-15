@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dkd83f1ej4xlh" path="res://Art/3D/Blender/Weapon/attachment/acog_scope.gltf" id="1_ywwve"]
 [ext_resource type="Material" uid="uid://l88nst5hi2lf" path="res://Art/Materials/scope_glass.material" id="2_ebv3f"]
-[ext_resource type="PackedScene" uid="uid://d2d67es7hovrb" path="res://Resources/Weapons/Attachment/Scope/Reticle/reticle.tscn" id="2_xkwwo"]
+[ext_resource type="PackedScene" uid="uid://d2d67es7hovrb" path="res://Art/Assets/Weapon/Attachment/Scope/Reticle/reticle.tscn" id="2_xkwwo"]
 [ext_resource type="Shader" uid="uid://c3yj4mxisrqka" path="res://Art/Shader/ScopeShader/scope.gdshader" id="3_8g36r"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glslj"]
@@ -93,7 +93,7 @@ orientation = 2
 [node name="blockbench_export" parent="." unique_id=1290800655 instance=ExtResource("1_ywwve")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="cylinder_selection" parent="blockbench_export" index="1" unique_id=1918593276]
+[node name="cylinder_selection" parent="blockbench_export" index="1" unique_id=1548973484]
 surface_material_override/0 = ExtResource("2_ebv3f")
 
 [node name="display" type="Node3D" parent="." unique_id=1787843111]

@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://cu06ajduxlmxo"]
 
-[ext_resource type="PackedScene" uid="uid://61bx40wnr1gc" path="res://Resources/Weapons/Attachment/Scope/Acog.tscn" id="1_6cb5l"]
+[ext_resource type="PackedScene" uid="uid://61bx40wnr1gc" path="res://Art/Assets/Weapon/Attachment/Scope/Acog.tscn" id="1_6cb5l"]
 [ext_resource type="Shader" uid="uid://c3yj4mxisrqka" path="res://Art/Shader/ScopeShader/scope.gdshader" id="2_dg8lt"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="3_ty10y"]
 
