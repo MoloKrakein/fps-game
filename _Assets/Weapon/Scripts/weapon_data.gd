@@ -8,3 +8,6 @@ class_name WeaponData extends Resource
 @export var is_loaded:bool = false
 @export var fire_mode:Weapon.WeaponFireMode = Weapon.WeaponFireMode.SEMI_AUTO
 
+@export var equipped_attachment_data:Dictionary[Attachment.AttachmentSlot, Attachment] = {
+    
+}

@@ -67,6 +67,7 @@ const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace wi
 # Cached Data to prevent Singleton Bottlenecks
 var active_weapon_data: WeaponData
 
+
 var player: PlayerController
 var player_stats_component: PlayerStats
 
@@ -223,6 +224,19 @@ func _process(delta: float) -> void:
 		rack_slide() 
 	if Input.is_action_just_pressed("combat_reload") and not is_reloading:
 		request_reload()
+
+	# --- LIVE ADS TUNER (Debug Only) ---
+	if OS.is_debug_build() and Input.is_action_pressed("ui_focus_next"): # Hold Tab or similar modifier
+		var step = 0.001 if Input.is_key_pressed(KEY_SHIFT) else 0.01
+		if Input.is_key_pressed(KEY_I): current_stance_pos.z += step
+		if Input.is_key_pressed(KEY_K): current_stance_pos.z -= step
+		if Input.is_key_pressed(KEY_J): current_stance_pos.x -= step
+		if Input.is_key_pressed(KEY_L): current_stance_pos.x += step
+		if Input.is_key_pressed(KEY_U): current_stance_pos.y += step
+		if Input.is_key_pressed(KEY_O): current_stance_pos.y -= step
+		
+		if Input.is_key_pressed(KEY_P):
+			print("Current Tweak Position: ", current_stance_pos)
 
 
 	
@@ -789,9 +803,12 @@ func aim_ads() -> void:
 	if current_weapon:
 		EventBus.change_visibility_of_crosshair.emit(false)
 		accuracy_modifier = current_weapon.aim_accuracy_modifier
+		var target_fov:float = get_effective_ads_fov()
 		# player.cam_effects.apply_ads_fov(current_weapon.aim_fov,1)
-		player.cam_effects.apply_ads_fov(current_weapon.aim_fov)
-		tween_weapon_to_position(current_weapon.aim_ADS_position, current_weapon.aim_ADS_rotation)
+		player.cam_effects.apply_ads_fov(target_fov)
+		var target_pos:Vector3 = get_effective_ads_position()
+		var target_rot:Vector3 = get_effective_ads_rotation()
+		tween_weapon_to_position(target_pos, target_rot)
 		
 func aim_canted() -> void:
 	if current_weapon:
@@ -1152,3 +1169,33 @@ func _apply_offsets(delta: float) -> void:
 
 #endregion
 
+# Helper Functions
+func get_effective_ads_position() -> Vector3:
+	if current_weapon == null:
+		return Vector3.ZERO
+	if active_weapon_data and active_weapon_data.equipped_attachment_data:
+		for slot in active_weapon_data:
+			var att = active_weapon_data[slot]
+			if att and att.attachment and att.override_ads_position != Vector3.ZERO:
+				return att.override_ads_position
+	return current_weapon.aim_ADS_position
+
+func get_effective_ads_rotation() -> Vector3:
+	if current_weapon == null:
+		return Vector3.ZERO
+	if active_weapon_data and active_weapon_data.equipped_attachment_data:
+		for slot in active_weapon_data:
+			var att = active_weapon_data[slot]
+			if att and att.attachment and att.override_ads_rotation != Vector3.ZERO:
+				return att.override_ads_rotation
+	return current_weapon.aim_ADS_rotation
+	
+func get_effective_ads_fov() -> float:
+	if current_weapon == null:
+		return 0.0
+	if active_weapon_data and active_weapon_data.equipped_attachment_data:
+		for slot in active_weapon_data:
+			var att = active_weapon_data[slot]
+			if att and att.attachment and att.override_ads_fov > 0.0:
+				return att.override_ads_fov
+	return current_weapon.aim_fov

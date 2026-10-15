@@ -108,6 +108,7 @@ enum WeaponAmmoType {
 
 const METERS_PER_WORLD_UNIT: float = 1.0
 var stats_component: PlayerStats
+var active_attachments: Dictionary = {}
 
 func get_muzzle_velocity_mps() -> float:
 	return maxf(projectile_speed / METERS_PER_WORLD_UNIT, 0.0)
@@ -138,6 +139,11 @@ func get_calculated_damage() -> float:
 	var final_damage:float = damage
 	if stats_component:
 		final_damage *= stats_component.get_stat("damage_modifier", 1.0)
+
+	for slot in active_attachments:
+		var att: Attachment = active_attachments[slot]
+		if att:
+			final_damage += att.damage_bonus
 	return max(final_damage, 0.0)
 
 func get_calculated_recoil() -> float:
@@ -145,6 +151,10 @@ func get_calculated_recoil() -> float:
 	if stats_component:
 		# recoil stability multiplier (example: 0.8 means 20% less recoil, 1.2 means 20% more recoil)
 		final_recoil *= stats_component.get_stat("recoil_stability", 1.0)
+	for slot in active_attachments:
+		var att: Attachment = active_attachments[slot]
+		if att:
+			final_recoil *= att.recoil_multiplier
 	return max(final_recoil, 0.0)
 
 func get_calculated_reload_speed() -> float:
