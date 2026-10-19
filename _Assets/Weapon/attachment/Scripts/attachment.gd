@@ -8,12 +8,17 @@ enum AttachmentSlot {
     STOCK,
     GRIP
 }
+enum AttachmentType {
+    ADDITIVE,
+    REPLACEABLE
+}
 
 
 @export_category("Attachment Stats")
 @export var attachment_name: String = "Attachment"
 @export var attachment_slot: AttachmentSlot = AttachmentSlot.OPTIC
 @export var attachment_model: PackedScene
+@export var attachment_type: AttachmentType = AttachmentType.ADDITIVE
 @export_group("Others Settings")
 @export var attachment_icon: Texture2D
 @export var scale: Vector3 = Vector3(1, 1, 1)
