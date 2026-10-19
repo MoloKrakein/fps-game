@@ -46,18 +46,6 @@ shadow_mesh = SubResource("ArrayMesh_tfgg2")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ywwve"]
 resource_local_to_scene = true
-render_priority = 0
-shader = ExtResource("3_8g36r")
-shader_parameter/scope_radius = 0.025
-shader_parameter/reticle_depth = 2.0
-shader_parameter/parallax_factor = 0.1
-shader_parameter/view_edge_fade_factor = 0.05
-shader_parameter/eyebox_position = 0.15
-shader_parameter/eyebox_tolerance = 0.005
-shader_parameter/eyebox_fade_distance = 0.05
-shader_parameter/shadow_inner_radius = 1.0
-shader_parameter/shadow_fade_factor = 0.2
-shader_parameter/shadow_movement_factor = 1.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_6f8o3"]
 viewport_path = NodePath("display/ReticleView")
@@ -71,24 +59,25 @@ render_priority = 0
 shader = ExtResource("3_8g36r")
 shader_parameter/reticle_texture = SubResource("ViewportTexture_6f8o3")
 shader_parameter/scope_texture = SubResource("ViewportTexture_qr0ht")
-shader_parameter/scope_radius = 0.1
-shader_parameter/reticle_depth = 0.845
-shader_parameter/parallax_factor = 0.1
-shader_parameter/view_edge_fade_factor = 0.05
+shader_parameter/scope_radius = 0.05
+shader_parameter/reticle_depth = 1.09
+shader_parameter/parallax_factor = 0.126000005985
+shader_parameter/view_edge_fade_factor = 0.1110000052725
 shader_parameter/eyebox_position = 0.15
-shader_parameter/eyebox_tolerance = 0.05
+shader_parameter/eyebox_tolerance = 0.99
 shader_parameter/eyebox_fade_distance = 0.05
 shader_parameter/shadow_inner_radius = 1.0
-shader_parameter/shadow_fade_factor = 0.2
+shader_parameter/shadow_fade_factor = 0.21
 shader_parameter/shadow_movement_factor = 1.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_bhunq"]
 resource_local_to_scene = true
 material = SubResource("ShaderMaterial_sn0t7")
-size = Vector2(0.3, 0.25)
+size = Vector2(0.205, 0.185)
 orientation = 2
 
 [node name="Node3D" type="Node3D" unique_id=694394248]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
 [node name="blockbench_export" parent="." unique_id=1290800655 instance=ExtResource("1_ywwve")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
@@ -115,7 +104,7 @@ use_hdr_2d = true
 use_hdr_2d = true
 
 [node name="Camera3D" type="Camera3D" parent="display/ScopeView" unique_id=1578499935]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.09618789, -0.12475492)
 fov = 5.9
 
 [node name="RemoteTransform3D" type="RemoteTransform3D" parent="display" unique_id=2089060351]
@@ -123,7 +112,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)
 remote_path = NodePath("../ScopeView/Camera3D")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="display" unique_id=1532520152]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1935789, 0.31091052)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18712997, 0.31967518)
 mesh = SubResource("PlaneMesh_bhunq")
 
 [editable path="blockbench_export"]

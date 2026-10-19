@@ -10,5 +10,6 @@ attachment_model = ExtResource("1_iiqet")
 accuracy_bonus = 100.0
 recoil_multiplier = 0.0
 is_optic = true
-override_ads_position = Vector3(0.395, 0.825, 1.565)
+override_ads_position = Vector3(0, -0.165, -0.21)
+override_ads_fov = 90.0
 metadata/_custom_type_script = "uid://byjrogv1mqm35"

@@ -32,6 +32,7 @@ material = SubResource("StandardMaterial3D_uo56h")
 size = Vector2(0.2, 0.2)
 
 [node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.066431046)
 script = ExtResource("1_qfc63")
 muzzle_socket = NodePath("Muzzle")
 ejection_socket = NodePath("EjectionPort")

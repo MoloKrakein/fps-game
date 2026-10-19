@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bisdgbfcek7ee"]
 
+[ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_mcvyo"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="1_mf45t"]
 [ext_resource type="Material" uid="uid://bttkkl63jo7ha" path="res://_Assets/VFX/Muzzle_flash.tres" id="2_mf45t"]
 [ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_vslle"]
@@ -186,6 +187,7 @@ node_connections = [&"output", 0, &"ReloadOneShot", &"BoltPosition", 0, &"Idle",
 
 [node name="SmgModel" type="Node3D" unique_id=1004586577]
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
+script = ExtResource("1_mcvyo")
 
 [node name="m15" parent="." unique_id=1774983117 instance=ExtResource("6_3vu8r")]
 transform = Transform3D(2.915, 0, 0, 0, 2.915, 0, 0, 0, 2.915, 0, -1.0183843, 0)
