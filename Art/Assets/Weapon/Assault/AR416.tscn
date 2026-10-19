@@ -60,18 +60,18 @@ draw_pass_1 = SubResource("QuadMesh_riqys")
 [node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=681250775]
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.109450966, -0.39674383)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.39674383)
 
 [node name="AR416" parent="." unique_id=1425081176 instance=ExtResource("3_omrth")]
 transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
 
 [node name="Optics" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="0" unique_id=581117067]
-transform = Transform3D(77.69228, 4.606557e-19, -6.9462285e-06, 4.630821e-06, -2.5469533e-05, 77.69228, -3.930233e-19, -77.69228, -2.778491e-05, -0.785803, -1.2163825, -1.2217761e-08)
+transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, -0.55788535, -1.2163825, -1.22177966e-08)
 
-[node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/Body/Optics" unique_id=629444751]
-transform = Transform3D(1, 1.7763568e-14, -7.1054274e-15, 0, 0.94026285, 0.3404483, 0, -0.34044874, 0.94026285, 0.013836311, 0.010648049, -0.0004339991)
+[node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="1" unique_id=629444751]
+transform = Transform3D(-3.3960375e-06, -73.051155, -26.450232, -5.5572928e-06, 26.450266, -73.051155, 77.692276, -5.129144e-07, -8.558582e-06, 0.69287366, -1.1826637, 1.0749747)
 
-[node name="GUI" parent="AR416/Armature/Skeleton3D/Body/Optics/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
-transform = Transform3D(1, 0, 1.4210855e-14, 0, 1.0000002, 2.9802322e-08, 0, 2.9802322e-08, 1.0000002, 0, 0.01002587, 0.0036301548)
+[node name="GUI" parent="AR416/Armature/Skeleton3D/Body/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
+transform = Transform3D(1.0000004, -5.3290705e-15, -7.1054274e-15, -8.881784e-16, 1.0000002, -5.9604645e-08, -1.2434498e-14, 2.9802322e-08, 1.0000002, -0.039096493, 0.00884722, 0.0032033892)
 
 [editable path="AR416"]

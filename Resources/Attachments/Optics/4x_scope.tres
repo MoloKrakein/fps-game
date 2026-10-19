@@ -7,8 +7,8 @@
 script = ExtResource("1_gtavo")
 attachment_name = "4X Scope"
 attachment_model = ExtResource("1_iiqet")
-accuracy_bonus = 10000.0
-damage_bonus = 99999.0
-ammo_capacity_bonus = 225
+accuracy_bonus = 100.0
+recoil_multiplier = 0.0
 is_optic = true
+override_ads_position = Vector3(0.395, 0.825, 1.565)
 metadata/_custom_type_script = "uid://byjrogv1mqm35"

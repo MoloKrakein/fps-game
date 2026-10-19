@@ -21,7 +21,9 @@ enum AttachmentType {
 @export var attachment_type: AttachmentType = AttachmentType.ADDITIVE
 @export_group("Others Settings")
 @export var attachment_icon: Texture2D
-@export var scale: Vector3 = Vector3(1, 1, 1)
+@export var model_position: Vector3 = Vector3.ZERO
+@export var model_rotation: Vector3 = Vector3.ZERO
+@export var model_scale: Vector3 = Vector3.ONE
 
 @export_category("Attachment Stats Modifiers")
 @export var accuracy_bonus: float = 0.0             #Flat bonus / penalty to accuracy

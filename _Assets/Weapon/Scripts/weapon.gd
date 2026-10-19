@@ -109,6 +109,7 @@ enum WeaponAmmoType {
 const METERS_PER_WORLD_UNIT: float = 1.0
 var stats_component: PlayerStats
 var active_attachments: Dictionary = {}
+var active_weapon_data_ref: WeaponData = null
 
 func get_muzzle_velocity_mps() -> float:
 	return maxf(projectile_speed / METERS_PER_WORLD_UNIT, 0.0)
@@ -136,25 +137,46 @@ func get_fire_interval_seconds() -> float:
 # Dynamic Stats getters, these can be used to modify the weapon's attributes based on player stats or other game mechanics.
 
 func get_calculated_damage() -> float:
-	var final_damage:float = damage
+	var final_damage: float = damage
 	if stats_component:
 		final_damage *= stats_component.get_stat("damage_modifier", 1.0)
 
-	for slot in active_attachments:
-		var att: Attachment = active_attachments[slot]
-		if att:
-			final_damage += att.damage_bonus
+	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
+		for slot in active_weapon_data_ref.equipped_attachment_data:
+			var att = active_weapon_data_ref.equipped_attachment_data[slot]
+			if att:
+				final_damage += att.damage_bonus
+
 	return max(final_damage, 0.0)
 
+func get_calculated_accuracy() -> float:
+	var final_accuracy: float = accuracy
+	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
+		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
+			if att:
+				final_accuracy += att.accuracy_bonus
+	return clampf(final_accuracy, 0.0, 100.0)
+
+func get_calculated_magazine_capacity() -> int:
+	var final_capacity: int = mags_ammo
+	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
+		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
+			if att:
+				final_capacity += att.ammo_capacity_bonus
+	return maxi(final_capacity, 0)
+
 func get_calculated_recoil() -> float:
-	var final_recoil:float = recoil_cam_pitch
+	var final_recoil: float = recoil_cam_pitch
 	if stats_component:
-		# recoil stability multiplier (example: 0.8 means 20% less recoil, 1.2 means 20% more recoil)
 		final_recoil *= stats_component.get_stat("recoil_stability", 1.0)
-	for slot in active_attachments:
-		var att: Attachment = active_attachments[slot]
-		if att:
-			final_recoil *= att.recoil_multiplier
+
+	# --- ADD THIS: Apply Attachment Recoil Multipliers ---
+	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
+		for slot in active_weapon_data_ref.equipped_attachment_data:
+			var att = active_weapon_data_ref.equipped_attachment_data[slot]
+			if att and "recoil_multiplier" in att:
+				final_recoil *= att.recoil_multiplier
+
 	return max(final_recoil, 0.0)
 
 func get_calculated_reload_speed() -> float:
@@ -162,6 +184,12 @@ func get_calculated_reload_speed() -> float:
 	if stats_component:
 		# reload speed multiplier (example: 0.8 means 20% faster reload, 1.2 means 20% slower reload)
 		final_reload_speed *= stats_component.get_stat("reload_speed", 1.0)
+
+	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
+		for slot in active_weapon_data_ref.equipped_attachment_data:
+			var att = active_weapon_data_ref.equipped_attachment_data[slot]
+			if att and "reload_time_multiplier" in att:
+				final_reload_speed *= att.reload_time_multiplier
 	return max(final_reload_speed, 0.0)
 
 # stats related functions, these can be used to modify the weapon's attributes based on player stats or other game mechanics.

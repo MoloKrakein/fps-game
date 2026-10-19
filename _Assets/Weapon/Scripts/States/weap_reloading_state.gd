@@ -17,10 +17,11 @@ func _on_reload_state_state_entered() -> void:
 
 	weapon_controller.is_reloading = true
 	# For per-bullet weapons, each reload input inserts a single shell.
-	# var reload_time: float = weapon_controller.current_weapon.reload_time
 	var reload_time: float = timer
 	if weapon_controller.current_weapon.is_reload_per_bullet:
 		reload_time = weapon_controller.get_single_round_reload_time()
+	elif weapon_controller.current_weapon.reload_time > 0.0:
+		reload_time *= weapon_controller.current_weapon.get_calculated_reload_speed() / weapon_controller.current_weapon.reload_time
 
 	weapon_controller.reload_timer_ui(reload_time)
 	

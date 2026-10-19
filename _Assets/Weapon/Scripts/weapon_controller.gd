@@ -164,7 +164,7 @@ func _ready() -> void:
 	if current_weapon != null:
 		spawn_weapon_model(current_weapon)
 		# Initialize magazine and reserve from weapon stats
-		current_ammo = current_weapon.mags_ammo
+		current_ammo = current_weapon.get_calculated_magazine_capacity()
 		reserve_ammo = current_weapon.max_ammo
 		current_fire_mode = current_weapon.fire_mode
 		is_loaded = current_ammo > 0
@@ -324,7 +324,7 @@ func can_reload() -> bool:
 		print("No reserve ammo left to reload.")
 		return false
 
-	if active_weapon_data.ammo_in_magazine == current_weapon.mags_ammo:
+	if active_weapon_data.ammo_in_magazine == current_weapon.get_calculated_magazine_capacity():
 		print("Magazine is already full.")
 		return false
 
@@ -354,7 +354,7 @@ func fire_weapon() -> void:
 	
 	# recoil effect
 	if camera != null and current_weapon != null:
-		camera.add_weapon_recoil(current_weapon.recoil_cam_pitch, current_weapon.recoil_cam_yaw, current_weapon.recoil_cam_roll)
+		camera.add_weapon_recoil(current_weapon.get_calculated_recoil(), current_weapon.recoil_cam_yaw, current_weapon.recoil_cam_roll)
 
 	if enable_recoil:
 		_add_model_recoil()
@@ -487,7 +487,7 @@ func execute_reload() -> void:
 		return
 
 	
-	var mag_capacity: int = current_weapon.mags_ammo
+	var mag_capacity: int = current_weapon.get_calculated_magazine_capacity()
 	if active_weapon_data.ammo_in_magazine >= mag_capacity:
 		return
 		
@@ -512,10 +512,11 @@ func get_single_round_reload_time() -> float:
 	if current_weapon == null:
 		return 0.0
 
-	if current_weapon.mags_ammo <= 0:
+	var mag_capacity: int = current_weapon.get_calculated_magazine_capacity()
+	if mag_capacity <= 0:
 		return 0.0
 
-	return current_weapon.reload_time / float(current_weapon.mags_ammo)
+	return current_weapon.reload_time / float(mag_capacity)
 
 func reload_single_round() -> void:
 	if not can_reload():
@@ -527,7 +528,7 @@ func reload_single_round() -> void:
 	if active_weapon_data.reserve_ammo <= 0:
 		return
 
-	if active_weapon_data.ammo_in_magazine >= current_weapon.mags_ammo:
+	if active_weapon_data.ammo_in_magazine >= current_weapon.get_calculated_magazine_capacity():
 		return
 
 	var was_empty: bool = not active_weapon_data.is_loaded
@@ -552,7 +553,7 @@ func reload_magazine() -> void:
 	if current_weapon == null or active_weapon_data == null:
 		return
 
-	var mag_capacity: int = current_weapon.mags_ammo
+	var mag_capacity: int = current_weapon.get_calculated_magazine_capacity()
 	if active_weapon_data.ammo_in_magazine >= mag_capacity:
 		return
 		
@@ -602,6 +603,9 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 		current_stance_pos = weapon_start_position
 		current_stance_rot = weapon_start_rotation
 
+		current_weapon.stats_component = player_stats_component
+		current_weapon.active_weapon_data_ref = active_weapon_data
+
 		_bob_x = 0.0
 		_bob_y = 0.0
 		_bob_x_velocity = 0.0
@@ -630,7 +634,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 
 			# player.ammo_counter_ui.position = current_weapon_model.position
 		# if there is a ammo counter, set the mesh instance as child of the weapon model and set its position to the ammo counter position
-
+		_mount_attachments()
 
 func get_weapon_position() -> Vector3:
 	if current_weapon_model != null:
@@ -824,7 +828,7 @@ func get_effective_spread() -> float:
 	
 	# 1. Base spread from weapon (and attachments)
 	# var base_spread: float = (100.0 - get_effective_stat("accuracy")) / 1000.0
-	var base_spread: float = (100.0 - current_weapon.accuracy) / 1000.0
+	var base_spread: float = (100.0 - current_weapon.get_calculated_accuracy()) / 1000.0
 	
 	# 2. Movement penalty
 	var move_penalty: float = 1.0
@@ -880,7 +884,7 @@ func update_weapon_ui() -> void:
 	if current_weapon != null:
 		EventBus.weapon_ammo_changed.emit(active_weapon_data.ammo_in_magazine, active_weapon_data.reserve_ammo)
 		EventBus.weapon_chamber_status.emit(active_weapon_data.is_loaded)
-		EventBus.weapon_magazine_changed.emit(active_weapon_data.ammo_in_magazine, current_weapon.mags_ammo)
+		EventBus.weapon_magazine_changed.emit(active_weapon_data.ammo_in_magazine, current_weapon.get_calculated_magazine_capacity())
 
 func reload_timer_ui(reload_time: float) -> void:
 	if active_weapon_data == null:
@@ -1174,9 +1178,8 @@ func get_effective_ads_position() -> Vector3:
 	if current_weapon == null:
 		return Vector3.ZERO
 	if active_weapon_data and active_weapon_data.equipped_attachment_data:
-		for slot in active_weapon_data:
-			var att = active_weapon_data[slot]
-			if att and att.attachment and att.override_ads_position != Vector3.ZERO:
+		for att: Attachment in active_weapon_data.equipped_attachment_data.values():
+			if att and att.override_ads_position != Vector3.ZERO:
 				return att.override_ads_position
 	return current_weapon.aim_ADS_position
 
@@ -1184,9 +1187,8 @@ func get_effective_ads_rotation() -> Vector3:
 	if current_weapon == null:
 		return Vector3.ZERO
 	if active_weapon_data and active_weapon_data.equipped_attachment_data:
-		for slot in active_weapon_data:
-			var att = active_weapon_data[slot]
-			if att and att.attachment and att.override_ads_rotation != Vector3.ZERO:
+		for att: Attachment in active_weapon_data.equipped_attachment_data.values():
+			if att and att.override_ads_rotation != Vector3.ZERO:
 				return att.override_ads_rotation
 	return current_weapon.aim_ADS_rotation
 	
@@ -1194,9 +1196,8 @@ func get_effective_ads_fov() -> float:
 	if current_weapon == null:
 		return 0.0
 	if active_weapon_data and active_weapon_data.equipped_attachment_data:
-		for slot in active_weapon_data:
-			var att = active_weapon_data[slot]
-			if att and att.attachment and att.override_ads_fov > 0.0:
+		for att: Attachment in active_weapon_data.equipped_attachment_data.values():
+			if att and att.override_ads_fov > 0.0:
 				return att.override_ads_fov
 	return current_weapon.aim_fov
 
@@ -1205,15 +1206,12 @@ func equip_attachment(att: Attachment) -> void:
 		print("Cannot equip attachment: active_weapon_data or att is null.")
 		return
 
-	active_weapon_data.equipped_attachment_data[att.slot] = att
+	active_weapon_data.equipped_attachment_data[att.attachment_slot] = att
 	
-	# Find the socket immediately so we can pass it to the spawn function
-	var socket_name = get_socket_name_for_attachment(att)
-	var socket: Marker3D = current_weapon_model.find_child(socket_name, true, false) as Marker3D
-	if socket != null:
-		spawn_attachment_model(att, socket)
+	if current_weapon_model is WeaponModel:
+		spawn_attachment_model(att)
 	
-	print("Equipped attachment: ", att.attachment.name, " in slot: ", att.slot)
+	print("Equipped attachment: ", att.attachment_name, " in slot: ", att.attachment_slot)
 
 func unequip_attachment(slot: Attachment.AttachmentSlot) -> void:
 	if active_weapon_data == null:
@@ -1228,60 +1226,37 @@ func unequip_attachment(slot: Attachment.AttachmentSlot) -> void:
 	if att != null:
 		active_weapon_data.equipped_attachment_data.erase(slot)
 		remove_attachment_model(att)
-		print("Unequipped attachment: ", att.attachment.name, " from slot: ", slot)
+		print("Unequipped attachment: ", att.attachment_name, " from slot: ", slot)
 
-func spawn_attachment_model(att: Attachment, socket: Marker3D) -> void:
-	if att == null or att.attachment == null or socket == null:
-		print("Cannot spawn attachment model: att, att.attachment, or socket is null.")
+func spawn_attachment_model(att: Attachment) -> void:
+	if att == null or current_weapon_model is not WeaponModel:
+		print("Cannot spawn attachment model: attachment or weapon model is null.")
 		return
 
-	var attachment_instance = att.attachment.attachment_model.instantiate()
-	socket.add_child(attachment_instance)
-	attachment_instance.position = Vector3.ZERO
-	attachment_instance.rotation = Vector3.ZERO
-	attachment_instance.scale = Vector3.ONE
-	print("Spawned attachment model for: ", att.attachment.name) 
+	if att.attachment_type == Attachment.AttachmentType.ADDITIVE:
+		current_weapon_model.apply_additive_attachment(att.attachment_slot, att)
+	else:
+		current_weapon_model.apply_replaceable_attachment(att.attachment_slot, att)
+	print("Spawned attachment model for: ", att.attachment_name)
 
 func remove_attachment_model(att: Attachment) -> void:
-	if att == null or att.attachment == null:
-		print("Cannot remove attachment model: att or att.attachment is null.")
+	if att == null or current_weapon_model is not WeaponModel:
+		print("Cannot remove attachment model: attachment or weapon model is null.")
 		return
 
-	var socket_name: String = get_socket_name_for_attachment(att)
-	var socket: Marker3D = current_weapon_model.find_child(socket_name, true, false) as Marker3D
-	if socket != null:
-		for child in socket.get_children():
-			child.queue_free()
-		print("Removed attachment model for: ", att.attachment.name)
+	if att.attachment_type == Attachment.AttachmentType.ADDITIVE:
+		current_weapon_model.apply_additive_attachment(att.attachment_slot, null)
 	else:
-		print("Socket not found for attachment: ", att.attachment.name, " in slot: ", att.slot)
+		current_weapon_model.apply_replaceable_attachment(att.attachment_slot, null)
+	print("Removed attachment model for: ", att.attachment_name)
+
 func _mount_attachments() -> void:
 	if active_weapon_data == null or current_weapon_model is not WeaponModel:
 		return
 
-	for slot in active_weapon_data.equipped_attachments:
-		var att: Attachment = active_weapon_data.equipped_attachments[slot]
+	for slot: Attachment.AttachmentSlot in active_weapon_data.equipped_attachment_data:
+		var att: Attachment = active_weapon_data.equipped_attachment_data[slot]
 		if att == null:
 			continue
 
-		# Route based on whether it's additive or a replacement component
-		if att.attachment_type == Attachment.AttachmentType.ADDITIVE:
-			current_weapon_model.apply_additive_attachment(slot, att.attachment_model)
-		else:
-			current_weapon_model.apply_replacement_attachment(slot, att.attachment_model)
-
-func get_socket_name_for_attachment(att: Attachment) -> String:
-	match att.slot:
-		Attachment.AttachmentSlot.OPTIC:
-			return att.attachment.scope_socket_name
-		Attachment.AttachmentSlot.UNDERBARREL:
-			return att.attachment.underbarrel_socket_name
-		Attachment.AttachmentSlot.MUZZLE:
-			return att.attachment.muzzle_socket_name
-		Attachment.AttachmentSlot.MAGAZINE:
-			return att.attachment.magazine_socket_name
-		Attachment.AttachmentSlot.STOCK:
-			return att.attachment.stock_socket_name
-		Attachment.AttachmentSlot.GRIP:
-			return att.attachment.grip_socket_name
-	return ""
+		spawn_attachment_model(att)
