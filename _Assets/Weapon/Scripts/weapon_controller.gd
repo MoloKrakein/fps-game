@@ -71,7 +71,7 @@ var active_weapon_data: WeaponData
 var player: PlayerController
 var player_stats_component: PlayerStats
 
-var current_weapon_model: Node3D
+var current_weapon_model: WeaponModel
 var weapon_animation_player: WeaponAnimation
 var current_ammo: int
 var reserve_ammo: int = 0
@@ -1256,21 +1256,19 @@ func remove_attachment_model(att: Attachment) -> void:
 	else:
 		print("Socket not found for attachment: ", att.attachment.name, " in slot: ", att.slot)
 func _mount_attachments() -> void:
-	if active_weapon_data == null or current_weapon_model == null:
+	if active_weapon_data == null or current_weapon_model is not WeaponModel:
 		return
 
-	for slot in active_weapon_data.equipped_attachment_data:
-		var att: Attachment = active_weapon_data.equipped_attachment_data[slot]
-		if att == null or att.attachment == null:
+	for slot in active_weapon_data.equipped_attachments:
+		var att: Attachment = active_weapon_data.equipped_attachments[slot]
+		if att == null:
 			continue
 
-		var socket_name = get_socket_name_for_attachment(att)
-		var socket: Marker3D = current_weapon_model.find_child(socket_name, true, false) as Marker3D
-		
-		if socket != null:
-			spawn_attachment_model(att, socket)
+		# Route based on whether it's additive or a replacement component
+		if att.attachment_type == Attachment.AttachmentType.ADDITIVE:
+			current_weapon_model.apply_additive_attachment(slot, att.attachment_model)
 		else:
-			print("Socket not found for attachment: ", att.attachment.name, " in slot: ", att.slot)
+			current_weapon_model.apply_replacement_attachment(slot, att.attachment_model)
 
 func get_socket_name_for_attachment(att: Attachment) -> String:
 	match att.slot:

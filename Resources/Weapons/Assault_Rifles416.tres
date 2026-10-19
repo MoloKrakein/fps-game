@@ -1,14 +1,23 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://rshmsh33r3p1"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_35nmv"]
+[ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/bullet_casing.tscn" id="1_u7282"]
 [ext_resource type="PackedScene" uid="uid://uh6cfflmaimf" path="res://Art/Assets/Weapon/Assault/AR416.tscn" id="2_a7i0a"]
+[ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="2_f5shg"]
 
 [resource]
 script = ExtResource("1_35nmv")
 weapon_name = "AR416"
 damage = 25.0
 mags_ammo = 30
-max_ammo = 300
+max_ammo = 400
 is_hitscan = false
+fire_rate_rpm = 800.0
+has_burst_mode = true
+projectile_speed = 1100.0
 weapon_model = ExtResource("2_a7i0a")
+projectile_scene = ExtResource("2_f5shg")
+bullet_case_scene = ExtResource("1_u7282")
+weapon_scale = Vector3(0.4, 0.4, 0.4)
+bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

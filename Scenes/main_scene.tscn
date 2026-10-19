@@ -9,7 +9,7 @@
 [ext_resource type="Resource" uid="uid://b7asglgx28t27" path="res://Resources/Weapons/pistol_data.tres" id="4_mai8y"]
 [ext_resource type="Resource" uid="uid://b4wuvyceoofh6" path="res://Resources/Weapons/sg_data.tres" id="5_76v2p"]
 [ext_resource type="Resource" uid="uid://c7li8s4pv7rdi" path="res://Resources/Weapons/smg_data.tres" id="6_m1efj"]
-[ext_resource type="Resource" uid="uid://b15yby6glemy0" path="res://Resources/Weapons/AutoSg_data.tres" id="7_76v2p"]
+[ext_resource type="Resource" uid="uid://ckk3s0l53w6i4" path="res://Resources/Weapons/Assault_Rifles416_data.tres" id="7_76v2p"]
 [ext_resource type="PackedScene" uid="uid://br62nk21xm7fu" path="res://Scenes/post_processing/post_processing_layer.tscn" id="10_76v2p"]
 
 [node name="MainScene" type="Node" unique_id=1881302021]
@@ -38,7 +38,7 @@ player = NodePath("../../CurrentLevel/PlayerController")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.809613, 5.8104715, 0.61031055)
 default_speed = 6.0
 
-[node name="HealthComponent" parent="CurrentLevel/PlayerController" index="0" unique_id=1115016750]
+[node name="HealthComponent" parent="CurrentLevel/PlayerController" index="1" unique_id=1115016750]
 start_with_armor = true
 
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]

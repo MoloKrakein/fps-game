@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_qfc63"]
 [ext_resource type="PackedScene" uid="uid://gypergadlhjc" path="res://Art/3D/Blender/Weapon/AR416/export/AR416.glb" id="3_omrth"]
+[ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="4_631vl"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="5_vgxpt"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
@@ -61,13 +62,16 @@ draw_pass_1 = SubResource("QuadMesh_riqys")
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.109450966, -0.39674383)
 
-[node name="AmmoCounterPosition" type="Node3D" parent="." unique_id=629444751]
-transform = Transform3D(-7.5626056e-14, -27.29261, -9.882061, -29.02658, -8.8352533e-07, 2.4401488e-06, -1.730119e-06, 9.882072, -27.29261, -0.30907646, -0.18106572, -0.310547)
-
 [node name="AR416" parent="." unique_id=1425081176 instance=ExtResource("3_omrth")]
 transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
 
 [node name="Optics" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="0" unique_id=581117067]
 transform = Transform3D(77.69228, 4.606557e-19, -6.9462285e-06, 4.630821e-06, -2.5469533e-05, 77.69228, -3.930233e-19, -77.69228, -2.778491e-05, -0.785803, -1.2163825, -1.2217761e-08)
+
+[node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/Body/Optics" unique_id=629444751]
+transform = Transform3D(1, 1.7763568e-14, -7.1054274e-15, 0, 0.94026285, 0.3404483, 0, -0.34044874, 0.94026285, 0.013836311, 0.010648049, -0.0004339991)
+
+[node name="GUI" parent="AR416/Armature/Skeleton3D/Body/Optics/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
+transform = Transform3D(1, 0, 1.4210855e-14, 0, 1.0000002, 2.9802322e-08, 0, 2.9802322e-08, 1.0000002, 0, 0.01002587, 0.0036301548)
 
 [editable path="AR416"]
