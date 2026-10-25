@@ -135,10 +135,8 @@ var _recoil_pitch:float = 0.0
 var _recoil_pitch_velocity: float = 0.0
 var _recoil_yaw:float = 0.0
 var _recoil_yaw_velocity: float = 0.0
-# var _recoil_x:float = 0.0
-# var _recoil_x_velocity
-# var _recoil_y:float = 0.0
-# var _recoil_y_velocity: float = 0.0
+var _recoil_roll: float = 0.0
+var _recoil_roll_velocity: float = 0.0
 
 # vertical lag variables
 var _vlag_y: float = 0.0
@@ -909,10 +907,21 @@ func _update_idle_sway(delta: float) -> Vector3:
 	# 2. Scale Frequency (Tired players breathe faster)
 	# At 100% tiredness, the breathing speed is multiplied by 2.5x
 	var current_frequency: float = idle_sway_frequency * (1.0 + (tiredness_factor * 1.5)) 
+	var two_handed: bool = _is_two_handed_weapon()
+	if two_handed:
+		# A rifle follows the torso and support hand instead of freely
+		# swinging from the firing hand.
+		current_frequency *= 0.8
 	idle_time += delta * current_frequency
 
 	var player_speed = Vector2(player.velocity.x, player.velocity.z).length()
 	var current_amplitude: Vector2 = idle_sway_amplitude
+	var sway_stiffness: float = idle_sway_stiffness
+	var sway_damping: float = idle_sway_damping
+	if two_handed:
+		current_amplitude *= 0.68
+		sway_stiffness *= 0.82
+		sway_damping *= 1.1
 	
 	if is_aiming:
 		current_amplitude *= aim_sway_multiplier
@@ -941,16 +950,16 @@ func _update_idle_sway(delta: float) -> Vector3:
 		target_rot_x = target_y * idle_sway_rotation_multiplier * exhaust_intensity
 
 	# 3. Apply Spring Physics (Position)
-	var result_x: Vector2 = SpringUtil.apply(_idle_x, _idle_x_velocity, target_x, delta, idle_sway_stiffness, idle_sway_damping)
+	var result_x: Vector2 = SpringUtil.apply(_idle_x, _idle_x_velocity, target_x, delta, sway_stiffness, sway_damping)
 	_idle_x = result_x.x
 	_idle_x_velocity = result_x.y
 
-	var result_y: Vector2 = SpringUtil.apply(_idle_y, _idle_y_velocity, target_y, delta, idle_sway_stiffness, idle_sway_damping)
+	var result_y: Vector2 = SpringUtil.apply(_idle_y, _idle_y_velocity, target_y, delta, sway_stiffness, sway_damping)
 	_idle_y = result_y.x
 	_idle_y_velocity = result_y.y
 
 	# 4. Apply Spring Physics (Rotation)
-	var result_rot_x: Vector2 = SpringUtil.apply(_idle_rot_x, _idle_rot_x_velocity, target_rot_x, delta, idle_sway_stiffness, idle_sway_damping)
+	var result_rot_x: Vector2 = SpringUtil.apply(_idle_rot_x, _idle_rot_x_velocity, target_rot_x, delta, sway_stiffness, sway_damping)
 	_idle_rot_x = result_rot_x.x
 	_idle_rot_x_velocity = result_rot_x.y
 
@@ -1077,24 +1086,36 @@ func _add_model_recoil() -> void:
 	if player != null and player._player_max_tiredness > 0.0:
 		var fatigue_factor = clamp(player._player_current_tiredness / player._player_max_tiredness, 0.0, 1.0)
 		_tiredness_multiplier += (fatigue_factor * 0.4) # Up to 3x recoil when fully exhausted
-	_recoil_z += current_weapon.recoil_weapon_kick * _tiredness_multiplier
-	_recoil_pitch += deg_to_rad(current_weapon.recoil_weapon_rise) * _tiredness_multiplier
 
-	var random_horizontal_sway = current_weapon.recoil_weapon_rise * 0.5 * _tiredness_multiplier
-	_recoil_yaw += deg_to_rad(randf_range(-random_horizontal_sway, random_horizontal_sway))
+	# A support hand keeps a long gun aligned with the bore. It still pushes
+	# the stock into the shoulder, but produces less muzzle climb and wobble.
+	var two_handed: bool = _is_two_handed_weapon()
+	var kick_multiplier: float = 1.12 if two_handed else 1.0
+	var rise_multiplier: float = 0.62 if two_handed else 1.0
+	var lateral_multiplier: float = 0.35 if two_handed else 1.0
+
+	_recoil_z += current_weapon.recoil_weapon_kick * kick_multiplier * _tiredness_multiplier
+	_recoil_pitch += deg_to_rad(current_weapon.recoil_weapon_rise) * rise_multiplier * _tiredness_multiplier
+
+	var random_horizontal_sway: float = current_weapon.recoil_weapon_rise * 0.5 * _tiredness_multiplier
+	_recoil_yaw += deg_to_rad(randf_range(-random_horizontal_sway, random_horizontal_sway)) * lateral_multiplier
+	if two_handed:
+		# The small roll is the remaining torque around the support hand, not
+		# an independent sideways snap.
+		_recoil_roll -= _recoil_yaw * 0.08
 
 func _update_model_recoil(delta: float) -> Vector3:
 	if not enable_recoil or current_weapon_model == null:
 		return Vector3.ZERO
 
+	var two_handed: bool = _is_two_handed_weapon()
+	var spring_stiffness: float = recoil_model_stillness * (0.78 if two_handed else 1.0)
+	var spring_damping: float = recoil_model_damping * (1.15 if two_handed else 1.0)
 
-		# _recoil_z *= recoil_multiplier
-		# _recoil_pitch *= recoil_multiplier
-		# _recoil_yaw *= recoil_multiplier
-
-	var rz = SpringUtil.apply(_recoil_z, _recoil_z_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
-	var rp = SpringUtil.apply(_recoil_pitch, _recoil_pitch_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
-	var ry = SpringUtil.apply(_recoil_yaw, _recoil_yaw_velocity, 0.0, delta, recoil_model_stillness, recoil_model_damping)
+	var rz: Vector2 = SpringUtil.apply(_recoil_z, _recoil_z_velocity, 0.0, delta, spring_stiffness, spring_damping)
+	var rp: Vector2 = SpringUtil.apply(_recoil_pitch, _recoil_pitch_velocity, 0.0, delta, spring_stiffness, spring_damping)
+	var ry: Vector2 = SpringUtil.apply(_recoil_yaw, _recoil_yaw_velocity, 0.0, delta, spring_stiffness, spring_damping)
+	var rr: Vector2 = SpringUtil.apply(_recoil_roll, _recoil_roll_velocity, 0.0, delta, spring_stiffness, spring_damping)
 
 	_recoil_z = clamp(rz.x,-recoil_model_max_angle, recoil_model_max_angle)
 	_recoil_z_velocity = rz.y
@@ -1105,7 +1126,21 @@ func _update_model_recoil(delta: float) -> Vector3:
 	_recoil_yaw = clamp(ry.x, -recoil_model_max_angle, recoil_model_max_angle)
 	_recoil_yaw_velocity = ry.y
 
+	_recoil_roll = clamp(rr.x, -recoil_model_max_angle, recoil_model_max_angle)
+	_recoil_roll_velocity = rr.y
+
 	return Vector3(0.0, 0.0, _recoil_z)
+
+func _is_two_handed_weapon() -> bool:
+	if current_weapon == null:
+		return false
+
+	return current_weapon.weapon_type in [
+		Weapon.WeaponType.RIFLE,
+		Weapon.WeaponType.SHOTGUN,
+		Weapon.WeaponType.SNIPER,
+		Weapon.WeaponType.HEAVY
+	]
 
 func _update_vertical_lag(delta: float) -> Vector3:
 	if not vertical_lag_enabled or current_weapon_model == null or not camera:
@@ -1166,7 +1201,7 @@ func _apply_offsets(delta: float) -> void:
 	if enable_recoil:
 		recoil_pos = _update_model_recoil(delta)
 	
-	var recoil_rot = Vector3(_recoil_pitch, _recoil_yaw, 0.0)
+	var recoil_rot = Vector3(_recoil_pitch, _recoil_yaw, _recoil_roll)
 
 	current_weapon_model.position = current_stance_pos + idle_offset + look_offset + bob_offset + _current_crouch_pos + recoil_pos + vertical_lag_offset
 	current_weapon_model.rotation = current_stance_rot + Vector3(_idle_rot_x, 0.0, strafe_tilt) + _current_crouch_rot + recoil_rot

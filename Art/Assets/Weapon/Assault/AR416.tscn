@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_qfc63"]
 [ext_resource type="PackedScene" uid="uid://gypergadlhjc" path="res://Art/3D/Blender/Weapon/AR416/export/AR416.glb" id="3_omrth"]
+[ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_qllkt"]
 [ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="4_631vl"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="5_vgxpt"]
 
@@ -21,7 +22,7 @@ transparency = 1
 blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(1, 0.73333335, 0, 1)
+albedo_color = Color(1, 0.73333335, 0, 0.34901962)
 billboard_mode = 3
 particles_anim_h_frames = 1
 particles_anim_v_frames = 1
@@ -30,6 +31,64 @@ particles_anim_loop = false
 [sub_resource type="QuadMesh" id="QuadMesh_riqys"]
 material = SubResource("StandardMaterial3D_uo56h")
 size = Vector2(0.05, 0.2)
+
+[sub_resource type="Curve" id="Curve_3pjgn"]
+_limits = [0.0, 200.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_5yekf"]
+curve = SubResource("Curve_3pjgn")
+
+[sub_resource type="Gradient" id="Gradient_oo46r"]
+offsets = PackedFloat32Array(0, 0.9916667)
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 0.627451)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_6f8o3"]
+gradient = SubResource("Gradient_oo46r")
+
+[sub_resource type="Curve" id="Curve_jtlrl"]
+_data = [Vector2(0.018796988, 0), 0.0, 0.0, 0, 0, Vector2(0.99248123, 0.97959185), -2.6731603, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_qr0ht"]
+curve = SubResource("Curve_jtlrl")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6kw58"]
+emission_shape = 1
+emission_sphere_radius = 1.0
+angle_min = -14.9999895
+angle_max = 15.0000105
+direction = Vector3(0, 0, -1)
+initial_velocity_min = 0.5
+initial_velocity_max = 1.5
+gravity = Vector3(0, 0.5, 0)
+damping_min = 1.0
+damping_max = 2.0
+scale_curve = SubResource("CurveTexture_qr0ht")
+color_ramp = SubResource("GradientTexture1D_6f8o3")
+anim_speed_min = 0.099999994
+anim_speed_max = 1.0
+anim_speed_curve = SubResource("CurveTexture_5yekf")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sn0t7"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.69411767)
+albedo_texture = ExtResource("3_qllkt")
+disable_receive_shadows = true
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+proximity_fade_enabled = true
+proximity_fade_distance = 0.1
+distance_fade_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_qrkt3"]
+material = SubResource("StandardMaterial3D_sn0t7")
+size = Vector2(0.5, 0.5)
 
 [node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.066431046)
@@ -42,10 +101,11 @@ default_stock_mesh = NodePath("AR416/Armature/Skeleton3D/Stock")
 default_grip_mesh = NodePath("AR416/Armature/Skeleton3D/Grip")
 default_magazine_mesh = NodePath("AR416/Armature/Skeleton3D/Magazine")
 
-[node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
+[node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045668572, -2.4102664)
 script = ExtResource("5_vgxpt")
 particles = NodePath("GPUParticles3D")
+smoke_particles = NodePath("Smoke")
 light = NodePath("OmniLight3D")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="Muzzle" unique_id=25292793]
@@ -60,6 +120,16 @@ process_material = SubResource("ParticleProcessMaterial_6f8o3")
 draw_pass_1 = SubResource("QuadMesh_riqys")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=681250775]
+
+[node name="Smoke" type="GPUParticles3D" parent="Muzzle" unique_id=2044631168]
+emitting = false
+amount = 5
+lifetime = 0.08
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_6kw58")
+draw_pass_1 = SubResource("QuadMesh_qrkt3")
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.39674383)
