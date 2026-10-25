@@ -29,7 +29,7 @@ particles_anim_loop = false
 
 [sub_resource type="QuadMesh" id="QuadMesh_riqys"]
 material = SubResource("StandardMaterial3D_uo56h")
-size = Vector2(0.2, 0.2)
+size = Vector2(0.05, 0.2)
 
 [node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.066431046)
@@ -51,9 +51,10 @@ light = NodePath("OmniLight3D")
 [node name="GPUParticles3D" type="GPUParticles3D" parent="Muzzle" unique_id=25292793]
 emitting = false
 amount = 20
+amount_ratio = 0.57
 lifetime = 0.01
 one_shot = true
-explosiveness = 1.0
+explosiveness = 0.4
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_6f8o3")
 draw_pass_1 = SubResource("QuadMesh_riqys")

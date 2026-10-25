@@ -8,15 +8,22 @@
 [resource]
 script = ExtResource("1_35nmv")
 weapon_name = "AR416"
+weapon_type = 1
 damage = 25.0
 mags_ammo = 30
 max_ammo = 400
 is_hitscan = false
+recoil_cam_yaw = 0.56
+recoil_weapon_kick = 0.023
 fire_rate_rpm = 800.0
+accuracy = 63.352
+fire_mode = 1
 has_burst_mode = true
 projectile_speed = 1100.0
 canted_sight_position = Vector3(0.04, -0.218, -0.305)
 canted_sight_rotation = Vector3(0, 0, 0.375)
+muzzle_light_energy = 0.58
+muzzle_flash_scale = 0.045
 weapon_model = ExtResource("2_a7i0a")
 projectile_scene = ExtResource("2_f5shg")
 bullet_case_scene = ExtResource("1_u7282")

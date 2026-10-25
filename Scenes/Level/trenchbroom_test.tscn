@@ -743,22 +743,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.653402, 2.8730125, -0.1521
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.566474, 0.936, -6.692631)
 
 [node name="NormalEnemy" parent="." unique_id=1253637122 instance=ExtResource("1_r01ad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.734238, -0.4261031, -8.202324)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.89632, -0.4261031, -5.1519837)
 
 [node name="NormalEnemy2" parent="." unique_id=1588764678 instance=ExtResource("1_r01ad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.734238, -0.4261031, -9.889347)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.89632, -0.4261031, -6.839007)
 
 [node name="NormalEnemy3" parent="." unique_id=1730954325 instance=ExtResource("1_r01ad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.629827, -0.4261031, -8.202324)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.000731, -0.4261031, -5.1519837)
 
 [node name="NormalEnemy4" parent="." unique_id=2040815129 instance=ExtResource("1_r01ad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.629827, -0.4261031, -9.889347)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.000731, -0.4261031, -6.839007)
 
 [node name="NormalEnemy5" parent="." unique_id=1704782503 instance=ExtResource("1_r01ad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.624307, -0.4261031, -8.202324)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0062513, -0.4261031, -5.1519837)
 
 [node name="NormalEnemy6" parent="." unique_id=1264306112 instance=ExtResource("1_r01ad")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.624307, -0.4261031, -9.889347)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0062513, -0.4261031, -6.839007)
 
 [node name="entity_1_office_celling_lamp" parent="." unique_id=466402785 instance=ExtResource("11_r01ad")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 51.068497, 20.1186, -6)

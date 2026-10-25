@@ -9,7 +9,6 @@
 [resource]
 script = ExtResource("1_a81bq")
 weapon_name = "SMG"
-weapon_type = 2
 damage = 15.0
 mags_ammo = 32
 max_ammo = 800

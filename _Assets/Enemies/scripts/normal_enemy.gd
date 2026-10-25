@@ -20,6 +20,12 @@ extends BaseEnemy
 @export_category("Combat")
 @export var attack_range: float = 10.0
 @export var attack_reach_tolerance: float = 1.5
+@export var cover_reposition_distance: float = 2.0
+@export var burst_min_shots: int = 2
+@export var burst_max_shots: int = 4
+@export var burst_pause_min: float = 0.45
+@export var burst_pause_max: float = 1.1
+@export var flank_reposition_interval: float = 3.0
 
 @export var animation_player: AnimationPlayer
 @export var anim_tree: AnimationTree
@@ -61,6 +67,12 @@ var is_stumbling: bool = false
 var pending_stumble_direction: Vector3 = Vector3.ZERO
 var stumble_controller: ActiveRagdollStumbleController
 var lost_target_time: float = 0.0
+var squad_coordinator: EnemySquadCoordinator
+var tactical_destination: Vector3 = Vector3.ZERO
+var tactical_refresh_timer: float = 0.0
+var burst_shots_remaining: int = 0
+var burst_pause_timer: float = 0.0
+var needs_reposition: bool = false
 
 enum TraversalState {
 	GROUND,
@@ -76,6 +88,8 @@ func _ready() -> void:
 	super._ready()
 
 	target = get_tree().get_first_node_in_group("player")
+	squad_coordinator = _get_or_create_squad_coordinator()
+	squad_coordinator.register_enemy(self)
 	health_component.died.connect(_on_died)
 	health_component.damage_received.connect(_on_damage_received)
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
@@ -98,6 +112,8 @@ func _ready() -> void:
 	# disable
 		
 	navigation_agent.target_desired_distance = randf_range(1.3, 3.0) # Randomize the distance to the player when following
+	tactical_refresh_timer = randf_range(0.0, flank_reposition_interval)
+	burst_shots_remaining = randi_range(burst_min_shots, burst_max_shots)
 
 
 
@@ -169,38 +185,36 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 	if not is_instance_valid(target):
 		return
 
+	if needs_reposition:
+		tactical_refresh_timer = maxf(tactical_refresh_timer - delta, 0.0)
+		if tactical_refresh_timer <= 0.0 or tactical_destination == Vector3.ZERO:
+			tactical_destination = squad_coordinator.get_tactical_destination(self, target)
+			tactical_refresh_timer = flank_reposition_interval
+		navigation_agent.target_position = tactical_destination
+		if global_position.distance_to(tactical_destination) > cover_reposition_distance:
+			_navigate_to_tactical_destination(delta)
+			return
+		needs_reposition = false
+
 	if _can_see_target() and global_position.distance_to(target.global_position) <= attack_range:
 		lost_target_time = 0.0
 		state_chart.send_event("toAttack")
 		return
 
-	navigation_agent.target_position = target.global_position
+	tactical_refresh_timer = maxf(tactical_refresh_timer - delta, 0.0)
+	if tactical_refresh_timer <= 0.0 or tactical_destination == Vector3.ZERO:
+		tactical_destination = squad_coordinator.get_tactical_destination(self, target)
+		tactical_refresh_timer = flank_reposition_interval
+	navigation_agent.target_position = tactical_destination
 
-	if navigation_agent.is_navigation_finished():
+	if navigation_agent.is_navigation_finished() and global_position.distance_to(tactical_destination) <= cover_reposition_distance:
 		navigation_agent.velocity = Vector3.ZERO
 		# if animation_player and animation_player.current_animation != "Idle":
 		# 	animation_player.play("Idle")
 		return
 
-	# Move towards the target
-	# if not ledge_raycast.is_colliding() and is_on_floor():
-	# 	var forward_dir = -global_transform.basis.z
-	# 	velocity = forward_dir * follow_speed
+	_navigate_to_tactical_destination(delta)
 
-	# 	state_chart.send_event("toAirborne")
-	# 	return
-
-	var next_pos = navigation_agent.get_next_path_position()
-	var direction = (next_pos - global_position).normalized()
-
-	navigation_agent.velocity = direction * follow_speed
-
-	var target_velocity_x = direction.x * follow_speed
-	var target_velocity_z = direction.z * follow_speed
-
-	if not navigation_agent.avoidance_enabled:
-		velocity.x = move_toward(velocity.x, target_velocity_x, acceleration * delta)
-		velocity.z = move_toward(velocity.z, target_velocity_z, acceleration * delta)
 	# if animation_player and animation_player.current_animation != "Running":
 	# 	animation_player.play("Running")
 		# animation_player.seek(randf_range(0.0,animation_player.current_animation_length))
@@ -208,17 +222,13 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 	if anim_tree_state.get_current_node() != "Follow":
 		anim_tree_state.travel("Follow")
 
-	if direction.length() > 0.01:
-		var target_rot = atan2(direction.x, direction.z)
-		rotation.y = lerp_angle(rotation.y, target_rot, 5.0 * delta)
-
 func _on_airborne_state_physics_processing(delta: float) -> void:
 	traversal_state = TraversalState.AIRBORNE
 
 	if is_on_floor() and velocity.y < 0.0:
 		traversal_state = TraversalState.GROUND
 		state_chart.send_event("toFollow")
-		navigation_agent.target_position = target.global_position
+		tactical_destination = Vector3.ZERO
 
 func _on_navigation_agent_3d_link_reached(details: Dictionary) -> void:
 	if is_dead or traversal_state == TraversalState.VAULTING:
@@ -421,6 +431,7 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 
 	lost_target_time = 0.0
 	navigation_agent.velocity = Vector3.ZERO
+	burst_pause_timer = maxf(burst_pause_timer - delta, 0.0)
 
 	var flat_direction = Vector3(
 		target.global_position.x - global_position.x, 
@@ -445,7 +456,19 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 			
 			shoot_pos.global_basis = Basis(current_quat.slerp(target_quat, 15.0 * delta))
 
+	if burst_pause_timer > 0.0:
+		return
+	if burst_shots_remaining <= 0:
+		burst_shots_remaining = randi_range(burst_min_shots, burst_max_shots)
+		burst_pause_timer = randf_range(burst_pause_min, burst_pause_max)
+		needs_reposition = true
+		tactical_destination = Vector3.ZERO
+		state_chart.send_event("toFollow")
+		return
+
 	enemy_shoot_component.fire()
+	if enemy_shoot_component.fire_timer > 0.0:
+		burst_shots_remaining -= 1
 
 func _can_see_target() -> bool:
 	if not is_instance_valid(target):
@@ -476,6 +499,25 @@ func _can_see_target() -> bool:
 	var collider: Object = result.get("collider") as Object
 	return collider == target or (collider is Node3D and target.is_ancestor_of(collider as Node3D))
 
+func _navigate_to_tactical_destination(delta: float) -> void:
+	if navigation_agent.is_navigation_finished():
+		navigation_agent.velocity = Vector3.ZERO
+		return
+
+	var next_pos: Vector3 = navigation_agent.get_next_path_position()
+	var direction: Vector3 = (next_pos - global_position).normalized()
+	navigation_agent.velocity = direction * follow_speed
+
+	var target_velocity_x: float = direction.x * follow_speed
+	var target_velocity_z: float = direction.z * follow_speed
+	if not navigation_agent.avoidance_enabled:
+		velocity.x = move_toward(velocity.x, target_velocity_x, acceleration * delta)
+		velocity.z = move_toward(velocity.z, target_velocity_z, acceleration * delta)
+
+	if direction.length_squared() > 0.001:
+		var target_rot: float = atan2(direction.x, direction.z)
+		rotation.y = lerp_angle(rotation.y, target_rot, 5.0 * delta)
+
 func _get_vision_origin() -> Node3D:
 	if is_instance_valid(vision_origin):
 		return vision_origin
@@ -491,6 +533,9 @@ func _get_target_aim_position() -> Vector3:
 #region Death and Ragdoll
 
 func _on_died() -> void:
+	add_to_group("dead")
+	if squad_coordinator:
+		squad_coordinator.unregister_enemy(self)
 	if stumble_controller:
 		stumble_controller.cancel_for_death()
 	state_chart.send_event("toDead")
@@ -540,3 +585,21 @@ func _on_stumble_state_physics_processing(delta: float) -> void:
 	# Handle the physics processing for the stumble state
 	# This is where you would implement the specific behavior for when the enemy is stumbling
 	pass
+
+func _get_or_create_squad_coordinator() -> EnemySquadCoordinator:
+	var scene_root: Node = get_tree().root
+	if scene_root.has_meta(&"enemy_squad_coordinator"):
+		var existing_variant: Variant = scene_root.get_meta(&"enemy_squad_coordinator")
+		var existing: EnemySquadCoordinator = existing_variant as EnemySquadCoordinator
+		if is_instance_valid(existing):
+			return existing
+
+	var created: EnemySquadCoordinator = EnemySquadCoordinator.new()
+	created.add_to_group("enemy_squad_coordinator")
+	scene_root.set_meta(&"enemy_squad_coordinator", created)
+	scene_root.add_child.call_deferred(created)
+	return created
+
+func _exit_tree() -> void:
+	if is_instance_valid(squad_coordinator):
+		squad_coordinator.unregister_enemy(self)
