@@ -104,6 +104,12 @@ enum WeaponAmmoType {
 @export var weapon_scale: Vector3 = Vector3(1, 1, 1)
 @export var bullet_case_scale: Vector3 = Vector3(1, 1, 1)
 
+@export_group("Tactical Sprint")
+@export var override_tactical_sprint_pose: bool = false
+@export var tactical_sprint_position_offset: Vector3 = Vector3.ZERO
+@export var tactical_sprint_rotation_offset: Vector3 = Vector3.ZERO
+@export_range(0.0, 3.0, 0.01) var tactical_sprint_motion_multiplier: float = 1.0
+
 
 
 const METERS_PER_WORLD_UNIT: float = 1.0

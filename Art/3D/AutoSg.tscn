@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bmco7vsh8f1cy"]
 
 [ext_resource type="PackedScene" uid="uid://bm5s4c7ejoxvk" path="res://Art/3D/Blender/auto-s12.glb" id="1_d1fxt"]
+[ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_o5dd6"]
 [ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="2_d1fxt"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="2_j04es"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="2_s6qqo"]
@@ -119,7 +120,7 @@ nodes/Animation/position = Vector2(580, 440)
 node_connections = [&"output", 0, &"FireOneShot", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"Animation"]
 
 [node name="AutoSg" type="Node3D" unique_id=1588667708]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4716842, 0.4094907)
+script = ExtResource("1_o5dd6")
 
 [node name="auto-s12" parent="." unique_id=1747288993 instance=ExtResource("1_d1fxt")]
 transform = Transform3D(1.43, 0, 0, 0, 1.43, 0, 0, 0, 1.43, 0, -0.45527112, -0.94514364)

@@ -34,9 +34,10 @@ extends BaseEnemy
 @export var stumble_bone: PhysicalBone3D
 @export var stumble_threshold: float = 35.0
 @export var stumble_force: float = 8.0
-@export var stumble_duration: float = 0.4
+@export var stumble_duration: float = 0.75
 @export var stumble_state: StateChartState
 @export var collision_shape: CollisionShape3D
+@export var active_ragdoll_controller: ActiveRagdollStumbleController
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var state_chart: StateChart = $StateChart
@@ -65,7 +66,8 @@ var vault_start_position: Vector3
 var vault_end_position: Vector3
 var is_stumbling: bool = false
 var pending_stumble_direction: Vector3 = Vector3.ZERO
-var stumble_controller: ActiveRagdollStumbleController
+var pending_stumble_intensity: float = 0.5
+var pending_stumble_position: Vector3 = Vector3.INF
 var lost_target_time: float = 0.0
 var squad_coordinator: EnemySquadCoordinator
 var tactical_destination: Vector3 = Vector3.ZERO
@@ -93,16 +95,11 @@ func _ready() -> void:
 	health_component.died.connect(_on_died)
 	health_component.damage_received.connect(_on_damage_received)
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
-	stumble_controller = ActiveRagdollStumbleController.new()
-	stumble_controller.actor = self
-	stumble_controller.ragdoll_skeleton = ragdoll_skeleton
-	stumble_controller.stumble_bone = stumble_bone
-	stumble_controller.anim_tree = anim_tree
-	stumble_controller.collision_shape = collision_shape
-	stumble_controller.stumble_duration = stumble_duration
-	stumble_controller.recovered.connect(_on_stumble_recovered)
-	add_child(stumble_controller)
-	if stumble_state:
+	if is_instance_valid(active_ragdoll_controller):
+		active_ragdoll_controller.recovered.connect(_on_stumble_recovered)
+	else:
+		push_warning("NormalEnemy: active_ragdoll_controller is not assigned.")
+	if is_instance_valid(stumble_state):
 		stumble_state.state_entered.connect(_on_stumble_state_entered)
 		print("Connected to stumble state entered signal")
 
@@ -118,6 +115,12 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if is_stumbling:
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+		move_and_slide()
+		return
+
 	if traversal_state == TraversalState.VAULTING:
 		_on_vaulting_state_physics_processing()
 		update_blends()
@@ -346,13 +349,25 @@ func update_blends() -> void:
 #region Combat and Detection
 
 func _on_damage_received(info: DamageInfo, _applied_damage: float) -> void:
-	if is_dead or is_stumbling or health_component.current_health <= 0.0:
+	if is_dead or health_component.current_health <= 0.0 or not is_instance_valid(active_ragdoll_controller):
 		return
 
 	if info.raw_damage < stumble_threshold:
 		return
 
-	pending_stumble_direction = _get_stumble_direction(info)
+	var impact_direction: Vector3 = _get_stumble_direction(info)
+	var intensity: float = clampf(info.raw_damage / maxf(stumble_threshold * 2.0, 0.01), 0.0, 1.0)
+	var hit_position: Vector3 = info.impact_position
+	if hit_position.length_squared() <= 0.001:
+		hit_position = Vector3.INF
+
+	if active_ragdoll_controller.is_active():
+		active_ragdoll_controller.add_hit(impact_direction, stumble_force, intensity, hit_position)
+		return
+
+	pending_stumble_direction = impact_direction
+	pending_stumble_intensity = intensity
+	pending_stumble_position = hit_position
 	state_chart.send_event("toStumble")
 
 func _get_stumble_direction(info: DamageInfo) -> Vector3:
@@ -368,18 +383,23 @@ func _get_stumble_direction(info: DamageInfo) -> Vector3:
 	return impact_direction.normalized()
 
 func _on_stumble_state_entered() -> void:
-	if is_dead or is_stumbling or not stumble_controller:
+	if is_dead or is_stumbling or not is_instance_valid(active_ragdoll_controller):
 		return
 
 	is_stumbling = true
 	navigation_agent.velocity = Vector3.ZERO
 	navigation_agent.target_position = global_position
 
-	if not stumble_controller.can_begin():
+	if not active_ragdoll_controller.can_begin():
 		is_stumbling = false
 		state_chart.send_event("toFollow")
 		return
-	stumble_controller.begin(pending_stumble_direction, stumble_force)
+	active_ragdoll_controller.begin(
+		pending_stumble_direction,
+		stumble_force,
+		pending_stumble_intensity,
+		pending_stumble_position
+	)
 
 func _on_stumble_recovered() -> void:
 	if is_dead:
@@ -536,8 +556,8 @@ func _on_died() -> void:
 	add_to_group("dead")
 	if squad_coordinator:
 		squad_coordinator.unregister_enemy(self)
-	if stumble_controller:
-		stumble_controller.cancel_for_death()
+	if is_instance_valid(active_ragdoll_controller):
+		active_ragdoll_controller.cancel_for_death()
 	state_chart.send_event("toDead")
 	# put the enemy into a ragdoll group so the player can kick it around
 	add_to_group("ragdoll")

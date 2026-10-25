@@ -177,6 +177,7 @@ casing_position = NodePath("../../CameraController/Cam/ShootPos")
 camera = NodePath("../../CameraController/Cam")
 cam_rig = NodePath("../../CameraController")
 crouch_rot_offset = Vector3(0, 0, 0.262)
+sprint_rot_offset = Vector3(0.489, 0.14, -0.559)
 idle_sway_frequency = 0.4
 idle_sway_amplitude = Vector2(0.015, 0.01)
 idle_sway_stiffness = 150.0

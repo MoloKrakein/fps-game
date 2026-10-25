@@ -223,15 +223,15 @@ func update_rotation(rotation_input)-> void:
 
 func sprint() -> void:
 	sprint_modifier = sprint_speed
+	is_sprinting = true
 	if debug:
 		print("Changed sprint modifier to: ", sprint_modifier)
-	# is_sprinting = true
 
 func walk() -> void:
 	sprint_modifier = 0.0
+	is_sprinting = false
 	if debug:
 		print("Changed sprint modifier to: ", sprint_modifier)
-	# is_sprinting = false
 
 func stand() -> void:
 	crouch_modifier = 0.0
@@ -243,6 +243,7 @@ func stand() -> void:
 
 func crouch() -> void:
 	crouch_modifier = crouch_speed
+	is_sprinting = false
 	crouching_col.disabled = false
 	standing_col.disabled = true
 	
@@ -259,6 +260,7 @@ func jump() -> void:
 
 func start_slide() -> void:
 	is_sliding = true
+	is_sprinting = false
 	_slide_direction = Vector3(velocity.x, 0, velocity.z).normalized()
 	standing_col.disabled = true
 	crouching_col.disabled = false
