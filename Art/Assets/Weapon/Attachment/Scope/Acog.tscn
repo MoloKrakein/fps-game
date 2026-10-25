@@ -60,6 +60,10 @@ shader = ExtResource("3_8g36r")
 shader_parameter/reticle_texture = SubResource("ViewportTexture_6f8o3")
 shader_parameter/scope_texture = SubResource("ViewportTexture_qr0ht")
 shader_parameter/scope_radius = 0.05
+shader_parameter/lens_mask_center = Vector2(0.5, 0.5)
+shader_parameter/lens_mask_radius = 0.5
+shader_parameter/lens_mask_scale = Vector2(1, 1)
+shader_parameter/lens_mask_softness = 0.01
 shader_parameter/reticle_depth = 1.09
 shader_parameter/parallax_factor = 0.126000005985
 shader_parameter/view_edge_fade_factor = 0.1110000052725
@@ -77,7 +81,6 @@ size = Vector2(0.205, 0.185)
 orientation = 2
 
 [node name="Node3D" type="Node3D" unique_id=694394248]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
 [node name="blockbench_export" parent="." unique_id=1290800655 instance=ExtResource("1_ywwve")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
@@ -104,7 +107,7 @@ use_hdr_2d = true
 use_hdr_2d = true
 
 [node name="Camera3D" type="Camera3D" parent="display/ScopeView" unique_id=1578499935]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.09618789, -0.12475492)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)
 fov = 5.9
 
 [node name="RemoteTransform3D" type="RemoteTransform3D" parent="display" unique_id=2089060351]

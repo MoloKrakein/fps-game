@@ -8,8 +8,16 @@ const vec3 BLACK = vec3(0.0);
 uniform sampler2D reticle_texture: repeat_disable;
 /** Viewport texture from a 3D Camera that will become the scope's view */
 uniform sampler2D scope_texture: repeat_disable;
-/** Radius for the scope's physical outer radius */
+/** Legacy physical radius used by older scope materials. */
 uniform float scope_radius = 0.025;
+/** Center of the visible lens aperture in the display mesh UVs. */
+uniform vec2 lens_mask_center = vec2(0.5, 0.5);
+/** Radius of the visible lens aperture in normalized UV space. */
+uniform float lens_mask_radius: hint_range(0.0, 0.75, 0.001) = 0.5;
+/** Ellipse correction for non-square lens openings. */
+uniform vec2 lens_mask_scale = vec2(1.0, 1.0);
+/** Softness of the aperture edge in normalized UV space. */
+uniform float lens_mask_softness: hint_range(0.0, 0.1, 0.001) = 0.01;
 /** Depth before the reticle appears */
 uniform float reticle_depth = 2.0;
 uniform float parallax_factor: hint_range(0.0, .3, 0.001) = 0.1;
@@ -98,6 +106,12 @@ float get_in_bounds_factor(vec2 uv) {
 	return step(lower, uv.x) * step(uv.x, upper) * step(lower, uv.y) * step(uv.y, upper);
 }
 
+float get_lens_mask(vec2 uv) {
+	vec2 mask_scale = max(lens_mask_scale, vec2(0.001));
+	float distance_from_center = length((uv - lens_mask_center) / mask_scale);
+	float edge_start = max(lens_mask_radius - lens_mask_softness, 0.0);
+	return 1.0 - smoothstep(edge_start, lens_mask_radius, distance_from_center);
+}
 
 void vertex() {
 	view = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz - (MODELVIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
@@ -107,29 +121,31 @@ void vertex() {
 void fragment() {
 	float eye_distance = length(NODE_POSITION_WORLD - CAMERA_POSITION_WORLD);
 	vec3 view_dir = normalize(normalize(-VERTEX + EYE_OFFSET) * mat3(TANGENT, -BINORMAL, NORMAL));
+	float lens_mask = get_lens_mask(UV);
+
+	if (lens_mask <= 0.0) {
+		discard;
+	}
 
 	// Inside of scope
-	if (length(view) <= scope_radius) {
+	if (lens_mask > 0.0) {
 		vec2 adj_uv = get_depth_effect(UV, view_dir, reticle_depth);
+		vec2 scope_uv = clamp(adj_uv, vec2(0.001), vec2(0.999));
 
 		// This setup seems to cause a parallax-like effect
 		// minimize using parallax_factor
 		vec2 parallax_uv = mix(adj_uv, UV, parallax_factor);
 
-		vec4 scope_sample = texture(scope_texture, adj_uv);
+		vec4 scope_sample = texture(scope_texture, scope_uv);
 		scope_sample.rgb = get_scope_shadow_effect(UV, scope_sample, view_dir, eye_distance);
 		scope_sample.rgb = get_scope_edge_fade_effect(adj_uv, scope_sample);
 
-		vec4 reticle_sample = texture(reticle_texture, parallax_uv);
+		vec4 reticle_sample = texture(reticle_texture, clamp(parallax_uv, vec2(0.001), vec2(0.999)));
 
 		// Mask to in-bounds to discard reticle sample "stretching to infinity" at edge of UV
-		reticle_sample.a *= get_in_bounds_factor(adj_uv);
+		reticle_sample.a *= get_in_bounds_factor(parallax_uv);
 
-		ALPHA = 1.0;
+		ALPHA = lens_mask;
 		ALBEDO = mix(scope_sample.rgb, reticle_sample.rgb, reticle_sample.a);
-
-	// Outside radius: Discard to make a perfect circle
-	} else {
-		discard;
 	}
 }

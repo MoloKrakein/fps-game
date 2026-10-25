@@ -66,6 +66,7 @@ var _sprint_motion_pos: Vector3 = Vector3.ZERO
 var _sprint_motion_rot: Vector3 = Vector3.ZERO
 var _sprint_motion_weight: float = 0.0
 var _sprint_motion_time: float = 0.0
+var _sprint_animation_active: bool = false
 
 
 func _init(controller: WeaponController) -> void:
@@ -315,8 +316,7 @@ func _update_crouch_stance(delta: float) -> void:
 func _update_sprint_stance(delta: float) -> void:
 	var target_pos: Vector3 = Vector3.ZERO
 	var target_rot: Vector3 = Vector3.ZERO
-	var sprinting: bool = player != null and player.is_sprinting and not player.is_crouching and not player.is_sliding
-	sprinting = sprinting and not is_aiming and _planar_speed() > 0.1
+	var sprinting: bool = _is_sprint_animation_active()
 
 	if sprinting:
 		target_pos = _get_sprint_position_offset()
@@ -354,6 +354,20 @@ func _update_sprint_stance(delta: float) -> void:
 		cos(motion_phase * 0.5) * ctrl.sprint_yaw_amount,
 		sin(motion_phase * 0.5) * ctrl.sprint_roll_amount
 	) * motion_scale
+
+
+func _is_sprint_animation_active() -> bool:
+	if player == null or not player.is_sprinting or player.is_crouching or player.is_sliding or is_aiming:
+		_sprint_animation_active = false
+		return false
+
+	var speed: float = _planar_speed()
+	if _sprint_animation_active:
+		var stop_speed: float = minf(ctrl.sprint_animation_stop_speed, ctrl.sprint_animation_min_speed)
+		_sprint_animation_active = speed >= stop_speed
+	else:
+		_sprint_animation_active = speed >= ctrl.sprint_animation_min_speed
+	return _sprint_animation_active
 
 
 func _get_sprint_position_offset() -> Vector3:
