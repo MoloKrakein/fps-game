@@ -4,11 +4,32 @@ extends BaseEnemy
 @export var follow_speed: float = 5.0
 @export var max_step_up: float = 1.0
 @export var max_step_down: float = 1.0
+@export var gap_jump_speed: float = 8.0
+@export var gravity: float = 20.0
+@export var vault_height: float = 1.5
+@export var vault_distance: float = 1.5
+@export var vault_duration: float = 0.45
+@export var vault_obstacle_check_distance: float = 0.75
+@export_category("Perception")
+@export var vision_origin: Node3D
+@export_range(1.0, 180.0, 1.0) var vision_angle: float = 110.0
+@export var vision_range: float = 24.0
+@export var target_aim_height: float = 1.0
+@export var lost_target_memory: float = 1.5
+@export var vision_collision_mask: int = 3
+@export_category("Combat")
+@export var attack_range: float = 10.0
+@export var attack_reach_tolerance: float = 1.5
 
 @export var animation_player: AnimationPlayer
 @export var anim_tree: AnimationTree
 @export var ledge_raycast: RayCast3D
 @export var ragdoll_skeleton: PhysicalBoneSimulator3D
+@export var stumble_bone: PhysicalBone3D
+@export var stumble_threshold: float = 35.0
+@export var stumble_force: float = 8.0
+@export var stumble_duration: float = 0.4
+@export var stumble_state: StateChartState
 @export var collision_shape: CollisionShape3D
 
 @onready var health_component: HealthComponent = $HealthComponent
@@ -24,8 +45,6 @@ extends BaseEnemy
 
 
 var character_height: float = 2.0
-var attack_range: float = 10.0
-
 var anim_tree_state: AnimationNodeStateMachinePlayback
 
 var acceleration: float = 10.0
@@ -35,6 +54,21 @@ var previous_velocity: Vector3
 var target: Node3D
 var is_sliding: bool = false
 var is_dead: bool = false
+var vault_tween: Tween
+var vault_start_position: Vector3
+var vault_end_position: Vector3
+var is_stumbling: bool = false
+var pending_stumble_direction: Vector3 = Vector3.ZERO
+var stumble_controller: ActiveRagdollStumbleController
+var lost_target_time: float = 0.0
+
+enum TraversalState {
+	GROUND,
+	AIRBORNE,
+	VAULTING,
+}
+
+var traversal_state: TraversalState = TraversalState.GROUND
 
 #region Lifecycle
 
@@ -43,7 +77,20 @@ func _ready() -> void:
 
 	target = get_tree().get_first_node_in_group("player")
 	health_component.died.connect(_on_died)
+	health_component.damage_received.connect(_on_damage_received)
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
+	stumble_controller = ActiveRagdollStumbleController.new()
+	stumble_controller.actor = self
+	stumble_controller.ragdoll_skeleton = ragdoll_skeleton
+	stumble_controller.stumble_bone = stumble_bone
+	stumble_controller.anim_tree = anim_tree
+	stumble_controller.collision_shape = collision_shape
+	stumble_controller.stumble_duration = stumble_duration
+	stumble_controller.recovered.connect(_on_stumble_recovered)
+	add_child(stumble_controller)
+	if stumble_state:
+		stumble_state.state_entered.connect(_on_stumble_state_entered)
+		print("Connected to stumble state entered signal")
 
 
 
@@ -55,13 +102,19 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if traversal_state == TraversalState.VAULTING:
+		_on_vaulting_state_physics_processing()
+		update_blends()
+		return
+
 	if not is_on_floor():
-		velocity.y -= 20.0 * delta
+		velocity.y -= gravity * delta
 
 	# If stair stepping handled the movement, we don't need to move_and_slide
 	var handled_stairs = _try_stair_stepping(velocity * delta)
 	if not handled_stairs:
-		move_and_slide()
+		if not _try_begin_vault():
+			move_and_slide()
 		
 	# ALWAYS update blends, regardless of whether we climbed a stair or walked flat!
 	update_blends()
@@ -110,6 +163,17 @@ func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 	velocity.z = move_toward(velocity.z, target_velocity.z, acceleration * get_physics_process_delta_time())
 
 func _on_follow_state_physics_processing(delta: float) -> void:
+	if traversal_state != TraversalState.GROUND:
+		return
+
+	if not is_instance_valid(target):
+		return
+
+	if _can_see_target() and global_position.distance_to(target.global_position) <= attack_range:
+		lost_target_time = 0.0
+		state_chart.send_event("toAttack")
+		return
+
 	navigation_agent.target_position = target.global_position
 
 	if navigation_agent.is_navigation_finished():
@@ -149,9 +213,110 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 		rotation.y = lerp_angle(rotation.y, target_rot, 5.0 * delta)
 
 func _on_airborne_state_physics_processing(delta: float) -> void:
+	traversal_state = TraversalState.AIRBORNE
+
 	if is_on_floor() and velocity.y < 0.0:
+		traversal_state = TraversalState.GROUND
 		state_chart.send_event("toFollow")
 		navigation_agent.target_position = target.global_position
+
+func _on_navigation_agent_3d_link_reached(details: Dictionary) -> void:
+	if is_dead or traversal_state == TraversalState.VAULTING:
+		return
+
+	var exit_position: Vector3 = _get_link_position(details, &"link_exit_position")
+	var jump_direction: Vector3 = exit_position - global_position
+	jump_direction.y = 0.0
+
+	if jump_direction.length_squared() <= 0.001:
+		jump_direction = -global_transform.basis.z
+
+	jump_direction = jump_direction.normalized()
+	velocity.x = jump_direction.x * follow_speed
+	velocity.z = jump_direction.z * follow_speed
+	velocity.y = gap_jump_speed
+	traversal_state = TraversalState.AIRBORNE
+	state_chart.send_event("toAirborne")
+
+func _get_link_position(details: Dictionary, key: StringName) -> Vector3:
+	var position_variant: Variant = details.get(key, global_position)
+	if position_variant is Vector3:
+		return position_variant as Vector3
+	return global_position
+
+func _try_begin_vault() -> bool:
+	if traversal_state != TraversalState.GROUND or not is_on_floor():
+		return false
+
+	var horizontal_velocity: Vector3 = Vector3(velocity.x, 0.0, velocity.z)
+	if horizontal_velocity.length_squared() <= 0.001:
+		return false
+
+	var direction: Vector3 = horizontal_velocity.normalized()
+	var body_test_parameters: PhysicsTestMotionParameters3D = PhysicsTestMotionParameters3D.new()
+	var body_test_result: PhysicsTestMotionResult3D = PhysicsTestMotionResult3D.new()
+	body_test_parameters.from = global_transform
+	body_test_parameters.motion = direction * vault_obstacle_check_distance
+
+	if not PhysicsServer3D.body_test_motion(get_rid(), body_test_parameters, body_test_result):
+		return false
+
+	var raised_transform: Transform3D = global_transform.translated(Vector3.UP * vault_height)
+	body_test_parameters.from = raised_transform
+	body_test_parameters.motion = direction * vault_distance
+
+	if PhysicsServer3D.body_test_motion(get_rid(), body_test_parameters, body_test_result):
+		return false
+
+	var landing_transform: Transform3D = raised_transform.translated(direction * vault_distance)
+	body_test_parameters.from = landing_transform
+	body_test_parameters.motion = Vector3.DOWN * (vault_height + max_step_down)
+
+	if not PhysicsServer3D.body_test_motion(get_rid(), body_test_parameters, body_test_result):
+		return false
+
+	var landing_position: Vector3 = landing_transform.origin + body_test_result.get_travel()
+
+	_begin_vault(landing_position, direction)
+	return true
+
+func _begin_vault(landing_position: Vector3, direction: Vector3) -> void:
+	traversal_state = TraversalState.VAULTING
+	velocity = Vector3.ZERO
+	navigation_agent.velocity = Vector3.ZERO
+	navigation_agent.target_position = global_position
+	vault_start_position = global_position
+	vault_end_position = landing_position
+
+	if vault_tween != null:
+		vault_tween.kill()
+
+	var vault_apex: Vector3 = vault_start_position.lerp(vault_end_position, 0.5)
+	vault_apex.y = maxf(vault_start_position.y, vault_end_position.y) + vault_height
+	vault_tween = create_tween()
+	vault_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	vault_tween.tween_method(_set_vault_position, vault_start_position, vault_apex, vault_duration * 0.5)
+	vault_tween.tween_method(_set_vault_position, vault_apex, vault_end_position, vault_duration * 0.5)
+	vault_tween.finished.connect(_finish_vault)
+
+	var target_rotation: float = atan2(direction.x, direction.z)
+	rotation.y = target_rotation
+
+func _set_vault_position(position: Vector3) -> void:
+	global_position = position
+
+func _on_vaulting_state_physics_processing() -> void:
+	velocity = Vector3.ZERO
+
+func _finish_vault() -> void:
+	if is_dead:
+		return
+
+	vault_tween = null
+	global_position = vault_end_position
+	traversal_state = TraversalState.GROUND
+	navigation_agent.target_position = target.global_position if is_instance_valid(target) else global_position
+
 
 #endregion
 
@@ -170,17 +335,67 @@ func update_blends() -> void:
 
 #region Combat and Detection
 
+func _on_damage_received(info: DamageInfo, _applied_damage: float) -> void:
+	if is_dead or is_stumbling or health_component.current_health <= 0.0:
+		return
+
+	if info.raw_damage < stumble_threshold:
+		return
+
+	pending_stumble_direction = _get_stumble_direction(info)
+	state_chart.send_event("toStumble")
+
+func _get_stumble_direction(info: DamageInfo) -> Vector3:
+	var impact_direction: Vector3 = info.impact_direction
+	if info.attacker is Node3D:
+		var attacker: Node3D = info.attacker as Node3D
+		var direction_from_attacker: Vector3 = global_position - attacker.global_position
+		if direction_from_attacker.length_squared() > 0.001:
+			impact_direction = direction_from_attacker.normalized()
+
+	if impact_direction.length_squared() <= 0.001:
+		impact_direction = global_transform.basis.z
+	return impact_direction.normalized()
+
+func _on_stumble_state_entered() -> void:
+	if is_dead or is_stumbling or not stumble_controller:
+		return
+
+	is_stumbling = true
+	navigation_agent.velocity = Vector3.ZERO
+	navigation_agent.target_position = global_position
+
+	if not stumble_controller.can_begin():
+		is_stumbling = false
+		state_chart.send_event("toFollow")
+		return
+	stumble_controller.begin(pending_stumble_direction, stumble_force)
+
+func _on_stumble_recovered() -> void:
+	if is_dead:
+		return
+
+	is_stumbling = false
+	state_chart.send_event("toFollow")
+
 func _on_detection_range_body_entered(body: Node3D) -> void:
 	if body.is_in_group("player") and not is_dead:
-		on_triggered()
+		target = body
+		lost_target_time = 0.0
+		if _can_see_target():
+			on_triggered()
 
 func on_triggered() -> void:
-	# print("Saw Player")
-	# state_chart.send_event("toFollow")
+	if is_dead or not _can_see_target():
+		return
 	state_chart.send_event("toAttack")
 
-func on_trigger(player) -> void:
-	# print("Saw Player")
+func on_trigger(player: Node3D) -> void:
+	if is_dead:
+		return
+
+	target = player
+	lost_target_time = 0.0
 	state_chart.send_event("toFollow")
 
 
@@ -188,18 +403,25 @@ func get_targetname() -> String:
 	return triggerable_component.targetname if triggerable_component else ""
 
 func _on_attack_state_physics_processing(delta: float) -> void:
-	if not target:
-		return
-
-	var distance_to_target = global_position.distance_to(target.global_position)
-	if distance_to_target > attack_range:
+	if not is_instance_valid(target):
 		state_chart.send_event("toFollow")
 		return
 
-	# 1. Stop moving and plant feet to shoot
+	var distance_to_target = global_position.distance_to(target.global_position)
+	if distance_to_target > attack_range + attack_reach_tolerance:
+		state_chart.send_event("toFollow")
+		return
+
+	if not _can_see_target():
+		lost_target_time += delta
+		navigation_agent.velocity = Vector3.ZERO
+		if lost_target_time >= lost_target_memory:
+			state_chart.send_event("toFollow")
+		return
+
+	lost_target_time = 0.0
 	navigation_agent.velocity = Vector3.ZERO
 
-	# 2. Rotate the Enemy Body Left/Right (Yaw) safely keeping Y flat
 	var flat_direction = Vector3(
 		target.global_position.x - global_position.x, 
 		0.0, 
@@ -210,33 +432,67 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 		var target_rot = atan2(flat_direction.x, flat_direction.z)
 		rotation.y = lerp_angle(rotation.y, target_rot, 15.0 * delta)
 
-	# 3. Rotate the Shoot Position (The Gun/Raycast) safely
 	if is_instance_valid(enemy_shoot_component.shoot_position):
-		
-		# THE FIX: Target the center mass directly. 
-		# (If they shoot your feet now, change it to Vector3(0.0, 0.5, 0.0) instead of 1.0)
-		var aim_target_position = target.global_position 
-		
+		var aim_target_position: Vector3 = _get_target_aim_position()
 		var shoot_pos = enemy_shoot_component.shoot_position
 		var aim_direction = (aim_target_position - shoot_pos.global_position).normalized()
 		
 		if aim_direction.length_squared() > 0.001:
 			var target_basis = Basis.looking_at(aim_direction, Vector3.UP)
 			
-			# Quaternions prevent the scaling/stretching crashes during fast tracking
 			var current_quat = shoot_pos.global_basis.orthonormalized().get_rotation_quaternion()
 			var target_quat = target_basis.get_rotation_quaternion()
 			
 			shoot_pos.global_basis = Basis(current_quat.slerp(target_quat, 15.0 * delta))
-	
-	# 4. Pull the trigger!
+
 	enemy_shoot_component.fire()
+
+func _can_see_target() -> bool:
+	if not is_instance_valid(target):
+		return false
+
+	var origin: Node3D = _get_vision_origin()
+	var target_position: Vector3 = _get_target_aim_position()
+	var to_target: Vector3 = target_position - origin.global_position
+	var distance_to_target: float = to_target.length()
+	if distance_to_target <= 0.001 or distance_to_target > vision_range:
+		return false
+
+	var view_direction: Vector3 = -origin.global_transform.basis.z
+	var direction_dot: float = clampf(view_direction.normalized().dot(to_target.normalized()), -1.0, 1.0)
+	if rad_to_deg(acos(direction_dot)) > vision_angle * 0.5:
+		return false
+
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
+		origin.global_position,
+		target_position,
+		vision_collision_mask
+	)
+	query.exclude = [get_rid()]
+	var result: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if result.is_empty():
+		return false
+
+	var collider: Object = result.get("collider") as Object
+	return collider == target or (collider is Node3D and target.is_ancestor_of(collider as Node3D))
+
+func _get_vision_origin() -> Node3D:
+	if is_instance_valid(vision_origin):
+		return vision_origin
+	if is_instance_valid(enemy_shoot_component.shoot_position):
+		return enemy_shoot_component.shoot_position
+	return self
+
+func _get_target_aim_position() -> Vector3:
+	return target.global_position + Vector3.UP * target_aim_height
 
 #endregion
 
 #region Death and Ragdoll
 
 func _on_died() -> void:
+	if stumble_controller:
+		stumble_controller.cancel_for_death()
 	state_chart.send_event("toDead")
 	# put the enemy into a ragdoll group so the player can kick it around
 	add_to_group("ragdoll")
@@ -259,7 +515,7 @@ func _on_dead_state_entered() -> void:
 	
 	# 2. Turn the main body into a ghost to prevent collision explosions
 	collision_layer = 0
-	collision_mask = 1
+	collision_mask = 0
 	if collision_shape:
 		collision_shape.set_deferred("disabled", true)
 	
@@ -278,3 +534,9 @@ func _on_dead_state_entered() -> void:
 	queue_free()
 
 #endregion
+
+
+func _on_stumble_state_physics_processing(delta: float) -> void:
+	# Handle the physics processing for the stumble state
+	# This is where you would implement the specific behavior for when the enemy is stumbling
+	pass

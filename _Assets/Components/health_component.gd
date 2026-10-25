@@ -3,6 +3,7 @@ class_name HealthComponent extends Node
 
 signal health_changed(new_health: float, max_health: float)
 signal damage_taken(damage_amount: float)
+signal damage_received(info: DamageInfo, applied_damage: float)
 signal armor_changed(new_armor: float, max_armor: float)
 signal on_armor_broken()
 signal died()
@@ -62,6 +63,7 @@ func take_damage_with_info(info: DamageInfo) -> void:
 		current_health -= final_damage
 
 	damage_taken.emit(final_damage)
+	damage_received.emit(info, final_damage)
 	health_changed.emit(current_health, max_health)
 
 	if current_health <= 0.0:
@@ -77,36 +79,6 @@ func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool 
 	damage_info.is_critical = is_crit
 	damage_info.armor_penetration = armor_penetration
 	take_damage_with_info(damage_info)
-	# if not is_alive:
-	#     return
-
-	# if current_armor > 0.0:
-	#     var effective_absorption: float = maxf(0.0, armor_absorption - armor_penetration)
-	#     var armor_damage: float = damage_amount * effective_absorption
-	#     var health_damage: float = damage_amount * (1.0 - effective_absorption)
-
-	#     if current_armor >= armor_damage:
-	#         current_armor -= armor_damage
-	#         current_health -= health_damage
-	#     else:
-	#         var remaining_damage: float = armor_damage - current_armor
-	#         armor_damage = current_armor
-	#         health_damage += remaining_damage
-			
-	#         current_armor = 0.0
-	#         on_armor_broken.emit()
-	#         print(get_parent().name, " armor broken!")
-	# else:
-	#     current_health -= damage_amount
-
-	
-	damage_taken.emit(damage_amount)
-	health_changed.emit(current_health, max_health)
-	armor_changed.emit(current_armor, armor_value)
-	# print(get_parent().name, " took ", damage_amount, " damage. Current health: ", current_health, "/", max_health)
-	# print("Current armor: ", current_armor, "/", armor_value)
-	if current_health <= 0.0:
-		_handle_death()
 
 func heal(heal_amount: float) -> void:
 	if not is_alive:
