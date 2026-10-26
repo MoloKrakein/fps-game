@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://df68lxky3tvad"]
 
 [ext_resource type="Script" uid="uid://kxvoo2aa83f8" path="res://Scenes/Player/PlayerController.gd" id="1_mtuoh"]
-[ext_resource type="Script" uid="uid://cpa8hpwwdko5m" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
+[ext_resource type="Script" uid="uid://c4o2bxxnlqu3o" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
 [ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="2_2jnj1"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
 [ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
@@ -25,7 +25,9 @@
 [ext_resource type="Script" uid="uid://dyukor5w2gr3g" path="res://_Assets/Player/States/airborne_state.gd" id="16_aqm4k"]
 [ext_resource type="Script" uid="uid://6mv42ee0wqh8" path="res://_Assets/Player/States/crouching_state.gd" id="16_hnuln"]
 [ext_resource type="Script" uid="uid://c1845mf4x4i1g" path="res://_Assets/Player/components/PlayerStats.gd" id="17_mwii3"]
+[ext_resource type="Script" uid="uid://b2bvbjne20wye" path="res://_Assets/Weapon/Scripts/weapon_wall_tuck.gd" id="19_ogmfp"]
 [ext_resource type="Script" uid="uid://guhkdu35mp0" path="res://_Assets/Player/States/sliding_state.gd" id="19_rcvs5"]
+[ext_resource type="Script" uid="uid://dh7qxflao4e60" path="res://_Assets/Weapon/Scripts/cover_peek.gd" id="20_ixrbb"]
 [ext_resource type="Script" uid="uid://wq07swbsgepb" path="res://_Assets/Weapon/Scripts/weapon_state_machine.gd" id="22_2ahak"]
 [ext_resource type="Script" uid="uid://dtkw3g0e1cx7o" path="res://_Assets/Weapon/Scripts/States/weap_idle_state.gd" id="22_ur3l4"]
 [ext_resource type="Script" uid="uid://d28nxftt0gg0j" path="res://_Assets/Weapon/Scripts/States/weap_firing_state.gd" id="23_2ahak"]
@@ -243,6 +245,14 @@ script = ExtResource("9_7g0yx")
 to = NodePath("../../EmptyHands")
 event = &"onDrop"
 delay_in_seconds = "0.0"
+
+[node name="WeaponWallTuck" type="Node" parent="Component" unique_id=16121334]
+script = ExtResource("19_ogmfp")
+
+[node name="CoverPeek" type="Node" parent="Component" unique_id=1798423182]
+script = ExtResource("20_ixrbb")
+cover_mask = 15
+side_distance = 0.715
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

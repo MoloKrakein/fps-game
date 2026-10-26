@@ -144,6 +144,7 @@ var weapon_start_rotation: Vector3
 var current_stance_pos: Vector3
 var current_stance_rot: Vector3
 var aim_tween: Tween
+var wall_tuck: WeaponWallTuck
 
 # Accuracy
 var stance_accuracy_modifier: float = 1.0
@@ -338,6 +339,9 @@ func can_fire() -> bool:
 		return false
 
 	if fire_timer > 0.0:
+		return false
+
+	if wall_tuck != null and wall_tuck.is_blocked():
 		return false
 
 	if current_weapon.is_open_bolt:
