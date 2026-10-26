@@ -9,6 +9,9 @@ extends Node
 ## - Slots: attackers get a firing position (line of sight, inside their weapon range),
 ##   everyone else gets a cover position (no line of sight). Slots are spaced apart.
 ## - Shared knowledge: if one enemy sees the player, the whole squad knows where they are.
+## - Morale: eager enemies get tokens more often, close in and volunteer to flank; cautious ones keep
+##   their distance; broken ones are ordered to retreat (and only shoot back when cornered).
+##   Allies dying nearby shake the survivors.
 ##
 ## The coordinator owns no scene references. Enemies register themselves and read their
 ## SquadOrder; it thinks a few times per second, not every frame.
@@ -26,6 +29,9 @@ class Member:
 	var cover_position: Vector3 = Vector3.INF
 	var cover_time: float = -100.0
 	var cover_target: Vector3 = Vector3.INF
+	var retreat_position: Vector3 = Vector3.INF
+	var retreat_time: float = -100.0
+	var retreat_target: Vector3 = Vector3.INF
 	var bad_positions: Array[Vector3] = []
 
 @export_group("General")
@@ -55,6 +61,13 @@ class Member:
 @export var flank_max_path_length: float = 45.0
 @export var flank_arrive_distance: float = 2.0
 @export var flank_speed_scale: float = 1.2
+
+@export_group("Retreat (broken morale)")
+## How far a broken enemy tries to get from where it stands, away from the target.
+@export var retreat_distance: float = 16.0
+@export var retreat_samples: int = 10
+## A broken enemy this close to the target (or with nowhere to go) fights back instead.
+@export var cornered_distance: float = 4.5
 
 @export_group("Slots")
 @export var fire_samples: int = 12
@@ -103,6 +116,8 @@ func register_enemy(enemy: BaseEnemy) -> void:
 	members.append(enemy)
 	var member: Member = Member.new()
 	member.enemy = enemy
+	# Share the enemy's own order object: the coordinator writes into it, the enemy reads it.
+	member.order = enemy.order
 	_data[enemy] = member
 
 
@@ -137,6 +152,42 @@ func alert_nearby(source: BaseEnemy, alert_position: Vector3, radius: float) -> 
 			continue
 		if other.global_position.distance_to(source.global_position) <= radius:
 			other.receive_alert(alert_position, source.target)
+
+
+## A squad mate died: nearby survivors lose some morale.
+func notify_ally_died(dead: BaseEnemy) -> void:
+	for other: BaseEnemy in members:
+		if other == dead or not is_instance_valid(other) or other.is_dead or other.morale == null:
+			continue
+		var distance: float = other.global_position.distance_to(dead.global_position)
+		if distance <= 20.0:
+			other.morale.on_ally_died(distance, 20.0)
+
+
+## Gives a visible enemy an immediate firing token before the next think tick.
+func request_attack_token(enemy: BaseEnemy) -> bool:
+	var member: Member = _data.get(enemy) as Member
+	if member == null:
+		return false
+	if member.has_token:
+		return true
+	if enemy.is_reloading() or not enemy.has_ammo() or enemy.is_broken():
+		return false
+
+	var holders: int = 0
+	for value: Variant in _data.values():
+		var other: Member = value as Member
+		if other != null and other.has_token:
+			holders += 1
+	if holders >= maxi(1, max_attackers):
+		return false
+
+	member.has_token = true
+	member.token_until = _now() + token_duration
+	member.order.role = &"attack"
+	member.order.may_fire = true
+	member.order.has_destination = false
+	return true
 
 
 ## An enemy finished its burst: give the token to someone else.
@@ -182,12 +233,24 @@ func _think() -> void:
 
 	if not _update_knowledge(squad):
 		return
+	_update_morale_context(squad)
 	_update_tokens(squad, now)
 	_update_flank(squad, now)
 
 	_taken.clear()
 	for enemy: BaseEnemy in squad:
 		_issue_order(enemy, now)
+
+
+func _update_morale_context(squad: Array[BaseEnemy]) -> void:
+	for enemy: BaseEnemy in squad:
+		if enemy.morale == null:
+			continue
+		var count: int = 0
+		for other: BaseEnemy in squad:
+			if other != enemy and enemy.global_position.distance_to(other.global_position) <= 12.0:
+				count += 1
+		enemy.morale.allies_nearby = count
 
 
 func _update_knowledge(squad: Array[BaseEnemy]) -> bool:
@@ -215,7 +278,7 @@ func _update_tokens(squad: Array[BaseEnemy], now: float) -> void:
 			continue
 		var lost_sight: bool = not enemy.target_visible and enemy.time_since_seen > 2.0
 		if now >= member.token_until or enemy.is_incapacitated() or enemy.is_reloading() \
-				or not enemy.has_ammo() or lost_sight:
+				or not enemy.has_ammo() or lost_sight or enemy.is_broken():
 			_release_token(member, now, squad.size())
 		else:
 			holders += 1
@@ -229,7 +292,7 @@ func _update_tokens(squad: Array[BaseEnemy], now: float) -> void:
 		var member: Member = _data[enemy]
 		if member.has_token or now < member.token_blocked_until:
 			continue
-		if enemy.is_incapacitated() or enemy.is_reloading() or not enemy.has_ammo():
+		if enemy.is_incapacitated() or enemy.is_reloading() or not enemy.has_ammo() or enemy.is_broken():
 			continue
 		# The flanker only gets a turn once it has arrived.
 		if enemy == _flanker:
@@ -248,7 +311,7 @@ func _update_tokens(squad: Array[BaseEnemy], now: float) -> void:
 
 func _score_token_candidate(member: Member, now: float) -> float:
 	var enemy: BaseEnemy = member.enemy
-	var score: float = randf() * 0.5
+	var score: float = randf() * 0.5 + enemy.get_token_bonus()
 	var distance: float = enemy.global_position.distance_to(squad_known_position)
 	if enemy.target_visible:
 		score += 4.0
@@ -268,7 +331,8 @@ func _release_token(member: Member, now: float, squad_size: int) -> void:
 	member.has_token = false
 	member.last_token_time = now
 	# A lone enemy should not hide for long between bursts.
-	member.token_blocked_until = now + (token_cooldown if squad_size > 1 else 0.4)
+	var cooldown: float = token_cooldown * member.enemy.get_token_cooldown_scale()
+	member.token_blocked_until = now + (cooldown if squad_size > 1 else 0.4)
 
 #endregion
 
@@ -281,7 +345,7 @@ func _update_flank(squad: Array[BaseEnemy], now: float) -> void:
 
 	if is_instance_valid(_flanker):
 		var arrived: bool = _flat_distance(_flanker.global_position, _flank_slot) <= flank_arrive_distance
-		if arrived or now >= _flank_deadline or not _is_active(_flanker):
+		if arrived or now >= _flank_deadline or not _is_active(_flanker) or _flanker.is_broken():
 			_end_flank(now, arrived)
 		return
 	_flanker = null
@@ -302,6 +366,9 @@ func _update_flank(squad: Array[BaseEnemy], now: float) -> void:
 	for enemy: BaseEnemy in squad:
 		var member: Member = _data[enemy]
 		if member.has_token or enemy.is_incapacitated() or enemy.is_reloading():
+			continue
+		# Only eager enemies volunteer to flank.
+		if enemy.is_broken() or not enemy.can_flank():
 			continue
 		var distance: float = enemy.global_position.distance_to(slot)
 		if distance < best_distance:
@@ -375,7 +442,9 @@ func _issue_order(enemy: BaseEnemy, now: float) -> void:
 	order.speed_scale = 1.0
 	order.has_destination = true
 
-	if enemy == _flanker:
+	if enemy.is_broken():
+		_issue_retreat_order(member, now)
+	elif enemy == _flanker:
 		order.role = &"flank"
 		order.destination = _flank_slot
 		order.may_fire = false
@@ -391,6 +460,69 @@ func _issue_order(enemy: BaseEnemy, now: float) -> void:
 		if enemy.is_reloading():
 			order.speed_scale = 1.1
 	_taken.append(order.destination)
+
+
+func _issue_retreat_order(member: Member, now: float) -> void:
+	var enemy: BaseEnemy = member.enemy
+	var order: SquadOrder = member.order
+	var here: Vector3 = enemy.global_position
+	var retreat_position: Vector3 = _get_retreat_position(member, now)
+
+	var nowhere_to_go: bool = _flat_distance(here, retreat_position) < 1.5
+	var too_close: bool = _flat_distance(here, squad_known_position) < cornered_distance
+	if (nowhere_to_go or too_close) and enemy.has_recent_sight(1.5):
+		# Cornered: fight back (the morale component makes the aim terrible).
+		order.role = &"desperate"
+		order.may_fire = true
+		order.destination = here
+	else:
+		order.role = &"retreat"
+		order.may_fire = false
+		order.destination = retreat_position
+
+
+func _get_retreat_position(member: Member, now: float) -> Vector3:
+	if _cache_valid(member.retreat_position, member.retreat_target, member.retreat_time, now) \
+			and not _is_near_any(member.retreat_position, _taken, slot_spacing):
+		return member.retreat_position
+	var found: Vector3 = _find_retreat_position(member)
+	member.retreat_position = found
+	member.retreat_time = now
+	member.retreat_target = squad_known_position
+	return found
+
+
+func _find_retreat_position(member: Member) -> Vector3:
+	var enemy: BaseEnemy = member.enemy
+	var target_position: Vector3 = squad_known_position
+	var map: RID = enemy.get_world_3d().navigation_map
+	var from: Vector3 = enemy.global_position
+	var away: Vector3 = from - target_position
+	away.y = 0.0
+	away = away.normalized() if away.length_squared() > 0.01 else Vector3.BACK
+	var current_range: float = _flat_distance(from, target_position)
+
+	var best: Vector3 = Vector3.INF
+	var best_score: float = -INF
+	for i: int in retreat_samples:
+		var angle: float = deg_to_rad(randf_range(-70.0, 70.0))
+		var raw: Vector3 = from + away.rotated(Vector3.UP, angle) * retreat_distance * randf_range(0.8, 1.2)
+		var nav_point: Vector3 = NavigationServer3D.map_get_closest_point(map, raw)
+		if _flat_distance(nav_point, raw) > 3.0:
+			continue
+		if _is_bad(member, nav_point) or _is_near_any(nav_point, _taken, slot_spacing):
+			continue
+		var gained: float = _flat_distance(nav_point, target_position) - current_range
+		if gained < 4.0:
+			continue
+		var score: float = gained
+		if not _has_line_of_sight(nav_point, target_position, enemy.target_aim_height):
+			score += 8.0 # out of sight is worth a lot
+		if score > best_score:
+			best_score = score
+			best = nav_point
+	# No way back: stay put (the enemy fights back if the target is near).
+	return best if best != Vector3.INF else from
 
 
 func _get_fire_position(member: Member, now: float) -> Vector3:
@@ -422,6 +554,10 @@ func _find_fire_position(member: Member) -> Vector3:
 	var target_position: Vector3 = squad_known_position
 	var low: float = enemy.min_attack_range
 	var high: float = maxf(enemy.attack_range - 1.0, low + 1.0)
+	# Eager enemies prefer the close part of the range, cautious ones the far part.
+	var preference: float = enemy.get_range_preference()
+	var band_low: float = low + (high - low) * preference * 0.5
+	var band_high: float = low + (high - low) * (0.5 + 0.5 * preference)
 	var map: RID = enemy.get_world_3d().navigation_map
 	var from: Vector3 = enemy.global_position
 	# Stay on our own side of the target so we do not run across its field of view.
@@ -431,7 +567,7 @@ func _find_fire_position(member: Member) -> Vector3:
 	var best_score: float = INF
 	for i: int in fire_samples:
 		var offset: float = deg_to_rad(randf_range(-70.0, 70.0))
-		var radius: float = randf_range(low, high)
+		var radius: float = randf_range(band_low, band_high)
 		var raw: Vector3 = target_position + Vector3(sin(bearing + offset), 0.0, cos(bearing + offset)) * radius
 		var nav_point: Vector3 = NavigationServer3D.map_get_closest_point(map, raw)
 		if _flat_distance(nav_point, raw) > 2.0:
@@ -443,7 +579,7 @@ func _find_fire_position(member: Member) -> Vector3:
 			continue
 		if _is_near_any(nav_point, _taken, slot_spacing) or _is_bad(member, nav_point):
 			continue
-		var score: float = from.distance_to(nav_point) + absf(range_to_target - (low + high) * 0.5) * 0.3
+		var score: float = from.distance_to(nav_point) + absf(range_to_target - (band_low + band_high) * 0.5) * 0.3
 		if score < best_score:
 			best_score = score
 			best = nav_point
@@ -590,12 +726,23 @@ func _path_length(path: PackedVector3Array) -> float:
 func _has_line_of_sight(point: Vector3, target_position: Vector3, aim_height: float) -> bool:
 	if not is_instance_valid(squad_target):
 		return false
+	var target_aim_position: Vector3 = _get_target_aim_position(target_position, aim_height)
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
 		point + Vector3.UP * 1.5,
-		target_position + Vector3.UP * aim_height,
+		target_aim_position,
 		world_mask
 	)
 	var result: Dictionary = squad_target.get_world_3d().direct_space_state.intersect_ray(query)
 	return result.is_empty()
+
+
+func _get_target_aim_position(target_position: Vector3, aim_height: float) -> Vector3:
+	var crouching_variant: Variant = squad_target.get(&"is_crouching")
+	if crouching_variant is bool and crouching_variant:
+		var crouching_shape_variant: Variant = squad_target.get(&"crouching_col")
+		if crouching_shape_variant is CollisionShape3D:
+			return (crouching_shape_variant as CollisionShape3D).global_position
+		return target_position + Vector3.UP * 0.1
+	return target_position + Vector3.UP * aim_height
 
 #endregion

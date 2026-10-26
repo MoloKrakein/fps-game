@@ -66,13 +66,24 @@ enum TraversalState {
 @export var burst_max_shots: int = 4
 @export var burst_pause_min: float = 0.45
 @export var burst_pause_max: float = 1.1
-## Aim error in metres at 10 m right after starting to aim...
-@export var aim_error_start: float = 0.9
-## ...and after aiming for `aim_settle_time` seconds.
-@export var aim_error_settled: float = 0.2
+## Weapon spread is multiplied by this when the enemy starts aiming, easing to 1.0 over `aim_settle_time`.
+## (Applied through BaseShootingComponent.external_accuracy_multiplier.)
+@export var aim_start_multiplier: float = 2.0
 @export var aim_settle_time: float = 1.2
+## Extra spread against a target moving at 8 m/s or more (scales with its speed).
+@export var target_movement_penalty: float = 0.5
 ## Allies this close are alerted when this enemy first engages.
 @export var alert_share_radius: float = 30.0
+
+@export_group("Morale")
+## Morale / eagerness driven by health, shock, nearby allies and personality. See EnemyMoraleComponent.
+@export var morale_enabled: bool = true
+## Optional: add an EnemyMoraleComponent to the scene to tune one enemy. Created at runtime if empty.
+@export var morale: EnemyMoraleComponent
+
+@export_group("Hitboxes")
+## Layers the enemy's hitbox bones are on. Shots that land on the capsule are re-cast against these.
+@export_flags_3d_physics var hitbox_collision_mask: int = 8
 
 @export_group("Debug")
 ## Shows a floating label with the enemy's role, sight, ammo and firing permission.
@@ -106,8 +117,8 @@ var _target_search_timer: float = 0.0
 var burst_shots_remaining: int = 0
 var burst_pause_timer: float = 0.0
 var aim_time: float = 0.0
-var _aim_offset: Vector3 = Vector3.ZERO
-var _aim_noise_timer: float = 0.0
+var _ally_in_line_of_fire: bool = false
+var _blocked_shot_timer: float = 0.0
 
 # Movement
 var previous_velocity: Vector3
@@ -134,6 +145,7 @@ func _ready() -> void:
 	health_component.damage_received.connect(_on_damage_received)
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
 	navigation_agent.target_desired_distance = arrive_tolerance * 0.8
+	_setup_morale()
 
 	burst_shots_remaining = randi_range(burst_min_shots, burst_max_shots)
 	# Spread the work of different enemies over different frames.
@@ -216,10 +228,13 @@ func _update_perception(delta: float) -> void:
 	_perception_timer = perception_interval + randf() * 0.05
 
 	target_visible = _can_see_target()
+	_ally_in_line_of_fire = target_visible and _is_ally_in_line_of_fire()
 	if target_visible:
 		time_since_seen = 0.0
 		last_known_target_position = target.global_position
 		engage()
+		if is_instance_valid(squad_coordinator) and squad_coordinator.has_method(&"request_attack_token"):
+			squad_coordinator.request_attack_token(self)
 
 
 ## Starts fighting and wakes up nearby allies.
@@ -244,6 +259,13 @@ func receive_alert(alert_position: Vector3, new_target: Node3D) -> void:
 	is_engaged = true
 	reset_navigation()
 	state_chart.send_event("toFollow")
+
+
+## Something else (a trigger, a level script) may have pushed us into Follow/Attack directly.
+## Make sure the squad knows about us in that case.
+func _ensure_engaged() -> void:
+	if not is_engaged:
+		is_engaged = true
 
 
 func disengage() -> void:
@@ -278,12 +300,18 @@ func _can_see_target() -> bool:
 			if rad_to_deg(acos(direction_dot)) > vision_angle * 0.5:
 				return false
 
+	var perception_mask: int = vision_collision_mask
+	if target is CollisionObject3D:
+		perception_mask |= (target as CollisionObject3D).collision_layer
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
 		origin.global_position,
 		target_position,
-		vision_collision_mask
+		perception_mask
 	)
-	query.exclude = [get_rid()]
+	if enemy_shoot_component != null:
+		query.exclude = enemy_shoot_component._get_ray_exclusions()
+	else:
+		query.exclude = [get_rid()]
 	var result: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 	if result.is_empty():
 		return false
@@ -301,6 +329,15 @@ func _get_vision_origin() -> Node3D:
 
 
 func _get_target_aim_position() -> Vector3:
+	if target == null:
+		return Vector3.ZERO
+	var crouching_variant: Variant = target.get(&"is_crouching")
+	if crouching_variant is bool and crouching_variant:
+		var crouching_shape_variant: Variant = target.get(&"crouching_col")
+		if crouching_shape_variant is CollisionShape3D:
+			var crouching_shape: CollisionShape3D = crouching_shape_variant as CollisionShape3D
+			return crouching_shape.global_position
+		return target.global_position + Vector3.UP * 0.1
 	return target.global_position + Vector3.UP * target_aim_height
 
 
@@ -366,6 +403,7 @@ func _on_idle_state_state_physics_processing(delta: float) -> void:
 func _on_follow_state_physics_processing(delta: float) -> void:
 	if not _can_act() or not is_instance_valid(target):
 		return
+	_ensure_engaged()
 
 	_on_combat_state(delta)
 
@@ -383,7 +421,7 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 		_stop_moving(delta)
 		_turn_towards(_get_look_position() - global_position, turn_speed_aiming, delta)
 	else:
-		_move_to(destination, delta, order.speed_scale if order.is_fresh() else 1.0)
+		_move_to(destination, delta, (order.speed_scale if order.is_fresh() else 1.0) * get_speed_scale())
 		_update_stuck(delta)
 
 
@@ -504,6 +542,7 @@ func _on_velocity_computed(suggested_velocity: Vector3) -> void:
 func _on_attack_state_physics_processing(delta: float) -> void:
 	if not _can_act():
 		return
+	_ensure_engaged()
 	if not is_instance_valid(target):
 		state_chart.send_event("toFollow")
 		return
@@ -529,6 +568,16 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 		_finish_burst()
 		return
 
+	# Hold fire while an ally is in the line of fire; after a moment ask for another position.
+	if _ally_in_line_of_fire:
+		_blocked_shot_timer += delta
+		if _blocked_shot_timer >= 0.8:
+			_blocked_shot_timer = 0.0
+			squad_coordinator.report_stuck(self)
+		return
+	_blocked_shot_timer = 0.0
+
+	enemy_shoot_component.external_accuracy_multiplier = _get_accuracy_multiplier()
 	enemy_shoot_component.fire()
 	if enemy_shoot_component.fire_timer > 0.0:
 		burst_shots_remaining -= 1
@@ -536,8 +585,8 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 
 ## The burst is over: pause, then hand the attack token to someone else.
 func _finish_burst() -> void:
-	burst_shots_remaining = randi_range(burst_min_shots, burst_max_shots)
-	burst_pause_timer = randf_range(burst_pause_min, burst_pause_max)
+	burst_shots_remaining = maxi(1, roundi(randi_range(burst_min_shots, burst_max_shots) * get_burst_scale()))
+	burst_pause_timer = randf_range(burst_pause_min, burst_pause_max) * get_pause_scale()
 	aim_time *= 0.5
 	# Empty magazine: poke the weapon so it starts reloading (while we move to cover).
 	if not has_ammo() and not is_reloading():
@@ -552,7 +601,7 @@ func _aim_at_target(delta: float) -> void:
 	if not is_instance_valid(enemy_shoot_component.shoot_position):
 		return
 	var shoot_pos: Node3D = enemy_shoot_component.shoot_position
-	var aim_direction: Vector3 = (_get_noisy_aim_position(delta) - shoot_pos.global_position).normalized()
+	var aim_direction: Vector3 = (_get_target_aim_position() - shoot_pos.global_position).normalized()
 	if aim_direction.length_squared() <= 0.001:
 		return
 
@@ -562,17 +611,17 @@ func _aim_at_target(delta: float) -> void:
 	shoot_pos.global_basis = Basis(current_quat.slerp(target_quat, 1.0 - exp(-15.0 * delta)))
 
 
-## Aim point with an error that shrinks the longer the enemy keeps aiming, and grows with distance.
-func _get_noisy_aim_position(delta: float) -> Vector3:
-	_aim_noise_timer -= delta
-	if _aim_noise_timer <= 0.0:
-		_aim_noise_timer = 0.35
-		var settle: float = clampf(aim_time / maxf(aim_settle_time, 0.01), 0.0, 1.0)
-		var error_at_ten_metres: float = lerpf(aim_error_start, aim_error_settled, settle)
-		var radius: float = error_at_ten_metres * (global_position.distance_to(target.global_position) / 10.0)
-		var random_direction: Vector3 = Vector3(randf_range(-1.0, 1.0), randf_range(-0.6, 0.6), randf_range(-1.0, 1.0))
-		_aim_offset = random_direction.normalized() * radius * randf()
-	return _get_target_aim_position() + _aim_offset
+## Spread multiplier for the weapon: worse right after starting to aim and when the target is moving,
+## then scaled by morale (and recent hits). 1.0 = the weapon's own accuracy.
+func _get_accuracy_multiplier() -> float:
+	var settle: float = clampf(aim_time / maxf(aim_settle_time, 0.01), 0.0, 1.0)
+	var multiplier: float = lerpf(aim_start_multiplier, 1.0, settle)
+	if morale:
+		multiplier *= morale.get_accuracy_multiplier()
+	var target_velocity: Variant = target.get(&"velocity") if is_instance_valid(target) else null
+	if target_velocity is Vector3:
+		multiplier *= 1.0 + clampf((target_velocity as Vector3).length() / 8.0, 0.0, 1.0) * target_movement_penalty
+	return multiplier
 
 #endregion
 
@@ -745,6 +794,100 @@ func _cancel_vault() -> void:
 #endregion
 
 
+#region Morale and hit resolution
+
+func _setup_morale() -> void:
+	if not morale_enabled:
+		return
+	if morale == null:
+		morale = EnemyMoraleComponent.new()
+		morale.name = &"EnemyMorale"
+		add_child(morale)
+	morale.bind_health(health_component)
+
+
+func is_broken() -> bool:
+	return morale != null and morale.is_broken()
+
+
+func can_flank() -> bool:
+	return morale == null or morale.can_flank()
+
+
+func get_speed_scale() -> float:
+	return morale.get_speed_scale() if morale else 1.0
+
+
+func get_burst_scale() -> float:
+	return morale.get_burst_scale() if morale else 1.0
+
+
+func get_pause_scale() -> float:
+	return morale.get_pause_scale() if morale else 1.0
+
+
+func get_range_preference() -> float:
+	return morale.get_range_preference() if morale else 0.5
+
+
+func get_token_bonus() -> float:
+	return morale.get_token_bonus() if morale else 0.0
+
+
+func get_token_cooldown_scale() -> float:
+	return morale.get_token_cooldown_scale() if morale else 1.0
+
+
+## Shots from BaseShootingComponent that land on the body capsule call this to get re-cast against
+## the more precise hitbox bones. Returns an empty Dictionary if no bone of this enemy is on the path.
+func resolve_hit(from: Vector3, to: Vector3) -> Dictionary:
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to, hitbox_collision_mask)
+	var result: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if result.is_empty():
+		return {}
+	var collider: Node = result.get("collider") as Node
+	if collider == null or not is_ancestor_of(collider):
+		return {}
+	return result
+
+
+## Fallback when a shot lands on the capsule itself (e.g. between two bones): plain body damage.
+func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, armor_penetration: float = 0.0) -> void:
+	if is_dead:
+		return
+	if source != null and source.get(&"shooter_body") is BaseEnemy:
+		return # no friendly fire
+	health_component.take_damage(damage_amount, source, is_headshot, is_crit, armor_penetration)
+
+
+## True when another enemy stands in the way of our shot.
+func _is_ally_in_line_of_fire() -> bool:
+	if enemy_shoot_component == null or not is_instance_valid(enemy_shoot_component.shoot_position):
+		return false
+	var from: Vector3 = enemy_shoot_component.shoot_position.global_position
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, _get_target_aim_position())
+	query.exclude = enemy_shoot_component._get_ray_exclusions()
+	var result: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if result.is_empty():
+		return false
+	var node: Node = result.get("collider") as Node
+	while node != null and not (node is BaseEnemy):
+		node = node.get_parent()
+	return node != null and node != self
+
+
+## Damage arrives from a shooting component; the shooter's body is the real attacker.
+func _resolve_attacker(source: Node) -> Node3D:
+	if source == null:
+		return null
+	var shooter: Variant = source.get(&"shooter_body")
+	if shooter is Node3D:
+		return shooter as Node3D
+	return source as Node3D
+
+#endregion
+
+
 ## The weapon only starts reloading when asked to fire with an empty magazine. Without this an
 ## enemy that ran dry would never be picked for an attack token again and stop shooting forever.
 func _reload_if_empty() -> void:
@@ -770,9 +913,12 @@ func _update_debug_label() -> void:
 		_debug_label.position = Vector3(0.0, 2.6, 0.0)
 		add_child(_debug_label)
 	var distance: float = global_position.distance_to(target.global_position) if is_instance_valid(target) else -1.0
-	_debug_label.text = "%s  fire:%s  engaged:%s\nsee:%s (%.1fs)  dist:%.1f\nammo:%d  reloading:%s" % [
-		order.role, order.may_fire, is_engaged,
-		target_visible, minf(time_since_seen, 99.0), distance,
+	var stance_name: String = EnemyMoraleComponent.Stance.keys()[morale.stance] if morale else "-"
+	var morale_value: float = morale.morale if morale else -1.0
+	_debug_label.text = "%s  fire:%s  order:%s  engaged:%s\n%s  morale:%.2f\nsee:%s (%.1fs)  dist:%.1f  blocked:%s\nammo:%d  reloading:%s" % [
+		order.role, order.may_fire, order.is_fresh(), is_engaged,
+		stance_name, morale_value,
+		target_visible, minf(time_since_seen, 99.0), distance, _ally_in_line_of_fire,
 		enemy_shoot_component.current_ammo if enemy_shoot_component else -1, is_reloading()
 	]
 
@@ -783,8 +929,8 @@ func _on_damage_received(info: DamageInfo, _applied_damage: float) -> void:
 	if is_dead:
 		return
 	# Being shot reveals where the shot came from, and wakes the squad up.
-	if info.attacker is Node3D:
-		var attacker: Node3D = info.attacker as Node3D
+	var attacker: Node3D = _resolve_attacker(info.attacker)
+	if attacker != null:
 		if not is_instance_valid(target) and attacker.is_in_group("player"):
 			target = attacker
 		if attacker == target:
@@ -803,6 +949,7 @@ func _on_died() -> void:
 		# Allies near a dead squad mate know there is a fight.
 		if is_instance_valid(target):
 			squad_coordinator.alert_nearby(self, target.global_position, alert_share_radius)
+		squad_coordinator.notify_ally_died(self)
 		squad_coordinator.unregister_enemy(self)
 	_cancel_vault()
 	_on_death_started()
@@ -854,9 +1001,8 @@ func _get_or_create_squad_coordinator() -> EnemySquadCoordinator:
 	var scene_root: Node = get_tree().root
 	if scene_root.has_meta(&"enemy_squad_coordinator"):
 		var existing_variant: Variant = scene_root.get_meta(&"enemy_squad_coordinator")
-		var existing: EnemySquadCoordinator = existing_variant as EnemySquadCoordinator
-		if is_instance_valid(existing):
-			return existing
+		if is_instance_valid(existing_variant):
+			return existing_variant as EnemySquadCoordinator
 
 	var created: EnemySquadCoordinator = EnemySquadCoordinator.new()
 	created.add_to_group("enemy_squad_coordinator")

@@ -28,6 +28,10 @@ extends BaseEnemy
 @export var stumble_force: float = 8.0
 ## Seconds of stumble immunity after recovering, so the enemy can't be stun-locked.
 @export var stumble_cooldown: float = 1.5
+## A headshot reacts at least this strongly (0..1), even if the damage alone would not.
+@export var headshot_stumble_intensity: float = 0.45
+## Added to the reaction when a leg is hit, so shot legs buckle.
+@export var leg_hit_intensity_bonus: float = 0.35
 
 var anim_tree_state: AnimationNodeStateMachinePlayback
 var is_stumbling: bool = false
@@ -131,6 +135,10 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 		inverse_lerp(stumble_threshold, maxf(stumble_heavy_threshold, stumble_threshold + 0.01), info.raw_damage),
 		0.0, 1.0
 	)
+	if info.is_headshot:
+		intensity = maxf(intensity, headshot_stumble_intensity)
+	if info.get_meta(&"hit_leg", false):
+		intensity = clampf(intensity + leg_hit_intensity_bonus, 0.0, 1.0)
 	var direction: Vector3 = _get_stumble_direction(info)
 	var hit_position: Vector3 = _get_hit_position(info)
 
@@ -149,10 +157,9 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 
 
 func _get_hit_position(info: DamageInfo) -> Vector3:
-	# Optional: add a `hit_position: Vector3` to DamageInfo so the impulse lands on the bone that was shot.
-	var value: Variant = info.get(&"hit_position")
-	if value is Vector3:
-		return value as Vector3
+	# EnemyHitbox fills impact_position with the exact point the bullet landed on.
+	if info.impact_position != Vector3.ZERO:
+		return info.impact_position
 	return Vector3.INF
 
 

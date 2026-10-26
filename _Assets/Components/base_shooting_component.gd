@@ -71,12 +71,30 @@ func _fire_hitscan(data: Weapon) -> void:
 	var end_pos = start_pos + (direction * data.shoot_range)
 	
 	var query = PhysicsRayQueryParameters3D.create(start_pos, end_pos)
-	if shooter_body:
-		query.exclude = [shooter_body.get_rid()] 
+	query.exclude = _get_ray_exclusions()
 		
 	var result = space_state.intersect_ray(query)
 	if result:
+		result = _refine_hit(result, start_pos, end_pos)
 		_handle_hit(result, data)
+
+## VIRTUAL FUNCTION: bodies the shot must ignore. By default only the shooter's own body.
+## Shooters whose body has child colliders (e.g. a ragdoll's bones) should return all of them.
+func _get_ray_exclusions() -> Array[RID]:
+	var exclusions: Array[RID] = []
+	if shooter_body:
+		exclusions.append(shooter_body.get_rid())
+	return exclusions
+
+## Lets a coarse collider (e.g. an enemy's capsule) hand the shot to a more precise hitbox.
+## The collider only needs a resolve_hit(from, to) -> Dictionary method.
+func _refine_hit(result: Dictionary, from: Vector3, to: Vector3) -> Dictionary:
+	var collider = result.collider
+	if collider != null and collider.has_method("resolve_hit"):
+		var refined: Dictionary = collider.resolve_hit(from, to)
+		if not refined.is_empty():
+			return refined
+	return result
 
 func _handle_hit(result: Dictionary, data: Weapon) -> void:
 	var hit_target = result.collider
@@ -84,6 +102,10 @@ func _handle_hit(result: Dictionary, data: Weapon) -> void:
 	_spawn_impact_effect(result.position, result.normal)
 
 	if hit_target.has_method("take_damage"):
+		# Optional: lets hitboxes know the exact impact point and direction.
+		if hit_target.has_method("set_hit_context"):
+			hit_target.set_hit_context(result.position, (result.position - shoot_position.global_position).normalized())
+
 		var final_damage = data.damage
 		
 		if hit_target.is_in_group("head"):
