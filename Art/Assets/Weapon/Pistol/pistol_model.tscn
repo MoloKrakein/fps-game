@@ -3,8 +3,23 @@
 [ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_2kfvb"]
 [ext_resource type="PackedScene" uid="uid://chbn144y1yp60" path="res://Art/3D/Blender/mk57.glb" id="1_uo56h"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="1_w2u2j"]
+[ext_resource type="Script" uid="uid://c6s8by6wlubla" path="res://_Assets/Weapon/attachment/Scripts/attachment_fit.gd" id="2_cbvsw"]
+[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="3_k02rg"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="3_uo56h"]
+[ext_resource type="Resource" uid="uid://bft80mdfaslva" path="res://Resources/Attachments/Optics/4x_scope.tres" id="4_2ib5x"]
 [ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="4_rjpr8"]
+
+[sub_resource type="Resource" id="Resource_cbvsw"]
+script = ExtResource("2_cbvsw")
+attachment = ExtResource("3_k02rg")
+scale_multiplier = Vector3(0.5, 0.5, 0.5)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
+
+[sub_resource type="Resource" id="Resource_6cgx4"]
+script = ExtResource("2_cbvsw")
+attachment = ExtResource("4_2ib5x")
+scale_multiplier = Vector3(0.3, 0.3, 0.3)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
 angle_min = -179.99998
@@ -100,11 +115,14 @@ nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_enst8")
 nodes/ReloadBlend/position = Vector2(180, 560)
 node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"rack", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"equiped", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload"]
 
-[node name="PistolModel" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket")]
+[node name="PistolModel" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "iron_sight_point", "ammo_display")]
 script = ExtResource("1_2kfvb")
 muzzle_socket = NodePath("Muzzle")
 ejection_socket = NodePath("EjectionPort")
 optic_socket = NodePath("mk57/Armature/Skeleton3D/Body_2/Optic_slot")
+iron_sight_point = NodePath("mk57/Armature/Skeleton3D/Body_2/Optic_slot")
+attachment_fits = Array[ExtResource("2_cbvsw")]([SubResource("Resource_cbvsw"), SubResource("Resource_6cgx4")])
+ammo_display = NodePath("mk57/Armature/Skeleton3D/Body_2/AmmoCounterPosition")
 
 [node name="mk57" parent="." unique_id=1019266233 instance=ExtResource("1_uo56h")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08635038, -0.115241945)
@@ -133,7 +151,7 @@ transform = Transform3D(1, 0, 0, 0, 0.94026315, 0.34044862, 0, -0.34044862, 0.94
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.087416366, 0.12306018, -1.8626451e-09)
 
 [node name="Optic_slot" type="Marker3D" parent="mk57/Armature/Skeleton3D/Body_2" parent_id_path=PackedInt32Array(1019266233, 1096691924) index="2" unique_id=1129605692]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009809915, 0.31509015, 0.062171817)
+transform = Transform3D(0.215, 0, 0, 0, 0.215, 0, 0, 0, 0.215, -0.009809915, 0.31509015, 0.062171817)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17425191, -0.6091657)

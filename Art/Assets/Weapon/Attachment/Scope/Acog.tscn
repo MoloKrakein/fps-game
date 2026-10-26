@@ -118,4 +118,7 @@ remote_path = NodePath("../ScopeView/Camera3D")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18676195, 0.31967518)
 mesh = SubResource("PlaneMesh_bhunq")
 
+[node name="SightPoint" type="Marker3D" parent="." unique_id=682799429]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20034266, 0.43753207)
+
 [editable path="blockbench_export"]

@@ -1,10 +1,26 @@
 [gd_scene format=3 uid="uid://uh6cfflmaimf"]
 
 [ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_qfc63"]
+[ext_resource type="Script" uid="uid://c6s8by6wlubla" path="res://_Assets/Weapon/attachment/Scripts/attachment_fit.gd" id="2_oo46r"]
+[ext_resource type="Resource" uid="uid://bft80mdfaslva" path="res://Resources/Attachments/Optics/4x_scope.tres" id="3_jtlrl"]
 [ext_resource type="PackedScene" uid="uid://gypergadlhjc" path="res://Art/3D/Blender/Weapon/AR416/export/AR416.glb" id="3_omrth"]
 [ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_qllkt"]
 [ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="4_631vl"]
+[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="4_jtlrl"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="5_vgxpt"]
+
+[sub_resource type="Resource" id="Resource_qllkt"]
+script = ExtResource("2_oo46r")
+attachment = ExtResource("3_jtlrl")
+ads_offset = Vector3(0, -0.045, 0)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
+
+[sub_resource type="Resource" id="Resource_mg82a"]
+script = ExtResource("2_oo46r")
+attachment = ExtResource("4_jtlrl")
+scale_multiplier = Vector3(0.8, 0.8, 0.8)
+ads_offset = Vector3(0, -0.065, -0.065)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
 angle_min = -179.99998
@@ -95,7 +111,7 @@ distance_fade_mode = 1
 material = SubResource("StandardMaterial3D_sn0t7")
 size = Vector2(0.5, 0.5)
 
-[node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "ammo_display")]
+[node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "iron_sight_point", "ammo_display")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.066431046)
 script = ExtResource("1_qfc63")
 muzzle_socket = NodePath("Muzzle")
@@ -105,6 +121,8 @@ builtin_iron_sight_mesh = [NodePath("AR416/Armature/Skeleton3D/Front Sight"), No
 default_stock_mesh = NodePath("AR416/Armature/Skeleton3D/Stock")
 default_grip_mesh = NodePath("AR416/Armature/Skeleton3D/Grip")
 default_magazine_mesh = NodePath("AR416/Armature/Skeleton3D/Magazine")
+iron_sight_point = NodePath("AR416/Armature/Skeleton3D/Body/Optics")
+attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a")])
 ammo_display = NodePath("AR416/Armature/Skeleton3D/Body/AmmoCounterPosition")
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "smoke_particles", "light")]

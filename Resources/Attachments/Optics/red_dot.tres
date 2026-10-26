@@ -10,6 +10,6 @@ attachment_model = ExtResource("1_85uds")
 model_position = Vector3(0, 0.001, 0)
 model_scale = Vector3(0.65, 0.65, 0.65)
 is_optic = true
-override_ads_position = Vector3(0, -0.105, -0.21)
 override_ads_fov = 90.0
+override_ads_position = Vector3(0, -0.105, -0.21)
 metadata/_custom_type_script = "uid://byjrogv1mqm35"

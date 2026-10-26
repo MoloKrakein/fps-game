@@ -50,12 +50,12 @@ shadow_mesh = SubResource("ArrayMesh_1o1tl")
 render_priority = 0
 shader = ExtResource("3_dxpo7")
 shader_parameter/reticle_color = Color(0.7262233, 3.4172833e-06, 5.7756904e-07, 1)
-shader_parameter/glass_color = Color(1, 1, 1, 0.1764706)
-shader_parameter/reticle_emission = 1.0
-shader_parameter/ref_element_size = 1.0
-shader_parameter/ref_target_moa = 7.11100033707398
+shader_parameter/glass_color = Color(0.6018906, 0.552156, 0.590676, 0.1764706)
+shader_parameter/reticle_emission = 1.4000000665
+shader_parameter/ref_element_size = 0.9999999776480001
+shader_parameter/ref_target_moa = 29.916001420311478
 shader_parameter/poa_use_moa = 1.0
-shader_parameter/poa_subdivision = 1.0
+shader_parameter/poa_subdivision = 0.2500000037253
 shader_parameter/poa_elevation = 0
 shader_parameter/poa_windage = 0
 
@@ -71,5 +71,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0625, 0)
 mesh = SubResource("ArrayMesh_owc8o")
 skeleton = NodePath("")
 surface_material_override/0 = SubResource("ShaderMaterial_dxpo7")
+
+[node name="SightPoint" type="Marker3D" parent="." unique_id=792289536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15950745, 0.1559956)
 
 [editable path="blockbench_export"]

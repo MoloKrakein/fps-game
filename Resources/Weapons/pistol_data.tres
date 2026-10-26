@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="1_5ows3"]
 [ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_ja07j"]
 [ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="2_1gkjs"]
-[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="2_6cgx4"]
+[ext_resource type="Resource" uid="uid://bft80mdfaslva" path="res://Resources/Attachments/Optics/4x_scope.tres" id="2_ja07j"]
 
 [resource]
 script = ExtResource("1_5ows3")
@@ -13,6 +13,6 @@ ammo_in_magazine = 7
 reserve_ammo = 800
 is_loaded = true
 equipped_attachment_data = Dictionary[int, ExtResource("1_ja07j")]({
-0: ExtResource("2_6cgx4")
+0: ExtResource("2_ja07j")
 })
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"
