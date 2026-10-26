@@ -16,3 +16,13 @@ signal change_visibility_of_crosshair(is_visible: bool)
 #endregion
 
 signal player_died
+
+## Semantic audio request. SoundEngine owns assets, buses, pooling and attenuation.
+@warning_ignore("unused_signal")
+signal sound_requested(
+	event_id: StringName,
+	world_position: Vector3,
+	volume_scale: float,
+	pitch_scale: float,
+	spatial: bool
+)

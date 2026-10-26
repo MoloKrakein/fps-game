@@ -242,6 +242,7 @@ func engage() -> void:
 	if is_dead or is_engaged:
 		return
 	is_engaged = true
+	_emit_sound_event(&"enemy_alert", global_position)
 	reset_navigation()
 	state_chart.send_event("toFollow")
 	if is_instance_valid(squad_coordinator) and is_instance_valid(target):
@@ -257,6 +258,7 @@ func receive_alert(alert_position: Vector3, new_target: Node3D) -> void:
 	last_known_target_position = alert_position
 	time_since_seen = 2.0
 	is_engaged = true
+	_emit_sound_event(&"enemy_alert_received", global_position)
 	reset_navigation()
 	state_chart.send_event("toFollow")
 
@@ -580,6 +582,7 @@ func _on_attack_state_physics_processing(delta: float) -> void:
 	enemy_shoot_component.external_accuracy_multiplier = _get_accuracy_multiplier()
 	enemy_shoot_component.fire()
 	if enemy_shoot_component.fire_timer > 0.0:
+		_emit_sound_event(&"enemy_weapon_fire", enemy_shoot_component.global_position)
 		burst_shots_remaining -= 1
 
 
@@ -928,6 +931,7 @@ func _update_debug_label() -> void:
 func _on_damage_received(info: DamageInfo, _applied_damage: float) -> void:
 	if is_dead:
 		return
+	_emit_sound_event(&"enemy_hit", global_position)
 	# Being shot reveals where the shot came from, and wakes the squad up.
 	var attacker: Node3D = _resolve_attacker(info.attacker)
 	if attacker != null:
@@ -944,6 +948,7 @@ func _on_died() -> void:
 		return
 	# Set immediately so nothing (hit reactions, vaulting, damage) can start after this point.
 	is_dead = true
+	_emit_sound_event(&"enemy_death", global_position)
 	add_to_group("dead")
 	if is_instance_valid(squad_coordinator):
 		# Allies near a dead squad mate know there is a fight.
@@ -960,6 +965,10 @@ func _on_died() -> void:
 		body_kicker.queue_free()
 	if is_instance_valid(navigation_agent):
 		navigation_agent.queue_free()
+
+
+func _emit_sound_event(event_id: StringName, event_position: Vector3) -> void:
+	EventBus.sound_requested.emit(event_id, event_position, 1.0, 1.0, true)
 
 
 func _on_dead_state_entered() -> void:
