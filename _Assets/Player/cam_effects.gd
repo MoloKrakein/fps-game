@@ -22,8 +22,11 @@ class_name CamEffects extends Camera3D
 @export var max_roll: float = 2.5
 @export_group("Fall Kick Settings")
 @export var fall_time: float = 0.3 
+@export var fall_kick_scale: float = 0.18
+@export var max_fall_kick: float = 5.0
 @export_group("Damage Kick Settings")
 @export var dmg_time: float = 0.3
+@export var damage_kick_scale: float = 0.06
 @export_group("Weapon Recoil Settings")
 # @export var weapon_decay: float = 0.5
 @export var recoil_cam_stiffness: float = 80.0
@@ -35,6 +38,7 @@ class_name CamEffects extends Camera3D
 @export_range(0.0, 1.0,0.001) var headbob_roll: float = 0.025
 @export_range(0.0, 0.4,0.001) var headbob_up: float = 0.005
 @export_range(3.0, 8.0, 0.1) var headbob_frequency: float = 6.0
+@export var run_bob_multiplier: float = 1.2
 @export_group("Slide Settings")
 @export var slide_pitch: float = 1.5 # Degrees to tilt up/down
 @export var slide_roll: float = 3.0  # Degrees to tilt left/right
@@ -68,8 +72,8 @@ var _current_run_pitch: float = 0.0
 var _current_run_roll: float = 0.0
 
 var _screen_shake_tween: Tween = null
-const MIN_SHAKE_INTENSITY: float = 0.05
-const MAX_SHAKE_INTENSITY: float = 0.5
+const MIN_SHAKE_INTENSITY: float = 0.008
+const MAX_SHAKE_INTENSITY: float = 0.06
 
 
 
@@ -161,13 +165,17 @@ func calculate_view_offset(delta):
 
 	# apply headbob effect
 	if enable_headbob:
-		var headbob_pitch_delta = headbob_sin * deg_to_rad(headbob_pitch) * speed
+		var bob_scale: float = speed
+		if player.is_sprinting:
+			bob_scale *= run_bob_multiplier
+
+		var headbob_pitch_delta = headbob_sin * deg_to_rad(headbob_pitch) * bob_scale
 		angles.x -= headbob_pitch_delta
 
-		var headbob_roll_delta = headbob_sin * deg_to_rad(headbob_roll) * speed
+		var headbob_roll_delta = headbob_sin * deg_to_rad(headbob_roll) * bob_scale
 		angles.z -= headbob_roll_delta
 
-		var headbob_height = headbob_sin * speed * headbob_up
+		var headbob_height = headbob_sin * bob_scale * headbob_up
 		offset.y += headbob_height
 
 	# apply slide effect
@@ -201,9 +209,15 @@ func calculate_view_offset(delta):
 
 # fall
 func add_fall_kick(amount: float) -> void:
-	_fall_value = deg_to_rad(amount)
+	_fall_value = deg_to_rad(clampf(amount, 0.0, max_fall_kick))
 	_fall_timer = fall_time
-	
+
+func add_landing_kick(impact_speed: float) -> void:
+	if impact_speed <= 0.5:
+		return
+
+	var kick_amount: float = clampf(impact_speed * fall_kick_scale, 0.8, max_fall_kick)
+	add_fall_kick(kick_amount)
 
 # damage kick
 func add_damage_kick(pitch_amount: float, roll_amount: float, source: Vector3) -> void:
@@ -215,6 +229,21 @@ func add_damage_kick(pitch_amount: float, roll_amount: float, source: Vector3) -
 	_dmg_value = deg_to_rad(pitch_amount) * forward_dot
 	_dmg_roll_value = deg_to_rad(roll_amount) * right_dot
 	_dmg_timer = dmg_time
+
+func add_damage_impact(damage_amount: float, source: Node3D = null) -> void:
+	var damage_ratio: float = clampf(damage_amount / 100.0, 0.0, 1.0)
+	var kick_scale: float = lerpf(0.7, 1.5, damage_ratio)
+	var pitch_amount: float = damage_kick_scale * 100.0 * kick_scale
+	var roll_amount: float = pitch_amount * 0.45
+
+	if is_instance_valid(source):
+		add_damage_kick(pitch_amount, roll_amount, source.global_position)
+	else:
+		_dmg_value = deg_to_rad(pitch_amount)
+		_dmg_roll_value = deg_to_rad(randf_range(-roll_amount, roll_amount))
+		_dmg_timer = dmg_time
+
+	add_screen_shake(clampf(damage_ratio * 0.15, 0.03, 0.15), lerpf(0.08, 0.14, damage_ratio))
 
 # weapon recoil
 func add_weapon_recoil(pitch: float, yaw: float, roll: float) -> void:

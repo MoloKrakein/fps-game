@@ -75,6 +75,7 @@ const THROW_HOLD_THRESHOLD: float = 0.5 # Time in seconds to hold the drop butto
 
 func _ready() -> void:
 	health_component.damage_taken.connect(_on_damage_taken)
+	health_component.damage_received.connect(_on_damage_received)
 	# if ammo_counter_ui:
 	# 	ammo_counter_ui.position = weapon_controller.get_weapon_position()
 	_initilize_ui()
@@ -85,8 +86,11 @@ func _on_health_component_health_changed(new_health: float, max_health: float) -
 
 func _on_damage_taken(damage_amount: float) -> void:
 	EventBus.player_damage_taken.emit(damage_amount)
+
+func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 	if cam_effects:
-		var _intensity = clamp(damage_amount / 100.0, 0.1, 0.6)
+		var attacker: Node3D = info.attacker as Node3D
+		cam_effects.add_damage_impact(applied_damage, attacker)
 
 
 func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
@@ -167,10 +171,13 @@ func _physics_process(delta: float) -> void:
 		_current_max_velocity = _movement_velocity.length()
 
 
+	var was_on_floor: bool = is_on_floor()
 	move_and_slide()
 
 	if is_on_floor() and y_velocity_before_on_floor < 0.0:
 		impact_velocity = y_velocity_before_on_floor
+		if not was_on_floor and cam_effects:
+			cam_effects.add_landing_kick(absf(y_velocity_before_on_floor))
 
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
@@ -324,20 +331,10 @@ func apply_fall_damage() -> void:
 		# var health_component = get_node_or_null("HealthComponent")
 		if health_component:
 			health_component.take_damage(damage_amount)
-		# if cam_effects:
-		# 	var intensity = clamp(damage_amount / 100.0, 0.1, 0.6)
-		# 	cam_effects.add_fall_kick(intensity)
 
 func take_damage(amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, penetration: float = 0.0) -> void:
 	if health_component:
-		health_component.take_damage(amount, null, false, false, penetration)
-	if cam_effects and source:
-        # Scale shake intensity based on damage
-		var intensity = clamp(amount / 100.0, 0.1, 0.6)
-		cam_effects.add_screen_shake(intensity, 0.05)
-        
-        # Feed the enemy's exact 3D position into your directional math!
-		cam_effects.add_damage_kick(15.0, 5.0, source.global_position)
+		health_component.take_damage(amount, source, is_headshot, is_crit, penetration)
 
 #endregion
 

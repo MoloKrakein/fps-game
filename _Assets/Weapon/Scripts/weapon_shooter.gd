@@ -77,7 +77,17 @@ func fire_projectile() -> void:
 		var projectile_velocity: Vector3 = direction * weapon.get_muzzle_velocity_mps()
 
 		projectile.look_at(projectile.global_position + direction, Vector3.UP)
-		projectile.setup(projectile_velocity, damage)
+		projectile.setup(
+			projectile_velocity,
+			damage,
+			ctrl.player,
+			weapon.ammo_type == Weapon.WeaponAmmoType.EXPLOSIVE,
+			weapon.explosion_radius,
+			weapon.explosion_damage,
+			weapon.explosion_falloff,
+			weapon.explosion_force,
+			weapon.armor_penetration
+		)
 
 
 ## Extra random offset for multi-pellet weapons (shotguns).

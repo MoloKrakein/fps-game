@@ -121,11 +121,27 @@ func _handle_hit(result: Dictionary, data: Weapon) -> void:
 		hit_target.apply_impulse(push_dir * force, result.position - hit_target.global_position)
 
 func _fire_projectile(data: Weapon) -> void:
-	if data.projectile_scene == null: return
-	var projectile = data.projectile_scene.instantiate()
+	if data.projectile_scene == null:
+		return
+	var projectile: Projectile = data.projectile_scene.instantiate() as Projectile
+	if projectile == null:
+		push_error("BaseShootingComponent: projectile_scene must instantiate Projectile.")
+		return
 	get_tree().root.add_child(projectile)
 	projectile.global_position = shoot_position.global_position
 	projectile.global_rotation = shoot_position.global_rotation
+	var direction: Vector3 = -shoot_position.global_transform.basis.z
+	projectile.setup(
+		direction * data.get_muzzle_velocity_mps(),
+		data.get_calculated_damage(),
+		shooter_body as Node3D,
+		data.ammo_type == Weapon.WeaponAmmoType.EXPLOSIVE,
+		data.explosion_radius,
+		data.explosion_damage,
+		data.explosion_falloff,
+		data.explosion_force,
+		data.armor_penetration
+	)
 
 func _spawn_impact_effect(hit_position: Vector3, hit_normal: Vector3) -> void:
 	var impact = IMPACT_DECAL.instantiate()

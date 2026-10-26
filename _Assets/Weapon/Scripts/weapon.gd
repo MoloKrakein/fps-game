@@ -18,7 +18,8 @@ enum WeaponFireMode {
 enum WeaponAmmoType {
 	LIGHT,
 	MEDIUM,
-	HEAVY
+	HEAVY,
+	EXPLOSIVE
 }
 
 @export_category("Weapon Stats")
@@ -59,6 +60,12 @@ enum WeaponAmmoType {
 @export var is_open_bolt: bool = false
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
 @export var projectile_speed: float = 50.0
+@export_group("Explosive Ammo")
+## Explosive weapons detonate their projectile on the first collision.
+@export var explosion_radius: float = 4.0
+@export var explosion_damage: float = 80.0
+@export_range(0.0, 1.0, 0.01) var explosion_falloff: float = 1.0
+@export var explosion_force: float = 8.0
 # @export var is_projectile_tracer: bool = false
 
 @export_category("Aiming")
