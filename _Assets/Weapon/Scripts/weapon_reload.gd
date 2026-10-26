@@ -121,7 +121,8 @@ func get_single_round_reload_time() -> float:
 	return weapon.reload_time / float(mag_capacity)
 
 
-## Loads one round (shotgun-style).
+## Loads one round (shotgun-style). The chamber is not touched: if it was empty,
+## the player still has to rack/pump before the gun can fire.
 func reload_single_round() -> void:
 	if not can_reload():
 		return
@@ -129,16 +130,15 @@ func reload_single_round() -> void:
 	if weapon_data.ammo_in_magazine >= weapon.get_calculated_magazine_capacity():
 		return
 
-	var was_empty: bool = not weapon_data.is_loaded
 	weapon_data.ammo_in_magazine += 1
 	weapon_data.reserve_ammo -= 1
-	if not was_empty:
-		weapon_data.is_loaded = true
-
+	_sync_open_bolt_flag()
 	ctrl.update_weapon_ui()
 
 
 ## Loads the whole magazine at once.
+## Tactical reload (round in the chamber): the chambered round stays, so you end up with capacity + 1.
+## Empty reload (chamber empty): the chamber stays empty until the player racks the slide.
 func reload_magazine() -> void:
 	if not can_reload():
 		return
@@ -149,12 +149,15 @@ func reload_magazine() -> void:
 
 	var needed: int = mag_capacity - weapon_data.ammo_in_magazine
 	var transfer: int = mini(needed, weapon_data.reserve_ammo)
-	var was_empty: bool = not weapon_data.is_loaded
 
 	weapon_data.ammo_in_magazine += transfer
 	weapon_data.reserve_ammo -= transfer
-	if not was_empty:
-		weapon_data.is_loaded = weapon_data.ammo_in_magazine > 0
-
+	_sync_open_bolt_flag()
 	ctrl.update_weapon_ui()
+
+
+## Open-bolt guns have no separate chamber; is_loaded just mirrors "has rounds" for the HUD.
+func _sync_open_bolt_flag() -> void:
+	if weapon.is_open_bolt:
+		weapon_data.is_loaded = weapon_data.ammo_in_magazine > 0
 #endregion

@@ -89,6 +89,19 @@ const TIREDNESS_PER_SHOT: float = 1.5
 @export var recoil_model_damping: float = 10.0
 @export var recoil_model_max_angle: float = 50.0
 @export var recoil_pitch_max: float = 0.4
+
+@export_group("Weapon Recoil Feel")
+@export var recoil_snap_stiffness: float = 600.0
+@export var recoil_snap_damping: float = 40.0
+@export_range(0.0, 1.0, 0.01) var recoil_climb_ratio: float = 0.35
+@export var recoil_climb_stiffness: float = 22.0
+@export var recoil_climb_damping: float = 9.4
+@export_range(0.0, 0.95, 0.01) var recoil_lateral_persistence: float = 0.5
+@export var recoil_ads_visual_multiplier: float = 0.5
+@export var recoil_roll_coupling: float = 0.15
+@export var recoil_vertical_lift: float = 0.15
+@export_group("Weapon Handling")
+@export var rack_lockout_time: float = 0.5
 #endregion
 
 
@@ -119,6 +132,7 @@ var is_aiming: bool = false
 
 # Trigger / fire mode
 var fire_timer: float = 0.0
+var _rack_timer: float = 0.0
 var current_fire_mode: Weapon.WeaponFireMode
 var shots_fired_this_trigger: int = 0
 var trigger_held: bool = false
@@ -167,6 +181,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)
+	if _rack_timer > 0.0:
+		_rack_timer = maxf(_rack_timer - delta, 0.0)
 
 	reload.process(delta)
 	animator.apply_offsets(delta)
@@ -254,7 +270,9 @@ func _resolve_initial_fire_mode_for_weapon_data() -> Weapon.WeaponFireMode:
 
 
 func has_ammo() -> bool:
-	return active_weapon_data != null and (active_weapon_data.ammo_in_magazine > 0 or active_weapon_data.reserve_ammo > 0)
+	if active_weapon_data == null:
+		return false
+	return active_weapon_data.is_loaded or active_weapon_data.ammo_in_magazine > 0 or active_weapon_data.reserve_ammo > 0
 #endregion
 
 
@@ -392,41 +410,57 @@ func _play_fire_feedback() -> void:
 		print("Muzzle flash not found on weapon model.")
 
 	if weapon_animation_player != null:
-		weapon_animation_player.play_animation("Fire")
-		# Already empty at this point? Show the empty animation.
-		if not active_weapon_data.is_loaded or active_weapon_data.ammo_in_magazine <= 0:
-			weapon_animation_player.play_animation("Empty")
+		_play_animation("Fire")
 
 
-## Consumes the chambered round and chambers the next one (if any).
+## Called after every shot: the fired round is gone, and the action cycles.
 func _cycle_weapon() -> void:
 	if current_weapon == null or active_weapon_data == null:
 		return
 
-	if active_weapon_data.ammo_in_magazine > 0:
-		active_weapon_data.ammo_in_magazine -= 1
-	active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+	if current_weapon.is_open_bolt:
+		active_weapon_data.ammo_in_magazine = maxi(active_weapon_data.ammo_in_magazine - 1, 0)
+		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+	else:
+		_feed_chamber()
 
 	_play_animation("Loaded" if active_weapon_data.is_loaded else "Empty")
 	update_weapon_ui()
 
 
+func _feed_chamber() -> void:
+	if active_weapon_data.ammo_in_magazine > 0:
+		active_weapon_data.ammo_in_magazine -= 1
+		active_weapon_data.is_loaded = true
+	else:
+		active_weapon_data.is_loaded = false
+
+
 func rack_slide() -> void:
 	if current_weapon == null or active_weapon_data == null:
 		return
-
-	if not active_weapon_data.is_loaded:
-		# Empty chamber: just chamber a round from the magazine, if there is one.
-		if active_weapon_data.ammo_in_magazine > 0:
-			active_weapon_data.is_loaded = true
-			_play_animation("Rack")
-			update_weapon_ui()
+	if is_reloading or _rack_timer > 0.0 or current_weapon.is_open_bolt:
 		return
 
-	# Loaded chamber: eject the live round, then cycle the next one in.
-	shooter.eject_casing("alive")
+	var chamber_was_loaded: bool = active_weapon_data.is_loaded
+	if not chamber_was_loaded and active_weapon_data.ammo_in_magazine <= 0:
+		return
+
+	if chamber_was_loaded:
+		shooter.eject_casing("alive")
+
+	_feed_chamber()
 	_play_animation("Rack")
-	_cycle_weapon()
+	if chamber_was_loaded:
+		_play_animation("Loaded" if active_weapon_data.is_loaded else "Empty")
+
+	_rack_timer = rack_lockout_time
+	fire_timer = maxf(fire_timer, rack_lockout_time)
+	reset_trigger()
+	update_weapon_ui()
+
+	if not chamber_was_loaded and active_weapon_data.is_loaded:
+		send_state_event("onIdle")
 
 
 func _play_animation(animation_name: String) -> void:
@@ -460,6 +494,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 	current_weapon.active_weapon_data_ref = active_weapon_data
 
 	animator.reset_bob()
+	animator.reset_recoil()
 	_bind_model_nodes(current_weapon_model)
 	attachments.mount_all()
 

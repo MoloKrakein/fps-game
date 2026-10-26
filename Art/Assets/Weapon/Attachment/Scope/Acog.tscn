@@ -77,7 +77,7 @@ shader_parameter/shadow_movement_factor = 1.0
 [sub_resource type="PlaneMesh" id="PlaneMesh_bhunq"]
 resource_local_to_scene = true
 material = SubResource("ShaderMaterial_sn0t7")
-size = Vector2(0.205, 0.185)
+size = Vector2(0.25, 0.255)
 orientation = 2
 
 [node name="Node3D" type="Node3D" unique_id=694394248]
@@ -115,7 +115,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)
 remote_path = NodePath("../ScopeView/Camera3D")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="display" unique_id=1532520152]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18712997, 0.31967518)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18676195, 0.31967518)
 mesh = SubResource("PlaneMesh_bhunq")
 
 [editable path="blockbench_export"]

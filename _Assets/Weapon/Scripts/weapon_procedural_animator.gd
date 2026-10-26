@@ -23,6 +23,23 @@ class SpringValue:
 		velocity = 0.0
 
 
+## Chained springs give recoil a fast visible snap and slower recovery.
+class RecoilChannel:
+	var target: SpringValue = SpringValue.new()
+	var shown: SpringValue = SpringValue.new()
+
+	func kick(amount: float) -> void:
+		target.value += amount
+
+	func step(delta: float, recover_stiffness: float, recover_damping: float, snap_stiffness: float, snap_damping: float, limit: float = INF) -> float:
+		target.step(0.0, delta, recover_stiffness, recover_damping, limit)
+		return shown.step(target.value, delta, snap_stiffness, snap_damping, limit)
+
+	func reset() -> void:
+		target.reset()
+		shown.reset()
+
+
 var ctrl: WeaponController
 
 # Shortcuts into the controller so the maths below stays readable.
@@ -48,10 +65,13 @@ var _bob_x := SpringValue.new()
 var _bob_y := SpringValue.new()
 var _strafe_tilt := SpringValue.new()
 var _vlag_y := SpringValue.new()
-var _recoil_z := SpringValue.new()
-var _recoil_pitch := SpringValue.new()
-var _recoil_yaw := SpringValue.new()
-var _recoil_roll := SpringValue.new()
+var _recoil_back: RecoilChannel = RecoilChannel.new()
+var _recoil_pitch: RecoilChannel = RecoilChannel.new()
+var _recoil_climb: RecoilChannel = RecoilChannel.new()
+var _recoil_yaw: RecoilChannel = RecoilChannel.new()
+var _last_yaw_dir: float = 0.0
+var _recoil_offset_pos: Vector3 = Vector3.ZERO
+var _recoil_offset_rot: Vector3 = Vector3.ZERO
 
 # Other per-frame state
 var _previous_look_dir: Vector3 = Vector3.ZERO
@@ -88,18 +108,29 @@ func apply_offsets(delta: float) -> void:
 	_update_crouch_stance(delta)
 	_update_sprint_stance(delta)
 
-	var recoil_pos: Vector3 = Vector3.ZERO
 	if ctrl.enable_recoil:
-		recoil_pos = _update_recoil(delta)
-	var recoil_rot: Vector3 = Vector3(_recoil_pitch.value, _recoil_yaw.value, _recoil_roll.value)
+		_update_recoil(delta)
+	else:
+		_recoil_offset_pos = Vector3.ZERO
+		_recoil_offset_rot = Vector3.ZERO
 
-	model.position = ctrl.current_stance_pos + idle_offset + look_offset + bob_offset + _crouch_pos + _sprint_pos + _sprint_motion_pos + recoil_pos + vertical_lag_offset
-	model.rotation = ctrl.current_stance_rot + Vector3(_idle_rot_x.value, 0.0, strafe_tilt) + _crouch_rot + _sprint_rot + _sprint_motion_rot + recoil_rot
+	model.position = ctrl.current_stance_pos + idle_offset + look_offset + bob_offset + _crouch_pos + _sprint_pos + _sprint_motion_pos + _recoil_offset_pos + vertical_lag_offset
+	model.rotation = ctrl.current_stance_rot + Vector3(_idle_rot_x.value, 0.0, strafe_tilt) + _crouch_rot + _sprint_rot + _sprint_motion_rot + _recoil_offset_rot
 
 
 func reset_bob() -> void:
 	_bob_x.reset()
 	_bob_y.reset()
+
+
+func reset_recoil() -> void:
+	_recoil_back.reset()
+	_recoil_pitch.reset()
+	_recoil_climb.reset()
+	_recoil_yaw.reset()
+	_last_yaw_dir = 0.0
+	_recoil_offset_pos = Vector3.ZERO
+	_recoil_offset_rot = Vector3.ZERO
 
 
 #region Recoil
@@ -108,39 +139,42 @@ func add_recoil() -> void:
 	if not ctrl.enable_recoil or ctrl.current_weapon_model == null:
 		return
 
+	var two_handed: bool = _is_two_handed_weapon()
 	# Up to +40% recoil when fully exhausted.
-	var tiredness_multiplier: float = 1.0 + _tiredness_factor() * 0.4
+	var strength: float = 1.0 + _tiredness_factor() * 0.4
+	if is_aiming:
+		strength *= ctrl.recoil_ads_visual_multiplier
 
 	# A support hand keeps a long gun aligned with the bore. It still pushes
 	# the stock into the shoulder, but produces less muzzle climb and wobble.
-	var two_handed: bool = _is_two_handed_weapon()
 	var kick_multiplier: float = 1.12 if two_handed else 1.0
 	var rise_multiplier: float = 0.62 if two_handed else 1.0
 	var lateral_multiplier: float = 0.35 if two_handed else 1.0
+	var rise: float = deg_to_rad(weapon.recoil_weapon_rise) * rise_multiplier * strength
+	var climb_share: float = clampf(ctrl.recoil_climb_ratio, 0.0, 1.0)
 
-	_recoil_z.value += weapon.recoil_weapon_kick * kick_multiplier * tiredness_multiplier
-	_recoil_pitch.value += deg_to_rad(weapon.recoil_weapon_rise) * rise_multiplier * tiredness_multiplier
-
-	var horizontal_range: float = weapon.recoil_weapon_rise * 0.5 * tiredness_multiplier
-	_recoil_yaw.value += deg_to_rad(randf_range(-horizontal_range, horizontal_range)) * lateral_multiplier
-	if two_handed:
-		# The small roll is the remaining torque around the support hand,
-		# not an independent sideways snap.
-		_recoil_roll.value -= _recoil_yaw.value * 0.08
+	_recoil_back.kick(weapon.recoil_weapon_kick * kick_multiplier * strength)
+	_recoil_pitch.kick(rise * (1.0 - climb_share))
+	_recoil_climb.kick(rise * climb_share)
+	_last_yaw_dir = lerpf(randf_range(-1.0, 1.0), _last_yaw_dir, ctrl.recoil_lateral_persistence)
+	var yaw_range: float = weapon.recoil_weapon_rise * 0.5 * strength
+	_recoil_yaw.kick(deg_to_rad(_last_yaw_dir * yaw_range) * lateral_multiplier)
 
 
-func _update_recoil(delta: float) -> Vector3:
+func _update_recoil(delta: float) -> void:
 	var two_handed: bool = _is_two_handed_weapon()
 	var stiffness: float = ctrl.recoil_model_stillness * (0.78 if two_handed else 1.0)
 	var damping: float = ctrl.recoil_model_damping * (1.15 if two_handed else 1.0)
 	var max_angle: float = ctrl.recoil_model_max_angle
-
-	var kick: float = _recoil_z.step(0.0, delta, stiffness, damping, max_angle)
-	_recoil_pitch.step(0.0, delta, stiffness, damping, ctrl.recoil_pitch_max)
-	_recoil_yaw.step(0.0, delta, stiffness, damping, max_angle)
-	_recoil_roll.step(0.0, delta, stiffness, damping, max_angle)
-
-	return Vector3(0.0, 0.0, kick)
+	var pitch_max: float = ctrl.recoil_pitch_max
+	var back: float = _recoil_back.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, max_angle)
+	var pitch: float = _recoil_pitch.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, pitch_max)
+	var climb: float = _recoil_climb.step(delta, ctrl.recoil_climb_stiffness, ctrl.recoil_climb_damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, pitch_max)
+	var yaw: float = _recoil_yaw.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, max_angle)
+	var total_pitch: float = clampf(pitch + climb, -pitch_max, pitch_max)
+	var roll: float = -yaw * ctrl.recoil_roll_coupling * (0.55 if two_handed else 1.0)
+	_recoil_offset_pos = Vector3(0.0, back * ctrl.recoil_vertical_lift, back)
+	_recoil_offset_rot = Vector3(total_pitch, yaw, roll)
 #endregion
 
 

@@ -201,6 +201,7 @@ vertical_alignment = 1
 uppercase = true
 
 [node name="Control2" type="Control" parent="." unique_id=512530261]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 610.5
