@@ -185,9 +185,10 @@ nodes/EmptyReload/node = SubResource("AnimationNodeAnimation_44ltg")
 nodes/EmptyReload/position = Vector2(-304.74106, 789.2642)
 node_connections = [&"output", 0, &"ReloadOneShot", &"BoltPosition", 0, &"Idle", &"BoltPosition", 1, &"CloseBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"BoltMove", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"ReloadBlend", 0, &"Reload", &"ReloadBlend", 1, &"EmptyReload"]
 
-[node name="SmgModel" type="Node3D" unique_id=1004586577]
+[node name="SmgModel" type="Node3D" unique_id=1004586577 node_paths=PackedStringArray("ammo_display")]
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
 script = ExtResource("1_mcvyo")
+ammo_display = NodePath("EjectionPort/AmmoCounterPosition")
 
 [node name="m15" parent="." unique_id=1774983117 instance=ExtResource("6_3vu8r")]
 transform = Transform3D(2.915, 0, 0, 0, 2.915, 0, 0, 0, 2.915, 0, -1.0183843, 0)
@@ -223,10 +224,10 @@ visible = false
 visible = false
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=227635064 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
-transform = Transform3D(0.9999417, 0.009721402, 0.0046989457, -0.009678353, 0.9999118, -0.009100334, -0.0047869855, 0.009054332, 0.99994755, -0.12537159, 1.0190798, -2.4445875)
+transform = Transform3D(0.9999417, 0.009721402, 0.0046989457, -0.009678353, 0.9999118, -0.009100334, -0.0047869855, 0.009054332, 0.99994755, -0.062213432, 0.7060107, -1.459262)
 script = ExtResource("1_mf45t")
 particles = NodePath("MuzzleFlash")
-smoke_particles = NodePath("Smoke")
+smoke_particles = [NodePath("Smoke")]
 light = NodePath("OmniLight3D")
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Muzzle" unique_id=1357457869]
@@ -253,13 +254,11 @@ local_coords = true
 process_material = SubResource("ParticleProcessMaterial_bhunq")
 draw_pass_1 = SubResource("QuadMesh_riqys")
 
-[node name="EjectionPort" type="Node3D" parent="." unique_id=919837844 node_paths=PackedStringArray("smoke_particles")]
+[node name="EjectionPort" type="Node3D" parent="." unique_id=919837844]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0010569347, 0.71043104, -0.007704174)
 script = ExtResource("1_mf45t")
-smoke_particles = NodePath("Smoke")
 
 [node name="Smoke" type="GPUParticles3D" parent="EjectionPort" unique_id=931166092]
-visible = false
 emitting = false
 amount = 10
 lifetime = 0.7
@@ -269,7 +268,7 @@ process_material = SubResource("ParticleProcessMaterial_sn0t7")
 draw_pass_1 = SubResource("QuadMesh_bhunq")
 
 [node name="AmmoCounterPosition" type="Node3D" parent="EjectionPort" unique_id=1728137422]
-transform = Transform3D(4.429559, 0, 0.06240923, 0, 4.429999, 0, -0.06240923, 0, 4.429559, -0.9164386, -0.112252355, 0.04992429)
+transform = Transform3D(4.429559, 0, 0.06240923, 0, 4.4299984, 0, -0.06240923, 0, 4.429559, -1.4204416, -0.112252355, 0.04992429)
 
 [node name="GUI" parent="EjectionPort/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("5_mtaa1")]
 

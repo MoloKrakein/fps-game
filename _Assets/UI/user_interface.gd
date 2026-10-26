@@ -8,6 +8,7 @@ class_name UserInterface extends CanvasLayer
 @onready var chamber_indicator: ColorRect = %ChamberIndicator
 @onready var health_label: Label = %lbl_HP
 @onready var armor_label: Label = %lbl_Armor
+@onready var ammo_container: PanelContainer = $AmmoContainer
 
 @onready var current_ammo_label: Label = %CurrentAmmoLabel
 @onready var reserved_ammo_label: Label = %ReservedAmmoLabel
@@ -21,6 +22,7 @@ func _ready() -> void:
 	EventBus.weapon_ammo_changed.connect(set_ammo_values)
 	EventBus.weapon_chamber_status.connect(set_chamber_visual)
 	EventBus.change_visibility_of_crosshair.connect(set_crosshair_visibility)
+	EventBus.weapon_2d_ammo_visibility_changed.connect(set_2d_ammo_visibility)
 
 func set_health_value(health: float, max_health: float) -> void:
 	if health_bar:
@@ -74,6 +76,15 @@ func set_crosshair_visibility(_is_visible: bool) -> void:
 	print("Setting crosshair visibility to: ", _is_visible)
 	if crosshair:
 		crosshair.visible = _is_visible
+
+func set_2d_ammo_visibility(is_visible: bool) -> void:
+	if ammo_container == null:
+		return
+	ammo_container.visible = is_visible
+	for child: Node in ammo_container.find_children("*", "CanvasItem", true, false):
+		var canvas_item: CanvasItem = child as CanvasItem
+		if canvas_item != null:
+			canvas_item.visible = is_visible
 
 func set_chamber_visual(is_chambered: bool) -> void:
 	if not chamber_indicator: return

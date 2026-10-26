@@ -400,7 +400,7 @@ func _get_fire_position(member: Member, now: float) -> Vector3:
 	var in_band: bool = distance >= enemy.min_attack_range and distance <= enemy.attack_range - 0.5
 
 	# Already a good spot: stay and shoot.
-	if enemy.target_visible and in_band and not _is_near_any(here, _taken, slot_spacing * 0.6):
+	if enemy.has_recent_sight(1.0) and in_band and not _is_near_any(here, _taken, slot_spacing * 0.6):
 		member.fire_position = here
 		member.fire_time = now
 		member.fire_target = squad_known_position

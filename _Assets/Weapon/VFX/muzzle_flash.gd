@@ -1,7 +1,7 @@
 class_name MuzzleFlash extends Node3D
 @export var enabled: bool = true
 @export var particles: GPUParticles3D
-@export var smoke_particles: GPUParticles3D
+@export var smoke_particles: Array[GPUParticles3D]
 @export var light: OmniLight3D
 
 var _light_tween: Tween
@@ -12,8 +12,9 @@ func _ready() -> void:
 		particles.one_shot = true
 		particles.emitting = false
 	if smoke_particles:
-		smoke_particles.one_shot = true
-		smoke_particles.emitting = false
+		for particle in smoke_particles:
+			particle.one_shot = true
+			particle.emitting = false
 	if light:
 		light.light_energy = 0.0
 
@@ -36,7 +37,8 @@ func flash(color: Color, energy: float, duration: float) -> void:
 	particles.restart()
 
 	if smoke_particles:
-		smoke_particles.restart()
+		for particle in smoke_particles:
+			particle.restart()
 
 	if _light_tween and _light_tween.is_valid():
 		_light_tween.kill()
@@ -51,7 +53,8 @@ func trigger(color: Color, energy: float, duration: float) -> void:
 	if particles:
 		particles.restart()
 	if smoke_particles:
-		smoke_particles.restart()
+		for particle in smoke_particles:
+			particle.restart()
 	if light:
 		light.light_color = color
 		light.light_energy = energy

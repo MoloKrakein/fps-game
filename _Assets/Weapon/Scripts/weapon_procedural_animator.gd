@@ -67,6 +67,7 @@ var _sprint_motion_rot: Vector3 = Vector3.ZERO
 var _sprint_motion_weight: float = 0.0
 var _sprint_motion_time: float = 0.0
 var _sprint_animation_active: bool = false
+var _2d_ammo_visible: bool = false
 
 
 func _init(controller: WeaponController) -> void:
@@ -317,6 +318,8 @@ func _update_sprint_stance(delta: float) -> void:
 	var target_pos: Vector3 = Vector3.ZERO
 	var target_rot: Vector3 = Vector3.ZERO
 	var sprinting: bool = _is_sprint_animation_active()
+	_set_ammo_display_visible(not sprinting)
+	_set_2d_ammo_visible(sprinting)
 
 	if sprinting:
 		target_pos = _get_sprint_position_offset()
@@ -354,6 +357,20 @@ func _update_sprint_stance(delta: float) -> void:
 		cos(motion_phase * 0.5) * ctrl.sprint_yaw_amount,
 		sin(motion_phase * 0.5) * ctrl.sprint_roll_amount
 	) * motion_scale
+
+
+func _set_ammo_display_visible(is_visible: bool) -> void:
+	var model: WeaponModel = ctrl.current_weapon_model
+	if model == null:
+		return
+	model.set_ammo_display_visible(is_visible)
+
+
+func _set_2d_ammo_visible(is_visible: bool) -> void:
+	if _2d_ammo_visible == is_visible:
+		return
+	_2d_ammo_visible = is_visible
+	EventBus.weapon_2d_ammo_visibility_changed.emit(is_visible)
 
 
 func _is_sprint_animation_active() -> bool:

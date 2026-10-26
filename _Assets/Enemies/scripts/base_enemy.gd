@@ -67,12 +67,16 @@ enum TraversalState {
 @export var burst_pause_min: float = 0.45
 @export var burst_pause_max: float = 1.1
 ## Aim error in metres at 10 m right after starting to aim...
-@export var aim_error_start: float = 1.4
+@export var aim_error_start: float = 0.9
 ## ...and after aiming for `aim_settle_time` seconds.
-@export var aim_error_settled: float = 0.35
+@export var aim_error_settled: float = 0.2
 @export var aim_settle_time: float = 1.2
 ## Allies this close are alerted when this enemy first engages.
 @export var alert_share_radius: float = 30.0
+
+@export_group("Debug")
+## Shows a floating label with the enemy's role, sight, ammo and firing permission.
+@export var debug_ai: bool = false
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var state_chart: StateChart = $StateChart
@@ -84,6 +88,7 @@ enum TraversalState {
 var target: Node3D
 var squad_coordinator: EnemySquadCoordinator
 var order: SquadOrder = SquadOrder.new()
+var _debug_label: Label3D
 
 var is_dead: bool = false
 ## True once the enemy noticed the player (or was alerted) and until it gives up.
@@ -137,6 +142,8 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_update_perception(delta)
+	_reload_if_empty()
+	_update_debug_label()
 
 	if traversal_state == TraversalState.VAULTING:
 		velocity = Vector3.ZERO
@@ -335,6 +342,11 @@ func get_targetname() -> String:
 
 #region Squad queries (used by the coordinator)
 
+## True while the target is visible, or was a moment ago (avoids flickering on partial cover).
+func has_recent_sight(max_age: float = 0.5) -> bool:
+	return target_visible or time_since_seen <= max_age
+
+
 func is_reloading() -> bool:
 	return enemy_shoot_component != null and enemy_shoot_component.reload_timer > 0.0
 
@@ -376,7 +388,7 @@ func _on_follow_state_physics_processing(delta: float) -> void:
 
 
 func _should_start_firing() -> bool:
-	if not order.may_fire or not target_visible:
+	if not order.may_fire or not has_recent_sight(0.4):
 		return false
 	if is_reloading() or not has_ammo():
 		return false
@@ -731,6 +743,38 @@ func _cancel_vault() -> void:
 		traversal_state = TraversalState.GROUND
 
 #endregion
+
+
+## The weapon only starts reloading when asked to fire with an empty magazine. Without this an
+## enemy that ran dry would never be picked for an attack token again and stop shooting forever.
+func _reload_if_empty() -> void:
+	if is_dead or not is_engaged or enemy_shoot_component == null:
+		return
+	if not has_ammo() and not is_reloading():
+		enemy_shoot_component.fire()
+
+
+func _update_debug_label() -> void:
+	if not debug_ai:
+		if _debug_label:
+			_debug_label.queue_free()
+			_debug_label = null
+		return
+	if _debug_label == null:
+		_debug_label = Label3D.new()
+		_debug_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		_debug_label.no_depth_test = true
+		_debug_label.pixel_size = 0.004
+		_debug_label.font_size = 40
+		_debug_label.outline_size = 12
+		_debug_label.position = Vector3(0.0, 2.6, 0.0)
+		add_child(_debug_label)
+	var distance: float = global_position.distance_to(target.global_position) if is_instance_valid(target) else -1.0
+	_debug_label.text = "%s  fire:%s  engaged:%s\nsee:%s (%.1fs)  dist:%.1f\nammo:%d  reloading:%s" % [
+		order.role, order.may_fire, is_engaged,
+		target_visible, minf(time_since_seen, 99.0), distance,
+		enemy_shoot_component.current_ammo if enemy_shoot_component else -1, is_reloading()
+	]
 
 
 #region Damage and death

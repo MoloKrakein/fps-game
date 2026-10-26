@@ -5,6 +5,7 @@ class_name AmmoUI extends Node
 @onready var current_ammo_label: Label = %CurrentAmmoLabel
 @onready var reserved_ammo_label: Label = %ReservedAmmoLabel
 @onready var bullet_bar: ProgressBar = %Bulletbar
+@export var hud_mesh: MeshInstance3D
 
 var reload_tween: Tween
 
@@ -35,6 +36,11 @@ func set_ammo_values(current_ammo: int = 0, reserved_ammo: int = 0, reload_time:
 		reserved_ammo_label.text = str(reserved_ammo)
 	if reload_timer_bar and reload_time > 0.0:
 		set_reload_timer_value(reload_time)
+
+
+func set_hud_visible(is_visible: bool) -> void:
+	if hud_mesh != null:
+		hud_mesh.visible = is_visible
 
 
 func set_bullet_bar_values(current_ammo: int, max_ammo_in_magazine: int) -> void:

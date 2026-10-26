@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://8ag50kstunba" path="res://Art/UI/HealthBar/HP Fill.svg" id="4_a3ewi"]
 [ext_resource type="Texture2D" uid="uid://bdamabxhbdice" path="res://Art/UI/HealthBar/ArmorRing.svg" id="5_ksybn"]
 [ext_resource type="FontFile" uid="uid://n4l4ux5ylwuv" path="res://Art/UI/fonts/ibm plex mono/IBMPlexMono-Regular.ttf" id="6_a3ewi"]
+[ext_resource type="PackedScene" uid="uid://c60g3sobumipj" path="res://_Assets/UI/ammo_ui_scene.tscn" id="7_ksybn"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_o08ba"]
 texture = ExtResource("3_p2qy6")
@@ -32,9 +33,6 @@ outline_color = Color(0, 0.42745098, 0.54901963, 1)
 shadow_size = 12
 shadow_color = Color(0, 0.3777927, 0.2802618, 0.56078434)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sn0t7"]
-bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
-
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_bhunq"]
 content_margin_left = 0.0
 content_margin_top = 0.0
@@ -45,6 +43,9 @@ thickness = 3
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_riqys"]
 color = Color(0, 0, 1, 1)
 thickness = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sn0t7"]
+bg_color = Color(0.030694237, 0.030694237, 0.046381705, 0.3647059)
 
 [node name="UserInterface" type="CanvasLayer" unique_id=2116638828]
 script = ExtResource("1_em0eb")
@@ -199,47 +200,73 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="AmmoContainer" type="PanelContainer" parent="." unique_id=386732142]
-visible = false
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -145.0
-offset_top = -41.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
+[node name="Control2" type="Control" parent="." unique_id=512530261]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 610.5
+offset_top = 679.0
+offset_right = 650.5
+offset_bottom = 719.0
 
-[node name="ChamberIndicator" type="ColorRect" parent="AmmoContainer" unique_id=1657171669]
+[node name="ChamberIndicator" type="ColorRect" parent="Control2" unique_id=1657171669]
 unique_name_in_owner = true
-layout_mode = 2
+visible = false
+layout_mode = 0
+offset_right = 145.0
+offset_bottom = 41.0
 color = Color(1, 0, 0.16470589, 0.23921569)
 
-[node name="AmmoBar" type="ProgressBar" parent="AmmoContainer" unique_id=1612725676]
+[node name="AmmoBar" type="ProgressBar" parent="Control2" unique_id=1612725676]
 unique_name_in_owner = true
-layout_mode = 2
+visible = false
+layout_mode = 0
+offset_right = 145.0
+offset_bottom = 3.0
 theme_override_styles/background = SubResource("StyleBoxLine_bhunq")
 theme_override_styles/fill = SubResource("StyleBoxLine_riqys")
 value = 100.0
 rounded = true
 show_percentage = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="AmmoContainer" unique_id=1166870338]
-layout_mode = 2
+[node name="HBoxContainer" type="HBoxContainer" parent="Control2" unique_id=1166870338]
+visible = false
+layout_mode = 0
+offset_right = 145.0
+offset_bottom = 41.0
 alignment = 1
 
-[node name="CurrentAmmoLabel" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=1555833833]
+[node name="CurrentAmmoLabel" type="Label" parent="Control2/HBoxContainer" unique_id=1555833833]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "000"
 
-[node name="Separator" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=354271008]
+[node name="Separator" type="Label" parent="Control2/HBoxContainer" unique_id=354271008]
+visible = false
 layout_mode = 2
 text = "/"
 
-[node name="ReservedAmmoLabel" type="Label" parent="AmmoContainer/HBoxContainer" unique_id=385965612]
+[node name="ReservedAmmoLabel" type="Label" parent="Control2/HBoxContainer" unique_id=385965612]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "9999"
+
+[node name="AmmoContainer" type="PanelContainer" parent="." unique_id=386732142]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -72.5
+offset_top = -41.0
+offset_right = 72.5
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
+
+[node name="Control2" parent="AmmoContainer" unique_id=1625207807 instance=ExtResource("7_ksybn")]
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, -6.36)

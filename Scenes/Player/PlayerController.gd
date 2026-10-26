@@ -86,7 +86,7 @@ func _on_health_component_health_changed(new_health: float, max_health: float) -
 func _on_damage_taken(damage_amount: float) -> void:
 	EventBus.player_damage_taken.emit(damage_amount)
 	if cam_effects:
-		var intensity = clamp(damage_amount / 100.0, 0.1, 0.6)
+		var _intensity = clamp(damage_amount / 100.0, 0.1, 0.6)
 
 
 func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
