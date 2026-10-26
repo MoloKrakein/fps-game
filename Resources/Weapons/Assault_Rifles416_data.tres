@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_ac8k0"]
 [ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="2_aynac"]
-[ext_resource type="Resource" uid="uid://bft80mdfaslva" path="res://Resources/Attachments/Optics/4x_scope.tres" id="2_mg82a"]
+[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="2_mg82a"]
 [ext_resource type="Resource" uid="uid://rshmsh33r3p1" path="res://Resources/Weapons/Assault_Rifles416.tres" id="3_aynac"]
 
 [resource]
