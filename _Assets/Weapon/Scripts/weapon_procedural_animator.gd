@@ -108,9 +108,12 @@ func apply_offsets(delta: float) -> void:
 	_update_crouch_stance(delta)
 	_update_sprint_stance(delta)
 
-	if ctrl.enable_recoil:
+	if ctrl.enable_recoil and not _is_recoil_suppressed():
 		_update_recoil(delta)
 	else:
+		# Clear accumulated kick while sprinting so firing cannot throw the
+		# weapon out of the tactical-sprint pose or leave it offset afterward.
+		reset_recoil()
 		_recoil_offset_pos = Vector3.ZERO
 		_recoil_offset_rot = Vector3.ZERO
 
@@ -136,7 +139,7 @@ func reset_recoil() -> void:
 #region Recoil
 ## Kicks the weapon model. Call once per shot.
 func add_recoil() -> void:
-	if not ctrl.enable_recoil or ctrl.current_weapon_model == null:
+	if not ctrl.enable_recoil or ctrl.current_weapon_model == null or _is_recoil_suppressed():
 		return
 
 	var two_handed: bool = _is_two_handed_weapon()
@@ -175,6 +178,10 @@ func _update_recoil(delta: float) -> void:
 	var roll: float = -yaw * ctrl.recoil_roll_coupling * (0.55 if two_handed else 1.0)
 	_recoil_offset_pos = Vector3(0.0, back * ctrl.recoil_vertical_lift, back)
 	_recoil_offset_rot = Vector3(total_pitch, yaw, roll)
+
+
+func _is_recoil_suppressed() -> bool:
+	return ctrl.disable_recoil_during_sprint and _is_sprint_animation_active()
 #endregion
 
 

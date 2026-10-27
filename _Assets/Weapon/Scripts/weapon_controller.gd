@@ -85,6 +85,7 @@ const TIREDNESS_PER_SHOT: float = 1.5
 
 @export_group("Weapon Recoil Settings")
 @export var enable_recoil: bool = true
+@export var disable_recoil_during_sprint: bool = true
 @export var recoil_model_stillness: float = 200.0
 @export var recoil_model_damping: float = 10.0
 @export var recoil_model_max_angle: float = 50.0
