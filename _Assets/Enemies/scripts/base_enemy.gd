@@ -75,6 +75,15 @@ enum TraversalState {
 ## Allies this close are alerted when this enemy first engages.
 @export var alert_share_radius: float = 30.0
 
+@export_group("Explosion reaction")
+## Velocity change (m/s) per unit of explosion impulse.
+@export var knockback_scale: float = 0.3
+@export var max_knockback_speed: float = 14.0
+## Seconds of stagger per m/s of launch speed.
+@export var stagger_per_speed: float = 0.12
+@export var max_stagger_time: float = 1.6
+@export var knockback_friction: float = 9.0
+
 @export_group("Morale")
 ## Morale / eagerness driven by health, shock, nearby allies and personality. See EnemyMoraleComponent.
 @export var morale_enabled: bool = true
@@ -105,6 +114,7 @@ var is_dead: bool = false
 ## True once the enemy noticed the player (or was alerted) and until it gives up.
 var is_engaged: bool = false
 var traversal_state: TraversalState = TraversalState.GROUND
+var _stagger_timer: float = 0.0
 
 # Perception
 var target_visible: bool = false
@@ -157,6 +167,13 @@ func _physics_process(delta: float) -> void:
 	_reload_if_empty()
 	_update_debug_label()
 
+	if _stagger_timer > 0.0:
+		_stagger_timer = maxf(_stagger_timer - delta, 0.0)
+		if is_on_floor():
+			var slide: Vector2 = Vector2(velocity.x, velocity.z).move_toward(Vector2.ZERO, knockback_friction * delta)
+			velocity.x = slide.x
+			velocity.z = slide.y
+
 	if traversal_state == TraversalState.VAULTING:
 		velocity = Vector3.ZERO
 		_update_animation()
@@ -185,7 +202,7 @@ func _exit_tree() -> void:
 
 ## True while the enemy cannot act (hit reaction, dead). The squad skips such enemies.
 func is_incapacitated() -> bool:
-	return is_dead
+	return is_dead or _stagger_timer > 0.0
 
 func _on_idle(_delta: float) -> void:
 	pass
@@ -713,6 +730,8 @@ func _get_link_position(details: Dictionary, key: StringName) -> Vector3:
 
 
 func _try_begin_vault() -> bool:
+	if _stagger_timer > 0.0:
+		return false
 	if traversal_state != TraversalState.GROUND or not is_on_floor() or not is_engaged:
 		return false
 
@@ -750,6 +769,19 @@ func _try_begin_vault() -> bool:
 
 	_begin_vault(landing_position, direction)
 	return true
+
+
+func apply_explosion_knockback(impulse: Vector3, _origin: Vector3) -> void:
+	if is_dead:
+		return
+	if traversal_state == TraversalState.VAULTING:
+		_cancel_vault()
+	var launch: Vector3 = (impulse * knockback_scale).limit_length(max_knockback_speed)
+	velocity += launch
+	_stagger_timer = maxf(_stagger_timer, minf(launch.length() * stagger_per_speed, max_stagger_time))
+	aim_time = 0.0
+	burst_pause_timer = maxf(burst_pause_timer, 0.4)
+	reset_navigation()
 
 
 func _begin_vault(landing_position: Vector3, direction: Vector3) -> void:

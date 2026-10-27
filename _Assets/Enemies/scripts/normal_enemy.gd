@@ -77,7 +77,7 @@ func _setup_active_ragdoll() -> void:
 #region BaseEnemy hooks
 
 func is_incapacitated() -> bool:
-	return is_dead or is_stumbling
+	return super.is_incapacitated() or is_stumbling
 
 
 func _on_idle(_delta: float) -> void:

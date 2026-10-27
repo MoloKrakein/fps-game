@@ -84,46 +84,18 @@ func _on_body_entered(body: Node3D) -> void:
 
 func _explode() -> void:
 	var blast_position: Vector3 = global_position
-	_spawn_explosion_effect(blast_position)
 	if explosion_radius <= 0.0 or explosion_damage <= 0.0:
 		return
 
-	var shape: SphereShape3D = SphereShape3D.new()
-	shape.radius = explosion_radius
-	var query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
-	query.shape = shape
-	query.transform = Transform3D(Basis.IDENTITY, blast_position)
-	query.collision_mask = explosion_collision_mask
-	if attacker is CollisionObject3D:
-		query.exclude = [attacker.get_rid()]
-
-	var affected_health: Array[HealthComponent] = []
-	for hit: Dictionary in get_world_3d().direct_space_state.intersect_shape(query):
-		var collider: Node = hit.get("collider") as Node
-		var health_component: HealthComponent = _find_health_component(collider)
-		if health_component == null or affected_health.has(health_component):
-			continue
-		affected_health.append(health_component)
-
-		var target_body: Node3D = health_component.get_parent() as Node3D
-		if _is_friendly_target(target_body):
-			continue
-		var target_position: Vector3 = target_body.global_position if target_body else blast_position
-		var distance_ratio: float = clampf(blast_position.distance_to(target_position) / explosion_radius, 0.0, 1.0)
-		var multiplier: float = lerpf(1.0, 1.0 - explosion_falloff, distance_ratio)
-		var info: DamageInfo = DamageInfo.new(explosion_damage * multiplier, attacker, "explosive")
-		info.armor_penetration = armor_penetration
-		info.impact_direction = (target_position - blast_position).normalized()
-		info.impact_position = blast_position
-		health_component.take_damage_with_info(info)
-
-		if explosion_force > 0.0:
-			if target_body is RigidBody3D:
-				(target_body as RigidBody3D).apply_central_impulse(info.impact_direction * explosion_force)
-
-
-func _is_friendly_target(target: Node3D) -> bool:
-	return attacker is BaseEnemy and target is BaseEnemy
+	var data: ExplosionData = ExplosionData.new()
+	data.radius = explosion_radius
+	data.damage = explosion_damage
+	data.falloff = explosion_falloff
+	data.force = explosion_force
+	data.armor_penetration = armor_penetration
+	data.target_mask = explosion_collision_mask
+	data.requires_line_of_sight = false
+	Explosion.detonate(self, blast_position, data, attacker)
 
 
 func _find_health_component(node: Node) -> HealthComponent:
@@ -137,6 +109,7 @@ func _find_health_component(node: Node) -> HealthComponent:
 			return child_health
 		current = current.get_parent()
 	return null
+
 
 func _spawn_impact_effect(hit_position: Vector3) -> void:
 	# Placeholder for spawning impact effects (e.g., particles, decals)
