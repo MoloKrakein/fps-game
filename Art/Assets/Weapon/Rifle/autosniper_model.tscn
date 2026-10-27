@@ -1,52 +1,17 @@
 [gd_scene format=4 uid="uid://cu06ajduxlmxo"]
 
-[ext_resource type="PackedScene" uid="uid://61bx40wnr1gc" path="res://Art/Assets/Weapon/Attachment/Scope/Acog.tscn" id="1_6cb5l"]
-[ext_resource type="Shader" uid="uid://c3yj4mxisrqka" path="res://Art/Shader/ScopeShader/scope.gdshader" id="2_dg8lt"]
+[ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_dg8lt"]
+[ext_resource type="Script" uid="uid://c6s8by6wlubla" path="res://_Assets/Weapon/attachment/Scripts/attachment_fit.gd" id="2_lbst0"]
+[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="3_1n0k8"]
+[ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="3_6v2q4"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="3_ty10y"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_dg8lt"]
-resource_local_to_scene = true
-render_priority = 0
-shader = ExtResource("2_dg8lt")
-shader_parameter/scope_radius = 0.025
-shader_parameter/reticle_depth = 2.0
-shader_parameter/parallax_factor = 0.1
-shader_parameter/view_edge_fade_factor = 0.05
-shader_parameter/eyebox_position = 0.15
-shader_parameter/eyebox_tolerance = 0.005
-shader_parameter/eyebox_fade_distance = 0.05
-shader_parameter/shadow_inner_radius = 1.0
-shader_parameter/shadow_fade_factor = 0.2
-shader_parameter/shadow_movement_factor = 1.0
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_6v2q4"]
-viewport_path = NodePath("display/ReticleView")
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_lbst0"]
-viewport_path = NodePath("display/ScopeView")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_1n0k8"]
-resource_local_to_scene = true
-render_priority = 0
-shader = ExtResource("2_dg8lt")
-shader_parameter/reticle_texture = SubResource("ViewportTexture_6v2q4")
-shader_parameter/scope_texture = SubResource("ViewportTexture_lbst0")
-shader_parameter/scope_radius = 0.03
-shader_parameter/reticle_depth = 0.845
-shader_parameter/parallax_factor = 0.1
-shader_parameter/view_edge_fade_factor = 0.05
-shader_parameter/eyebox_position = 0.15
-shader_parameter/eyebox_tolerance = 0.05
-shader_parameter/eyebox_fade_distance = 0.05
-shader_parameter/shadow_inner_radius = 1.0
-shader_parameter/shadow_fade_factor = 0.2
-shader_parameter/shadow_movement_factor = 1.0
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_nvs8a"]
-resource_local_to_scene = true
-material = SubResource("ShaderMaterial_1n0k8")
-size = Vector2(0.3, 0.25)
-orientation = 2
+[sub_resource type="Resource" id="Resource_dg8lt"]
+script = ExtResource("2_lbst0")
+attachment = ExtResource("3_1n0k8")
+scale_multiplier = Vector3(0.3, 0.3, 0.3)
+ads_offset = Vector3(0, 0.04, 0)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_munpi"]
 resource_name = "material_0"
@@ -395,22 +360,15 @@ nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_enst8")
 nodes/ReloadBlend/position = Vector2(180, 560)
 node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"rack", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"equiped", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload"]
 
-[node name="PistolModel" type="Node3D" unique_id=1425760719]
+[node name="WA2k" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("optic_socket", "iron_sight_point", "ammo_display")]
+script = ExtResource("1_dg8lt")
+optic_socket = NodePath("blockbench_export/Cube_002/scope_socket")
+iron_sight_point = NodePath("blockbench_export/Cube_002/scope_socket")
+attachment_fits = Array[ExtResource("2_lbst0")]([SubResource("Resource_dg8lt")])
+ammo_display = NodePath("AmmoCounterPosition")
 
 [node name="blockbench_export" type="Node3D" parent="." unique_id=1242381913]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -0.13892382, 0)
-
-[node name="Node3D" parent="blockbench_export" unique_id=694394248 instance=ExtResource("1_6cb5l")]
-transform = Transform3D(-1.131128e-08, 0, -0.25877193, 0, 0.25877193, 0, 0.25877193, 0, -1.131128e-08, 0, 0.19370203, 0)
-
-[node name="DisplayMesh" parent="blockbench_export/Node3D/display" parent_id_path=PackedInt32Array(694394248, 1787843111) index="0" unique_id=825921561]
-surface_material_override/0 = SubResource("ShaderMaterial_dg8lt")
-
-[node name="Camera3D" parent="blockbench_export/Node3D/display/ScopeView" parent_id_path=PackedInt32Array(694394248, 323996123) index="0" unique_id=1578499935]
-transform = Transform3D(0.25877193, 0, 0, 0, 0.25877193, 0, 0, 0, 0.25877193, 0, 0.10455965, -0.06456614)
-
-[node name="MeshInstance3D" parent="blockbench_export/Node3D/display" parent_id_path=PackedInt32Array(694394248, 1787843111) index="4" unique_id=1532520152]
-mesh = SubResource("PlaneMesh_nvs8a")
 
 [node name="mesh_selection" type="MeshInstance3D" parent="blockbench_export" unique_id=1495890334]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.015625, 0.114365, -0.003765625)
@@ -431,6 +389,9 @@ skeleton = NodePath("")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15991813, 0.01639625, 0)
 mesh = SubResource("ArrayMesh_4lnit")
 skeleton = NodePath("")
+
+[node name="scope_socket" type="Marker3D" parent="blockbench_export/Cube_002" unique_id=692444622]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.146425, 0.18373935, 6.4004397e-09)
 
 [node name="Cube_0022" type="MeshInstance3D" parent="blockbench_export" unique_id=2010594730]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1875, 0.0359375, 0)
@@ -489,7 +450,7 @@ parameters/ReloadBlend/blend_amount = 0.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="." unique_id=1112189428]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18046615, 0.027169734, 0.04992429)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18046615, 0.027169734, -0.2633954)
 
-[editable path="blockbench_export/Node3D"]
-[editable path="blockbench_export/Node3D/blockbench_export"]
+[node name="GUI" parent="AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("3_6v2q4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.044470966, -0.028495118, 0.10883766)

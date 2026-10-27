@@ -127,6 +127,11 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 		on_airbone_time += delta
+		# Sprinting is grounded movement only. Clear the modifier immediately
+		# so jumping or walking off a ledge cannot preserve sprint speed.
+		if is_sprinting:
+			sprint_modifier = 0.0
+			is_sprinting = false
 	else:
 		on_airbone_time = 0.0
 	
@@ -229,6 +234,9 @@ func update_rotation(rotation_input)-> void:
 	global_transform.basis = Basis.from_euler(rotation_input)
 
 func sprint() -> void:
+	if not is_on_floor():
+		walk()
+		return
 	sprint_modifier = sprint_speed
 	is_sprinting = true
 	if debug:
@@ -259,7 +267,9 @@ func crouch() -> void:
 	is_crouching = true
 
 func jump() -> void:
-	# if is_on_floor():
+	if not is_on_floor():
+		return
+	walk()
 	velocity.y = jump_velocity
 #endregion
 

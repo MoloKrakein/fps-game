@@ -11,6 +11,7 @@
 [ext_resource type="Resource" uid="uid://c7li8s4pv7rdi" path="res://Resources/Weapons/smg_data.tres" id="6_m1efj"]
 [ext_resource type="Resource" uid="uid://ckk3s0l53w6i4" path="res://Resources/Weapons/Assault_Rifles416_data.tres" id="7_76v2p"]
 [ext_resource type="Resource" uid="uid://b15yby6glemy0" path="res://Resources/Weapons/AutoSg_data.tres" id="8_drdnd"]
+[ext_resource type="Resource" uid="uid://bulqjfu7p4m6d" path="res://Resources/Weapons/autoSniper_data.tres" id="9_ioaeq"]
 [ext_resource type="PackedScene" uid="uid://br62nk21xm7fu" path="res://Scenes/post_processing/post_processing_layer.tscn" id="10_76v2p"]
 
 [node name="MainScene" type="Node" unique_id=1881302021]
@@ -28,7 +29,8 @@ weapons = Dictionary[int, ExtResource("3_m1efj")]({
 2: ExtResource("5_76v2p"),
 3: ExtResource("6_m1efj"),
 4: ExtResource("7_76v2p"),
-5: ExtResource("8_drdnd")
+5: ExtResource("8_drdnd"),
+6: ExtResource("9_ioaeq")
 })
 player = NodePath("../../CurrentLevel/PlayerController")
 

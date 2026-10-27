@@ -1,7 +1,9 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://bulqjfu7p4m6d"]
 
 [ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="1_iydnr"]
+[ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_udx7i"]
 [ext_resource type="Resource" uid="uid://bjohgrqcs2d67" path="res://Resources/Weapons/autoSniper.tres" id="2_1b6n4"]
+[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="2_ee3si"]
 
 [resource]
 script = ExtResource("1_iydnr")
@@ -10,4 +12,7 @@ is_unlocked = true
 ammo_in_magazine = 100
 reserve_ammo = 100
 is_loaded = true
+equipped_attachment_data = Dictionary[int, ExtResource("1_udx7i")]({
+0: ExtResource("2_ee3si")
+})
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"

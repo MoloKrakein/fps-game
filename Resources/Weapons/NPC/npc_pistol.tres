@@ -10,5 +10,6 @@ mags_ammo = 40
 max_ammo = 999
 fire_rate_rpm = 300.0
 fire_rate = 300.0
+fire_mode = 1
 projectile_scene = ExtResource("1_ayddn")
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

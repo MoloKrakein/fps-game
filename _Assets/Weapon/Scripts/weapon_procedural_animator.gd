@@ -415,7 +415,7 @@ func _set_2d_ammo_visible(is_visible: bool) -> void:
 
 
 func _is_sprint_animation_active() -> bool:
-	if player == null or not player.is_sprinting or player.is_crouching or player.is_sliding or is_aiming:
+	if player == null or not player.is_on_floor() or not player.is_sprinting or player.is_crouching or player.is_sliding or is_aiming:
 		_sprint_animation_active = false
 		return false
 
