@@ -8,6 +8,8 @@ var stats: Dictionary = {
     "evasion_chance": 0.05, # Chance to evade attacks (5%)
     "damage_reduction": 0.10, # Damage reduction percentage (10%)
     "flat_armor_reduction": 5.0, # Flat armor reduction value
+    "armor_regeneration_rate": 5.0, # Armor restored per second
+    "armor_regeneration_delay": 3.0, # Seconds after damage before armor starts regenerating
 
     # Offensive Stats
     "damage_modifier": 1.0, # Damage multiplier for the player
@@ -51,6 +53,8 @@ func reset_stats() -> void:
         "evasion_chance": 0.0,
         "damage_reduction": 0.0,
         "flat_armor_reduction": 0.0,
+        "armor_regeneration_rate": 5.0,
+        "armor_regeneration_delay": 3.0,
         "damage_modifier": 1.0,
         "recoil_stability": 1.0,
         "reload_speed": 1.0,

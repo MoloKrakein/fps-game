@@ -79,6 +79,7 @@ metadata/_custom_type_script = "uid://c1845mf4x4i1g"
 [node name="HealthComponent" type="Node" parent="." unique_id=1115016750]
 script = ExtResource("2_2jnj1")
 armor_value = 50.0
+regenerate_armor = true
 metadata/_custom_type_script = "uid://dtyhxdhs168m"
 
 [node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]

@@ -15,10 +15,12 @@ signal attack_dodged()
 @export_range(0.1,1.0) var armor_absorption: float = 0.5
 @export var start_max_health: bool = true
 @export var start_with_armor: bool = false
+@export var regenerate_armor: bool = false
 
-var current_health:float
+var current_health: float
 var current_armor: float = 0.0
 var is_alive: bool = true
+var _armor_regeneration_timer: float = 0.0
 
 @onready var player_stats_component: PlayerStats = get_parent().get_node_or_null("PlayerStats")
 
@@ -27,6 +29,7 @@ func take_damage_with_info(info: DamageInfo) -> void:
 	if not is_alive:
 		return
 	var final_damage: float = info.raw_damage
+	var armor_before_damage: float = current_armor
 
 	# player stats component can modify the damage based on player's stats
 	if player_stats_component:
@@ -65,10 +68,12 @@ func take_damage_with_info(info: DamageInfo) -> void:
 	damage_taken.emit(final_damage)
 	damage_received.emit(info, final_damage)
 	health_changed.emit(current_health, max_health)
+	_reset_armor_regeneration_timer()
 
 	if current_health <= 0.0:
 		_handle_death()
-	armor_changed.emit(current_armor, armor_value)
+	if current_armor != armor_before_damage:
+		armor_changed.emit(current_armor, armor_value)
 
 func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool = false, is_crit: bool = false, armor_penetration: float = 0.0) -> void:
 	# Legacy method for compatibility, wraps the damage info into a DamageInfo object and calls take_damage_with_info
@@ -83,9 +88,34 @@ func take_damage(damage_amount: float, source: Node3D = null, is_headshot: bool 
 func heal(heal_amount: float) -> void:
 	if not is_alive:
 		return
-	var actual_heal = max(0.0, heal_amount)
+	var actual_heal: float = maxf(0.0, heal_amount)
 	current_health = min(max_health, current_health + actual_heal)
 	health_changed.emit(current_health, max_health)
+
+func _process(delta: float) -> void:
+	if not regenerate_armor or player_stats_component == null or not is_alive:
+		return
+	if current_armor >= armor_value:
+		return
+	if _armor_regeneration_timer > 0.0:
+		_armor_regeneration_timer = maxf(0.0, _armor_regeneration_timer - delta)
+		return
+
+	var armor_before_regeneration: float = current_armor
+	var regeneration_rate: float = _get_armor_regeneration_rate()
+	current_armor = minf(armor_value, current_armor + regeneration_rate * delta)
+	if current_armor != armor_before_regeneration:
+		armor_changed.emit(current_armor, armor_value)
+
+func _get_armor_regeneration_rate() -> float:
+	return maxf(0.0, player_stats_component.get_stat("armor_regeneration_rate", 0.0))
+
+func _get_armor_regeneration_delay() -> float:
+	return maxf(0.0, player_stats_component.get_stat("armor_regeneration_delay", 0.0))
+
+func _reset_armor_regeneration_timer() -> void:
+	if regenerate_armor and player_stats_component != null:
+		_armor_regeneration_timer = _get_armor_regeneration_delay()
 
 func _handle_death() -> void:
 	if not is_alive:
