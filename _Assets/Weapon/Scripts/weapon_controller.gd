@@ -498,8 +498,9 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 	current_weapon.stats_component = player_stats_component
 	current_weapon.active_weapon_data_ref = active_weapon_data
 
-	animator.reset_bob()
-	animator.reset_recoil()
+	animator.reset_motion_state()
+	if wall_tuck != null:
+		wall_tuck.reset_state()
 	_bind_model_nodes(current_weapon_model)
 	attachments.mount_all()
 

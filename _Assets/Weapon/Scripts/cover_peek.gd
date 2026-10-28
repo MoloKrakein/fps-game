@@ -1,7 +1,7 @@
 class_name CoverPeek extends Node
-## Far Cry 3 style automatic peek. While aiming next to cover the camera (and the
-## weapon with it) moves up over low cover, or out around a corner of a tall
-## wall, then returns when you stop aiming.
+## Explicit snap lean while aiming. The camera and weapon remain together because
+## the weapon model is parented below the camera. A vertical cover peek is kept
+## as an automatic fallback when neither lean button is held.
 ##
 ## Setup: add this as a Node under "Component". It uses physics queries only,
 ## so no RayCast nodes are needed. Requires the patched camera_controller.gd.
@@ -11,6 +11,8 @@ class_name CoverPeek extends Node
 @export_group("When")
 @export var require_aiming: bool = true
 @export var require_grounded: bool = true
+@export var lean_left_action: StringName = &"lean_left"
+@export var lean_right_action: StringName = &"lean_right"
 
 @export_group("Detection")
 ## Physics layers that count as cover / walls. Must include your level geometry.
@@ -23,13 +25,14 @@ class_name CoverPeek extends Node
 @export var eye_rise: float = 0.03
 
 @export_group("Peek Over (low cover)")
-@export var max_raise: float = 0.55
+@export var max_raise: float = 0.85
 ## Keep the eye this far above the top edge of the cover.
-@export var raise_clearance: float = 0.18
+@export var raise_clearance: float = 0.22
 
 @export_group("Peek Around (corners)")
-@export var side_distance: float = 0.55
-@export var side_roll_degrees: float = 7.0
+@export var side_distance: float = 0.72
+@export var side_roll_degrees: float = 10.0
+@export var lean_raise: float = 0.12
 
 @export_group("Safety / Feel")
 ## Camera clearance. The peek is shortened so the camera never enters geometry.
@@ -49,6 +52,7 @@ var _roll: float = 0.0
 
 
 func _ready() -> void:
+	_ensure_lean_actions()
 	_player = get_tree().get_first_node_in_group("player") as PlayerController
 	if _player == null:
 		push_warning("CoverPeek: no node in group 'player'.")
@@ -68,7 +72,9 @@ func _physics_process(_delta: float) -> void:
 		return
 	if _player.is_sprinting or _player.is_sliding:
 		return
-	_detect_cover()
+	_detect_requested_lean()
+	if _target_offset == Vector3.ZERO:
+		_detect_cover()
 
 
 func _process(delta: float) -> void:
@@ -96,10 +102,34 @@ func _detect_cover() -> void:
 	var eye_start := eye + Vector3.UP * eye_rise
 	var eye_hit := _ray(space, eye_start, eye_start + forward * (cover_reach + 0.15))
 
-	if not chest_hit.is_empty() and eye_hit.is_empty():
+	if not chest_hit.is_empty():
 		_peek_over(space, eye, forward, chest_hit)
-	elif not eye_hit.is_empty():
+	# If the cover top is outside the safe vertical range, fall back to a
+	# lateral peek. This also keeps tall walls from forcing the camera upward.
+	if _target_offset == Vector3.ZERO and not eye_hit.is_empty():
 		_peek_around(space, eye, forward, right)
+
+
+func _detect_requested_lean() -> void:
+	var left_requested: bool = Input.is_action_pressed(lean_left_action)
+	var right_requested: bool = Input.is_action_pressed(lean_right_action)
+	if left_requested == right_requested:
+		return
+
+	var space := _player.get_world_3d().direct_space_state
+	var eye := _rig.get_base_eye_position()
+	var basis := _player.global_transform.basis
+	var forward := -basis.z
+	forward.y = 0.0
+	forward = forward.normalized()
+	var right := basis.x
+	var side: float = -1.0 if left_requested else 1.0
+	var roll := -side * deg_to_rad(side_roll_degrees)
+	var requested_offset := Vector3(side * side_distance, lean_raise, 0.0)
+
+	# Do not snap into a wall. The cast shortens the lean while preserving its
+	# direction, so the weapon stays aligned with the camera at the corner.
+	_apply_target(space, eye, requested_offset, roll)
 
 
 func _peek_over(space: PhysicsDirectSpaceState3D, eye: Vector3, forward: Vector3, chest_hit: Dictionary) -> void:
@@ -139,6 +169,20 @@ func _peek_around(space: PhysicsDirectSpaceState3D, eye: Vector3, forward: Vecto
 func _side_is_open(space: PhysicsDirectSpaceState3D, eye: Vector3, forward: Vector3, right: Vector3, side: float) -> bool:
 	var start := eye + right * side * side_distance
 	return _ray(space, start, start + forward * (cover_reach + 0.15)).is_empty()
+
+
+func _ensure_lean_actions() -> void:
+	_register_lean_action(lean_left_action, KEY_Q)
+	_register_lean_action(lean_right_action, KEY_E)
+
+
+func _register_lean_action(action: StringName, keycode: Key) -> void:
+	if action.is_empty() or InputMap.has_action(action):
+		return
+	InputMap.add_action(action)
+	var event := InputEventKey.new()
+	event.physical_keycode = keycode
+	InputMap.action_add_event(action, event)
 
 
 ## Shortens the peek if the camera would end up inside geometry, then stores it.

@@ -126,6 +126,33 @@ func reset_bob() -> void:
 	_bob_y.reset()
 
 
+func reset_motion_state() -> void:
+	_idle_time = 0.0
+	_idle_x.reset()
+	_idle_y.reset()
+	_idle_rot_x.reset()
+	_bob_x.reset()
+	_bob_y.reset()
+	_strafe_tilt.reset()
+	_vlag_y.reset()
+	_recoil_offset_pos = Vector3.ZERO
+	_recoil_offset_rot = Vector3.ZERO
+	_previous_look_dir = Vector3.ZERO
+	_camera_rotation_rate = Vector3.ZERO
+	_prev_camera_y = 0.0
+	_vlag_seeded = false
+	_crouch_pos = Vector3.ZERO
+	_crouch_rot = Vector3.ZERO
+	_sprint_pos = Vector3.ZERO
+	_sprint_rot = Vector3.ZERO
+	_sprint_motion_pos = Vector3.ZERO
+	_sprint_motion_rot = Vector3.ZERO
+	_sprint_motion_weight = 0.0
+	_sprint_motion_time = 0.0
+	_sprint_animation_active = false
+	reset_recoil()
+
+
 func reset_recoil() -> void:
 	_recoil_back.reset()
 	_recoil_pitch.reset()
@@ -143,10 +170,12 @@ func add_recoil() -> void:
 		return
 
 	var two_handed: bool = _is_two_handed_weapon()
+	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_recoil_multiplier)
 	# Up to +40% recoil when fully exhausted.
 	var strength: float = 1.0 + _tiredness_factor() * 0.4
 	if is_aiming:
 		strength *= ctrl.recoil_ads_visual_multiplier
+	strength *= running_aim_multiplier
 
 	# A support hand keeps a long gun aligned with the bore. It still pushes
 	# the stock into the shoulder, but produces less muzzle climb and wobble.
@@ -166,10 +195,13 @@ func add_recoil() -> void:
 
 func _update_recoil(delta: float) -> void:
 	var two_handed: bool = _is_two_handed_weapon()
+	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_recoil_multiplier)
 	var stiffness: float = ctrl.recoil_model_stillness * (0.78 if two_handed else 1.0)
 	var damping: float = ctrl.recoil_model_damping * (1.15 if two_handed else 1.0)
 	var max_angle: float = ctrl.recoil_model_max_angle
 	var pitch_max: float = ctrl.recoil_pitch_max
+	pitch_max *= running_aim_multiplier
+	max_angle *= running_aim_multiplier
 	var back: float = _recoil_back.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, max_angle)
 	var pitch: float = _recoil_pitch.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, pitch_max)
 	var climb: float = _recoil_climb.step(delta, ctrl.recoil_climb_stiffness, ctrl.recoil_climb_damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, pitch_max)
@@ -182,6 +214,12 @@ func _update_recoil(delta: float) -> void:
 
 func _is_recoil_suppressed() -> bool:
 	return ctrl.disable_recoil_during_sprint and _is_sprint_animation_active()
+
+
+func _running_aim_multiplier(base_multiplier: float) -> float:
+	if player == null or not player.is_sprinting or not is_aiming:
+		return 1.0
+	return maxf(base_multiplier, 1.0)
 #endregion
 
 
@@ -210,6 +248,7 @@ func _update_idle_sway(delta: float) -> Vector3:
 
 	if is_aiming:
 		amplitude *= ctrl.aim_sway_multiplier
+	amplitude *= _running_aim_multiplier(weapon.running_aim_sway_multiplier)
 	# Tiredness is applied AFTER the aim multiplier so aiming stays shaky when exhausted.
 	amplitude *= 1.0 + tiredness * 2.0
 
@@ -257,9 +296,10 @@ func _update_look_sway(delta: float) -> Vector3:
 	var norm_pitch: float = _camera_rotation_rate.x / max_rad if max_rad > 0.0 else 0.0
 	var norm_yaw: float = _camera_rotation_rate.y / max_rad if max_rad > 0.0 else 0.0
 
+	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_lag_multiplier)
 	return Vector3(
-		norm_yaw * ctrl.look_lag_pos_scale,
-		norm_pitch * ctrl.look_lag_pos_scale,
+		norm_yaw * ctrl.look_lag_pos_scale * running_aim_multiplier,
+		norm_pitch * ctrl.look_lag_pos_scale * running_aim_multiplier,
 		0.0
 	)
 
@@ -274,6 +314,7 @@ func _update_strafe_tilt(delta: float) -> float:
 	var lateral_fraction: float = absf(x_z.x) / x_z_speed if x_z_speed > 0.1 else 0.0
 
 	var tilt_multiplier: float = weapon.aim_tilt_amount if is_aiming else 1.0
+	tilt_multiplier *= _running_aim_multiplier(weapon.running_aim_tilt_multiplier)
 	tilt_multiplier *= 1.0 + _tiredness_factor() * 2.0
 
 	var target_tilt: float = clampf(
@@ -291,6 +332,7 @@ func _update_weapon_bob(delta: float) -> Vector3:
 	var phase: float = camera.get_bob_phase()
 	var speed: float = _planar_speed()
 	var bob_multiplier: float = 0.08 if is_aiming else 1.0
+	bob_multiplier *= _running_aim_multiplier(weapon.running_aim_bob_multiplier)
 	var tiredness: float = _tiredness_factor()
 
 	var target_x: float = 0.0
@@ -322,9 +364,8 @@ func _update_vertical_lag(delta: float) -> Vector3:
 	var camera_y: float = ctrl.cam_rig.global_position.y
 
 	if not _vlag_seeded:
-		# NOTE: seeds the spring with the world-space camera height, which looks
-		# like a leftover from the older (commented-out) approach. Probably meant to be 0.
-		_vlag_y.value = camera_y
+		# This spring stores a local weapon offset, not the camera's world height.
+		_vlag_y.value = 0.0
 		_prev_camera_y = camera_y
 		_vlag_seeded = true
 		return Vector3.ZERO
@@ -338,6 +379,7 @@ func _update_vertical_lag(delta: float) -> Vector3:
 		cam_vel_y = 0.0
 
 	var lag_multiplier: float = weapon.aim_lag_amount if is_aiming else 1.0
+	lag_multiplier *= _running_aim_multiplier(weapon.running_aim_lag_multiplier)
 	var target_y: float = -cam_vel_y * weapon.vertical_lag_multiplier * lag_multiplier
 	var y: float = _vlag_y.step(target_y, delta, ctrl.vertical_lag_stiffness, ctrl.vertical_lag_damping, ctrl.vertical_lag_max)
 	return Vector3(0.0, y, 0.0)

@@ -23,6 +23,7 @@ projectile_speed = 790.0
 aim_ADS_position = Vector3(0, -0.143, -0.295)
 canted_sight_position = Vector3(-0.075, -0.168, -0.305)
 canted_sight_rotation = Vector3(0, 0, 0.465)
+is_muzzle_flash_enabled = false
 muzzle_light_energy = 0.58
 muzzle_flash_scale = 0.045
 weapon_model = ExtResource("2_a7i0a")

@@ -47,6 +47,12 @@ var _target: float = 0.0
 var _aim_scale: float = 1.0
 
 
+func reset_state() -> void:
+	amount = 0.0
+	_target = 0.0
+	_aim_scale = 1.0
+
+
 func _ready() -> void:
 	process_priority = 10   # run after WeaponController, so we modify the final pose
 	_player = get_tree().get_first_node_in_group("player") as PlayerController
@@ -98,16 +104,16 @@ func _process(delta: float) -> void:
 	var goal := _target * _aim_scale if enabled else 0.0
 	var speed := tuck_in_speed if goal > amount else tuck_out_speed
 	amount = lerpf(amount, goal, 1.0 - exp(-speed * delta))
-	if amount < 0.0005:
-		return
 
-	# Additive on top of whatever the animator just wrote this frame.
+	# WeaponController's animator writes the model's complete base pose before
+	# this node runs. Apply one bounded offset to that pose; never accumulate a
+	# tuck onto the previous frame's transform.
 	model.position += tuck_position * amount
 	var rot := Vector3(
 		deg_to_rad(tuck_rotation_degrees.x),
 		deg_to_rad(tuck_rotation_degrees.y),
 		deg_to_rad(tuck_rotation_degrees.z)) * amount
-	model.basis = Basis.from_euler(rot) * model.basis   # rotates about the model's own origin
+	model.rotation += rot
 
 
 ## Distance from the camera to the muzzle at the weapon's rest pose, measured
