@@ -121,6 +121,7 @@ var player_stats_component: PlayerStats
 var current_weapon_model: WeaponModel
 var weapon_animation_player: WeaponAnimation
 var _muzzle_flash: MuzzleFlash
+var _weapon_smear: MotionSmear
 
 # Ammo (cached copies of active_weapon_data)
 var current_ammo: int
@@ -404,6 +405,8 @@ func _apply_recoil() -> void:
 	if camera != null:
 		camera.add_weapon_recoil(current_weapon.get_calculated_recoil(), current_weapon.recoil_cam_yaw, current_weapon.recoil_cam_roll)
 	animator.add_recoil()
+	if _weapon_smear != null and current_weapon_model != null:
+		_weapon_smear.pulse(current_weapon_model.global_basis.z * 0.8, 0.06)
 
 
 func _play_fire_feedback() -> void:
@@ -511,13 +514,21 @@ func _bind_model_nodes(model: WeaponModel) -> void:
 	var ejection_port: Node3D = model.get_node_or_null("EjectionPort") as Node3D
 
 	_muzzle_flash = null
+	_weapon_smear = null
 	if muzzle != null:
 		shoot_position = muzzle
 		var found: Array[Node] = model.find_children("*", "MuzzleFlash", true, false)
 		_muzzle_flash = (found[0] as MuzzleFlash) if not found.is_empty() else null
 		print("Muzzle flash found: ", _muzzle_flash != null)
 		if _muzzle_flash:
+			var ejection_port_smoke: GPUParticles3D = model.get_node_or_null("EjectionPort/Smoke") as GPUParticles3D
+			if ejection_port_smoke != null:
+				_muzzle_flash.ejection_smoke = ejection_port_smoke
 			_muzzle_flash.configure(current_weapon)
+
+	var smear_nodes: Array[Node] = model.find_children("*", "MotionSmear", true, false)
+	if not smear_nodes.is_empty():
+		_weapon_smear = smear_nodes[0] as MotionSmear
 
 	if ejection_port != null:
 		casing_position = ejection_port
@@ -533,6 +544,7 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	if is_reloading or weapon_data == null or weapon_data.weapon == null:
 		return
 
+	shooter.flush_casing_tube()
 	current_weapon = weapon_data.weapon
 	# Cache the active data immediately so per-frame code doesn't have to query a manager.
 	active_weapon_data = weapon_data
@@ -630,6 +642,7 @@ func can_reload() -> bool:
 	return reload.can_reload()
 
 func request_reload() -> void:
+	shooter.flush_casing_tube()
 	reload.request_reload()
 
 func dump_magazine_and_reload() -> void:

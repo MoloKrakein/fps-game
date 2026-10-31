@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_7t6ir"]
 [ext_resource type="PackedScene" uid="uid://cs7xd43kmv5cg" path="res://Art/Assets/Weapon/Projectile/buckshot_casing.tscn" id="1_c5m1e"]
 [ext_resource type="PackedScene" uid="uid://cfdj0j3pd1bfv" path="res://Art/Assets/Weapon/Projectile/buckshot.tscn" id="2_8mopf"]
+[ext_resource type="Resource" uid="uid://b4cku8crdkhvu" path="res://_Assets/Weapon/resources/generic_casing_prof.tres" id="2_uenax"]
 [ext_resource type="PackedScene" uid="uid://bmco7vsh8f1cy" path="res://Art/3D/AutoSg.tscn" id="3_8mopf"]
 
 [resource]
@@ -39,6 +40,7 @@ muzzle_flash_scale = 1.6949999999999998
 weapon_model = ExtResource("3_8mopf")
 projectile_scene = ExtResource("2_8mopf")
 bullet_case_scene = ExtResource("1_c5m1e")
+casing_profile = ExtResource("2_uenax")
 weapon_position = Vector3(0.044, -0.227, -0.378)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 metadata/_custom_type_script = "uid://djccd7pdwygtl"

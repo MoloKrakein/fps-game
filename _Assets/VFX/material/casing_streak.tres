@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://du71p3tdgcqxd"]
+
+[ext_resource type="Shader" uid="uid://blojt5i4fo7f4" path="res://_Assets/VFX/casing_streak.gdshader" id="1_kfvsp"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_kfvsp")

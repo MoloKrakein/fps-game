@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CasingEjectionProfile" format=3 uid="uid://b4cku8crdkhvu"]
+
+[ext_resource type="Script" uid="uid://ddepm2ivt2tgf" path="res://Art/Assets/Weapon/Projectile/casing_ejection_profile.gd" id="1_y0lib"]
+
+[resource]
+script = ExtResource("1_y0lib")
+direction = Vector3(1, 0.2, -0.1)
+power = 2.0
+speed_min = 7.0
+speed_max = 9.0
+gravity_scale = 2.0
+bounce = 0.1
+lifetime = 20.0

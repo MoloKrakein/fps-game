@@ -5,6 +5,9 @@ render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, fog_disabled;
 instance uniform vec4 smoke_color : source_color = vec4(0.72, 0.72, 0.74, 1.0);
 instance uniform float density = 1.0;    // 0..1, raised by barrel heat
 instance uniform float size_mult = 1.0;
+instance uniform float smoke_opacity : hint_range(0.0, 1.0) = 0.55;
+instance uniform float smoke_thickness : hint_range(0.05, 3.0) = 1.0;
+instance uniform float smoke_stretch : hint_range(1.0, 4.0) = 1.8;
 
 // Shared look (tune once per material: barrel / ejection use different materials)
 uniform vec4 shadow_color : source_color = vec4(0.28, 0.29, 0.32, 1.0);
@@ -50,7 +53,7 @@ float fbm(vec2 p) {
 }
 
 void vertex() {
-	age = INSTANCE_CUSTOM.y;
+	age = clamp(INSTANCE_CUSTOM.y, 0.0, 1.0);
 	seed = INSTANCE_CUSTOM.x;
 	pcolor = COLOR;
 
@@ -67,6 +70,7 @@ void vertex() {
 
 void fragment() {
 	vec2 q = UV - 0.5;                       // unrotated, used for fake top lighting
+	q.x /= smoke_stretch;                    // elongated barrel trail instead of a round puff
 	float c = cos(seed);
 	float s = sin(seed);
 	vec2 uv = vec2(c * q.x - s * q.y, s * q.x + c * q.y);
@@ -80,13 +84,13 @@ void fragment() {
 	float d = n1 * 0.65 + n2 * 0.35;
 
 	float shape = 1.0 - smoothstep(0.2, 1.0, r);
-	float dens = d * shape * 1.6;
+	float dens = d * shape * (1.0 + smoke_thickness * 1.2);
 
 	// dissolve: the threshold rises with age, so the smoke erodes into wisps
 	float cut = age * 0.85;
 	float a = smoothstep(cut, cut + softness, dens);
 	a *= pow(1.0 - age, fade_power) * smoothstep(0.0, 0.03, age);
-	a *= density * pcolor.a * smoke_color.a;
+	a *= density * smoke_opacity * pcolor.a * smoke_color.a;
 
 	// colour: shadow -> light, lit from above, plus a short hot tint
 	float lit = clamp(0.5 - q.y * 0.8 + (d - 0.5) * 0.6, 0.0, 1.0);

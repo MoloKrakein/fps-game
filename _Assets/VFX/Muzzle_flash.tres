@@ -1,6 +1,18 @@
 [gd_resource type="StandardMaterial3D" format=3 uid="uid://bttkkl63jo7ha"]
 
+[ext_resource type="Shader" uid="uid://ok0pd3nwhf5w" path="res://_Assets/VFX/muzzle_flash.gdshader" id="1_rcmju"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2v2p1"]
+render_priority = 0
+shader = ExtResource("1_rcmju")
+shader_parameter/core_color = Color(1, 0.95, 0.8, 1)
+shader_parameter/spike_sharpness = 6.0
+shader_parameter/spike_length = 0.95
+shader_parameter/core_size = 0.2
+shader_parameter/jitter = 0.35
+
 [resource]
+next_pass = SubResource("ShaderMaterial_2v2p1")
 transparency = 1
 blend_mode = 1
 shading_mode = 0

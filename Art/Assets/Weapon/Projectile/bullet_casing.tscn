@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dlvl4srer712l" path="res://Art/Assets/Weapon/Projectile/bullet_casing.gd" id="1_raipx"]
 [ext_resource type="PackedScene" uid="uid://60pvdj10epua" path="res://Art/3D/Blender/bullet_case_rtr.gltf" id="2_s8t0t"]
+[ext_resource type="Material" uid="uid://du71p3tdgcqxd" path="res://_Assets/VFX/material/casing_streak.tres" id="3_fgusy"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_5yekf"]
 rough = true
@@ -18,6 +19,12 @@ physics_material_override = SubResource("PhysicsMaterial_5yekf")
 gravity_scale = 3.0
 script = ExtResource("1_raipx")
 lifetime = 30.0
+streak_material = ExtResource("3_fgusy")
+streak_min_speed = 5.0
+streak_alpha = 0.55
+streak_width = 0.084
+streak_color = Color(0.69411767, 0.6745098, 0.45490196, 0.7490196)
+despawn_after_rest = 30.0
 metadata/collision_preset_name = &"__custom__"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=692575596]

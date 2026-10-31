@@ -34,7 +34,7 @@ void start() {
 	vec3 rnd = vec3(rx, ry, rz) * 2.0 - vec3(1.0);
 	vec3 dir = normalize(normalize(emit_direction) + rnd * cone_spread);
 	float speed = mix(speed_min, speed_max, spark_rand(rng));
-	float life_scale = mix(1.0 - lifetime_random, 1.0, spark_rand(rng));
+	float life_scale = max(mix(1.0 - lifetime_random, 1.0, spark_rand(rng)), 0.05);
 
 	vec3 world_dir = normalize((EMISSION_TRANSFORM * vec4(dir, 0.0)).xyz);
 
@@ -50,7 +50,8 @@ void start() {
 }
 
 void process() {
-	CUSTOM.y += DELTA / (LIFETIME * CUSTOM.z);
+	float particle_lifetime = max(LIFETIME * max(CUSTOM.z, 0.05), 0.001);
+	CUSTOM.y += DELTA / particle_lifetime;
 	if (CUSTOM.y >= 1.0) {
 		ACTIVE = false;
 	}

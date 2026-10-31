@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_35nmv"]
 [ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/bullet_casing.tscn" id="1_u7282"]
+[ext_resource type="Resource" uid="uid://b4cku8crdkhvu" path="res://_Assets/Weapon/resources/generic_casing_prof.tres" id="2_4sqev"]
 [ext_resource type="PackedScene" uid="uid://uh6cfflmaimf" path="res://Art/Assets/Weapon/Assault/AR416.tscn" id="2_a7i0a"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="2_f5shg"]
 
@@ -23,12 +24,13 @@ projectile_speed = 790.0
 aim_ADS_position = Vector3(0, -0.143, -0.295)
 canted_sight_position = Vector3(-0.075, -0.168, -0.305)
 canted_sight_rotation = Vector3(0, 0, 0.465)
-is_muzzle_flash_enabled = false
 muzzle_light_energy = 0.58
-muzzle_flash_scale = 0.045
+muzzle_flash_scale = 0.31
+ejection_smoke_scale = 7.51
 weapon_model = ExtResource("2_a7i0a")
 projectile_scene = ExtResource("2_f5shg")
 bullet_case_scene = ExtResource("1_u7282")
+casing_profile = ExtResource("2_4sqev")
 weapon_scale = Vector3(0.4, 0.4, 0.4)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)
 override_tactical_sprint_pose = true

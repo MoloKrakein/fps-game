@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="1_mf45t"]
 [ext_resource type="Material" uid="uid://bttkkl63jo7ha" path="res://_Assets/VFX/Muzzle_flash.tres" id="2_mf45t"]
 [ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_vslle"]
-[ext_resource type="Shader" uid="uid://cx0517gxjv20f" path="res://_Assets/VFX/barrel_gas.gdshader" id="5_bedmg"]
+[ext_resource type="PackedScene" uid="uid://dbvm232i3jjhh" path="res://_Assets/VFX/VFX_SCENE/wpn_smoke_vfx.tscn" id="4_bedmg"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="5_c8wk2"]
 [ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="5_mtaa1"]
 [ext_resource type="PackedScene" uid="uid://sjbhyef1d7rb" path="res://Art/3D/Blender/m15.glb" id="6_3vu8r"]
@@ -23,34 +23,6 @@ scale_max = 1.3
 [sub_resource type="PrismMesh" id="PrismMesh_rcmju"]
 material = ExtResource("2_mf45t")
 size = Vector3(0.1, 0.1, 0.1)
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bedmg"]
-angle_min = 1.0728835e-05
-angle_max = 360.00003
-direction = Vector3(1, 0.3, -1)
-spread = 25.0
-initial_velocity_min = 0.29999998
-initial_velocity_max = 0.79999995
-gravity = Vector3(0, 0.15, 0)
-damping_min = 1.0
-damping_max = 2.0
-scale_min = 0.0
-scale_max = 0.39999998
-turbulence_enabled = true
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ry0qi"]
-render_priority = 0
-shader = ExtResource("5_bedmg")
-shader_parameter/distortion = 0.015
-shader_parameter/tint_amount = 0.18
-shader_parameter/noise_scale = 3.0
-shader_parameter/flow_speed = 1.2
-shader_parameter/grow = 2.5
-shader_parameter/softness = 0.35
-shader_parameter/fade_power = 1.5
-
-[sub_resource type="QuadMesh" id="QuadMesh_y71i0"]
-material = SubResource("ShaderMaterial_ry0qi")
 
 [sub_resource type="Gradient" id="Gradient_vslle"]
 offsets = PackedFloat32Array(0, 0.1375, 0.34583333, 0.6, 0.79583335, 0.9916667)
@@ -201,6 +173,9 @@ particles = NodePath("MuzzleFlash")
 smoke_particles = [NodePath("Smoke")]
 light = NodePath("OmniLight3D")
 
+[node name="Smoke" parent="Muzzle" unique_id=2001100571 instance=ExtResource("4_bedmg")]
+emitting = false
+
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Muzzle" unique_id=1357457869]
 emitting = false
 amount = 12
@@ -214,15 +189,6 @@ draw_pass_1 = SubResource("PrismMesh_rcmju")
 draw_pass_2 = null
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=1057061963]
-
-[node name="Smoke" type="GPUParticles3D" parent="Muzzle" unique_id=1425834968]
-emitting = false
-amount = 20
-lifetime = 0.02
-one_shot = true
-explosiveness = 1.0
-process_material = SubResource("ParticleProcessMaterial_bedmg")
-draw_pass_1 = SubResource("QuadMesh_y71i0")
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=919837844]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0010569347, 0.71043104, -0.007704174)

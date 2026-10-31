@@ -8,9 +8,9 @@ instance uniform float spikes = 6.0;      // number of star points
 
 // Shared look
 uniform vec4 core_color : source_color = vec4(1.0, 0.95, 0.8, 1.0);
-uniform float spike_sharpness = 6.0;
+uniform float spike_sharpness = 12.0;
 uniform float spike_length = 0.95;
-uniform float core_size = 0.2;
+uniform float core_size = 0.09;
 uniform float jitter = 0.35;              // random length variation per spike
 
 varying float age;    // 0..1 over the particle lifetime
@@ -57,18 +57,18 @@ void fragment() {
 	float ang = atan(uv.y, uv.x);
 
 	// star shape: N lobes, each with a random length
-	float lobe = pow(abs(cos(ang * spikes * 0.5)), spike_sharpness);
+	float lobe = pow(max(cos(ang * spikes * 0.5), 0.0), max(spike_sharpness * 2.0, 10.0));
 	float rnd = vnoise(vec2(ang * 2.0 + seed * 5.0, seed * 3.0));
-	float reach = mix(0.25, spike_length, lobe) * mix(1.0 - jitter, 1.0, rnd);
-	float star = pow(1.0 - smoothstep(reach * 0.15, reach, r), 1.5);
+	float reach = mix(0.035, spike_length, lobe) * mix(1.0 - jitter, 1.0, rnd);
+	float star = pow(1.0 - smoothstep(reach * 0.35, reach, r), 2.5);
 
-	float core = exp(-pow(r / core_size, 2.0));
-	float glow = exp(-r * r * 3.0) * 0.5;
+	float core = exp(-pow(r / min(core_size, 0.1), 2.0));
+	float glow = exp(-r * r * 10.0) * 0.12;
 	float edge = 1.0 - smoothstep(0.7, 1.0, r); // no visible quad edges
 
 	float fade = (1.0 - age);
 	fade *= fade;
 
-	vec3 col = flash_color.rgb * (star + glow) + core_color.rgb * core * 1.5;
+	vec3 col = flash_color.rgb * (star + glow) + core_color.rgb * core * 0.8;
 	ALBEDO = col * edge * intensity * fade * pcolor.rgb;
 }

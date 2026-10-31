@@ -121,6 +121,8 @@ enum WeaponAmmoType {
 @export var projectile_scene: PackedScene
 @export var bullet_case_scene: PackedScene
 @export var alive_bullet_scene: PackedScene
+## Optional casing behavior profile. Leave empty to use the legacy ejection impulse.
+@export var casing_profile: CasingEjectionProfile
 @export_group("Other Model Setting")
 @export var weapon_position: Vector3 = Vector3(0.2, -0.2, -0.3)
 @export var weapon_rotation: Vector3 = Vector3(0, 0, 0)

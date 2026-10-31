@@ -1,21 +1,25 @@
 shader_type spatial;
-// Subtle muzzle gas / heat haze (Call of Duty style).
-// Mostly refracts the scene behind it (air distortion) with only a faint haze tint.
-// Uses the same instance uniforms as smoke.gdshader, so MuzzleFlash.gd drives it unchanged.
+// Quick, subtle, white star-shaped gas burst that appears a split second after the shot
+// and disperses almost immediately (no lingering smoke).
+// Use on a one-shot GPUParticles3D, lifetime ~0.15 s, listed in MuzzleFlash.gas_particles.
 render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, fog_disabled;
 
-instance uniform vec4 smoke_color : source_color = vec4(0.85, 0.87, 0.9, 1.0);
-instance uniform float density = 1.0;     // raised by barrel heat
+instance uniform vec4 smoke_color : source_color = vec4(0.95, 0.96, 1.0, 1.0);
+instance uniform float density = 1.0;
 instance uniform float size_mult = 1.0;
+instance uniform float petals = 6.0;
+instance uniform float max_opacity : hint_range(0.0, 1.0) = 0.35;
 
-uniform float distortion = 0.015;         // heat haze strength (screen UV units)
-uniform float tint_amount : hint_range(0.0, 1.0) = 0.18;  // how visible the gas itself is
+uniform float petal_sharpness = 4.5;
+uniform float petal_reach_min = 0.28;
 uniform float noise_scale = 3.0;
-uniform float flow_speed = 1.2;
-uniform float grow = 2.5;                 // final size vs start size
-uniform float softness : hint_range(0.01, 1.0) = 0.35;
-uniform float fade_power = 1.5;
-uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
+uniform float flow_speed = 1.5;
+uniform float start_size = 0.25;
+uniform float softness : hint_range(0.01, 1.0) = 0.22;
+uniform float fade_power = 1.6;
+uniform vec4 warm_color : source_color = vec4(1.0, 0.8, 0.55, 1.0);
+uniform float warm_amount : hint_range(0.0, 1.0) = 0.08;
+uniform float warm_time : hint_range(0.01, 1.0) = 0.12;
 
 varying float age;
 varying float seed;
@@ -47,12 +51,12 @@ float fbm(vec2 p) {
 }
 
 void vertex() {
-	age = INSTANCE_CUSTOM.y;
+	age = clamp(INSTANCE_CUSTOM.y, 0.0, 1.0);
 	seed = INSTANCE_CUSTOM.x;
 	pcolor = COLOR;
 
-	float t = 1.0 - (1.0 - age) * (1.0 - age);
-	VERTEX.xy *= size_mult * mix(1.0, grow, t);
+	float t = 1.0 - pow(1.0 - age, 3.0);
+	VERTEX.xy *= size_mult * mix(start_size, 1.0, t);
 
 	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
 	MODELVIEW_MATRIX = MODELVIEW_MATRIX * mat4(
@@ -66,29 +70,23 @@ void fragment() {
 	vec2 q = UV - 0.5;
 	float c = cos(seed);
 	float s = sin(seed);
-	vec2 uv = vec2(c * q.x - s * q.y, s * q.x + c * q.y);
-	float r = length(uv) * 2.0;
+	vec2 uv = vec2(c * q.x - s * q.y, s * q.x + c * q.y) * 2.0;
+	float r = length(uv);
+	float ang = atan(uv.y, uv.x);
 
-	// turbulent flow that keeps moving as the gas expands
-	vec2 p = uv * noise_scale + vec2(seed * 13.37, seed * 7.91);
-	p += vec2(age * flow_speed, -age * flow_speed * 0.7);
-	float n = fbm(p);
+	float lobe = pow(abs(cos(ang * petals * 0.5)), petal_sharpness);
+	float nr = fbm(vec2(ang * 1.5 + seed * 7.0, seed * 3.0 + age * flow_speed));
+	float reach = mix(petal_reach_min, 1.0, lobe) * mix(0.7, 1.0, nr);
 
-	float shape = 1.0 - smoothstep(0.1, 1.0, r);
-	float dens = n * shape * 1.8;
+	float d = pow(1.0 - smoothstep(0.0, reach, r), 1.3);
+	float n = fbm(uv * noise_scale + vec2(seed * 9.1, seed * 4.7) + vec2(age * flow_speed, 0.0));
+	float cut = age * 0.85;
+	float mask = smoothstep(cut, cut + softness, d * (0.5 + n));
 
-	float cut = age * 0.9;
-	float mask = smoothstep(cut, cut + softness, dens);
-	mask *= pow(1.0 - age, fade_power) * smoothstep(0.0, 0.04, age);
-	mask *= density * pcolor.a;
-	mask = clamp(mask, 0.0, 1.0);
+	float edge = 1.0 - smoothstep(0.75, 1.0, r);
+	float fade = pow(1.0 - age, fade_power) * smoothstep(0.0, 0.05, age);
+	float warm = warm_amount * (1.0 - smoothstep(0.0, warm_time, age));
 
-	// refraction: push the background along the noise gradient
-	vec2 e = vec2(0.02, 0.0);
-	vec2 grad = vec2(fbm(p + e.xy) - fbm(p - e.xy), fbm(p + e.yx) - fbm(p - e.yx)) / 0.04;
-	vec2 offset = grad * distortion * mask;
-	vec3 scene = textureLod(screen_texture, SCREEN_UV + offset, 0.0).rgb;
-
-	ALBEDO = mix(scene, smoke_color.rgb, tint_amount);
-	ALPHA = mask;
+	ALBEDO = mix(smoke_color.rgb, warm_color.rgb, warm) * pcolor.rgb;
+	ALPHA = clamp(mask * edge * fade * density * pcolor.a * smoke_color.a * max_opacity, 0.0, 1.0);
 }

@@ -4,8 +4,8 @@ class_name WeaponShooter extends RefCounted
 
 const IMPACT_DECAL = preload("res://Scenes/debug/impact_node.tscn") # Replace with your actual path!
 const IMPACT_LIFETIME: float = 0.5
-
 var ctrl: WeaponController
+var _casing_tube: CasingTube = CasingTube.new()
 
 
 func _init(controller: WeaponController) -> void:
@@ -161,6 +161,28 @@ func eject_casing(casing_type: String = "empty") -> void:
 	if weapon == null or ctrl.casing_position == null:
 		return
 
+	var profile: CasingEjectionProfile = weapon.casing_profile
+	var count: int = 1
+	if casing_type == "empty":
+		count = _casing_tube.add_shot(profile)
+
+	for index: int in range(count):
+		_spawn_casing(weapon, casing_type, profile, index)
+
+
+func flush_casing_tube() -> void:
+	var weapon: Weapon = ctrl.current_weapon
+	if weapon == null or ctrl.casing_position == null:
+		_casing_tube.reset()
+		return
+
+	var count: int = _casing_tube.flush()
+	for index: int in range(count):
+		_spawn_casing(weapon, "empty", weapon.casing_profile, index)
+
+
+func _spawn_casing(weapon: Weapon, casing_type: String,
+		profile: CasingEjectionProfile, index: int) -> void:
 	var casing_scene: PackedScene = null
 	match casing_type:
 		"empty":
@@ -175,6 +197,13 @@ func eject_casing(casing_type: String = "empty") -> void:
 	ctrl.get_tree().current_scene.add_child(casing)
 	casing.global_transform = ctrl.casing_position.global_transform
 	casing.scale = weapon.bullet_case_scale
+
+	if profile != null:
+		var inherited_velocity: Vector3 = Vector3.ZERO
+		if ctrl.player != null:
+			inherited_velocity = ctrl.player.velocity
+		casing.eject_with_profile(ctrl.casing_position, profile, inherited_velocity, index)
+		return
 
 	# Read the basis AFTER scaling, as before.
 	var right_dir: Vector3 = casing.global_transform.basis.x
@@ -198,4 +227,6 @@ func eject_casing(casing_type: String = "empty") -> void:
 	).normalized() * randf_range(0.5, 1.5) * 10.0
 
 	casing.eject(linear_velocity, torque)
+
+
 #endregion
