@@ -403,10 +403,14 @@ func _register_shot() -> void:
 
 func _apply_recoil() -> void:
 	if camera != null:
-		camera.add_weapon_recoil(current_weapon.get_calculated_recoil(), current_weapon.recoil_cam_yaw, current_weapon.recoil_cam_roll)
+		var pitch: float = current_weapon.get_calculated_recoil() * randf_range(0.9, 1.1)
+		var yaw: float = current_weapon.recoil_cam_yaw
+		if is_aiming:
+			pitch *= 0.7
+			yaw *= 0.7
+		camera.add_weapon_recoil(pitch, yaw, current_weapon.recoil_cam_roll)
+		camera.add_fov_punch(current_weapon.recoil_fov_punch)
 	animator.add_recoil()
-	if _weapon_smear != null and current_weapon_model != null:
-		_weapon_smear.pulse(current_weapon_model.global_basis.z * 0.8, 0.06)
 
 
 func _play_fire_feedback() -> void:

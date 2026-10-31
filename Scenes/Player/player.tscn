@@ -191,7 +191,6 @@ bob_amplitude = Vector2(0.05, 0.012)
 bob_max_speed = 5.0
 recoil_model_max_angle = 25.0
 recoil_pitch_max = 0.2
-recoil_snap_stiffness = 900.0
 
 [node name="GrabController" type="Node" parent="Component" unique_id=1472151820 node_paths=PackedStringArray("interaction_ray", "hold_position", "interaction_state_chart", "cam")]
 script = ExtResource("14_2aanf")
@@ -244,11 +243,19 @@ delay_in_seconds = "0.0"
 
 [node name="WeaponWallTuck" type="Node" parent="Component" unique_id=16121334]
 script = ExtResource("19_ogmfp")
+world_mask = 13
+tuck_position = Vector3(0, -0.04, 0.9)
+tuck_rotation_degrees = Vector3(30, 12, 2)
+ads_strength = 0.65
 
 [node name="CoverPeek" type="Node" parent="Component" unique_id=1798423182]
 script = ExtResource("20_ixrbb")
-cover_mask = 15
-side_distance = 0.715
+cover_mask = 13
+max_raise = 1.005
+raise_clearance = 0.04
+side_distance = 9.145
+side_roll_degrees = 14.37
+lean_raise = 1.99
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

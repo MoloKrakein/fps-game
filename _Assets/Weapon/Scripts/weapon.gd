@@ -44,6 +44,7 @@ enum WeaponAmmoType {
 @export var recoil_cam_recovery_speed: float = 5.0
 @export var recoil_weapon_kick: float = 0.02
 @export var recoil_weapon_rise: float = 8.0
+@export var recoil_fov_punch: float = -0.5
 
 @export_group("Fire Control")
 @export var fire_rate_rpm: float = 600.0

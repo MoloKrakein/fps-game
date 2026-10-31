@@ -32,6 +32,11 @@ class_name CamEffects extends Camera3D
 @export var recoil_cam_stiffness: float = 80.0
 @export var recoil_cam_damping: float = 10.0
 @export var recoil_cam_max_angle: float = 50.0
+## true = the kick is applied as speed, so the view snaps up over a few frames instead of teleporting
+@export var recoil_kick_as_velocity: bool = true
+@export var recoil_kick_velocity_scale: float = 1.4
+## Fraction of the pitch / yaw kick that stays as real aim climb (needs CameraController.add_recoil_climb)
+@export_range(0.0, 1.0, 0.05) var recoil_climb_ratio: float = 0.5
 
 @export_subgroup("Headbob Settings")
 @export_range(0.0, 1.0,0.001) var headbob_pitch: float = 0.05
@@ -44,6 +49,9 @@ class_name CamEffects extends Camera3D
 @export var slide_roll: float = 3.0  # Degrees to tilt left/right
 @export var slide_fov: float = 105.0 
 @export var fov_transition_speed: float = 8.0
+@export_group("Weapon FOV Punch")
+@export var fov_punch_stiffness: float = 350.0
+@export var fov_punch_damping: float = 26.0
 
 var _fall_value: float = 0.0
 var _fall_timer: float = 0.0
@@ -67,6 +75,9 @@ var _target_slide_roll: float = 0.0
 var _target_slide_pitch: float = 0.0
 var _fov_tween: Tween
 var _fov_aim_tween: Tween
+var _fov_smooth: float = 90.0
+var _fov_punch: float = 0.0
+var _fov_punch_vel: float = 0.0
 
 var _current_run_pitch: float = 0.0
 var _current_run_roll: float = 0.0
@@ -80,6 +91,7 @@ const MAX_SHAKE_INTENSITY: float = 0.06
 func _ready() -> void:
 	_base_fov = fov
 	_aim_fov = _base_fov
+	_fov_smooth = fov
 
 func _process(delta: float) -> void:
 	calculate_view_offset(delta)
@@ -184,7 +196,11 @@ func calculate_view_offset(delta):
 		target_fov = slide_fov
 	if player.weapon_controller and player.weapon_controller.is_aiming:
 		target_fov = _aim_fov
-	fov = lerp(fov, target_fov, delta * fov_transition_speed)
+	_fov_smooth = lerpf(_fov_smooth, target_fov, delta * fov_transition_speed)
+	var fov_d: float = minf(delta, 0.05)
+	_fov_punch_vel += (-fov_punch_stiffness * _fov_punch - fov_punch_damping * _fov_punch_vel) * fov_d
+	_fov_punch += _fov_punch_vel * fov_d
+	fov = _fov_smooth + _fov_punch
 
 	if enable_slide_effect:
 		if player.is_sliding:
@@ -247,10 +263,30 @@ func add_damage_impact(damage_amount: float, source: Node3D = null) -> void:
 
 # weapon recoil
 func add_weapon_recoil(pitch: float, yaw: float, roll: float) -> void:
-	_recoil_angles.x += deg_to_rad(pitch)
-	
-	_recoil_angles.y += deg_to_rad(randf_range(-yaw, yaw))
-	_recoil_angles.z += deg_to_rad(randf_range(-roll, roll))
+	var p: float = deg_to_rad(pitch)
+	var y: float = deg_to_rad(randf_range(-yaw, yaw))
+	var r: float = deg_to_rad(randf_range(-roll, roll))
+
+	# layer 1: view punch (springs back to zero)
+	if recoil_kick_as_velocity:
+		var gain: float = sqrt(recoil_cam_stiffness) * recoil_kick_velocity_scale
+		_recoil_velocity.x += p * gain
+		_recoil_velocity.y += y * gain
+		_recoil_velocity.z += r * gain
+	else:
+		_recoil_angles.x += p
+		_recoil_angles.y += y
+		_recoil_angles.z += r
+
+	# layer 2: aim climb (stays until the player pulls down or it slowly settles)
+	var controller := get_parent() as CameraController
+	if controller != null and recoil_climb_ratio > 0.0:
+		controller.add_recoil_climb(p * recoil_climb_ratio, y * recoil_climb_ratio)
+
+
+# FOV punch: positive widens briefly, negative pulls in. Try about -0.6 .. 1.0 degrees.
+func add_fov_punch(degrees: float) -> void:
+	_fov_punch_vel += degrees * sqrt(fov_punch_stiffness) * 1.2
 
 
 # screen shake

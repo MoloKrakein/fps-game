@@ -25,6 +25,17 @@ var _step_smoothing: bool = false
 
 var offset_height: float = 0.0
 
+@export_group("Recoil Climb")
+## Seconds after the last shot before the view starts settling back
+@export var climb_recover_delay: float = 0.12
+## How fast the view settles back
+@export var climb_recover_speed: float = 3.0
+## Fraction of the climb that comes back on its own (the rest the player has to pull down)
+@export_range(0.0, 1.0, 0.05) var climb_recover_ratio: float = 0.6
+
+var _climb_pending: Vector2 = Vector2.ZERO  # radians (pitch, yaw) that can still recover
+var _climb_timer: float = 0.0
+
 # --- Cover peek (driven by CoverPeek) ---------------------------------
 # Offset is in player-local space (x = right, y = up). It is applied to the Cam
 # child's position, NOT to this node's position, so the crouch / step-smoothing
@@ -69,8 +80,11 @@ func update_camera_rotation(input: Vector2) -> void:
 
 func _process(delta: float) -> void:
 	_apply_peek()
-	if component_mouse_capture._mouse_input != Vector2.ZERO:
-		update_camera_rotation(component_mouse_capture._mouse_input)
+	var mouse_input: Vector2 = component_mouse_capture._mouse_input
+	if mouse_input != Vector2.ZERO:
+		_cancel_climb_with_input(mouse_input)
+		update_camera_rotation(mouse_input)
+	_update_climb_recovery(delta)
 	
 	if _step_smoothing:
 		_target_h = lerp(_target_h, 0.0, step_speed * delta)
@@ -108,3 +122,37 @@ func _apply_peek() -> void:
 		var pitch_only := Basis.from_euler(Vector3(rotation.x, 0.0, 0.0))
 		_cam.position = _cam_base_position + pitch_only.inverse() * _peek_offset
 	rotation.z = _peek_roll
+
+
+## Real aim climb from weapon recoil (radians). Called by CamEffects.add_weapon_recoil.
+func add_recoil_climb(pitch_rad: float, yaw_rad: float) -> void:
+	_rotation.x = clampf(_rotation.x + pitch_rad, deg_to_rad(tilt_low_limit), deg_to_rad(tilt_high_limit))
+	_rotation.y += yaw_rad
+	_climb_pending += Vector2(pitch_rad, yaw_rad) * climb_recover_ratio
+	_climb_timer = climb_recover_delay
+	update_camera_rotation(Vector2.ZERO)  # re-applies the rotation without any mouse input
+
+
+# If the player pulls against the climb, that counts as compensation, so it must not recover again.
+func _cancel_climb_with_input(input: Vector2) -> void:
+	var dx: float = input.y * (1.0 if is_Vertical_inverted else -1.0)
+	var dy: float = input.x * (1.0 if is_Horizontal_inverted else -1.0)
+	if signf(dx) == -signf(_climb_pending.x):
+		_climb_pending.x = move_toward(_climb_pending.x, 0.0, absf(dx))
+	if signf(dy) == -signf(_climb_pending.y):
+		_climb_pending.y = move_toward(_climb_pending.y, 0.0, absf(dy))
+
+
+func _update_climb_recovery(delta: float) -> void:
+	if _climb_timer > 0.0:
+		_climb_timer -= delta
+		return
+	if _climb_pending == Vector2.ZERO:
+		return
+	var step: Vector2 = _climb_pending * minf(1.0, climb_recover_speed * delta)
+	_climb_pending -= step
+	_rotation.x -= step.x
+	_rotation.y -= step.y
+	update_camera_rotation(Vector2.ZERO)
+	if _climb_pending.length() < 0.0005:
+		_climb_pending = Vector2.ZERO
