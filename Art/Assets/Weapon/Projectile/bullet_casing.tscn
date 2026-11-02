@@ -20,10 +20,11 @@ gravity_scale = 3.0
 script = ExtResource("1_raipx")
 lifetime = 30.0
 streak_material = ExtResource("3_fgusy")
+streak_time = 0.018
 streak_min_speed = 5.0
-streak_alpha = 0.55
+streak_alpha = 1.0
 streak_width = 0.084
-streak_color = Color(0.69411767, 0.6745098, 0.45490196, 0.7490196)
+streak_color = Color(0.69411767, 0.6745098, 0.45490196, 0.99607843)
 despawn_after_rest = 30.0
 metadata/collision_preset_name = &"__custom__"
 

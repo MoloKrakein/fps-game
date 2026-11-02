@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://ceeybyr22vi1b"]
+
+[ext_resource type="Shader" uid="uid://bg51p7fsai5ud" path="res://_Assets/VFX/tracer.gdshader" id="1_8y7ui"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_8y7ui")
+shader_parameter/core_color = Color(1.0413129, 0.923134, 0.3200142, 1)
+shader_parameter/tail_power = 0.4
+shader_parameter/flicker_amount = 0.15
+shader_parameter/min_pixel_width = 1.5

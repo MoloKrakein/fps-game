@@ -23,21 +23,24 @@ class SpringValue:
 		velocity = 0.0
 
 
-## Chained springs give recoil a fast visible snap and slower recovery.
-class RecoilChannel:
-	var target: SpringValue = SpringValue.new()
-	var shown: SpringValue = SpringValue.new()
+## A single impulse-driven spring keeps recoil responsive without a second
+## high-frequency "snap" spring fighting the recovery spring.
+class RecoilSpring:
+	var value: float = 0.0
+	var velocity: float = 0.0
 
-	func kick(amount: float) -> void:
-		target.value += amount
+	func kick(amount: float, impulse_scale: float = 1.0) -> void:
+		velocity += amount * impulse_scale
 
-	func step(delta: float, recover_stiffness: float, recover_damping: float, snap_stiffness: float, snap_damping: float, limit: float = INF) -> float:
-		target.step(0.0, delta, recover_stiffness, recover_damping, limit)
-		return shown.step(target.value, delta, snap_stiffness, snap_damping, limit)
+	func step(delta: float, stiffness: float, damping: float, limit: float = INF) -> float:
+		var result: Vector2 = SpringUtil.apply(value, velocity, 0.0, delta, stiffness, damping)
+		value = clampf(result.x, -limit, limit)
+		velocity = result.y
+		return value
 
 	func reset() -> void:
-		target.reset()
-		shown.reset()
+		value = 0.0
+		velocity = 0.0
 
 
 var ctrl: WeaponController
@@ -65,11 +68,19 @@ var _bob_x := SpringValue.new()
 var _bob_y := SpringValue.new()
 var _strafe_tilt := SpringValue.new()
 var _vlag_y := SpringValue.new()
-var _recoil_back: RecoilChannel = RecoilChannel.new()
-var _recoil_pitch: RecoilChannel = RecoilChannel.new()
-var _recoil_climb: RecoilChannel = RecoilChannel.new()
-var _recoil_yaw: RecoilChannel = RecoilChannel.new()
+var _recoil_back: RecoilSpring = RecoilSpring.new()
+var _recoil_pitch: RecoilSpring = RecoilSpring.new()
+var _recoil_yaw: RecoilSpring = RecoilSpring.new()
 var _last_yaw_dir: float = 0.0
+
+# Hand markers on the weapon model (GripHand, SupportHand, optional RecoilPivot), cached per model.
+var _markers_model: WeaponModel = null
+var _has_grip: bool = false
+var _has_support: bool = false
+var _has_pivot: bool = false
+var _grip_local: Vector3 = Vector3.ZERO
+var _support_local: Vector3 = Vector3.ZERO
+var _pivot_local: Vector3 = Vector3.ZERO
 var _recoil_offset_pos: Vector3 = Vector3.ZERO
 var _recoil_offset_rot: Vector3 = Vector3.ZERO
 
@@ -117,8 +128,12 @@ func apply_offsets(delta: float) -> void:
 		_recoil_offset_pos = Vector3.ZERO
 		_recoil_offset_rot = Vector3.ZERO
 
-	model.position = ctrl.current_stance_pos + idle_offset + look_offset + bob_offset + _crouch_pos + _sprint_pos + _sprint_motion_pos + _recoil_offset_pos + vertical_lag_offset
-	model.rotation = ctrl.current_stance_rot + Vector3(_idle_rot_x.value, 0.0, strafe_tilt) + _crouch_rot + _sprint_rot + _sprint_motion_rot + _recoil_offset_rot
+	_ensure_markers(model)
+	var full_rotation: Vector3 = ctrl.current_stance_rot + Vector3(_idle_rot_x.value, 0.0, strafe_tilt) + _crouch_rot + _sprint_rot + _sprint_motion_rot + _recoil_offset_rot
+	var pivot_shift: Vector3 = _recoil_pivot_shift(model, full_rotation)
+
+	model.position = ctrl.current_stance_pos + idle_offset + look_offset + bob_offset + _crouch_pos + _sprint_pos + _sprint_motion_pos + _recoil_offset_pos + vertical_lag_offset + pivot_shift
+	model.rotation = full_rotation
 
 
 func reset_bob() -> void:
@@ -156,7 +171,6 @@ func reset_motion_state() -> void:
 func reset_recoil() -> void:
 	_recoil_back.reset()
 	_recoil_pitch.reset()
-	_recoil_climb.reset()
 	_recoil_yaw.reset()
 	_last_yaw_dir = 0.0
 	_recoil_offset_pos = Vector3.ZERO
@@ -180,36 +194,34 @@ func add_recoil() -> void:
 	# A support hand keeps a long gun aligned with the bore. It still pushes
 	# the stock into the shoulder, but produces less muzzle climb and wobble.
 	var kick_multiplier: float = 1.12 if two_handed else 1.0
-	var rise_multiplier: float = 0.62 if two_handed else 1.0
+	var rise_multiplier: float = (0.62 if two_handed else 1.0) * _hand_leverage_multiplier()
 	var lateral_multiplier: float = 0.35 if two_handed else 1.0
 	var rise: float = deg_to_rad(weapon.recoil_weapon_rise) * rise_multiplier * strength
-	var climb_share: float = clampf(ctrl.recoil_climb_ratio, 0.0, 1.0)
 
-	_recoil_back.kick(weapon.recoil_weapon_kick * kick_multiplier * strength)
-	_recoil_pitch.kick(rise * (1.0 - climb_share))
-	_recoil_climb.kick(rise * climb_share)
+	# Kick velocity rather than position. This gives a soft acceleration into
+	# recoil followed by one continuous recovery instead of a rigid snap.
+	_recoil_back.kick(weapon.recoil_weapon_kick * kick_multiplier * strength, 42.0)
+	_recoil_pitch.kick(rise, 30.0)
 	_last_yaw_dir = lerpf(randf_range(-1.0, 1.0), _last_yaw_dir, ctrl.recoil_lateral_persistence)
 	var yaw_range: float = weapon.recoil_weapon_rise * 0.5 * strength
-	_recoil_yaw.kick(deg_to_rad(_last_yaw_dir * yaw_range) * lateral_multiplier)
+	_recoil_yaw.kick(deg_to_rad(_last_yaw_dir * yaw_range) * lateral_multiplier, 24.0)
 
 
 func _update_recoil(delta: float) -> void:
 	var two_handed: bool = _is_two_handed_weapon()
 	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_recoil_multiplier)
-	var stiffness: float = ctrl.recoil_model_stillness * (0.78 if two_handed else 1.0)
-	var damping: float = ctrl.recoil_model_damping * (1.15 if two_handed else 1.0)
+	var stiffness: float = ctrl.recoil_model_stillness * (0.65 if two_handed else 0.55)
+	var damping: float = ctrl.recoil_model_damping * (1.6 if two_handed else 1.45)
 	var max_angle: float = ctrl.recoil_model_max_angle
 	var pitch_max: float = ctrl.recoil_pitch_max
 	pitch_max *= running_aim_multiplier
 	max_angle *= running_aim_multiplier
-	var back: float = _recoil_back.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, max_angle)
-	var pitch: float = _recoil_pitch.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, pitch_max)
-	var climb: float = _recoil_climb.step(delta, ctrl.recoil_climb_stiffness, ctrl.recoil_climb_damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, pitch_max)
-	var yaw: float = _recoil_yaw.step(delta, stiffness, damping, ctrl.recoil_snap_stiffness, ctrl.recoil_snap_damping, max_angle)
-	var total_pitch: float = clampf(pitch + climb, -pitch_max, pitch_max)
+	var back: float = _recoil_back.step(delta, stiffness, damping, max_angle)
+	var pitch: float = _recoil_pitch.step(delta, stiffness, damping, pitch_max)
+	var yaw: float = _recoil_yaw.step(delta, stiffness, damping, max_angle)
 	var roll: float = -yaw * ctrl.recoil_roll_coupling * (0.55 if two_handed else 1.0)
 	_recoil_offset_pos = Vector3(0.0, back * ctrl.recoil_vertical_lift, back)
-	_recoil_offset_rot = Vector3(total_pitch, yaw, roll)
+	_recoil_offset_rot = Vector3(pitch, yaw, roll)
 
 
 func _is_recoil_suppressed() -> bool:
@@ -507,10 +519,81 @@ func _is_two_handed_weapon() -> bool:
 	if weapon == null:
 		return false
 
+	# Hand markers on the model decide it when present: SupportHand = two hands, only GripHand = one hand.
+	if ctrl.recoil_use_hand_markers:
+		_ensure_markers(ctrl.current_weapon_model)
+		if _has_support:
+			return true
+		if _has_grip:
+			return false
+
 	return weapon.weapon_type in [
 		Weapon.WeaponType.RIFLE,
 		Weapon.WeaponType.SHOTGUN,
 		Weapon.WeaponType.SNIPER,
 		Weapon.WeaponType.HEAVY
 	]
+#endregion
+
+
+#region Hand markers and recoil pivot
+## Finds GripHand / SupportHand / RecoilPivot on the model once per spawned model.
+func _ensure_markers(model: WeaponModel) -> void:
+	if model == _markers_model:
+		return
+	_markers_model = model
+	_has_grip = false
+	_has_support = false
+	_has_pivot = false
+	if model == null:
+		return
+	var grip: Node3D = model.find_child("GripHand", true, false) as Node3D
+	var support: Node3D = model.find_child("SupportHand", true, false) as Node3D
+	var pivot: Node3D = model.find_child("RecoilPivot", true, false) as Node3D
+	if grip != null:
+		_has_grip = true
+		_grip_local = model.to_local(grip.global_position)
+	if support != null:
+		_has_support = true
+		_support_local = model.to_local(support.global_position)
+	if pivot != null:
+		_has_pivot = true
+		_pivot_local = model.to_local(pivot.global_position)
+
+
+## Pivot point in model-local space. RecoilPivot wins, otherwise a point between the two hands.
+func _recoil_pivot_local() -> Vector3:
+	if _has_pivot:
+		return _pivot_local
+	if _has_grip and _has_support:
+		return _grip_local.lerp(_support_local, ctrl.recoil_pivot_blend)
+	if _has_grip:
+		return _grip_local
+	if _has_support:
+		return _support_local
+	return Vector3.ZERO
+
+
+## Position correction so the recoil rotation turns around the pivot instead of the model origin.
+func _recoil_pivot_shift(model: WeaponModel, full_rotation: Vector3) -> Vector3:
+	if not ctrl.recoil_pivot_enabled or _recoil_offset_rot == Vector3.ZERO:
+		return Vector3.ZERO
+	var pivot: Vector3 = _recoil_pivot_local() * model.scale
+	if pivot == Vector3.ZERO:
+		return Vector3.ZERO
+	var base_basis: Basis = Basis.from_euler(full_rotation - _recoil_offset_rot)
+	var full_basis: Basis = Basis.from_euler(full_rotation)
+	return (base_basis * pivot - full_basis * pivot) * ctrl.recoil_pivot_strength
+
+
+## Hands further apart = more leverage = less muzzle rise. 1.0 when off or markers are missing.
+func _hand_leverage_multiplier() -> float:
+	if ctrl.recoil_hand_leverage <= 0.0:
+		return 1.0
+	_ensure_markers(ctrl.current_weapon_model)
+	if not (_has_grip and _has_support):
+		return 1.0
+	var separation: float = (_grip_local - _support_local).length() * _markers_model.scale.x
+	var ratio: float = ctrl.recoil_hand_reference_distance / maxf(separation, 0.05)
+	return lerpf(1.0, clampf(ratio, 0.6, 1.5), ctrl.recoil_hand_leverage)
 #endregion

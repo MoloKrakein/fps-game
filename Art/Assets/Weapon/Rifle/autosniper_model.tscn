@@ -454,3 +454,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18046615, 0.027169734, -0.
 
 [node name="GUI" parent="AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("3_6v2q4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.044470966, -0.028495118, 0.10883766)
+
+[node name="GripHand" type="Marker3D" parent="." unique_id=1073744102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.10251212, 0.04171428)
+
+[node name="SupportHand" type="Marker3D" parent="." unique_id=1630405924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08509212, -0.2853567)
+
+[node name="RecoilPivot" type="Marker3D" parent="." unique_id=1246342790]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.015423089, 0.36108172)

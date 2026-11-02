@@ -121,7 +121,9 @@ draw_pass_1 = SubResource("QuadMesh_0cluu")
 [node name="Smoke" parent="Muzzle" unique_id=2001100571 instance=ExtResource("8_qrkt3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.042939484, -0.10427165)
 instance_shader_parameters/size_mult = 9.0
+emitting = false
 amount = 23
+one_shot = true
 speed_scale = 3.45
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
@@ -138,5 +140,14 @@ transform = Transform3D(-3.3960375e-06, -73.051155, -26.450232, -5.5572928e-06, 
 
 [node name="GUI" parent="AR416/Armature/Skeleton3D/Body/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
 transform = Transform3D(1.0000004, -1.0658141e-14, -4.2632564e-14, 0, 1.0000002, -3.2782555e-07, -1.2434498e-14, 2.9802322e-08, 1.0000002, -0.035971098, 0.010502523, -0.0055913813)
+
+[node name="GripHand" type="Marker3D" parent="." unique_id=1897020530]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.47601122, 0.098496675)
+
+[node name="SupportHand" type="Marker3D" parent="." unique_id=816410030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.10096738, -1.2005291)
+
+[node name="RecoilPivot" type="Marker3D" parent="." unique_id=1733188836]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07424399, 0.9025229)
 
 [editable path="AR416"]

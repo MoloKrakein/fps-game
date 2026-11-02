@@ -91,16 +91,26 @@ const TIREDNESS_PER_SHOT: float = 1.5
 @export var recoil_model_max_angle: float = 50.0
 @export var recoil_pitch_max: float = 0.4
 
-@export_group("Weapon Recoil Feel")
-@export var recoil_snap_stiffness: float = 600.0
-@export var recoil_snap_damping: float = 40.0
-@export_range(0.0, 1.0, 0.01) var recoil_climb_ratio: float = 0.35
-@export var recoil_climb_stiffness: float = 22.0
-@export var recoil_climb_damping: float = 9.4
 @export_range(0.0, 0.95, 0.01) var recoil_lateral_persistence: float = 0.5
 @export var recoil_ads_visual_multiplier: float = 0.5
 @export var recoil_roll_coupling: float = 0.15
 @export var recoil_vertical_lift: float = 0.15
+
+@export_group("Weapon Recoil Hands")
+## Use the GripHand / SupportHand markers to decide one- or two-handed recoil
+@export var recoil_use_hand_markers: bool = true
+## Turn the recoil rotation around a pivot between the hands instead of the model origin
+@export var recoil_pivot_enabled: bool = true
+## 0 = pivot at the grip hand, 1 = at the support hand (ignored if the model has a RecoilPivot marker)
+@export_range(0.0, 1.0, 0.05) var recoil_pivot_blend: float = 0.5
+## 0 = rotate around the model origin (old behaviour), 1 = fully around the pivot
+@export_range(0.0, 1.0, 0.05) var recoil_pivot_strength: float = 1.0
+## Hands further apart = more leverage = less muzzle rise. 0 = off
+@export_range(0.0, 1.0, 0.05) var recoil_hand_leverage: float = 0.5
+## Hand separation (metres) that counts as normal leverage
+@export var recoil_hand_reference_distance: float = 0.3
+
+
 @export_group("Weapon Handling")
 @export var rack_lockout_time: float = 0.5
 #endregion
