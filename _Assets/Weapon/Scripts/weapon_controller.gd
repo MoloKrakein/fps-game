@@ -63,6 +63,12 @@ const TIREDNESS_PER_SHOT: float = 1.5
 @export var look_lag_divisor: float = 10.0
 @export var look_lag_rot_max: float = 5.0
 @export var look_lag_pos_scale: float = 0.006
+@export var look_lag_hipfire_weight: float = 1.9
+@export var look_lag_ads_weight: float = 0.45
+@export var look_lag_fast_turn_threshold_deg: float = 100.0
+@export var look_lag_fast_turn_boost: float = 1.45
+@export var look_lag_tip_follow_slow: float = 0.30
+@export var look_lag_tip_follow_fast: float = 0.80
 @export_category("Strafe Tilt Settings")
 @export var strafe_tilt_enabled: bool = true
 @export var strafe_tilt_scale: float = 0.3

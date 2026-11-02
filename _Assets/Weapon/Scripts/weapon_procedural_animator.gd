@@ -68,6 +68,13 @@ var _bob_x := SpringValue.new()
 var _bob_y := SpringValue.new()
 var _strafe_tilt := SpringValue.new()
 var _vlag_y := SpringValue.new()
+var _look_root_x := SpringValue.new()
+var _look_root_y := SpringValue.new()
+var _look_tip_x := SpringValue.new()
+var _look_tip_y := SpringValue.new()
+var _look_rot_x := SpringValue.new()
+var _look_rot_y := SpringValue.new()
+var _look_rot_z := SpringValue.new()
 var _recoil_back: RecoilSpring = RecoilSpring.new()
 var _recoil_pitch: RecoilSpring = RecoilSpring.new()
 var _recoil_yaw: RecoilSpring = RecoilSpring.new()
@@ -113,6 +120,7 @@ func apply_offsets(delta: float) -> void:
 
 	var idle_offset: Vector3 = _update_idle_sway(delta)
 	var look_offset: Vector3 = _update_look_sway(delta)
+	var look_rotation: Vector3 = _update_look_rotation(delta)
 	var strafe_tilt: float = _update_strafe_tilt(delta)
 	var bob_offset: Vector3 = _update_weapon_bob(delta)
 	var vertical_lag_offset: Vector3 = _update_vertical_lag(delta)
@@ -129,7 +137,7 @@ func apply_offsets(delta: float) -> void:
 		_recoil_offset_rot = Vector3.ZERO
 
 	_ensure_markers(model)
-	var full_rotation: Vector3 = ctrl.current_stance_rot + Vector3(_idle_rot_x.value, 0.0, strafe_tilt) + _crouch_rot + _sprint_rot + _sprint_motion_rot + _recoil_offset_rot
+	var full_rotation: Vector3 = ctrl.current_stance_rot + Vector3(_idle_rot_x.value, 0.0, strafe_tilt) + look_rotation + _crouch_rot + _sprint_rot + _sprint_motion_rot + _recoil_offset_rot
 	var pivot_shift: Vector3 = _recoil_pivot_shift(model, full_rotation)
 
 	model.position = ctrl.current_stance_pos + idle_offset + look_offset + bob_offset + _crouch_pos + _sprint_pos + _sprint_motion_pos + _recoil_offset_pos + vertical_lag_offset + pivot_shift
@@ -150,6 +158,13 @@ func reset_motion_state() -> void:
 	_bob_y.reset()
 	_strafe_tilt.reset()
 	_vlag_y.reset()
+	_look_root_x.reset()
+	_look_root_y.reset()
+	_look_tip_x.reset()
+	_look_tip_y.reset()
+	_look_rot_x.reset()
+	_look_rot_y.reset()
+	_look_rot_z.reset()
 	_recoil_offset_pos = Vector3.ZERO
 	_recoil_offset_rot = Vector3.ZERO
 	_previous_look_dir = Vector3.ZERO
@@ -294,7 +309,11 @@ func _update_look_sway(delta: float) -> Vector3:
 		return Vector3.ZERO
 
 	var camera_rotation: Vector3 = camera.global_rotation
-	var rotation_delta: Vector3 = camera_rotation - _previous_look_dir
+	var rotation_delta: Vector3 = Vector3(
+		wrapf(camera_rotation.x - _previous_look_dir.x, -PI, PI),
+		wrapf(camera_rotation.y - _previous_look_dir.y, -PI, PI),
+		0.0
+	)
 	_previous_look_dir = camera_rotation
 
 	var max_rad: float = deg_to_rad(ctrl.look_lag_rot_max)
@@ -302,17 +321,53 @@ func _update_look_sway(delta: float) -> Vector3:
 	rotation_delta.y = clampf(rotation_delta.y, -max_rad, max_rad)
 	rotation_delta.z = 0.0
 
-	var interpolate_speed: float = (1.0 / delta) / ctrl.look_lag_divisor
+	var interpolate_speed: float = (1.0 / maxf(delta, 0.016)) / ctrl.look_lag_divisor
 	_camera_rotation_rate = _camera_rotation_rate.lerp(rotation_delta, clampf(interpolate_speed * delta, 0.0, 1.0))
 
-	var norm_pitch: float = _camera_rotation_rate.x / max_rad if max_rad > 0.0 else 0.0
-	var norm_yaw: float = _camera_rotation_rate.y / max_rad if max_rad > 0.0 else 0.0
+	var turn_speed_deg: float = rad_to_deg(_camera_rotation_rate.length() / maxf(delta, 0.0001))
+	var threshold_deg: float = maxf(ctrl.look_lag_fast_turn_threshold_deg, 0.1)
+	var fast_turn_strength: float = clampf((turn_speed_deg - threshold_deg) / threshold_deg, 0.0, 1.0)
+	fast_turn_strength = smoothstep(0.0, 1.0, fast_turn_strength)
 
 	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_lag_multiplier)
+	var stance_weight: float = ctrl.look_lag_ads_weight if is_aiming else ctrl.look_lag_hipfire_weight
+	var fast_turn_boost: float = 1.0 + fast_turn_strength * ctrl.look_lag_fast_turn_boost
+	var root_target_x: float = _camera_rotation_rate.y * ctrl.look_lag_pos_scale * running_aim_multiplier * stance_weight
+	var root_target_y: float = _camera_rotation_rate.x * ctrl.look_lag_pos_scale * running_aim_multiplier * stance_weight
+	var root_x: float = _look_root_x.step(root_target_x * fast_turn_boost, delta, 15.0, 26.0)
+	var root_y: float = _look_root_y.step(root_target_y * fast_turn_boost, delta, 15.0, 26.0)
+	var tip_lag: float = lerpf(ctrl.look_lag_tip_follow_slow, ctrl.look_lag_tip_follow_fast, fast_turn_strength)
+	var tip_x: float = _look_tip_x.step(root_x * tip_lag, delta, 10.0, 20.0)
+	var tip_y: float = _look_tip_y.step(root_y * tip_lag, delta, 10.0, 20.0)
+
+	# The chassis reacts immediately, but the muzzle / front of the gun keeps
+	# swinging behind it like a weighted object. This gives the weapon a more
+	# physical, delayed feel when the camera turns quickly.
+	return Vector3(root_x - tip_x, root_y - tip_y, 0.0)
+
+
+func _update_look_rotation(delta: float) -> Vector3:
+	if not ctrl.look_sway_enabled or not camera:
+		return Vector3.ZERO
+
+	var threshold_rad: float = deg_to_rad(maxf(ctrl.look_lag_fast_turn_threshold_deg, 0.1))
+	var turn_speed_rad: float = _camera_rotation_rate.length() / maxf(delta, 0.0001)
+	var fast_turn_strength: float = clampf((turn_speed_rad - threshold_rad) / threshold_rad, 0.0, 1.0)
+	fast_turn_strength = smoothstep(0.0, 1.0, fast_turn_strength)
+
+	var stance_weight: float = ctrl.look_lag_ads_weight if is_aiming else ctrl.look_lag_hipfire_weight
+	var target_pitch: float = _camera_rotation_rate.x * 0.55 * stance_weight * (1.0 + fast_turn_strength * 0.85)
+	var target_yaw: float = _camera_rotation_rate.y * 0.45 * stance_weight * (1.0 + fast_turn_strength * 0.85)
+	var target_roll: float = -_camera_rotation_rate.y * 0.30 * stance_weight * (1.0 + fast_turn_strength * 1.1)
+	var pitch: float = _look_rot_x.step(target_pitch, delta, 12.0, 21.0)
+	var yaw: float = _look_rot_y.step(target_yaw, delta, 12.0, 21.0)
+	var roll: float = _look_rot_z.step(target_roll, delta, 10.0, 18.0)
+
+	var max_rotation: float = deg_to_rad(8.0)
 	return Vector3(
-		norm_yaw * ctrl.look_lag_pos_scale * running_aim_multiplier,
-		norm_pitch * ctrl.look_lag_pos_scale * running_aim_multiplier,
-		0.0
+		clampf(pitch, -max_rotation, max_rotation),
+		clampf(yaw, -max_rotation, max_rotation),
+		clampf(roll, -max_rotation, max_rotation)
 	)
 
 
