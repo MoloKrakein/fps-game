@@ -35,6 +35,8 @@ class_name WeaponModel extends Node3D
 
 # slot -> spawned attachment instance (so we can find sight points etc.)
 var _instances: Dictionary = {}
+# slot -> Attachment currently shown
+var _equipped: Dictionary = {}
 
 
 func set_ammo_display_visible(is_visible: bool) -> void:
@@ -102,6 +104,51 @@ func get_iron_sight_point_local() -> Dictionary:
 #endregion
 
 
+#region Muzzle effects
+## The flash that should play right now: the muzzle device's own, none, or the weapon's.
+func get_active_muzzle_flash() -> MuzzleFlash:
+	var att := _equipped.get(Attachment.AttachmentSlot.MUZZLE) as Attachment
+	if att != null:
+		match att.muzzle_flash_mode:
+			Attachment.MuzzleFlashMode.DISABLE:
+				return null
+			Attachment.MuzzleFlashMode.REPLACE:
+				var inst := get_attachment_instance(Attachment.AttachmentSlot.MUZZLE)
+				if inst != null:
+					var own: Array[Node] = inst.find_children("*", "MuzzleFlash", true, false)
+					if not own.is_empty():
+						return own[0] as MuzzleFlash
+				# REPLACE but the scene has no MuzzleFlash node: fall back to the weapon's
+	return _find_default_flash()
+
+
+## Barrel tip: the muzzle device's MuzzlePoint if it has one, otherwise the weapon's "Muzzle".
+func get_active_muzzle_point() -> Node3D:
+	var att := _equipped.get(Attachment.AttachmentSlot.MUZZLE) as Attachment
+	if att != null:
+		var inst := get_attachment_instance(Attachment.AttachmentSlot.MUZZLE)
+		if inst != null:
+			var point := inst.find_child(String(att.muzzle_point_name), true, false) as Node3D
+			if point != null:
+				return point
+	if muzzle_socket != null:
+		return muzzle_socket
+	return get_node_or_null("Muzzle") as Node3D
+
+
+func _find_default_flash() -> MuzzleFlash:
+	for node: Node in find_children("*", "MuzzleFlash", true, false):
+		var inside_attachment := false
+		for inst: Node in _instances.values():
+			if is_instance_valid(inst) and inst.is_ancestor_of(node):
+				inside_attachment = true
+				break
+		if not inside_attachment:
+			return node as MuzzleFlash
+	return null
+#endregion
+
+
 #region Attachment handling
 ## Single entry point: show `attachment` in its slot, or clear the slot with null.
 func set_attachment(slot: Attachment.AttachmentSlot, attachment: Attachment) -> void:
@@ -112,6 +159,7 @@ func set_attachment(slot: Attachment.AttachmentSlot, attachment: Attachment) -> 
 
 	_clear_socket(socket)
 	_instances.erase(slot)
+	_equipped.erase(slot)
 
 	# Built-in meshes that the attachment replaces / hides.
 	match slot:
@@ -131,6 +179,7 @@ func set_attachment(slot: Attachment.AttachmentSlot, attachment: Attachment) -> 
 	var instance := _spawn_attachment_instance(socket, attachment)
 	if instance:
 		_instances[slot] = instance
+		_equipped[slot] = attachment
 
 
 # Kept so any other script that still calls the old API keeps working.

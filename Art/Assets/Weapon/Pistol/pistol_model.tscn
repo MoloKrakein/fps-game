@@ -203,4 +203,10 @@ parameters/ReloadBlend/blend_amount = 0.0
 [node name="Magazine" type="Node3D" parent="." unique_id=2029134148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
 
+[node name="GripHand" type="Marker3D" parent="." unique_id=166587296]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07926726, 0.098496675)
+
+[node name="SupportHand" type="Marker3D" parent="." unique_id=987351923]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.038741484, 0.033266544)
+
 [editable path="mk57"]

@@ -18,6 +18,12 @@ enum AttachmentType {
 	ADDITIVE,
 	REPLACEABLE
 }
+## What a muzzle device does to the weapon's own muzzle flash.
+enum MuzzleFlashMode {
+	KEEP_WEAPON,   ## weapon's flash plays as usual (optionally dimmed, see multiplier)
+	REPLACE,       ## use the MuzzleFlash node that lives inside this attachment's scene
+	DISABLE        ## no flash at all (e.g. a suppressor)
+}
 
 
 @export_category("Attachment Stats")
@@ -40,6 +46,14 @@ enum AttachmentType {
 @export var damage_bonus: float = 0.0               # Flat bonus / penalty to damage
 @export var reload_time_multiplier: float = 1.0     # 1.0 = no change, <1.0 = faster reload, >1.0 = slower reload
 @export var ammo_capacity_bonus: int = 0            # Flat bonus / penalty to ammo capacity
+
+@export_category("Muzzle Effects")
+@export var muzzle_flash_mode: MuzzleFlashMode = MuzzleFlashMode.KEEP_WEAPON
+## Scales the flash light energy. Multiplies across equipped attachments.
+@export var muzzle_flash_energy_multiplier: float = 1.0
+## Optional Marker3D inside the attachment scene marking the new barrel tip
+## (shots / tracers / flash originate here instead of the weapon's "Muzzle").
+@export var muzzle_point_name: StringName = &"MuzzlePoint"
 
 @export_category("Optic / ADS")
 @export var is_optic: bool = false

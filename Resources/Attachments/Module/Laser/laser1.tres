@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Attachment" format=3 uid="uid://bewoeqyukvpk6"]
+
+[ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_vdjql"]
+[ext_resource type="PackedScene" uid="uid://di1efhnqust5d" path="res://Art/Assets/Weapon/Attachment/Scope/laser_module_t1.tscn" id="1_ycwwm"]
+
+[resource]
+script = ExtResource("1_vdjql")
+attachment_name = "Simple Laser Module"
+attachment_slot = 2
+attachment_model = ExtResource("1_ycwwm")
+model_scale = Vector3(0.5, 0.5, 0.5)
+recoil_multiplier = 0.0
+metadata/_custom_type_script = "uid://byjrogv1mqm35"

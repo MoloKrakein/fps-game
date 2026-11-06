@@ -177,6 +177,7 @@ func _init() -> void:
 	shooter = WeaponShooter.new(self)
 	reload = WeaponReload.new(self)
 	attachments = WeaponAttachments.new(self)
+	attachments.changed.connect(_refresh_muzzle_effects)
 
 
 func _ready() -> void:
@@ -433,13 +434,21 @@ func _play_fire_feedback() -> void:
 	shooter.eject_casing()
 
 	if _muzzle_flash != null:
-		_muzzle_flash.flash(current_weapon.muzzle_light_color, current_weapon.muzzle_light_energy, current_weapon.muzzle_light_duration)
-	else:
-		print("Muzzle flash not found on weapon model.")
+		_muzzle_flash.flash(
+   		current_weapon.muzzle_light_color,
+   		current_weapon.muzzle_light_energy * attachments.get_muzzle_flash_energy_multiplier(),
+   		current_weapon.muzzle_light_duration)
 
-	if weapon_animation_player != null:
-		_play_animation("Fire")
-
+# Override muzzle flash
+func _refresh_muzzle_effects() -> void:
+	if current_weapon_model == null:
+		return
+	var tip : Variant = current_weapon_model.get_active_muzzle_point()
+	if tip != null:
+		shoot_position = tip
+	_muzzle_flash = current_weapon_model.get_active_muzzle_flash()
+	if _muzzle_flash != null:
+		_muzzle_flash.configure(current_weapon)
 
 ## Called after every shot: the fired round is gone, and the action cycles.
 func _cycle_weapon() -> void:
@@ -537,7 +546,10 @@ func _bind_model_nodes(model: WeaponModel) -> void:
 	_weapon_smear = null
 	if muzzle != null:
 		shoot_position = muzzle
+		# var found: Array[Node] = model.find_children("*", "MuzzleFlash", true, false)
+		# In _bind_model_nodes, replace the find_children("*", "MuzzleFlash", ...) and configure lines with a call to _refresh_muzzle_effects(), but keep the muzzle lookup if you rely on it.
 		var found: Array[Node] = model.find_children("*", "MuzzleFlash", true, false)
+		_refresh_muzzle_effects()
 		_muzzle_flash = (found[0] as MuzzleFlash) if not found.is_empty() else null
 		print("Muzzle flash found: ", _muzzle_flash != null)
 		if _muzzle_flash:

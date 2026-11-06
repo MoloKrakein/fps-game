@@ -12,6 +12,7 @@ var _damage_bonus: float = 0.0
 var _ammo_capacity_bonus: int = 0
 var _recoil_multiplier: float = 1.0
 var _reload_time_multiplier: float = 1.0
+var _muzzle_energy_multiplier: float = 1.0
 
 
 func _init(controller: WeaponController) -> void:
@@ -122,6 +123,11 @@ func get_reload_time_multiplier() -> float:
 	return _reload_time_multiplier
 
 
+func get_muzzle_flash_energy_multiplier() -> float:
+	_refresh_stats()
+	return _muzzle_energy_multiplier
+
+
 func _refresh_stats() -> void:
 	if not _stats_dirty:
 		return
@@ -131,6 +137,7 @@ func _refresh_stats() -> void:
 	_ammo_capacity_bonus = int(Attachment.sum_float(list, &"ammo_capacity_bonus"))
 	_recoil_multiplier = Attachment.product_float(list, &"recoil_multiplier")
 	_reload_time_multiplier = Attachment.product_float(list, &"reload_time_multiplier")
+	_muzzle_energy_multiplier = Attachment.product_float(list, &"muzzle_flash_energy_multiplier")
 	_stats_dirty = false
 #endregion
 

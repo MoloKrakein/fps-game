@@ -6,8 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://gypergadlhjc" path="res://Art/3D/Blender/Weapon/AR416/export/AR416.glb" id="3_omrth"]
 [ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="4_631vl"]
 [ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="4_jtlrl"]
+[ext_resource type="Resource" uid="uid://bewoeqyukvpk6" path="res://Resources/Attachments/Module/Laser/laser1.tres" id="5_3xira"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="5_vgxpt"]
 [ext_resource type="Shader" uid="uid://ok0pd3nwhf5w" path="res://_Assets/VFX/muzzle_flash.gdshader" id="6_qrkt3"]
+[ext_resource type="Resource" uid="uid://c2pwq7v11v2gy" path="res://Resources/Attachments/Muzzle Device/Supp_gen_1.tres" id="6_uer85"]
 [ext_resource type="Material" uid="uid://bq0k71nxq3n07" path="res://_Assets/VFX/material/smoke_haze.tres" id="7_qrkt3"]
 [ext_resource type="PackedScene" uid="uid://dbvm232i3jjhh" path="res://_Assets/VFX/VFX_SCENE/wpn_smoke_vfx.tscn" id="8_qrkt3"]
 
@@ -22,6 +24,18 @@ script = ExtResource("2_oo46r")
 attachment = ExtResource("4_jtlrl")
 scale_multiplier = Vector3(0.8, 0.8, 0.8)
 ads_offset = Vector3(0, 0.089, 0.135)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
+
+[sub_resource type="Resource" id="Resource_5yekf"]
+script = ExtResource("2_oo46r")
+attachment = ExtResource("5_3xira")
+position_offset = Vector3(0, 0, -0.02)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
+
+[sub_resource type="Resource" id="Resource_3dwt8"]
+script = ExtResource("2_oo46r")
+attachment = ExtResource("6_uer85")
+scale_multiplier = Vector3(0.5, 0.5, 0.5)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
@@ -67,18 +81,20 @@ scale_max = 0.5
 material = ExtResource("7_qrkt3")
 size = Vector2(5, 5)
 
-[node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "iron_sight_point", "ammo_display")]
+[node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "underbarrel_socket", "muzzle_socket_attachment", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "iron_sight_point", "ammo_display")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.066431046)
 script = ExtResource("1_qfc63")
 muzzle_socket = NodePath("Muzzle")
 ejection_socket = NodePath("EjectionPort")
 optic_socket = NodePath("AR416/Armature/Skeleton3D/Body/Optics")
+underbarrel_socket = NodePath("AR416/Armature/Skeleton3D/Body/Underbarrels")
+muzzle_socket_attachment = NodePath("AR416/Armature/Skeleton3D/Body/MuzzleDevice")
 builtin_iron_sight_mesh = [NodePath("AR416/Armature/Skeleton3D/Front Sight"), NodePath("AR416/Armature/Skeleton3D/Back Sight")]
 default_stock_mesh = NodePath("AR416/Armature/Skeleton3D/Stock")
 default_grip_mesh = NodePath("AR416/Armature/Skeleton3D/Grip")
 default_magazine_mesh = NodePath("AR416/Armature/Skeleton3D/Magazine")
 iron_sight_point = NodePath("AR416/Armature/Skeleton3D/Body/Optics")
-attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a")])
+attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a"), SubResource("Resource_5yekf"), SubResource("Resource_3dwt8")])
 ammo_display = NodePath("AR416/Armature/Skeleton3D/Body/AmmoCounterPosition")
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
@@ -133,13 +149,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.
 transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
 
 [node name="Optics" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="0" unique_id=581117067]
-transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, -0.55788535, -1.2163825, -1.22177966e-08)
+transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, -0.5578852, -0.89970136, 1.987209e-08)
 
-[node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="1" unique_id=629444751]
+[node name="MuzzleDevice" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="1" unique_id=52446211]
+transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, -0.19254667, 4.3496065, 5.677633e-07)
+
+[node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="2" unique_id=629444751]
 transform = Transform3D(-3.3960375e-06, -73.051155, -26.450232, -5.5572928e-06, 26.450266, -73.051155, 77.692276, -5.129144e-07, -8.558582e-06, 0.69287366, -1.1826637, 1.0749747)
 
 [node name="GUI" parent="AR416/Armature/Skeleton3D/Body/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
 transform = Transform3D(1.0000004, -1.0658141e-14, -4.2632564e-14, 0, 1.0000002, -3.2782555e-07, -1.2434498e-14, 2.9802322e-08, 1.0000002, -0.035971098, 0.010502523, -0.0055913813)
+
+[node name="Underbarrels" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="3" unique_id=216068345]
+transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, 0.1545935, 1.2429999, 6.7574946e-09)
 
 [node name="GripHand" type="Marker3D" parent="." unique_id=1897020530]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.47601122, 0.098496675)

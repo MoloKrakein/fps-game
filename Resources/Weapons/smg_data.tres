@@ -1,7 +1,10 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://c7li8s4pv7rdi"]
 
+[ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_3bvqy"]
 [ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="1_peuoo"]
 [ext_resource type="Resource" uid="uid://bjop8ilrehk8q" path="res://Resources/Weapons/smg.tres" id="2_10xtv"]
+[ext_resource type="Resource" uid="uid://bewoeqyukvpk6" path="res://Resources/Attachments/Module/Laser/laser1.tres" id="2_ru78k"]
+[ext_resource type="Resource" uid="uid://c2pwq7v11v2gy" path="res://Resources/Attachments/Muzzle Device/Supp_gen_1.tres" id="3_r240k"]
 
 [resource]
 script = ExtResource("1_peuoo")
@@ -11,4 +14,8 @@ ammo_in_magazine = 900
 reserve_ammo = 900
 is_loaded = true
 fire_mode = 1
+equipped_attachment_data = Dictionary[int, ExtResource("1_3bvqy")]({
+1: ExtResource("3_r240k"),
+2: ExtResource("2_ru78k")
+})
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"

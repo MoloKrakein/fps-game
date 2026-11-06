@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://qd0wv6hu5uby" path="res://_Assets/Weapon/Scripts/weapon_data.gd" id="2_aynac"]
 [ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="2_mg82a"]
 [ext_resource type="Resource" uid="uid://rshmsh33r3p1" path="res://Resources/Weapons/Assault_Rifles416.tres" id="3_aynac"]
+[ext_resource type="Resource" uid="uid://bewoeqyukvpk6" path="res://Resources/Attachments/Module/Laser/laser1.tres" id="3_ymdu4"]
+[ext_resource type="Resource" uid="uid://c2pwq7v11v2gy" path="res://Resources/Attachments/Muzzle Device/Supp_gen_1.tres" id="4_ghq7h"]
 
 [resource]
 script = ExtResource("2_aynac")
@@ -14,6 +16,8 @@ reserve_ammo = 1000
 is_loaded = true
 fire_mode = 1
 equipped_attachment_data = Dictionary[int, ExtResource("1_ac8k0")]({
-0: ExtResource("2_mg82a")
+0: ExtResource("2_mg82a"),
+1: ExtResource("4_ghq7h"),
+2: ExtResource("3_ymdu4")
 })
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"

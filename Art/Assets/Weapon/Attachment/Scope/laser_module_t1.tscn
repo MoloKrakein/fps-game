@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://di1efhnqust5d"]
+
+[ext_resource type="Script" uid="uid://wdwxjb4xommr" path="res://Art/Assets/Weapon/Attachment/scripts/laser_module.gd" id="1_asbs6"]
+[ext_resource type="PackedScene" uid="uid://dalpfv33cpu7h" path="res://Art/3D/Blender/Weapon/attachment/laser_module1.gltf" id="1_tcv54"]
+[ext_resource type="Shader" uid="uid://b8x6qvt0jimgj" path="res://Art/Shader/LaserShader/laser_beam.gdshader" id="2_8q4x6"]
+[ext_resource type="Shader" uid="uid://b2iqqa5ff5w7i" path="res://Art/Shader/LaserShader/laser_hit.gdshader" id="3_asbs6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o08ba"]
+render_priority = 0
+shader = ExtResource("2_8q4x6")
+shader_parameter/laser_color = Color(1, 0.05, 0.05, 1)
+shader_parameter/intensity = 3.0
+shader_parameter/edge_falloff = 2.5
+shader_parameter/start_fade = 0.05
+shader_parameter/flicker_amount = 0.04
+shader_parameter/flicker_speed = 40.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_o08ba"]
+material = SubResource("ShaderMaterial_o08ba")
+top_radius = 0.03
+bottom_radius = 0.1
+height = 100.12695
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_srnv3"]
+render_priority = 0
+shader = ExtResource("3_asbs6")
+shader_parameter/dot_color = Color(1, 0.05, 0.05, 1)
+shader_parameter/intensity = 5.0
+shader_parameter/softness = 2.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_o08ba"]
+material = SubResource("ShaderMaterial_srnv3")
+size = Vector2(0.1, 0.1)
+
+[node name="LaserModuleT1" type="Node3D" unique_id=744532126]
+script = ExtResource("1_asbs6")
+max_length = 100.0
+
+[node name="Beam" type="MeshInstance3D" parent="." unique_id=1088343594]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -1.7469348e-07, -50.346634)
+mesh = SubResource("CylinderMesh_o08ba")
+skeleton = NodePath("../blockbench_export")
+
+[node name="HitDot" type="MeshInstance3D" parent="." unique_id=1199544489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -7.965689)
+mesh = SubResource("QuadMesh_o08ba")
+skeleton = NodePath("../blockbench_export")
+
+[node name="blockbench_export" parent="." unique_id=1678194383 instance=ExtResource("1_tcv54")]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="RayCast3D" type="RayCast3D" parent="." unique_id=803733656]

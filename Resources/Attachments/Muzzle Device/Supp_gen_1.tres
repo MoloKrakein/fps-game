@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Attachment" format=3 uid="uid://c2pwq7v11v2gy"]
+
+[ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_j1j0v"]
+[ext_resource type="PackedScene" uid="uid://cd7gu1tg8sfj5" path="res://Art/Assets/Weapon/Attachment/Scope/suppressor_gen_1.tscn" id="1_ngybt"]
+
+[resource]
+script = ExtResource("1_j1j0v")
+attachment_name = "SHH Suppressor"
+attachment_slot = 1
+attachment_model = ExtResource("1_ngybt")
+accuracy_bonus = 40.0
+damage_bonus = -1.0
+muzzle_flash_mode = 1
+muzzle_flash_energy_multiplier = 0.0
+metadata/_custom_type_script = "uid://byjrogv1mqm35"

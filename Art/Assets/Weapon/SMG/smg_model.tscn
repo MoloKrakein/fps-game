@@ -128,9 +128,12 @@ nodes/EmptyReload/node = SubResource("AnimationNodeAnimation_44ltg")
 nodes/EmptyReload/position = Vector2(-304.74106, 789.2642)
 node_connections = [&"output", 0, &"ReloadOneShot", &"BoltPosition", 0, &"Idle", &"BoltPosition", 1, &"CloseBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"BoltMove", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"ReloadBlend", 0, &"Reload", &"ReloadBlend", 1, &"EmptyReload"]
 
-[node name="SmgModel" type="Node3D" unique_id=1004586577 node_paths=PackedStringArray("ammo_display")]
+[node name="SmgModel" type="Node3D" unique_id=1004586577 node_paths=PackedStringArray("muzzle_socket", "underbarrel_socket", "muzzle_socket_attachment", "ammo_display")]
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
 script = ExtResource("1_mcvyo")
+muzzle_socket = NodePath("Muzzle")
+underbarrel_socket = NodePath("m15/Armature/Skeleton3D/Body/Underbarrel")
+muzzle_socket_attachment = NodePath("m15/Armature/Skeleton3D/Body/Muzzle_Slot")
 ammo_display = NodePath("EjectionPort/AmmoCounterPosition")
 
 [node name="m15" parent="." unique_id=1774983117 instance=ExtResource("6_3vu8r")]
@@ -160,10 +163,16 @@ transform = Transform3D(3.878585e-15, 1, 1.14549294e-07, -1, -6.051388e-15, 1.70
 [node name="Body" parent="m15/Armature/Skeleton3D" index="4" unique_id=874081936]
 transform = Transform3D(1, 2.3573414e-16, 3.4228545e-08, -1.9735133e-15, 1, 5.0769884e-08, -3.4228545e-08, -5.0769884e-08, 1, -4.440892e-16, 1.5483238e-08, 0)
 
-[node name="Stockp2" parent="m15/Armature/Skeleton3D/Body" index="4" unique_id=1451605842]
+[node name="Muzzle_Slot" type="Marker3D" parent="m15/Armature/Skeleton3D/Body" index="0" unique_id=1527877394]
+transform = Transform3D(-1, 2.9918614e-15, -1.509958e-07, -4.674179e-15, 1, 5.0769888e-08, 1.509958e-07, 5.0769888e-08, -1, 1.7703739e-08, 0.60579586, -0.51722145)
+
+[node name="Underbarrel" type="Marker3D" parent="m15/Armature/Skeleton3D/Body" index="1" unique_id=1652760825]
+transform = Transform3D(0.34305316, -6.770194e-16, -1.17422125e-08, 8.08686e-17, 0.34305316, -1.741677e-08, 1.17422125e-08, 1.741677e-08, 0.34305316, 1.0891888e-08, 0.40999484, -0.31821075)
+
+[node name="Stockp2" parent="m15/Armature/Skeleton3D/Body" index="6" unique_id=1451605842]
 visible = false
 
-[node name="Suppressor" parent="m15/Armature/Skeleton3D/Body" index="5" unique_id=702202001]
+[node name="Suppressor" parent="m15/Armature/Skeleton3D/Body" index="7" unique_id=702202001]
 visible = false
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=227635064 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
