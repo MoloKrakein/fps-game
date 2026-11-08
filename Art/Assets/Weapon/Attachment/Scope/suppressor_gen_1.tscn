@@ -3,7 +3,6 @@
 [ext_resource type="PackedScene" uid="uid://bv1mln4raihcj" path="res://Art/3D/Blender/Weapon/attachment/gen_suppressor_1.gltf" id="1_7iyfv"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="2_oncql"]
 [ext_resource type="Shader" uid="uid://ok0pd3nwhf5w" path="res://_Assets/VFX/muzzle_flash.gdshader" id="3_kmm6g"]
-[ext_resource type="PackedScene" uid="uid://dbvm232i3jjhh" path="res://_Assets/VFX/VFX_SCENE/wpn_smoke_vfx.tscn" id="4_x7nyj"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ecirl"]
 angle_min = -449.19998
@@ -33,13 +32,139 @@ lightmap_size_hint = Vector2i(25, 12)
 material = SubResource("ShaderMaterial_75jmf")
 size = Vector2(5, 3.8)
 
+[sub_resource type="Shader" id="Shader_6kw58"]
+code = "shader_type spatial;
+// Quick, subtle, white star-shaped gas burst that appears a split second after the shot
+// and disperses almost immediately (no lingering smoke).
+// Use on a one-shot GPUParticles3D, lifetime ~0.15 s, listed in MuzzleFlash.gas_particles.
+render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, fog_disabled;
+
+instance uniform vec4 smoke_color : source_color = vec4(0.95, 0.96, 1.0, 1.0);
+instance uniform float density = 1.0;
+instance uniform float size_mult = 1.0;
+instance uniform float petals = 6.0;
+instance uniform float max_opacity : hint_range(0.0, 1.0) = 0.35;
+
+uniform float petal_sharpness = 4.5;
+uniform float petal_reach_min = 0.28;
+uniform float noise_scale = 3.0;
+uniform float flow_speed = 1.5;
+uniform float start_size = 0.25;
+uniform float softness : hint_range(0.01, 1.0) = 0.22;
+uniform float fade_power = 1.6;
+uniform vec4 warm_color : source_color = vec4(1.0, 0.8, 0.55, 1.0);
+uniform float warm_amount : hint_range(0.0, 1.0) = 0.08;
+uniform float warm_time : hint_range(0.01, 1.0) = 0.12;
+
+varying float age;
+varying float seed;
+varying vec4 pcolor;
+
+float hash21(vec2 p) {
+	p = fract(p * vec2(123.34, 456.21));
+	p += dot(p, p + 45.32);
+	return fract(p.x * p.y);
+}
+
+float vnoise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x),
+			mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+
+float fbm(vec2 p) {
+	float v = 0.0;
+	float a = 0.5;
+	for (int i = 0; i < 3; i++) {
+		v += a * vnoise(p);
+		p = p * 2.03 + vec2(17.1, 9.7);
+		a *= 0.5;
+	}
+	return v;
+}
+
+void vertex() {
+	age = clamp(INSTANCE_CUSTOM.y, 0.0, 1.0);
+	seed = INSTANCE_CUSTOM.x;
+	pcolor = COLOR;
+
+	float t = 1.0 - pow(1.0 - age, 3.0);
+	VERTEX.xy *= size_mult * mix(start_size, 1.0, t);
+
+	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
+	MODELVIEW_MATRIX = MODELVIEW_MATRIX * mat4(
+			vec4(length(MODEL_MATRIX[0].xyz), 0.0, 0.0, 0.0),
+			vec4(0.0, length(MODEL_MATRIX[1].xyz), 0.0, 0.0),
+			vec4(0.0, 0.0, length(MODEL_MATRIX[2].xyz), 0.0),
+			vec4(0.0, 0.0, 0.0, 1.0));
+}
+
+void fragment() {
+	vec2 q = UV - 0.5;
+	float c = cos(seed);
+	float s = sin(seed);
+	vec2 uv = vec2(c * q.x - s * q.y, s * q.x + c * q.y) * 2.0;
+	float r = length(uv);
+	float ang = atan(uv.y, uv.x);
+
+	float lobe = pow(abs(cos(ang * petals * 0.5)), petal_sharpness);
+	float nr = fbm(vec2(ang * 1.5 + seed * 7.0, seed * 3.0 + age * flow_speed));
+	float reach = mix(petal_reach_min, 1.0, lobe) * mix(0.7, 1.0, nr);
+
+	float d = pow(1.0 - smoothstep(0.0, reach, r), 1.3);
+	float n = fbm(uv * noise_scale + vec2(seed * 9.1, seed * 4.7) + vec2(age * flow_speed, 0.0));
+	float cut = age * 0.85;
+	float mask = smoothstep(cut, cut + softness, d * (0.5 + n));
+
+	float edge = 1.0 - smoothstep(0.75, 1.0, r);
+	float fade = pow(1.0 - age, fade_power) * smoothstep(0.0, 0.05, age);
+	float warm = warm_amount * (1.0 - smoothstep(0.0, warm_time, age));
+
+	ALBEDO = mix(smoke_color.rgb, warm_color.rgb, warm) * pcolor.rgb;
+	ALPHA = clamp(mask * edge * fade * density * pcolor.a * smoke_color.a * max_opacity, 0.0, 1.0);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qrkt3"]
+render_priority = 1
+shader = SubResource("Shader_6kw58")
+shader_parameter/petal_sharpness = 2.36
+shader_parameter/petal_reach_min = 0.82
+shader_parameter/noise_scale = 3.0
+shader_parameter/flow_speed = 1.5
+shader_parameter/start_size = 0.25
+shader_parameter/softness = 0.22
+shader_parameter/fade_power = 4.03
+shader_parameter/warm_color = Color(1, 0.8, 0.55, 1)
+shader_parameter/warm_amount = 0.08
+shader_parameter/warm_time = 0.34600001573648
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o08ba"]
+angle_min = 1.0728835e-05
+angle_max = 360.00003
+direction = Vector3(0, 0.3, -1)
+spread = 15.0
+initial_velocity_min = 0.14999999
+initial_velocity_max = 0.79999995
+gravity = Vector3(0, 0.15, 0)
+damping_min = 0.8
+damping_max = 2.0
+scale_min = 0.19999999
+scale_max = 0.79999995
+
+[sub_resource type="QuadMesh" id="QuadMesh_6kw58"]
+material = SubResource("ShaderMaterial_qrkt3")
+size = Vector2(4, 4)
+
 [node name="Suppressor_Gen_1" type="Node3D" unique_id=1211912121]
 
 [node name="blockbench_export" parent="." unique_id=50322618 instance=ExtResource("1_7iyfv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23819162, 0)
 
 [node name="MuzzleFlash" type="Node3D" parent="." unique_id=1462897762 node_paths=PackedStringArray("particles", "smoke_particles")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.569131)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.040414125, -0.44747302)
 script = ExtResource("2_oncql")
 flash_chance = 0.0
 particles = NodePath("Flash")
@@ -56,10 +181,19 @@ local_coords = true
 process_material = SubResource("ParticleProcessMaterial_ecirl")
 draw_pass_1 = SubResource("QuadMesh_y0oe5")
 
-[node name="Smoke" parent="MuzzleFlash" unique_id=2001100571 instance=ExtResource("4_x7nyj")]
+[node name="Smoke" type="GPUParticles3D" parent="MuzzleFlash" unique_id=2001100571]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.042939484, -0.10427165)
+material_override = SubResource("ShaderMaterial_qrkt3")
+instance_shader_parameters/density = 20.0
+instance_shader_parameters/max_opacity = 0.0370000017575
+instance_shader_parameters/petals = 100.0
 instance_shader_parameters/size_mult = 9.0
 emitting = false
 amount = 23
 one_shot = true
+preprocess = 2.0
 speed_scale = 3.45
+randomness = 1.0
+fixed_fps = 12
+process_material = SubResource("ParticleProcessMaterial_o08ba")
+draw_pass_1 = SubResource("QuadMesh_6kw58")

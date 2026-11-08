@@ -2,7 +2,18 @@ class_name WeaponAnimation extends Node
 @export var weapon_animation_tree: AnimationTree
 @export var weapon_bolt_time: float = 0.5
 @export var animation_player: AnimationPlayer
-func _ready():
+@export_category("Other Tweaks")
+@export var reload_animation_name: String = "Reload"
+@export var fire_animation_name: String = "Fire"
+@export var rack_animation_name: String = "Rack"
+@export var equip_animation_name: String = "Equip"
+@export var idle_animation_name: String = "Idle"
+@export var empty_animation_name: String = "Empty"
+@export var loaded_animation_name: String = "Loaded"
+@export var empty_reload_animation_name: String = "Reload_Empty"
+@export var loaded_reload_animation_name: String = "Reload"
+
+func _ready() -> void:
 	if weapon_animation_tree == null:
 		print("AnimationTree not assigned in WeaponAnimation script.")
 
@@ -10,13 +21,12 @@ func play_animation(animation_name: String) -> void:
 	if not weapon_animation_tree:
 		print("AnimationTree is not assigned. Cannot play animation.")
 		return
-	
-	match animation_name:
+
+	match _resolve_animation_key(animation_name):
 		"Fire":
 			weapon_animation_tree.set("parameters/FireOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 		"Reload":
 			weapon_animation_tree.set("parameters/ReloadOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
-			print("Reload animation triggered.")
 		"Rack":
 			weapon_animation_tree.set("parameters/RackOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 		"Idle":
@@ -27,7 +37,6 @@ func play_animation(animation_name: String) -> void:
 			set_bolt_position(true)
 		"Loaded":
 			set_bolt_position(false)
-		# if no match, print a warning
 		_:
 			print("Animation name not recognized: ", animation_name)
 
@@ -37,15 +46,15 @@ func reload_weapon_animation(reload_type: String = "empty_reload") -> void:
 		print("AnimationTree is not assigned. Cannot play reload animation.")
 		return
 	
-	match reload_type:
+	match _resolve_reload_key(reload_type):
 		"empty_reload":
 			weapon_animation_tree.set("parameters/ReloadBlend/blend_amount", 1.0)
 			weapon_animation_tree.set("parameters/ReloadOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
-			print("Empty reload animation triggered.")
 		"loaded_reload":
 			weapon_animation_tree.set("parameters/ReloadBlend/blend_amount", 0.0)
 			weapon_animation_tree.set("parameters/ReloadOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
-			print("Loaded reload animation triggered.")
+		_:
+			print("Reload animation name not recognized: ", reload_type)
 
 func set_trigger_pressed(is_pressed: bool) -> void:
 	if not weapon_animation_tree:
@@ -79,17 +88,67 @@ func set_reload_blend(blend_value: float) -> void:
 	weapon_animation_tree.set("parameters/ReloadBlend/blend_amount", blend_value)
 
 func get_animation_length(animation_name: String) -> float:
-	if not weapon_animation_tree:
-		print("AnimationTree is not assigned. Cannot get animation length.")
-		return 0.0
-	
 	if animation_player == null:
-		print("AnimationPlayer not found in AnimationTree.")
+		print("AnimationPlayer is not assigned. Cannot get animation length.")
 		return 0.0
 	
-	var animation = animation_player.get_animation(animation_name)
+	var resolved_name: String = _resolve_model_animation_name(animation_name)
+	var animation: Animation = animation_player.get_animation(resolved_name)
+	if animation == null and _is_reload_variant(animation_name):
+		var fallback_name: String = reload_animation_name
+		animation = animation_player.get_animation(fallback_name)
+		if animation != null:
+			print("Reload animation not found: ", resolved_name, ". Using base reload animation: ", fallback_name)
 	if animation == null:
-		print("Animation not found: ", animation_name)
+		print("Animation not found: ", resolved_name)
 		return 0.0
-	print("Animation length for ", animation_name, ": ", animation.length)
+
 	return animation.length
+
+func _resolve_animation_key(animation_name: String) -> String:
+	if animation_name == fire_animation_name:
+		return "Fire"
+	if animation_name == reload_animation_name:
+		return "Reload"
+	if animation_name == rack_animation_name:
+		return "Rack"
+	if animation_name == idle_animation_name:
+		return "Idle"
+	if animation_name == equip_animation_name:
+		return "Equip"
+	if animation_name == empty_animation_name:
+		return "Empty"
+	if animation_name == loaded_animation_name:
+		return "Loaded"
+	return animation_name
+
+func _resolve_reload_key(reload_type: String) -> String:
+	if reload_type == empty_reload_animation_name:
+		return "empty_reload"
+	if reload_type == loaded_reload_animation_name:
+		return "loaded_reload"
+	return reload_type
+
+func _resolve_model_animation_name(animation_name: String) -> String:
+	if animation_name == "empty_reload":
+		return empty_reload_animation_name
+	if animation_name == "loaded_reload":
+		return loaded_reload_animation_name
+	if animation_name == "Reload":
+		return reload_animation_name
+	if animation_name == "Fire":
+		return fire_animation_name
+	if animation_name == "Rack":
+		return rack_animation_name
+	if animation_name == "Idle":
+		return idle_animation_name
+	if animation_name == "Equip":
+		return equip_animation_name
+	if animation_name == "Empty":
+		return empty_animation_name
+	if animation_name == "Loaded":
+		return loaded_animation_name
+	return animation_name
+
+func _is_reload_variant(animation_name: String) -> bool:
+	return animation_name == "empty_reload" or animation_name == "loaded_reload"

@@ -11,17 +11,23 @@ func _on_reload_state_state_entered() -> void:
 		weapon_controller.is_reloading = false
 		return
 
+	var reload_type: String = "empty_reload" if not weapon_controller.active_weapon_data.is_loaded else "loaded_reload"
 	if weapon_controller.weapon_animation_player != null:
-		timer = weapon_controller.weapon_animation_player.get_animation_length("Reload")
-		weapon_controller.weapon_animation_player.reload_weapon_animation("empty_reload" if not weapon_controller.active_weapon_data.is_loaded else "loaded_reload")
+		timer = weapon_controller.weapon_animation_player.get_animation_length(reload_type)
+		weapon_controller.weapon_animation_player.reload_weapon_animation(reload_type)
 
 	weapon_controller.is_reloading = true
 	# For per-bullet weapons, each reload input inserts a single shell.
+	var weapon_reload_time: float = weapon_controller.current_weapon.get_calculated_reload_speed()
 	var reload_time: float = timer
+	if reload_time <= 0.0:
+		reload_time = weapon_reload_time
 	if weapon_controller.current_weapon.is_reload_per_bullet:
-		reload_time = weapon_controller.get_single_round_reload_time()
+		var magazine_capacity: int = weapon_controller.current_weapon.get_calculated_magazine_capacity()
+		if magazine_capacity > 0:
+			reload_time = weapon_reload_time / float(magazine_capacity)
 	elif weapon_controller.current_weapon.reload_time > 0.0:
-		reload_time *= weapon_controller.current_weapon.get_calculated_reload_speed() / weapon_controller.current_weapon.reload_time
+		reload_time *= weapon_reload_time / weapon_controller.current_weapon.reload_time
 
 	weapon_controller.reload_timer_ui(reload_time)
 	

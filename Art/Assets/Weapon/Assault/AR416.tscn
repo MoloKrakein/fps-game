@@ -12,6 +12,7 @@
 [ext_resource type="Resource" uid="uid://c2pwq7v11v2gy" path="res://Resources/Attachments/Muzzle Device/Supp_gen_1.tres" id="6_uer85"]
 [ext_resource type="Material" uid="uid://bq0k71nxq3n07" path="res://_Assets/VFX/material/smoke_haze.tres" id="7_qrkt3"]
 [ext_resource type="PackedScene" uid="uid://dbvm232i3jjhh" path="res://_Assets/VFX/VFX_SCENE/wpn_smoke_vfx.tscn" id="8_qrkt3"]
+[ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="13_75jmf"]
 
 [sub_resource type="Resource" id="Resource_qllkt"]
 script = ExtResource("2_oo46r")
@@ -81,21 +82,76 @@ scale_max = 0.5
 material = ExtResource("7_qrkt3")
 size = Vector2(5, 5)
 
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_uer85"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_75jmf"]
+animation = &"Bolt_Close"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_5i3wd"]
+animation = &"EmptyReload"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_4dw8u"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_614sg"]
+animation = &"Bolt_Open"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ex8ux"]
+animation = &"Bolt_Open"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_4dw8u"]
+animation = &"Rack"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_614sg"]
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_oh2wu"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_bwwb7"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_egbc5"]
+animation = &"PartialReload"
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_o08ba"]
+graph_offset = Vector2(-400.594, 320.61862)
+nodes/output/position = Vector2(640, 140)
+nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_75jmf")
+nodes/CloseBolt/position = Vector2(-520, 60)
+nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_ex8ux")
+nodes/OpenBolt/position = Vector2(-520, 280)
+nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_uer85")
+nodes/BoltPosition/position = Vector2(-257.6554, 58.892662)
+nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_4dw8u")
+nodes/FireOneShot/position = Vector2(-80, 160)
+"nodes/OpenBolt 2/node" = SubResource("AnimationNodeAnimation_614sg")
+"nodes/OpenBolt 2/position" = Vector2(-260, 320)
+nodes/ReloadOneShot/node = SubResource("AnimationNodeOneShot_bwwb7")
+nodes/ReloadOneShot/position = Vector2(120, 140)
+nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_oh2wu")
+nodes/ReloadBlend/position = Vector2(-171.2396, 587.27783)
+nodes/reload/node = SubResource("AnimationNodeAnimation_egbc5")
+nodes/reload/position = Vector2(-420, 580)
+nodes/EmptyReload/node = SubResource("AnimationNodeAnimation_5i3wd")
+nodes/EmptyReload/position = Vector2(-440, 800)
+nodes/RackOneShot/node = SubResource("AnimationNodeOneShot_614sg")
+nodes/RackOneShot/position = Vector2(380, 300)
+nodes/Rack/node = SubResource("AnimationNodeAnimation_4dw8u")
+nodes/Rack/position = Vector2(169.42085, 510.9721)
+node_connections = [&"output", 0, &"RackOneShot", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt 2", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"Rack"]
+
 [node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "underbarrel_socket", "muzzle_socket_attachment", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "iron_sight_point", "ammo_display")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.066431046)
 script = ExtResource("1_qfc63")
 muzzle_socket = NodePath("Muzzle")
 ejection_socket = NodePath("EjectionPort")
-optic_socket = NodePath("AR416/Armature/Skeleton3D/Body/Optics")
-underbarrel_socket = NodePath("AR416/Armature/Skeleton3D/Body/Underbarrels")
-muzzle_socket_attachment = NodePath("AR416/Armature/Skeleton3D/Body/MuzzleDevice")
-builtin_iron_sight_mesh = [NodePath("AR416/Armature/Skeleton3D/Front Sight"), NodePath("AR416/Armature/Skeleton3D/Back Sight")]
+optic_socket = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Optics")
+underbarrel_socket = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Underbarrels")
+muzzle_socket_attachment = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/MuzzleDevice")
+builtin_iron_sight_mesh = [NodePath("AR416/Armature/Skeleton3D/Back Sight"), NodePath("AR416/Armature/Skeleton3D/Front Sight")]
 default_stock_mesh = NodePath("AR416/Armature/Skeleton3D/Stock")
 default_grip_mesh = NodePath("AR416/Armature/Skeleton3D/Grip")
 default_magazine_mesh = NodePath("AR416/Armature/Skeleton3D/Magazine")
-iron_sight_point = NodePath("AR416/Armature/Skeleton3D/Body/Optics")
+iron_sight_point = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Optics")
 attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a"), SubResource("Resource_5yekf"), SubResource("Resource_3dwt8")])
-ammo_display = NodePath("AR416/Armature/Skeleton3D/Body/AmmoCounterPosition")
+ammo_display = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/AmmoCounterPosition")
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045668572, -2.4102664)
@@ -135,7 +191,7 @@ process_material = SubResource("ParticleProcessMaterial_vx3u4")
 draw_pass_1 = SubResource("QuadMesh_0cluu")
 
 [node name="Smoke" parent="Muzzle" unique_id=2001100571 instance=ExtResource("8_qrkt3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.042939484, -0.10427165)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08337161, 0.001565665, 0.06309283)
 instance_shader_parameters/size_mult = 9.0
 emitting = false
 amount = 23
@@ -148,20 +204,38 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.
 [node name="AR416" parent="." unique_id=1425081176 instance=ExtResource("3_omrth")]
 transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
 
-[node name="Optics" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="0" unique_id=581117067]
-transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, -0.5578852, -0.89970136, 1.987209e-08)
+[node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 1602609225) index="0" unique_id=926787097]
+bones/0/position = Vector3(0, 0, 0)
+bones/0/rotation = Quaternion(0, 0, 0, 1)
+bones/3/position = Vector3(-0.49308467, -2.4697914, -2.7660187e-07)
+bones/4/position = Vector3(0.2675931, 1.2130874, 1.2703553e-07)
+bones/10/position = Vector3(1.1312768, -0.5149672, -2.7858312e-07)
+bones/10/rotation = Quaternion(-0.49999994, 0.50000006, 0.49999997, 0.5)
+bones/11/position = Vector3(-8.413533e-08, 1.0414236, -0.5360675)
+bones/13/position = Vector3(-7.1339194e-08, 0.9472706, -0.53854513)
+bones/17/rotation = Quaternion(1, -4.269544e-07, -7.54979e-08, -5.692725e-07)
 
-[node name="MuzzleDevice" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="1" unique_id=52446211]
-transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, -0.19254667, 4.3496065, 5.677633e-07)
+[node name="BodySkelleton" type="BoneAttachment3D" parent="AR416/Armature/Skeleton3D" index="0" unique_id=1242988179]
+transform = Transform3D(1, 0, 0, 0, 1, -3.5527137e-15, 0, 3.5527137e-15, 1, 0, 0, 0)
+bone_name = "body"
+bone_idx = 0
+use_external_skeleton = true
+external_skeleton = NodePath("..")
 
-[node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="2" unique_id=629444751]
-transform = Transform3D(-3.3960375e-06, -73.051155, -26.450232, -5.5572928e-06, 26.450266, -73.051155, 77.692276, -5.129144e-07, -8.558582e-06, 0.69287366, -1.1826637, 1.0749747)
+[node name="Optics" type="Marker3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=581117067]
+transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572923e-06, 2.8865568e-05, -77.692276, 77.692276, -3.3960357e-06, -7.872699e-06, -0.55788517, -0.8997011, 1.9872097e-08)
 
-[node name="GUI" parent="AR416/Armature/Skeleton3D/Body/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
+[node name="MuzzleDevice" type="Marker3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=52446211]
+transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572923e-06, 2.8865568e-05, -77.692276, 77.692276, -3.3960357e-06, -7.872699e-06, -0.19254667, 4.3496065, 5.677633e-07)
+
+[node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=629444751]
+transform = Transform3D(-3.3960375e-06, -73.051155, -26.450232, -5.5572923e-06, 26.450266, -73.051155, 77.692276, -5.1291454e-07, -8.558581e-06, 0.69287366, -1.1826636, 1.0749747)
+
+[node name="GUI" parent="AR416/Armature/Skeleton3D/BodySkelleton/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
 transform = Transform3D(1.0000004, -1.0658141e-14, -4.2632564e-14, 0, 1.0000002, -3.2782555e-07, -1.2434498e-14, 2.9802322e-08, 1.0000002, -0.035971098, 0.010502523, -0.0055913813)
 
-[node name="Underbarrels" type="Marker3D" parent="AR416/Armature/Skeleton3D/Body" parent_id_path=PackedInt32Array(1425081176, 263697469) index="3" unique_id=216068345]
-transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572928e-06, 2.8865568e-05, -77.692276, 77.692276, -3.396036e-06, -7.872699e-06, 0.1545935, 1.2429999, 6.7574946e-09)
+[node name="Underbarrels" type="Marker3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=216068345]
+transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572923e-06, 2.8865568e-05, -77.692276, 77.692276, -3.3960357e-06, -7.872699e-06, 0.1545935, 1.243, 6.757503e-09)
 
 [node name="GripHand" type="Marker3D" parent="." unique_id=1897020530]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.47601122, 0.098496675)
@@ -171,5 +245,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.10096738, -1.2005291)
 
 [node name="RecoilPivot" type="Marker3D" parent="." unique_id=1733188836]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07424399, 0.9025229)
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=374440408]
+root_node = NodePath("../AR416")
+tree_root = SubResource("AnimationNodeBlendTree_o08ba")
+anim_player = NodePath("../AR416/AnimationPlayer")
+parameters/BoltPosition/blend_amount = 0.0
+parameters/FireOneShot/active = false
+parameters/FireOneShot/internal_active = false
+parameters/FireOneShot/request = 0
+parameters/ReloadOneShot/active = false
+parameters/ReloadOneShot/internal_active = false
+parameters/ReloadOneShot/request = 0
+parameters/ReloadBlend/blend_amount = 0.0
+parameters/RackOneShot/active = false
+parameters/RackOneShot/internal_active = false
+parameters/RackOneShot/request = 0
+
+[node name="WeaponAnimation" type="Node" parent="." unique_id=1110659900 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
+script = ExtResource("13_75jmf")
+weapon_animation_tree = NodePath("../AnimationTree")
+animation_player = NodePath("../AR416/AnimationPlayer")
+empty_reload_animation_name = "EmptyReload"
+loaded_reload_animation_name = "PartialReload"
+metadata/_custom_type_script = "uid://csp53xj462vmj"
 
 [editable path="AR416"]
