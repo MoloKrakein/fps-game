@@ -85,7 +85,7 @@ animation = &"Rack"
 animation = &"Reload"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(-18.152222, 76.313416)
+graph_offset = Vector2(-251.16446, 35.869324)
 nodes/output/position = Vector2(1440, 180)
 nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_uo56h")
 nodes/FireOneShot/position = Vector2(240, 120)
@@ -113,7 +113,7 @@ nodes/EmptyReload/node = SubResource("AnimationNodeAnimation_qkr1u")
 nodes/EmptyReload/position = Vector2(-160, 740)
 nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_enst8")
 nodes/ReloadBlend/position = Vector2(180, 560)
-node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"RackOneShot", 0, &"rack", &"RackOneShot", 1, &"ReloadOneShot", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"equiped", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload"]
+node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"rack", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"equiped", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload"]
 
 [node name="PistolModel" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "iron_sight_point", "ammo_display")]
 script = ExtResource("1_2kfvb")
