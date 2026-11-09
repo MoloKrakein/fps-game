@@ -148,7 +148,6 @@ player = NodePath("../..")
 max_roll = 1.5
 slide_pitch = 4.5
 slide_roll = 6.0
-slide_fov = 125.0
 
 [node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.41322422)
@@ -193,6 +192,9 @@ script = ExtResource("11_ei2r2")
 player = NodePath("../..")
 stats = NodePath("../../PlayerStats")
 dive_height = 5.0
+cam_roll_degrees = 12.0
+landing_shake = 0.6
+tiredness_cost = 30.0
 
 [node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position", "casing_position", "camera", "cam_rig")]
 script = ExtResource("24_qr1w5")

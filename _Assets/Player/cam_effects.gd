@@ -86,7 +86,8 @@ var _screen_shake_tween: Tween = null
 const MIN_SHAKE_INTENSITY: float = 0.008
 const MAX_SHAKE_INTENSITY: float = 0.06
 
-
+var _dive_roll: float = 0.0
+var _dive_pitch: float = 0.0
 
 func _ready() -> void:
 	_base_fov = fov
@@ -194,8 +195,9 @@ func calculate_view_offset(delta):
 	var target_fov = _base_fov
 	if enable_slide_effect and player.is_sliding:
 		target_fov = slide_fov
-	if player.weapon_controller and player.weapon_controller.is_aiming:
-		target_fov = _aim_fov
+	elif player.is_diving and player.prone_dive:
+		target_fov = _base_fov + player.prone_dive.dive_fov_boost
+
 	_fov_smooth = lerpf(_fov_smooth, target_fov, delta * fov_transition_speed)
 	var fov_d: float = minf(delta, 0.05)
 	_fov_punch_vel += (-fov_punch_stiffness * _fov_punch - fov_punch_damping * _fov_punch_vel) * fov_d
@@ -218,10 +220,24 @@ func calculate_view_offset(delta):
 
 		angles.z += _target_slide_roll
 		angles.x += _target_slide_pitch
+	# Dive effect
+	var dive_roll_t: float = 0.0
+	var dive_pitch_t: float = 0.0
+	if player.is_diving and player.prone_dive:
+		var dv: Vector3 = player.prone_dive.dive_velocity
+		if dv.length() > 0.1:
+			var dn: Vector3 = dv.normalized()
+			dive_roll_t = dn.dot(global_transform.basis.x) * deg_to_rad(player.prone_dive.cam_roll_degrees)
+			dive_pitch_t = dn.dot(-global_transform.basis.z) * deg_to_rad(player.prone_dive.cam_pitch_degrees)
+	_dive_roll = lerpf(_dive_roll, dive_roll_t, delta * fov_transition_speed)
+	_dive_pitch = lerpf(_dive_pitch, dive_pitch_t, delta * fov_transition_speed)
+	angles.z += _dive_roll
+	angles.x += _dive_pitch
 
+	
 	position = offset
 	rotation = angles
-
+	
 
 # fall
 func add_fall_kick(amount: float) -> void:

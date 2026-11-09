@@ -80,6 +80,12 @@ enum WeaponAmmoType {
 @export var aim_sway_amount: float = 0.5
 @export var aim_tilt_amount: float = 0.5
 @export var aim_lag_amount: float = 0.5
+@export_group("Handling")
+## 0 = light and agile (pistol), 1 = heavy (LMG). Drives sway/lag spring frequency,
+## overshoot, amplitudes and ADS time. 0.5 keeps the old neutral feel.
+@export_range(0.0, 1.0, 0.05) var handling_weight: float = 0.5
+## Seconds to raise/lower the sights. 0 = derive from handling_weight.
+@export var ads_time_override: float = 0.0
 @export_group("Aiming ADS")
 @export var aim_ADS_position: Vector3 = Vector3(0, 0, 0)
 @export var aim_ADS_rotation: Vector3 = Vector3(0, 0, 0)
@@ -156,6 +162,11 @@ func get_muzzle_velocity_mps() -> float:
 
 func get_muzzle_velocity_kmh() -> float:
 	return get_muzzle_velocity_mps() * 3.6
+
+func get_ads_time() -> float:
+	if ads_time_override > 0.0:
+		return ads_time_override
+	return lerpf(0.12, 0.30, handling_weight)
 
 func get_fire_rate_rpm() -> float:
 

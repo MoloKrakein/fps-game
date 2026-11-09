@@ -13,10 +13,15 @@ class SpringValue:
 
 	## Advances the spring toward `target`. `limit` clamps the value (not the velocity).
 	func step(target: float, delta: float, stiffness: float, damping: float, limit: float = INF) -> float:
-		var result: Vector2 = SpringUtil.apply(value, velocity, target, delta, stiffness, damping)
+		var result: Vector2 = SpringUtil.apply_stable(value, velocity, target, delta, stiffness, damping)
 		value = clampf(result.x, -limit, limit)
 		velocity = result.y
 		return value
+
+	## Tune by natural frequency (rad/s) and damping ratio instead of stiffness/damping.
+	## zeta < 1 overshoots and settles (heavy feel), zeta > 1 just drags.
+	func step_zeta(target: float, delta: float, omega: float, zeta: float, limit: float = INF) -> float:
+		return step(target, delta, omega * omega, 2.0 * zeta * omega, limit)
 
 	func reset() -> void:
 		value = 0.0
@@ -33,7 +38,7 @@ class RecoilSpring:
 		velocity += amount * impulse_scale
 
 	func step(delta: float, stiffness: float, damping: float, limit: float = INF) -> float:
-		var result: Vector2 = SpringUtil.apply(value, velocity, 0.0, delta, stiffness, damping)
+		var result: Vector2 = SpringUtil.apply_stable(value, velocity, 0.0, delta, stiffness, damping)
 		value = clampf(result.x, -limit, limit)
 		velocity = result.y
 		return value
@@ -66,6 +71,7 @@ var is_reloading: bool:
 var _idle_time: float = 0.0
 var _idle_x := SpringValue.new()
 var _idle_y := SpringValue.new()
+var _idle_z := SpringValue.new()
 var _idle_rot_x := SpringValue.new()
 var _bob_x := SpringValue.new()
 var _bob_y := SpringValue.new()
@@ -96,7 +102,12 @@ var _recoil_offset_rot: Vector3 = Vector3.ZERO
 
 # Other per-frame state
 var _previous_look_dir: Vector3 = Vector3.ZERO
-var _camera_rotation_rate: Vector3 = Vector3.ZERO
+var _look_rate: Vector2 = Vector2.ZERO # x = pitch rate, y = yaw rate, rad/s, smoothed
+var _look_seeded: bool = false
+var _inertia_x := SpringValue.new()
+var _inertia_z := SpringValue.new()
+var _prev_planar_velocity: Vector3 = Vector3.ZERO
+var _inertia_seeded: bool = false
 var _prev_camera_y: float = 0.0
 var _vlag_seeded: bool = false
 var _crouch_pos: Vector3 = Vector3.ZERO
@@ -127,6 +138,7 @@ func apply_offsets(delta: float) -> void:
 	var strafe_tilt: float = _update_strafe_tilt(delta)
 	var bob_offset: Vector3 = _update_weapon_bob(delta)
 	var vertical_lag_offset: Vector3 = _update_vertical_lag(delta)
+	var inertia_offset: Vector3 = _update_inertia(delta)
 	_update_crouch_stance(delta)
 	_update_sprint_stance(delta)
 
@@ -143,7 +155,7 @@ func apply_offsets(delta: float) -> void:
 	var full_rotation: Vector3 = ctrl.current_stance_rot + Vector3(_idle_rot_x.value, 0.0, strafe_tilt) + look_rotation + _crouch_rot + _sprint_rot + _sprint_motion_rot + _recoil_offset_rot
 	var pivot_shift: Vector3 = _recoil_pivot_shift(model, full_rotation)
 
-	model.position = ctrl.current_stance_pos + idle_offset + look_offset + bob_offset + _crouch_pos + _sprint_pos + _sprint_motion_pos + _recoil_offset_pos + vertical_lag_offset + pivot_shift
+	model.position = ctrl.current_stance_pos + idle_offset + look_offset + bob_offset + _crouch_pos + _sprint_pos + _sprint_motion_pos + _recoil_offset_pos + vertical_lag_offset + inertia_offset + pivot_shift
 	model.rotation = full_rotation
 
 
@@ -156,6 +168,7 @@ func reset_motion_state() -> void:
 	_idle_time = 0.0
 	_idle_x.reset()
 	_idle_y.reset()
+	_idle_z.reset()
 	_idle_rot_x.reset()
 	_bob_x.reset()
 	_bob_y.reset()
@@ -171,7 +184,12 @@ func reset_motion_state() -> void:
 	_recoil_offset_pos = Vector3.ZERO
 	_recoil_offset_rot = Vector3.ZERO
 	_previous_look_dir = Vector3.ZERO
-	_camera_rotation_rate = Vector3.ZERO
+	_look_rate = Vector2.ZERO
+	_look_seeded = false
+	_inertia_x.reset()
+	_inertia_z.reset()
+	_prev_planar_velocity = Vector3.ZERO
+	_inertia_seeded = false
 	_prev_camera_y = 0.0
 	_vlag_seeded = false
 	_crouch_pos = Vector3.ZERO
@@ -260,10 +278,11 @@ func _update_idle_sway(delta: float) -> Vector3:
 
 	var tiredness: float = _tiredness_factor()
 	var two_handed: bool = _is_two_handed_weapon()
+	var w: float = _weight()
 
-	# Tired players breathe faster (2.5x at full tiredness).
-	var frequency: float = ctrl.idle_sway_frequency * (1.0 + tiredness * 1.5)
-	var amplitude: Vector2 = ctrl.idle_sway_amplitude
+	# Tired players breathe faster (2.5x at full tiredness). Heavier guns sway slower and wider.
+	var frequency: float = ctrl.idle_sway_frequency * (1.0 + tiredness * 1.5) * lerpf(1.15, 0.85, w)
+	var amplitude: Vector2 = ctrl.idle_sway_amplitude * lerpf(0.8, 1.2, w)
 	var stiffness: float = ctrl.idle_sway_stiffness
 	var damping: float = ctrl.idle_sway_damping
 
@@ -287,65 +306,90 @@ func _update_idle_sway(delta: float) -> Vector3:
 
 	var target_x: float = 0.0
 	var target_y: float = 0.0
+	var target_z: float = 0.0
 	var target_rot_x: float = 0.0
 
-	# Figure-8 base, only while standing still (or aiming).
+	# Breathing cycle, only while standing still (or aiming): figure-8 in x/y,
+	# plus a slow push/pull in z and a small pitch so the whole gun rides the breath.
 	if _planar_speed() < 0.1 or is_aiming:
 		target_x = sin(_idle_time) * amplitude.x
 		target_y = cos(_idle_time * 2.0) * amplitude.y + micro_tremor
+		target_z = cos(_idle_time) * amplitude.y * 0.8
+		target_rot_x = target_y * ctrl.idle_sway_rotation_multiplier * 0.3
 
 	# Exhausted up/down tilt, driven by the vertical breathing wave.
 	var threshold: float = ctrl.idle_sway_tremor_threshold
 	if tiredness > threshold:
 		# Maps threshold..1.0 tiredness onto a 0..1 intensity.
 		var exhaust_intensity: float = (tiredness - threshold) * (1.0 / (1.0 - threshold))
-		target_rot_x = target_y * ctrl.idle_sway_rotation_multiplier * exhaust_intensity
+		target_rot_x += target_y * ctrl.idle_sway_rotation_multiplier * exhaust_intensity
 
-	var x: float = _idle_x.step(target_x, delta, stiffness, damping)
-	var y: float = _idle_y.step(target_y, delta, stiffness, damping)
-	_idle_rot_x.step(target_rot_x, delta, stiffness, damping)
-	return Vector3(x, y, 0.0)
+	var sp: Vector2 = _weighted_spring(stiffness, damping)
+	var x: float = _idle_x.step(target_x, delta, sp.x, sp.y)
+	var y: float = _idle_y.step(target_y, delta, sp.x, sp.y)
+	var z: float = _idle_z.step(target_z, delta, sp.x, sp.y)
+	_idle_rot_x.step(target_rot_x, delta, sp.x, sp.y)
+	return Vector3(x, y, z)
+
+
+## Updates the smoothed camera turn rate (rad/s). Called once per frame from
+## _update_look_sway; _update_look_rotation reuses the result.
+func _update_look_rate(delta: float) -> void:
+	var camera_rotation: Vector3 = camera.global_rotation
+	if not _look_seeded:
+		_previous_look_dir = camera_rotation
+		_look_rate = Vector2.ZERO
+		_look_seeded = true
+		return
+
+	var dt: float = maxf(delta, 0.0001)
+	var raw := Vector2(
+		wrapf(camera_rotation.x - _previous_look_dir.x, -PI, PI),
+		wrapf(camera_rotation.y - _previous_look_dir.y, -PI, PI)
+	) / dt
+	_previous_look_dir = camera_rotation
+
+	# look_lag_rot_max is degrees per frame at 60 FPS, converted to a rate so it no longer depends on FPS.
+	var max_rate: float = deg_to_rad(ctrl.look_lag_rot_max) * 60.0
+	raw.x = clampf(raw.x, -max_rate, max_rate)
+	raw.y = clampf(raw.y, -max_rate, max_rate)
+
+	var tau: float = maxf(ctrl.look_lag_divisor / 60.0, 0.001)
+	_look_rate = _look_rate.lerp(raw, 1.0 - exp(-dt / tau))
+
+
+func _fast_turn_strength() -> float:
+	var threshold_deg: float = maxf(ctrl.look_lag_fast_turn_threshold_deg, 0.1)
+	var turn_speed_deg: float = rad_to_deg(_look_rate.length())
+	return smoothstep(0.0, 1.0, clampf((turn_speed_deg - threshold_deg) / threshold_deg, 0.0, 1.0))
 
 
 func _update_look_sway(delta: float) -> Vector3:
 	if not ctrl.look_sway_enabled or not camera:
 		return Vector3.ZERO
 
-	var camera_rotation: Vector3 = camera.global_rotation
-	var rotation_delta: Vector3 = Vector3(
-		wrapf(camera_rotation.x - _previous_look_dir.x, -PI, PI),
-		wrapf(camera_rotation.y - _previous_look_dir.y, -PI, PI),
-		0.0
-	)
-	_previous_look_dir = camera_rotation
+	_update_look_rate(delta)
+	var fast_turn_strength: float = _fast_turn_strength()
 
-	var max_rad: float = deg_to_rad(ctrl.look_lag_rot_max)
-	rotation_delta.x = clampf(rotation_delta.x, -max_rad, max_rad)
-	rotation_delta.y = clampf(rotation_delta.y, -max_rad, max_rad)
-	rotation_delta.z = 0.0
-
-	var interpolate_speed: float = (1.0 / maxf(delta, 0.016)) / ctrl.look_lag_divisor
-	_camera_rotation_rate = _camera_rotation_rate.lerp(rotation_delta, clampf(interpolate_speed * delta, 0.0, 1.0))
-
-	var turn_speed_deg: float = rad_to_deg(_camera_rotation_rate.length() / maxf(delta, 0.0001))
-	var threshold_deg: float = maxf(ctrl.look_lag_fast_turn_threshold_deg, 0.1)
-	var fast_turn_strength: float = clampf((turn_speed_deg - threshold_deg) / threshold_deg, 0.0, 1.0)
-	fast_turn_strength = smoothstep(0.0, 1.0, fast_turn_strength)
-
+	# Tuned at 60 FPS, where one frame of rotation was the old unit.
+	var rate60: Vector2 = _look_rate / 60.0
 	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_lag_multiplier)
 	var stance_weight: float = ctrl.look_lag_ads_weight if is_aiming else ctrl.look_lag_hipfire_weight
 	var fast_turn_boost: float = 1.0 + fast_turn_strength * ctrl.look_lag_fast_turn_boost
-	var root_target_x: float = _camera_rotation_rate.y * ctrl.look_lag_pos_scale * running_aim_multiplier * stance_weight
-	var root_target_y: float = _camera_rotation_rate.x * ctrl.look_lag_pos_scale * running_aim_multiplier * stance_weight
-	var root_x: float = _look_root_x.step(root_target_x * fast_turn_boost, delta, 15.0, 26.0)
-	var root_y: float = _look_root_y.step(root_target_y * fast_turn_boost, delta, 15.0, 26.0)
+	var weight_scale: float = lerpf(0.8, 1.3, _weight())
+	var scale: float = ctrl.look_lag_pos_scale * running_aim_multiplier * stance_weight * fast_turn_boost * weight_scale
+
+	# Slightly underdamped: a fast flick overshoots a little and settles, which reads as mass.
+	var omega: float = _omega(13.0, 7.5)
+	var zeta: float = _zeta(0.85, 0.55)
+	var root_x: float = _look_root_x.step_zeta(rate60.y * scale, delta, omega, zeta)
+	var root_y: float = _look_root_y.step_zeta(rate60.x * scale, delta, omega, zeta)
 	var tip_lag: float = lerpf(ctrl.look_lag_tip_follow_slow, ctrl.look_lag_tip_follow_fast, fast_turn_strength)
-	var tip_x: float = _look_tip_x.step(root_x * tip_lag, delta, 10.0, 20.0)
-	var tip_y: float = _look_tip_y.step(root_y * tip_lag, delta, 10.0, 20.0)
+	var tip_x: float = _look_tip_x.step_zeta(root_x * tip_lag, delta, omega * 0.8, zeta * 0.85)
+	var tip_y: float = _look_tip_y.step_zeta(root_y * tip_lag, delta, omega * 0.8, zeta * 0.85)
 
 	# The chassis reacts immediately, but the muzzle / front of the gun keeps
-	# swinging behind it like a weighted object. This gives the weapon a more
-	# physical, delayed feel when the camera turns quickly.
+	# swinging behind it like a weighted object.
 	return Vector3(root_x - tip_x, root_y - tip_y, 0.0)
 
 
@@ -353,20 +397,23 @@ func _update_look_rotation(delta: float) -> Vector3:
 	if not ctrl.look_sway_enabled or not camera:
 		return Vector3.ZERO
 
-	var threshold_rad: float = deg_to_rad(maxf(ctrl.look_lag_fast_turn_threshold_deg, 0.1))
-	var turn_speed_rad: float = _camera_rotation_rate.length() / maxf(delta, 0.0001)
-	var fast_turn_strength: float = clampf((turn_speed_rad - threshold_rad) / threshold_rad, 0.0, 1.0)
-	fast_turn_strength = smoothstep(0.0, 1.0, fast_turn_strength)
-
+	var fast_turn_strength: float = _fast_turn_strength()
+	var rate60: Vector2 = _look_rate / 60.0
 	var stance_weight: float = ctrl.look_lag_ads_weight if is_aiming else ctrl.look_lag_hipfire_weight
-	var target_pitch: float = _camera_rotation_rate.x * 0.55 * stance_weight * (1.0 + fast_turn_strength * 0.85)
-	var target_yaw: float = _camera_rotation_rate.y * 0.45 * stance_weight * (1.0 + fast_turn_strength * 0.85)
-	var target_roll: float = -_camera_rotation_rate.y * 0.30 * stance_weight * (1.0 + fast_turn_strength * 1.1)
-	var pitch: float = _look_rot_x.step(target_pitch, delta, 12.0, 21.0)
-	var yaw: float = _look_rot_y.step(target_yaw, delta, 12.0, 21.0)
-	var roll: float = _look_rot_z.step(target_roll, delta, 10.0, 18.0)
+	var w: float = _weight()
+	var weight_scale: float = lerpf(0.8, 1.3, w)
 
-	var max_rotation: float = deg_to_rad(8.0)
+	var target_pitch: float = rate60.x * 0.55 * stance_weight * (1.0 + fast_turn_strength * 0.85) * weight_scale
+	var target_yaw: float = rate60.y * 0.45 * stance_weight * (1.0 + fast_turn_strength * 0.85) * weight_scale
+	var target_roll: float = -rate60.y * 0.30 * stance_weight * (1.0 + fast_turn_strength * 1.1) * weight_scale
+
+	var omega: float = _omega(12.0, 7.0)
+	var zeta: float = _zeta(0.8, 0.5)
+	var pitch: float = _look_rot_x.step_zeta(target_pitch, delta, omega, zeta)
+	var yaw: float = _look_rot_y.step_zeta(target_yaw, delta, omega, zeta)
+	var roll: float = _look_rot_z.step_zeta(target_roll, delta, omega * 0.9, zeta * 0.9)
+
+	var max_rotation: float = deg_to_rad(lerpf(6.0, 9.0, w))
 	return Vector3(
 		clampf(pitch, -max_rotation, max_rotation),
 		clampf(yaw, -max_rotation, max_rotation),
@@ -392,7 +439,8 @@ func _update_strafe_tilt(delta: float) -> float:
 		-ctrl.strafe_tilt_max,
 		ctrl.strafe_tilt_max
 	)
-	return _strafe_tilt.step(target_tilt, delta, ctrl.strafe_tilt_stiffness, ctrl.strafe_tilt_damping)
+	var sp: Vector2 = _weighted_spring(ctrl.strafe_tilt_stiffness, ctrl.strafe_tilt_damping)
+	return _strafe_tilt.step(target_tilt, delta, sp.x, sp.y)
 
 
 func _update_weapon_bob(delta: float) -> Vector3:
@@ -422,8 +470,9 @@ func _update_weapon_bob(delta: float) -> Vector3:
 		target_x = (sin(angle) * amp_x * speed_factor * bob_multiplier) + limp_wobble
 		target_y = -absf(sin(angle)) * amp_y * speed_factor * bob_multiplier
 
-	var x: float = _bob_x.step(target_x, delta, ctrl.bob_stiffness, ctrl.bob_damping)
-	var y: float = _bob_y.step(target_y, delta, ctrl.bob_stiffness, ctrl.bob_damping)
+	var sp: Vector2 = _weighted_spring(ctrl.bob_stiffness, ctrl.bob_damping)
+	var x: float = _bob_x.step(target_x, delta, sp.x, sp.y)
+	var y: float = _bob_y.step(target_y, delta, sp.x, sp.y)
 	return Vector3(x, y, 0.0)
 
 
@@ -440,19 +489,49 @@ func _update_vertical_lag(delta: float) -> Vector3:
 		_vlag_seeded = true
 		return Vector3.ZERO
 
-	var cam_vel_y: float = (camera_y - _prev_camera_y) / delta
+	var cam_vel_y: float = (camera_y - _prev_camera_y) / maxf(delta, 0.0001)
 	_prev_camera_y = camera_y
 
-	# NOTE: clamps with vertical_lag_max (an offset limit). vertical_lag_vel_max is currently unused.
-	cam_vel_y = clampf(cam_vel_y, -ctrl.vertical_lag_max, ctrl.vertical_lag_max)
+	# Clamp the VELOCITY with vertical_lag_vel_max (was wrongly using the offset limit).
+	cam_vel_y = clampf(cam_vel_y, -ctrl.vertical_lag_vel_max, ctrl.vertical_lag_vel_max)
 	if absf(cam_vel_y) < ctrl.vertical_lag_deadzone:
 		cam_vel_y = 0.0
 
 	var lag_multiplier: float = weapon.aim_lag_amount if is_aiming else 1.0
 	lag_multiplier *= _running_aim_multiplier(weapon.running_aim_lag_multiplier)
-	var target_y: float = -cam_vel_y * weapon.vertical_lag_multiplier * lag_multiplier
-	var y: float = _vlag_y.step(target_y, delta, ctrl.vertical_lag_stiffness, ctrl.vertical_lag_damping, ctrl.vertical_lag_max)
+	lag_multiplier *= lerpf(0.8, 1.5, _weight())
+	var target_y: float = -cam_vel_y * ctrl.vertical_lag_velocity_scale * weapon.vertical_lag_multiplier * lag_multiplier
+	var sp: Vector2 = _weighted_spring(ctrl.vertical_lag_stiffness, ctrl.vertical_lag_damping)
+	var y: float = _vlag_y.step(target_y, delta, sp.x, sp.y, ctrl.vertical_lag_max)
 	return Vector3(0.0, y, 0.0)
+
+
+## The weapon lags against planar acceleration: pushed back when you start running,
+## forward when you stop, sideways on strafe reversals.
+func _update_inertia(delta: float) -> Vector3:
+	if not ctrl.inertia_lag_enabled or player == null or camera == null:
+		return Vector3.ZERO
+
+	var vel: Vector3 = Vector3(player.velocity.x, 0.0, player.velocity.z)
+	if not _inertia_seeded:
+		_prev_planar_velocity = vel
+		_inertia_seeded = true
+		return Vector3.ZERO
+
+	var accel: Vector3 = ((vel - _prev_planar_velocity) / maxf(delta, 0.0001)).limit_length(60.0)
+	_prev_planar_velocity = vel
+	var local: Vector3 = camera.global_transform.basis.inverse() * accel
+
+	var k: float = ctrl.inertia_lag_scale * lerpf(0.8, 1.6, _weight())
+	if is_aiming:
+		k *= 0.35
+	k *= _running_aim_multiplier(weapon.running_aim_lag_multiplier)
+
+	var omega: float = _omega(12.0, 7.0)
+	var zeta: float = _zeta(0.75, 0.5)
+	var x: float = _inertia_x.step_zeta(clampf(-local.x * k, -ctrl.inertia_lag_max_x, ctrl.inertia_lag_max_x), delta, omega, zeta)
+	var z: float = _inertia_z.step_zeta(clampf(-local.z * k, -ctrl.inertia_lag_max_z, ctrl.inertia_lag_max_z), delta, omega, zeta)
+	return Vector3(x, 0.0, z)
 
 
 func _update_crouch_stance(delta: float) -> void:
@@ -560,6 +639,29 @@ func _get_sprint_motion_multiplier() -> float:
 
 
 #region Helpers
+## 0 = light and agile, 1 = heavy. 0.5 when no weapon is equipped.
+func _weight() -> float:
+	return weapon.handling_weight if weapon != null else 0.5
+
+
+## Natural frequency / damping ratio picked between a light and a heavy value.
+func _omega(light: float, heavy: float) -> float:
+	return lerpf(light, heavy, _weight())
+
+
+func _zeta(light: float, heavy: float) -> float:
+	return lerpf(light, heavy, _weight())
+
+
+## Re-tunes an existing stiffness/damping pair for the current weapon's weight.
+## Neutral at handling_weight 0.5: heavier = lower frequency and slightly lower damping ratio.
+func _weighted_spring(stiffness: float, damping: float) -> Vector2:
+	var w: float = _weight()
+	var k_scale: float = pow(2.0, (0.5 - w) * 1.4)
+	var zeta_scale: float = pow(0.8, (w - 0.5) * 2.0)
+	return Vector2(stiffness * k_scale, damping * sqrt(k_scale) * zeta_scale)
+
+
 ## 0.0 (fresh) to 1.0 (fully exhausted).
 func _tiredness_factor() -> float:
 	if player == null or player._player_max_tiredness <= 0.0:

@@ -12,6 +12,7 @@ class_name WeaponController extends Node
 ## bottom), so the state chart, UI and animation tracks that call into this
 ## node keep working.
 
+## Fallback only. The real ADS time comes from Weapon.get_ads_time().
 const AIM_SPEED: float = 0.2
 const DEFAULT_BURST_SHOTS_PER_TRIGGER: int = 3
 const TIREDNESS_PER_SHOT: float = 1.5
@@ -50,9 +51,9 @@ const TIREDNESS_PER_SHOT: float = 1.5
 @export_category("Idle Sway Animations Settings")
 @export var idle_sway_enabled: bool = true
 @export var idle_sway_frequency: float = 0.8
-@export var idle_sway_amplitude: Vector2 = Vector2(0.005, 0.005)
+@export var idle_sway_amplitude: Vector2 = Vector2(0.008, 0.008)
 @export var idle_sway_stiffness: float = 40.0
-@export var idle_sway_damping: float = 60.0
+@export var idle_sway_damping: float = 14.0
 @export var idle_sway_rotation_multiplier: float = 0.5
 @export_range(0.0, 1.0, 0.001) var idle_sway_tremor_threshold: float = 0.5
 @export_category("Idle Aiming Sway Settings")
@@ -60,9 +61,10 @@ const TIREDNESS_PER_SHOT: float = 1.5
 @export var aim_sway_multiplier: float = 0.15
 @export_category("Look Sway Settings")
 @export var look_sway_enabled: bool = true
-@export var look_lag_divisor: float = 10.0
+## Input smoothing time = divisor / 60 seconds (10 = 0.17s, 5 = 0.08s).
+@export var look_lag_divisor: float = 5.0
 @export var look_lag_rot_max: float = 5.0
-@export var look_lag_pos_scale: float = 0.006
+@export var look_lag_pos_scale: float = 0.04
 @export var look_lag_hipfire_weight: float = 1.9
 @export var look_lag_ads_weight: float = 0.45
 @export var look_lag_fast_turn_threshold_deg: float = 100.0
@@ -86,8 +88,18 @@ const TIREDNESS_PER_SHOT: float = 1.5
 @export var vertical_lag_stiffness: float = 60.0
 @export var vertical_lag_damping: float = 12.0
 @export var vertical_lag_max: float = 0.1
-@export var vertical_lag_vel_max: float = 10.0 # currently unused
+@export var vertical_lag_vel_max: float = 10.0
 @export var vertical_lag_deadzone: float = 0.05
+## Metres of weapon offset per m/s of camera vertical speed (jump / land kick).
+@export var vertical_lag_velocity_scale: float = 0.012
+
+@export_category("Movement Inertia Settings")
+## Weapon lags against player acceleration (starts, stops, strafe reversals).
+@export var inertia_lag_enabled: bool = true
+## Metres of offset per m/s^2 of planar acceleration.
+@export var inertia_lag_scale: float = 0.0006
+@export var inertia_lag_max_x: float = 0.04
+@export var inertia_lag_max_z: float = 0.05
 
 @export_group("Weapon Recoil Settings")
 @export var enable_recoil: bool = true
@@ -639,8 +651,9 @@ func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3
 	aim_tween.set_ease(Tween.EASE_IN_OUT)
 	aim_tween.set_parallel(true)
 
-	aim_tween.tween_property(self, "current_stance_pos", target_position, AIM_SPEED)
-	aim_tween.tween_property(self, "current_stance_rot", target_rotation, AIM_SPEED)
+	var ads_time: float = current_weapon.get_ads_time() if current_weapon != null else AIM_SPEED
+	aim_tween.tween_property(self, "current_stance_pos", target_position, ads_time)
+	aim_tween.tween_property(self, "current_stance_rot", target_rotation, ads_time)
 #endregion
 
 
