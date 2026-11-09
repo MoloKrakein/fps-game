@@ -285,8 +285,8 @@ ads_strength = 0.65
 
 [node name="CoverPeek" type="Node" parent="Component" unique_id=1798423182]
 script = ExtResource("20_ixrbb")
-cover_mask = 3
-camera_radius = 99.0
+debug = true
+world_mask = 13
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

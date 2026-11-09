@@ -169,7 +169,7 @@ func calculate_view_offset(delta):
 		var d = min(delta, 0.05)
 		var angle_max = deg_to_rad(recoil_cam_max_angle)
 		for axis in 3:
-			var r = SpringUtil.apply(_recoil_angles[axis], _recoil_velocity[axis], 0.0, d, recoil_cam_stiffness, recoil_cam_damping)
+			var r: Vector2 = SpringUtil.apply_stable(_recoil_angles[axis], _recoil_velocity[axis], 0.0, d, recoil_cam_stiffness, recoil_cam_damping)
 			_recoil_angles[axis] = clamp(r.x, -angle_max, angle_max)
 			_recoil_velocity[axis] = r.y
 
