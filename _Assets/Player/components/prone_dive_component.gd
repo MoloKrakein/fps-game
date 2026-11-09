@@ -5,11 +5,13 @@ class_name ProneDiveComponent extends Node
 ##   1. Export variables below (base values, per player / per scene).
 ##   2. PlayerStats (skills, perks, abilities), read live every time a value is used:
 ##        multipliers (default 1.0): prone_speed, dive_speed, dive_height, dive_cooldown,
-##                                   dive_land_slide, dive_fall_damage
+##                                   dive_land_slide, dive_fall_damage, dive_wall_bounce
 ##        additive    (default 0.0): dive_air_control
 ##        flags:                     dive_unlocked, dive_from_air, dive_from_walk,
 ##                                   dive_no_cooldown, dive_no_fall_damage, dive_shoot
 ##      e.g.  stats.set_stats("dive_speed", 1.25)   stats.set_flag("dive_no_fall_damage", true)
+
+enum WallResponse { SLIDE, STOP, BOUNCE }
 
 signal dive_started(direction: Vector3)
 signal dive_landed
@@ -64,6 +66,17 @@ signal dive_landed
 ## Safety: force the dive to end after this long even if the player never lands
 @export var max_air_time: float = 2.5
 @export var cooldown: float = 0.8
+@export_group("Wall impact")
+## SLIDE: keep the speed along the wall (no rebound). STOP: kill the dive. BOUNCE: reflect off the wall.
+@export var wall_response: WallResponse = WallResponse.SLIDE
+## Walls are detected this far ahead of the body so the dive never presses into them
+@export var wall_check_margin: float = 0.08
+## Share of speed lost on each wall hit (SLIDE and BOUNCE)
+@export_range(0.0, 1.0, 0.05) var wall_speed_loss: float = 0.2
+## Fraction of the speed that comes back off the wall (BOUNCE only)
+@export_range(0.0, 1.0, 0.05) var wall_bounce_factor: float = 0.35
+## Walls steeper than this count as walls, flatter slopes are ignored (0 = vertical only, 1 = everything)
+@export_range(0.0, 1.0, 0.05) var wall_normal_max_y: float = 0.5
 @export_group("Landing")
 ## Seconds the dive momentum keeps sliding you along the floor after landing
 @export var landing_slide_time: float = 0.45
@@ -218,14 +231,48 @@ func timed_out() -> bool:
 	return _air_time >= max_air_time
 
 ## Horizontal velocity the controller adds on top of normal movement (dive, then landing slide).
-func get_extra_velocity() -> Vector3:
+## Called once per physics tick right before move_and_slide(): walls ahead are resolved here so the body
+## is never pushed into a wall (that push is what makes the character pop back out and rebound).
+func get_extra_velocity(delta: float) -> Vector3:
 	if player == null:
 		return Vector3.ZERO
 	if player.is_diving:
+		dive_velocity = _resolve_wall(dive_velocity, delta, true)
 		return dive_velocity
 	if _land_left > 0.0 and _land_total > 0.0:
+		_land_velocity = _resolve_wall(_land_velocity, delta, false)
 		return _land_velocity * (_land_left / _land_total)
 	return Vector3.ZERO
+
+func _resolve_wall(vel: Vector3, delta: float, allow_bounce: bool) -> Vector3:
+	var flat := Vector3(vel.x, 0.0, vel.z)
+	if flat.length() < 0.05:
+		return vel
+	var motion: Vector3 = flat * delta + flat.normalized() * wall_check_margin
+	var result := KinematicCollision3D.new()
+	if not player.test_move(player.global_transform, motion, result, 0.001, false, 4):
+		return vel
+	for i in result.get_collision_count():
+		var n: Vector3 = result.get_normal(i)
+		if absf(n.y) > wall_normal_max_y:
+			continue  # floor / ramp, not a wall
+		n.y = 0.0
+		if n == Vector3.ZERO:
+			continue
+		n = n.normalized()
+		if flat.dot(n) > -0.05:
+			continue  # moving along or away from the wall
+		var response: WallResponse = wall_response if allow_bounce else WallResponse.SLIDE
+		match response:
+			WallResponse.STOP:
+				flat = Vector3.ZERO
+			WallResponse.BOUNCE:
+				var bounce_factor: float = clampf(wall_bounce_factor * _mult("dive_wall_bounce"), 0.0, 1.0)
+				flat = flat.bounce(n) * bounce_factor
+			_:
+				flat = flat.slide(n) * (1.0 - wall_speed_loss)
+		break
+	return Vector3(flat.x, vel.y, flat.z)
 
 
 # --- per-frame ---------------------------------------------------------------
@@ -253,13 +300,6 @@ func _tick_dive(delta: float) -> void:
 
 	if air_drag > 0.0:
 		dive_velocity = dive_velocity.move_toward(Vector3.ZERO, air_drag * delta)
-
-	# keep the dive from grinding into walls
-	if player.is_on_wall():
-		var n: Vector3 = player.get_wall_normal()
-		n.y = 0.0
-		if n != Vector3.ZERO and dive_velocity.dot(n) < 0.0:
-			dive_velocity = dive_velocity.slide(n.normalized())
 
 func _get_wish_direction() -> Vector3:
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")

@@ -6,6 +6,8 @@ class_name StepHandlerComponent extends Node
 @export_category("Step Settings")
 @export var surface_threshold: float = 0.3
 @export var max_step_height: float = 0.35 # Changed from 0.01 to a realistic 35cm step
+## Step limit while crawling prone (no stepping at all while diving)
+@export var prone_max_step_height: float = 0.2
 
 const FEET_ADJUST_HEIGHT: float = 0.05 # Lowered from 0.5 to prevent floating feet
 const MIN_STEP_HEIGHT: float = 0.1
@@ -21,7 +23,8 @@ func handle_step_climbing():
 			var measured_height = _measure_step_height(collision)
 			
 			# Using the corrected max_step_height variable
-			if measured_height > MIN_STEP_HEIGHT and measured_height <= max_step_height and _is_valid_step_dir(collision) and not player.is_sliding:
+			var step_limit: float = prone_max_step_height if player.is_prone else max_step_height
+			if measured_height > MIN_STEP_HEIGHT and measured_height <= step_limit and _is_valid_step_dir(collision) and not player.is_sliding and not player.is_diving:
 				step_status = "Step detected with height: " + str(measured_height)
 				player.global_position.y += measured_height
 				player.velocity = player.previous_velocity

@@ -14,6 +14,11 @@ func _on_sliding_state_physics_processing(delta: float) -> void:
 
 	player_controller.slide_modifier = player_controller.current_slide_power * (_slide_timer / player_controller.current_slide_duration)
 
+	# prone key mid-slide: dive out of it (or just go prone)
+	if Input.is_action_just_pressed("move_prone"):
+		player_controller.request_prone()
+		return
+
 	# 1. Calculate exactly how long we have been sliding
 	var time_in_slide = player_controller.current_slide_duration - _slide_timer
 	

@@ -13,6 +13,8 @@ class_name CameraController extends Node3D
 @export var is_Horizontal_inverted: bool = false
 @export var crouch_offset: float = 0.0
 @export var crouch_speed: float = 3.0
+## Camera rig height while prone / diving (rig y; the eye ends up about 0.14 lower because of the Cam child)
+@export var prone_offset: float = -0.5
 
 var _rotation: Vector3
 const DEFAULT_HEIGHT: float = 0.5
@@ -98,23 +100,19 @@ func smooth_step(height_change: float) -> void:
 	_target_h -= height_change
 	_step_smoothing = true
 
+## Moves the camera rig toward a target height. Used by every stance (stand / crouch / prone / dive).
+func move_camera_to(delta: float, target_height: float, speed: float) -> void:
+	offset_height = move_toward(offset_height, target_height, speed * delta)
+	position.y = move_toward(position.y, target_height, speed * delta)
+
+# direction > 0 raises to standing height, direction < 0 lowers to crouch height.
+# Works from any current height, so coming up out of prone lands on the crouch height instead of sticking.
 func update_camera_height(delta: float, direction: int) -> void:
-	# if position.y >= crouch_offset and position.y <= DEFAULT_HEIGHT:
-	# 	position.y = clamp(position.y + (crouch_speed * direction) * delta, crouch_offset, DEFAULT_HEIGHT)
-
-	if offset_height >= crouch_offset and offset_height <= DEFAULT_HEIGHT:
-		offset_height = clamp(offset_height + (crouch_speed * direction) * delta, crouch_offset, DEFAULT_HEIGHT)
-
-	# lower the camera to crouch offset
-	if direction < 0:
-		if position.y > crouch_offset:
-			position.y = clamp(max(position.y + (crouch_speed * direction) * delta, crouch_offset), crouch_offset, DEFAULT_HEIGHT)
-		# print("Camera Lowering: ", position.y)
-	# raise the camera to default height
-	elif direction > 0:
-		if position.y < DEFAULT_HEIGHT:
-			position.y = clamp(min(position.y + (crouch_speed * direction) * delta, DEFAULT_HEIGHT), crouch_offset, DEFAULT_HEIGHT)
-		# print("Camera Raising: ", position.y)
+	var speed: float = crouch_speed * absf(direction)
+	if direction > 0:
+		move_camera_to(delta, DEFAULT_HEIGHT, speed)
+	elif direction < 0:
+		move_camera_to(delta, crouch_offset, speed)
 
 func _apply_peek() -> void:
 	if _cam:

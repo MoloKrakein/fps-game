@@ -13,6 +13,9 @@ class_name PlayerController extends CharacterBody3D
 @export var cam_effects: CamEffects
 @export var grab_controller: GrabController
 @export var step_handler: StepHandlerComponent
+@export var prone_col: CollisionShape3D
+@export var prone_check: ShapeCast3D
+@export var prone_dive: ProneDiveComponent
 
 @export_category("Movement")
 # @export var speed: float = 0.1
@@ -39,6 +42,7 @@ class_name PlayerController extends CharacterBody3D
 @export var isToggleSprint: bool = false
 
 @onready var health_component: HealthComponent = get_node("HealthComponent")
+@onready var player_stats: PlayerStats = get_node_or_null("PlayerStats")
 
 var _input_dir: Vector2 = Vector2.ZERO
 var _movement_velocity: Vector3 = Vector3.ZERO
@@ -66,6 +70,9 @@ var _player_max_tiredness: float = 100
 var is_crouching: bool = false
 var is_sprinting: bool = false
 var is_sliding: bool = false
+var is_prone: bool = false
+var is_diving: bool = false
+var _dive_fall_grace: float = 0.0
 
 var _is_holding_drop: bool = false
 var _drop_hold_time: float = 0.0
@@ -74,6 +81,8 @@ const THROW_HOLD_THRESHOLD: float = 0.5 # Time in seconds to hold the drop butto
 
 
 func _ready() -> void:
+	if prone_dive == null:
+		prone_dive = get_node_or_null("Component/ProneDive") as ProneDiveComponent
 	health_component.damage_taken.connect(_on_damage_taken)
 	health_component.damage_received.connect(_on_damage_received)
 	# if ammo_counter_ui:
@@ -123,9 +132,17 @@ func _physics_process(delta: float) -> void:
 
 	if _current_slide_cooldown > 0.0:
 		_current_slide_cooldown -= delta
+
+	if is_diving and prone_dive:
+		_dive_fall_grace = prone_dive.fall_damage_grace
+	elif _dive_fall_grace > 0.0:
+		_dive_fall_grace -= delta
 	
 	if not is_on_floor():
-		velocity += get_gravity() * delta
+		var gravity_scale: float = 1.0
+		if is_diving and prone_dive:
+			gravity_scale = prone_dive.dive_gravity_scale
+		velocity += get_gravity() * delta * gravity_scale
 		on_airbone_time += delta
 		# Sprinting is grounded movement only. Clear the modifier immediately
 		# so jumping or walking off a ledge cannot preserve sprint speed.
@@ -145,18 +162,27 @@ func _physics_process(delta: float) -> void:
 	var speed_modifier: float = sprint_modifier + crouch_modifier + (_hold_item_mass * 0.5) # Adjust the multiplier as needed for balance
 	var raw_speed: float = default_speed + speed_modifier + slide_modifier
 	speed = maxf(0.5, raw_speed)
+	# prone crawls slower than the crouch floor above, so it gets its own value
+	if is_prone and prone_dive:
+		speed = prone_dive.get_prone_speed()
 
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
 	var direction: Vector3
+	var diving: bool = is_diving and prone_dive != null
 	if is_sliding:
 		direction = _slide_direction
+	elif diving:
+		# the dive owns horizontal movement, WASD only steers it (see ProneDiveComponent)
+		direction = Vector3.ZERO
 	else:
 		direction = (transform.basis * Vector3(_input_dir.x, 0, _input_dir.y)).normalized()
 
 	current_player_rotation = _input_dir.angle()
 
-	if direction != Vector3.ZERO:
+	if diving:
+		current_velocity = Vector2.ZERO
+	elif direction != Vector3.ZERO:
 		current_velocity = lerp(current_velocity, Vector2(direction.x, direction.z)* speed, acceleration * delta)
 
 	else:
@@ -168,6 +194,11 @@ func _physics_process(delta: float) -> void:
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
 
 	velocity = _movement_velocity
+	if prone_dive:
+		# dive / landing-slide momentum is added on top, never fed back into _movement_velocity
+		var extra: Vector3 = prone_dive.get_extra_velocity(delta)
+		velocity.x += extra.x
+		velocity.z += extra.z
 	var y_velocity_before_on_floor = velocity.y
 	
 
@@ -234,7 +265,7 @@ func update_rotation(rotation_input)-> void:
 	global_transform.basis = Basis.from_euler(rotation_input)
 
 func sprint() -> void:
-	if not is_on_floor():
+	if not is_on_floor() or is_prone or is_diving:
 		walk()
 		return
 	sprint_modifier = sprint_speed
@@ -252,6 +283,9 @@ func stand() -> void:
 	crouch_modifier = 0.0
 	standing_col.disabled = false
 	crouching_col.disabled = true
+	if prone_col:
+		prone_col.disabled = true
+	is_prone = false
 	if debug:
 		print("Changed crouch modifier to: ", crouch_modifier)
 	is_crouching = false
@@ -261,16 +295,63 @@ func crouch() -> void:
 	is_sprinting = false
 	crouching_col.disabled = false
 	standing_col.disabled = true
+	if prone_col:
+		prone_col.disabled = true
+	is_prone = false
 	
 	if debug:
 		print("Changed crouch modifier to: ", crouch_modifier)
 	is_crouching = true
 
+func can_jump() -> bool:
+	return is_on_floor() and not is_prone and not is_diving
+
 func jump() -> void:
-	if not is_on_floor():
+	if not can_jump():
 		return
 	walk()
 	velocity.y = jump_velocity
+#endregion
+
+#region Prone / Dive
+## Single entry point for the prone key. Dives when the dive rules allow it, otherwise goes prone.
+func request_prone() -> void:
+	if is_prone or is_diving or state_chart == null:
+		return
+	if prone_dive and prone_dive.can_dive():
+		state_chart.send_event("onDiving")
+	elif is_on_floor():
+		state_chart.send_event("onProne")
+
+func prone() -> void:
+	crouch_modifier = 0.0
+	slide_modifier = 0.0
+	sprint_modifier = 0.0
+	is_sprinting = false
+	standing_col.disabled = true
+	crouching_col.disabled = true
+	if prone_col:
+		prone_col.disabled = false
+	is_prone = true
+	# is_crouching stays true on purpose: the weapon animator and tiredness already key off it
+	is_crouching = true
+
+func start_dive() -> void:
+	prone()
+	is_diving = true
+	if prone_dive:
+		prone_dive.begin_dive()
+
+func end_dive() -> void:
+	is_diving = false
+	if prone_dive:
+		prone_dive.end_dive()
+
+func can_leave_prone_to_crouch() -> bool:
+	return prone_check == null or not prone_check.is_colliding()
+
+func can_stand_from_prone() -> bool:
+	return can_leave_prone_to_crouch() and not crouch_check.is_colliding()
 #endregion
 
 #region Slide
@@ -281,6 +362,9 @@ func start_slide() -> void:
 	_slide_direction = Vector3(velocity.x, 0, velocity.z).normalized()
 	standing_col.disabled = true
 	crouching_col.disabled = false
+	if prone_col:
+		prone_col.disabled = true
+	is_prone = false
 	disable_movement() # Ensure WASD is locked as previously discussed
 	
 	# Calculate the momentum multiplier
@@ -297,6 +381,8 @@ func start_slide() -> void:
 
 	
 func can_slide() -> bool:
+	if is_prone or is_diving:
+		return false
 	if _current_slide_cooldown > 0.0:
 		return false
 	if not is_on_floor():
@@ -332,6 +418,8 @@ func calculate_fall_damage() -> float:
 	var damage: float = 0.0
 	if impact_velocity < fall_velocity_threshold:
 		damage = abs(impact_velocity) * fall_damage_multiplier
+		if prone_dive and _dive_fall_grace > 0.0:
+			damage *= prone_dive.get_fall_damage_scale()
 	return damage
 
 func apply_fall_damage() -> void:
