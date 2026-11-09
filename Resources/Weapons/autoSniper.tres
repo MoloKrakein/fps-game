@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dr0q2hevdy3wl" path="res://Art/Assets/Weapon/Projectile/live_bullet_casing_9mm.tscn" id="1_b7mce"]
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_dlgg1"]
-[ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/bullet_casing.tscn" id="2_1b4fu"]
+[ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/Casing/bullet_casing_generic.tscn" id="2_1b4fu"]
 [ext_resource type="Resource" uid="uid://b4cku8crdkhvu" path="res://_Assets/Weapon/resources/generic_casing_prof.tres" id="3_1b4fu"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="3_27xgg"]
 [ext_resource type="PackedScene" uid="uid://cu06ajduxlmxo" path="res://Art/Assets/Weapon/Rifle/autosniper_model.tscn" id="5_px1me"]

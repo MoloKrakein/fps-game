@@ -90,13 +90,18 @@ animation = &"Bolt_Close"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_5i3wd"]
 animation = &"EmptyReload"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_oh2wu"]
+animation = &"Equip"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_egbc5"]
+
 [sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_4dw8u"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_614sg"]
 animation = &"Bolt_Open"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ex8ux"]
-animation = &"Bolt_Open"
+animation = &"Bolt_Close"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_4dw8u"]
 animation = &"Rack"
@@ -111,7 +116,7 @@ animation = &"Rack"
 animation = &"PartialReload"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_o08ba"]
-nodes/output/position = Vector2(640, 140)
+nodes/output/position = Vector2(800, 140)
 nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_75jmf")
 nodes/CloseBolt/position = Vector2(-520, 60)
 nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_ex8ux")
@@ -119,9 +124,9 @@ nodes/OpenBolt/position = Vector2(-520, 280)
 nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_uer85")
 nodes/BoltPosition/position = Vector2(-257.6554, 58.892662)
 nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_4dw8u")
-nodes/FireOneShot/position = Vector2(-80, 160)
+nodes/FireOneShot/position = Vector2(-80, 140)
 "nodes/OpenBolt 2/node" = SubResource("AnimationNodeAnimation_614sg")
-"nodes/OpenBolt 2/position" = Vector2(-260, 320)
+"nodes/OpenBolt 2/position" = Vector2(-300, 320)
 nodes/ReloadOneShot/node = SubResource("AnimationNodeOneShot_bwwb7")
 nodes/ReloadOneShot/position = Vector2(120, 140)
 nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_oh2wu")
@@ -134,9 +139,13 @@ nodes/RackOneShot/node = SubResource("AnimationNodeOneShot_614sg")
 nodes/RackOneShot/position = Vector2(380, 300)
 nodes/Rack/node = SubResource("AnimationNodeAnimation_4dw8u")
 nodes/Rack/position = Vector2(169.42085, 510.9721)
-node_connections = [&"output", 0, &"RackOneShot", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt 2", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"Rack"]
+nodes/EquipOneShot/node = SubResource("AnimationNodeOneShot_egbc5")
+nodes/EquipOneShot/position = Vector2(600, 180)
+nodes/Equip/node = SubResource("AnimationNodeAnimation_oh2wu")
+nodes/Equip/position = Vector2(460, 580)
+node_connections = [&"output", 0, &"EquipOneShot", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt 2", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"Rack", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"Equip"]
 
-[node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "underbarrel_socket", "muzzle_socket_attachment", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "iron_sight_point", "ammo_display")]
+[node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "underbarrel_socket", "muzzle_socket_attachment", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "iron_sight_point", "ammo_display")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.066431046)
 script = ExtResource("1_qfc63")
 muzzle_socket = NodePath("Muzzle")
@@ -144,6 +153,7 @@ ejection_socket = NodePath("EjectionPort")
 optic_socket = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Optics")
 underbarrel_socket = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Underbarrels")
 muzzle_socket_attachment = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/MuzzleDevice")
+builtin_iron_sight_mesh = [NodePath("AR416/Armature/Skeleton3D/Front Sight"), NodePath("AR416/Armature/Skeleton3D/Back Sight")]
 default_stock_mesh = NodePath("AR416/Armature/Skeleton3D/Stock")
 default_grip_mesh = NodePath("AR416/Armature/Skeleton3D/Grip")
 default_magazine_mesh = NodePath("AR416/Armature/Skeleton3D/Magazine")
@@ -159,9 +169,10 @@ particles = NodePath("Flash")
 smoke_particles = [NodePath("Smoke")]
 light = NodePath("OmniLight3D")
 barrel_smoke_burst = 0.3
-barrel_smoke_opacity = 0.05
-barrel_smoke_thickness = 0.6000000000000001
-barrel_smoke_stretch = 2.7
+barrel_smoke_opacity = 1.0
+barrel_smoke_thickness = 3.0
+barrel_smoke_stretch = 4.0
+eject_smoke_on_fire = false
 heat_per_shot = 1.5
 heat_cool_rate = 1.49
 max_heat_burst_multiplier = 2.0
@@ -189,12 +200,8 @@ process_material = SubResource("ParticleProcessMaterial_vx3u4")
 draw_pass_1 = SubResource("QuadMesh_0cluu")
 
 [node name="Smoke" parent="Muzzle" unique_id=2001100571 instance=ExtResource("8_qrkt3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08337161, 0.001565665, 0.06309283)
-instance_shader_parameters/size_mult = 9.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.045668572, 0.005574703)
 emitting = false
-amount = 23
-one_shot = true
-speed_scale = 3.45
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.39674383)
@@ -202,7 +209,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.
 [node name="AR416" parent="." unique_id=1425081176 instance=ExtResource("3_omrth")]
 transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
 
-[node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 1187081403) index="0" unique_id=728834447]
+[node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 995622234) index="0" unique_id=968420334]
 bones/0/position = Vector3(0, 0, 0)
 bones/0/rotation = Quaternion(0, 0, 0, 1)
 bones/3/position = Vector3(-0.49308467, -2.4697914, -2.7660187e-07)
@@ -213,7 +220,9 @@ bones/11/position = Vector3(-8.4135294e-08, 1.0414236, -0.5360675)
 bones/13/position = Vector3(-7.1339194e-08, 0.9472706, -0.53854525)
 bones/15/position = Vector3(0.2515676, -1.1540471, -0.065102234)
 bones/17/rotation = Quaternion(1, -4.269544e-07, -7.54979e-08, -5.692725e-07)
-bones/21/position = Vector3(1.1312768, -13.059398, -2.785832e-07)
+bones/21/position = Vector3(-2.8905804, -13.207276, -2.8274899)
+bones/21/rotation = Quaternion(-0.34638306, 0.52122444, 0.4291275, 0.6513013)
+bones/21/scale = Vector3(1.0000002, 0.99999994, 1.0000002)
 
 [node name="BodySkelleton" type="BoneAttachment3D" parent="AR416/Armature/Skeleton3D" index="0" unique_id=1242988179]
 transform = Transform3D(1, 0, 0, 0, 1, -3.5527137e-15, 0, 3.5527137e-15, 1, 0, 0, 0)
@@ -261,10 +270,14 @@ parameters/ReloadBlend/blend_amount = 0.0
 parameters/RackOneShot/active = false
 parameters/RackOneShot/internal_active = false
 parameters/RackOneShot/request = 0
+parameters/EquipOneShot/active = false
+parameters/EquipOneShot/internal_active = false
+parameters/EquipOneShot/request = 0
 
 [node name="WeaponAnimation" type="Node" parent="." unique_id=1110659900 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
 script = ExtResource("13_75jmf")
 weapon_animation_tree = NodePath("../AnimationTree")
+weapon_bolt_time = 0.1
 animation_player = NodePath("../AR416/AnimationPlayer")
 empty_reload_animation_name = "EmptyReload"
 loaded_reload_animation_name = "PartialReload"

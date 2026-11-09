@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://djw8732o0svqt"]
+
+[ext_resource type="Script" uid="uid://dlvl4srer712l" path="res://Art/Assets/Weapon/Projectile/bullet_casing.gd" id="1_rjcgm"]
+[ext_resource type="Material" uid="uid://du71p3tdgcqxd" path="res://_Assets/VFX/material/casing_streak.tres" id="2_wlg72"]
+[ext_resource type="PackedScene" uid="uid://by1lfhdh64cv" path="res://Art/3D/Blender/Weapon/AR416/case_556.glb" id="3_rjcgm"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_5yekf"]
+rough = true
+bounce = 0.05
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_wlg72"]
+points = PackedVector3Array(-0.06826941, 0.20189273, -4.4703484e-08, -0.034134712, 0.20189273, 0.064800516, 0.06826938, 0.20189273, -1.2733042e-05, -0.034134712, 0.20184821, -0.064800605, -0.06098538, -0.25290918, -4.4703484e-08, 0.03412132, 0.20189273, 0.064787835, -0.03049938, -0.25290918, 0.05279947, 0.030485988, -0.25290918, 0.05279947, 0.060971983, -0.25290918, -4.4703484e-08, 0.03412132, 0.20184821, -0.064800605, -0.03049938, -0.25290918, -0.05281225, 0.030485988, -0.25290918, -0.05281225)
+
+[node name="Bullet Casing" type="RigidBody3D" unique_id=692806909]
+transform = Transform3D(-1.4901161e-07, 0, -1, 0, 1, 0, 1, 0, -1.4901161e-07, 0, 0, 0)
+collision_layer = 8
+collision_mask = 9
+physics_material_override = SubResource("PhysicsMaterial_5yekf")
+gravity_scale = 3.0
+script = ExtResource("1_rjcgm")
+lifetime = 30.0
+streak_material = ExtResource("2_wlg72")
+streak_time = 0.018
+streak_min_speed = 5.0
+streak_alpha = 1.0
+streak_width = 0.084
+streak_color = Color(0.69411767, 0.6745098, 0.45490196, 0.99607843)
+despawn_after_rest = 30.0
+metadata/collision_preset_name = &"__custom__"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1420161970]
+transform = Transform3D(1.1920929e-07, -0.99999994, -8.742279e-08, 0.99999994, 1.1920929e-07, 1.2246469e-16, 1.0299145e-14, -8.742279e-08, 1, -0.02520354, -0.009177238, -0.0011678636)
+shape = SubResource("ConvexPolygonShape3D_wlg72")
+
+[node name="case_556" parent="." unique_id=692933094 instance=ExtResource("3_rjcgm")]
+transform = Transform3D(-1, -8.22112e-24, -8.742279e-08, 0, -1, 1.2246469e-16, -8.742279e-08, 1.2246469e-16, 1, -0.02520354, -0.009177238, -0.0011678636)
+
+[editable path="case_556"]

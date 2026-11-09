@@ -1,0 +1,633 @@
+[gd_scene format=3 uid="uid://df68lxky3tvad"]
+
+[ext_resource type="Script" uid="uid://kxvoo2aa83f8" path="res://Scenes/Player/PlayerController.gd" id="1_mtuoh"]
+[ext_resource type="Script" uid="uid://c4o2bxxnlqu3o" path="res://Scenes/Player/camera_controller.gd" id="1_xpcdj"]
+[ext_resource type="Script" uid="uid://dtyhxdhs168m" path="res://_Assets/Components/health_component.gd" id="2_2jnj1"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_oikmp"]
+[ext_resource type="Script" uid="uid://cebpxfv72ruik" path="res://Scenes/Player/mouse_capture.gd" id="2_xpcdj"]
+[ext_resource type="Script" uid="uid://dly6myqcou03q" path="res://_Assets/Player/cam_effects.gd" id="4_eksi1"]
+[ext_resource type="Script" uid="uid://cq66n74o0epnw" path="res://_Assets/Player/components/interaction_raycast.gd" id="4_h8ma5"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_jhyir"]
+[ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="6_74mp2"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="7_oikmp"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="8_06tpx"]
+[ext_resource type="Script" uid="uid://b4ce2h8s1ankj" path="res://_Assets/Player/components/player_physics.gd" id="9_2aanf"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="9_7g0yx"]
+[ext_resource type="Script" uid="uid://bpmu3hthnrd0k" path="res://Scenes/Player/state_machine.gd" id="10_dey5f"]
+[ext_resource type="Script" uid="uid://du2jup5hg1y2y" path="res://_Assets/Player/States/idle_state.gd" id="11_74mp2"]
+[ext_resource type="Script" uid="uid://ck7gkkw5mi2wp" path="res://_Assets/Player/States/grounded_state.gd" id="11_hnuln"]
+[ext_resource type="Script" uid="uid://1kn1bg1umx82" path="res://_Assets/Player/States/moving_state.gd" id="12_06tpx"]
+[ext_resource type="Script" uid="uid://dotft84ps0jwd" path="res://_Assets/Player/States/walking_state.gd" id="13_dey5f"]
+[ext_resource type="Script" uid="uid://jl4l8ekvamp8" path="res://_Assets/Player/components/grab_controller.gd" id="14_2aanf"]
+[ext_resource type="Script" uid="uid://b0o0vic4fjuvl" path="res://_Assets/Player/States/running_state.gd" id="14_r5xpd"]
+[ext_resource type="Script" uid="uid://b481b5psp66d5" path="res://_Assets/Player/States/standing_state.gd" id="15_ks1b7"]
+[ext_resource type="Script" uid="uid://dyukor5w2gr3g" path="res://_Assets/Player/States/airborne_state.gd" id="16_aqm4k"]
+[ext_resource type="Script" uid="uid://6mv42ee0wqh8" path="res://_Assets/Player/States/crouching_state.gd" id="16_hnuln"]
+[ext_resource type="Script" uid="uid://c1845mf4x4i1g" path="res://_Assets/Player/components/PlayerStats.gd" id="17_mwii3"]
+[ext_resource type="Script" uid="uid://b2bvbjne20wye" path="res://_Assets/Weapon/Scripts/weapon_wall_tuck.gd" id="19_ogmfp"]
+[ext_resource type="Script" uid="uid://guhkdu35mp0" path="res://_Assets/Player/States/sliding_state.gd" id="19_rcvs5"]
+[ext_resource type="Script" uid="uid://dh7qxflao4e60" path="res://_Assets/Weapon/Scripts/cover_peek.gd" id="20_ixrbb"]
+[ext_resource type="Script" uid="uid://wq07swbsgepb" path="res://_Assets/Weapon/Scripts/weapon_state_machine.gd" id="22_2ahak"]
+[ext_resource type="Script" uid="uid://dtkw3g0e1cx7o" path="res://_Assets/Weapon/Scripts/States/weap_idle_state.gd" id="22_ur3l4"]
+[ext_resource type="Script" uid="uid://d28nxftt0gg0j" path="res://_Assets/Weapon/Scripts/States/weap_firing_state.gd" id="23_2ahak"]
+[ext_resource type="Script" uid="uid://gwkuothaiqkm" path="res://Scenes/Player/step_handler.gd" id="23_jincj"]
+[ext_resource type="Script" uid="uid://bdvwooe4dfsx0" path="res://_Assets/Weapon/Scripts/weapon_controller.gd" id="24_qr1w5"]
+[ext_resource type="Script" uid="uid://dwaido63afkrc" path="res://_Assets/Weapon/Scripts/States/weap_empty_state.gd" id="24_rukb4"]
+[ext_resource type="Script" uid="uid://vkhddca7hyn2" path="res://_Assets/Weapon/Scripts/States/weap_reloading_state.gd" id="26_1agin"]
+[ext_resource type="Script" uid="uid://fo18j0fu5t4e" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_hipfire_state.gd" id="26_fcwna"]
+[ext_resource type="Script" uid="uid://c4ugr8wbr6sn" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_ads_state.gd" id="27_1agin"]
+[ext_resource type="Script" uid="uid://dm1430qubtqlq" path="res://_Assets/Weapon/Scripts/States/Aiming/weap_canted_state.gd" id="28_2jnj1"]
+[ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="33_1agin"]
+[ext_resource type="Script" path="res://_Assets/Player/components/prone_dive_component.gd" id="40_pdive"]
+[ext_resource type="Script" path="res://_Assets/Player/States/prone_state.gd" id="41_prone"]
+[ext_resource type="Script" path="res://_Assets/Player/States/diving_state.gd" id="42_diving"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ks1b7"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_o08ba"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_o08ba"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_prone"]
+radius = 0.35
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pcheck"]
+radius = 0.35
+
+[node name="PlayerController" type="CharacterBody3D" unique_id=1796224466 node_paths=PackedStringArray("camera", "state_chart", "weapon_controller", "standing_col", "crouching_col", "crouch_check", "interaction_raycast", "cam_effects", "grab_controller", "step_handler", "prone_col", "prone_check", "prone_dive") groups=["player"]]
+process_priority = -9
+collision_layer = 10
+script = ExtResource("1_mtuoh")
+camera = NodePath("CameraController")
+state_chart = NodePath("StateChart")
+weapon_controller = NodePath("Component/WeaponController")
+standing_col = NodePath("StandCollider")
+crouching_col = NodePath("CrouchCollider")
+crouch_check = NodePath("CrouchCheck")
+interaction_raycast = NodePath("CameraController/Cam/InteractionRaycast")
+cam_effects = NodePath("CameraController/Cam")
+grab_controller = NodePath("Component/GrabController")
+step_handler = NodePath("Component/StepHandler")
+prone_col = NodePath("ProneCollider")
+prone_check = NodePath("ProneCheck")
+prone_dive = NodePath("Component/ProneDive")
+default_speed = 1.0
+sprint_speed = 3.5
+acceleration = 3.0
+deceleration = 20.0
+jump_velocity = 3.5
+fall_velocity_threshold = -7.0
+fall_damage_multiplier = 0.45
+base_slide_power = 3.0
+max_slide_momentum = 5.0
+metadata/collision_preset_name = &"__custom__"
+
+[node name="PlayerStats" type="Node" parent="." unique_id=1216481220]
+script = ExtResource("17_mwii3")
+metadata/_custom_type_script = "uid://c1845mf4x4i1g"
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1115016750]
+script = ExtResource("2_2jnj1")
+armor_value = 50.0
+regenerate_armor = true
+metadata/_custom_type_script = "uid://dtyhxdhs168m"
+
+[node name="StandCollider" type="CollisionShape3D" parent="." unique_id=1617641562]
+shape = SubResource("CapsuleShape3D_o08ba")
+debug_fill = false
+
+[node name="StateChartDebugger" parent="StandCollider" unique_id=854209845 instance=ExtResource("2_oikmp")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 485.0
+offset_bottom = 497.0
+grow_horizontal = 1
+grow_vertical = 1
+enabled = false
+initial_node_to_watch = NodePath("../../StateChart")
+
+[node name="CrouchCollider" type="CollisionShape3D" parent="." unique_id=1751202798]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.43174714, 0)
+shape = SubResource("SphereShape3D_ks1b7")
+debug_fill = false
+
+[node name="ProneCollider" type="CollisionShape3D" parent="." unique_id=1873450211]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.64, 0)
+shape = SubResource("SphereShape3D_prone")
+disabled = true
+debug_fill = false
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=1636070211]
+visible = false
+mesh = SubResource("CapsuleMesh_o08ba")
+
+[node name="CrouchCheck" type="ShapeCast3D" parent="." unique_id=1790915549]
+transform = Transform3D(0.9999619, 0, -0.008726535, 0, 1, 0, 0.008726535, 0, 0.9999619, 0, 0, 0)
+shape = SubResource("SphereShape3D_o08ba")
+target_position = Vector3(0, 0.5, 0)
+
+[node name="ProneCheck" type="ShapeCast3D" parent="." unique_id=1873450212]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.55, 0)
+shape = SubResource("SphereShape3D_pcheck")
+target_position = Vector3(0, 0.5, 0)
+
+[node name="CameraController" type="Node3D" parent="." unique_id=642708642 node_paths=PackedStringArray("player_controller", "component_mouse_capture")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.613845, 0)
+script = ExtResource("1_xpcdj")
+player_controller = NodePath("..")
+component_mouse_capture = NodePath("../Component/MouseCapture")
+
+[node name="Cam" type="Camera3D" parent="CameraController" unique_id=1415166113 node_paths=PackedStringArray("player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14272428, -0.5983944)
+fov = 90.0
+script = ExtResource("4_eksi1")
+player = NodePath("../..")
+max_roll = 1.5
+slide_pitch = 4.5
+slide_roll = 6.0
+slide_fov = 125.0
+
+[node name="ShootPos" type="Node3D" parent="CameraController/Cam" unique_id=212577752]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.41322422)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="CameraController/Cam/ShootPos" unique_id=1148951692]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5676575)
+visible = false
+light_energy = 1.862
+light_indirect_energy = 1.479
+spot_range = 20.0
+
+[node name="InteractionRaycast" type="RayCast3D" parent="CameraController/Cam" unique_id=748889240]
+transform = Transform3D(1.075, 0, 0, 0, -4.6989744e-08, -1.075, 0, 1.075, -4.6989744e-08, 0, 0, 0)
+visible = false
+target_position = Vector3(0, -1.745, 0)
+collision_mask = 9
+debug_shape_custom_color = Color(0.9588106, 0, 0.51712954, 1)
+debug_shape_thickness = 5
+script = ExtResource("4_h8ma5")
+
+[node name="HoldPropPos" type="Marker3D" parent="CameraController/Cam" unique_id=407412408]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8348626, 0.034930766, -1.1499147)
+
+[node name="Component" type="Node" parent="." unique_id=2093724721]
+
+[node name="PlayerPhysics" type="Node" parent="Component" unique_id=1025167660 node_paths=PackedStringArray("controller")]
+script = ExtResource("9_2aanf")
+controller = NodePath("../..")
+force_multiplier = 2.0
+metadata/_custom_type_script = "uid://b4ce2h8s1ankj"
+
+[node name="MouseCapture" type="Node" parent="Component" unique_id=426572266]
+script = ExtResource("2_xpcdj")
+
+[node name="StepHandler" type="Node" parent="Component" unique_id=1782951827 node_paths=PackedStringArray("player")]
+script = ExtResource("23_jincj")
+player = NodePath("../..")
+max_step_height = 0.75
+
+[node name="ProneDive" type="Node" parent="Component" unique_id=1873450213 node_paths=PackedStringArray("player", "stats")]
+script = ExtResource("40_pdive")
+player = NodePath("../..")
+stats = NodePath("../../PlayerStats")
+
+[node name="WeaponController" type="Node" parent="Component" unique_id=1548420683 node_paths=PackedStringArray("weapon_model_parent", "weapon_state_chart", "shoot_position", "casing_position", "camera", "cam_rig")]
+script = ExtResource("24_qr1w5")
+current_weapon = ExtResource("33_1agin")
+weapon_model_parent = NodePath("../../CameraController/Cam")
+weapon_state_chart = NodePath("../../WeaponStateChart")
+shoot_position = NodePath("../../CameraController/Cam/ShootPos")
+casing_position = NodePath("../../CameraController/Cam/ShootPos")
+camera = NodePath("../../CameraController/Cam")
+cam_rig = NodePath("../../CameraController")
+crouch_rot_offset = Vector3(0, 0, 0.262)
+sprint_rot_offset = Vector3(0.489, 0.14, -0.559)
+sprint_animation_min_speed = 7.625
+idle_sway_frequency = 0.4
+idle_sway_amplitude = Vector2(0.015, 0.01)
+idle_sway_stiffness = 150.0
+idle_sway_damping = 12.0
+idle_sway_rotation_multiplier = 4.0
+idle_sway_tremor_threshold = 0.4
+aim_sway_multiplier = 0.18
+look_lag_rot_max = 30.0
+look_lag_pos_scale = 0.2
+look_lag_tip_follow_fast = 0.1
+bob_amplitude = Vector2(0.05, 0.012)
+bob_max_speed = 5.0
+disable_recoil_during_sprint = false
+recoil_model_stillness = 600.0
+recoil_model_damping = 7.0
+recoil_ads_visual_multiplier = 0.3
+recoil_roll_coupling = -0.15
+recoil_vertical_lift = -0.15
+
+[node name="GrabController" type="Node" parent="Component" unique_id=1472151820 node_paths=PackedStringArray("interaction_ray", "hold_position", "interaction_state_chart", "cam")]
+script = ExtResource("14_2aanf")
+interaction_ray = NodePath("../../CameraController/Cam/InteractionRaycast")
+hold_position = NodePath("../../CameraController/Cam/HoldPropPos")
+interaction_state_chart = NodePath("InteractionStateChart")
+cam = NodePath("../../CameraController/Cam")
+metadata/_custom_type_script = "uid://jl4l8ekvamp8"
+
+[node name="InteractionStateChart" type="Node" parent="Component/GrabController" unique_id=2111415437]
+script = ExtResource("5_jhyir")
+metadata/_custom_type_script = "uid://couw105c3bde4"
+
+[node name="InteractionLogic" type="Node" parent="Component/GrabController/InteractionStateChart" unique_id=1966899481]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("EmptyHands")
+
+[node name="EmptyHands" type="Node" parent="Component/GrabController/InteractionStateChart/InteractionLogic" unique_id=880416195]
+script = ExtResource("8_06tpx")
+
+[node name="OnGrab" type="Node" parent="Component/GrabController/InteractionStateChart/InteractionLogic/EmptyHands" unique_id=770074833]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../HoldingProp")
+event = &"onGrab"
+delay_in_seconds = "0.0"
+
+[node name="HoldingProp" type="Node" parent="Component/GrabController/InteractionStateChart/InteractionLogic" unique_id=663962968]
+script = ExtResource("8_06tpx")
+
+[node name="OnThrow" type="Node" parent="Component/GrabController/InteractionStateChart/InteractionLogic/HoldingProp" unique_id=1242121712]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../ThrowingProp")
+event = &"onThrow"
+delay_in_seconds = "0.0"
+
+[node name="OnDrop" type="Node" parent="Component/GrabController/InteractionStateChart/InteractionLogic/HoldingProp" unique_id=1331723882]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../EmptyHands")
+event = &"onDrop"
+delay_in_seconds = "0.0"
+
+[node name="ThrowingProp" type="Node" parent="Component/GrabController/InteractionStateChart/InteractionLogic" unique_id=253100283]
+script = ExtResource("8_06tpx")
+
+[node name="OnDrop" type="Node" parent="Component/GrabController/InteractionStateChart/InteractionLogic/ThrowingProp" unique_id=1700651729]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../EmptyHands")
+event = &"onDrop"
+delay_in_seconds = "0.0"
+
+[node name="WeaponWallTuck" type="Node" parent="Component" unique_id=16121334]
+script = ExtResource("19_ogmfp")
+world_mask = 7
+tuck_position = Vector3(0, -0.04, 0.9)
+tuck_rotation_degrees = Vector3(30, 12, 2)
+ads_strength = 0.65
+
+[node name="CoverPeek" type="Node" parent="Component" unique_id=1798423182]
+script = ExtResource("20_ixrbb")
+cover_mask = 3
+camera_radius = 99.0
+
+[node name="StateChart" type="Node" parent="." unique_id=596134014]
+script = ExtResource("5_jhyir")
+metadata/_custom_type_script = "uid://couw105c3bde4"
+
+[node name="Root" type="Node" parent="StateChart" unique_id=895260290]
+script = ExtResource("6_74mp2")
+metadata/_custom_type_script = "uid://c1vp0ojjvaby1"
+
+[node name="Movement" type="Node" parent="StateChart/Root" unique_id=971743674]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Grounded")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Grounded" type="Node" parent="StateChart/Root/Movement" unique_id=511585891]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Idle")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Idle" type="Node" parent="StateChart/Root/Movement/Grounded" unique_id=606773680]
+script = ExtResource("8_06tpx")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="OnMoving" type="Node" parent="StateChart/Root/Movement/Grounded/Idle" unique_id=106582483]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../Moving")
+event = &"onMoving"
+delay_in_seconds = "0.0"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Moving" type="Node" parent="StateChart/Root/Movement/Grounded" unique_id=963843281]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Walking")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Walking" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=371987094]
+script = ExtResource("8_06tpx")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="Sprinting" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=329249352]
+script = ExtResource("8_06tpx")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="OnIdle" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=1250493170]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../Idle")
+event = &"onIdle"
+delay_in_seconds = "0.0"
+
+[node name="OnWalking" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=910881412]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Walking")
+event = &"onWalking"
+delay_in_seconds = "0.0"
+
+[node name="OnSprinting" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=96507387]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Sprinting")
+event = &"onSprinting"
+delay_in_seconds = "0.0"
+
+[node name="OnAirborne" type="Node" parent="StateChart/Root/Movement/Grounded/Moving" unique_id=1805463402]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../../Airborne")
+event = &"onAirborne"
+delay_in_seconds = "0.0"
+
+[node name="Airborne" type="Node" parent="StateChart/Root/Movement" unique_id=1671367421]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Jumping")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Jumping" type="Node" parent="StateChart/Root/Movement/Airborne" unique_id=239388086]
+script = ExtResource("8_06tpx")
+
+[node name="OnGrounded" type="Node" parent="StateChart/Root/Movement/Airborne" unique_id=935858291]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../Grounded")
+event = &"onGrounded"
+delay_in_seconds = "0.0"
+
+[node name="Stance" type="Node" parent="StateChart/Root" unique_id=628390868]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("Standing")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Standing" type="Node" parent="StateChart/Root/Stance" unique_id=2107118800]
+script = ExtResource("8_06tpx")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="Crouching" type="Node" parent="StateChart/Root/Stance" unique_id=1116793213]
+script = ExtResource("8_06tpx")
+
+[node name="Sliding" type="Node" parent="StateChart/Root/Stance" unique_id=2012999867]
+script = ExtResource("8_06tpx")
+
+[node name="Prone" type="Node" parent="StateChart/Root/Stance" unique_id=1873450214]
+script = ExtResource("8_06tpx")
+
+[node name="Diving" type="Node" parent="StateChart/Root/Stance" unique_id=1873450215]
+script = ExtResource("8_06tpx")
+
+[node name="OnStanding" type="Node" parent="StateChart/Root/Stance" unique_id=509212157]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Standing")
+event = &"onStanding"
+delay_in_seconds = "0.0"
+
+[node name="OnCrouching" type="Node" parent="StateChart/Root/Stance" unique_id=715314641]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Crouching")
+event = &"onCrouching"
+delay_in_seconds = "0.0"
+
+[node name="OnSliding" type="Node" parent="StateChart/Root/Stance" unique_id=1406676454]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Sliding")
+event = &"onSliding"
+delay_in_seconds = "0.0"
+
+[node name="OnProne" type="Node" parent="StateChart/Root/Stance" unique_id=1873450216]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Prone")
+event = &"onProne"
+delay_in_seconds = "0.0"
+
+[node name="OnDiving" type="Node" parent="StateChart/Root/Stance" unique_id=1873450217]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Diving")
+event = &"onDiving"
+delay_in_seconds = "0.0"
+
+[node name="OnSlideEnd" type="Node" parent="StateChart/Root/Stance" unique_id=155742018]
+script = ExtResource("9_7g0yx")
+to = NodePath("../Crouching")
+delay_in_seconds = "0.8"
+
+[node name="StateMachine" type="Node" parent="." unique_id=985945145 node_paths=PackedStringArray("player_controller")]
+script = ExtResource("10_dey5f")
+debug = true
+player_controller = NodePath("..")
+
+[node name="MovementState" type="Node" parent="StateMachine" unique_id=1012520038]
+
+[node name="GroundedState" type="Node" parent="StateMachine/MovementState" unique_id=692606877]
+script = ExtResource("11_hnuln")
+
+[node name="IdleState" type="Node" parent="StateMachine/MovementState/GroundedState" unique_id=1462120889]
+script = ExtResource("11_74mp2")
+
+[node name="MovingState" type="Node" parent="StateMachine/MovementState/GroundedState" unique_id=1751751381]
+script = ExtResource("12_06tpx")
+
+[node name="WalkingState" type="Node" parent="StateMachine/MovementState/GroundedState/MovingState" unique_id=1515019042]
+script = ExtResource("13_dey5f")
+
+[node name="RunningState" type="Node" parent="StateMachine/MovementState/GroundedState/MovingState" unique_id=1465574720]
+script = ExtResource("14_r5xpd")
+
+[node name="AirborneState" type="Node" parent="StateMachine/MovementState" unique_id=468989558]
+script = ExtResource("16_aqm4k")
+
+[node name="JumpingState" type="Node" parent="StateMachine/MovementState/AirborneState" unique_id=150216897]
+
+[node name="StanceState" type="Node" parent="StateMachine" unique_id=1959543440]
+
+[node name="StandingState" type="Node" parent="StateMachine/StanceState" unique_id=1406277482]
+script = ExtResource("15_ks1b7")
+
+[node name="CrouchingState" type="Node" parent="StateMachine/StanceState" unique_id=651418231]
+script = ExtResource("16_hnuln")
+
+[node name="SlidingState" type="Node" parent="StateMachine/StanceState" unique_id=1351751666]
+script = ExtResource("19_rcvs5")
+
+[node name="ProneState" type="Node" parent="StateMachine/StanceState" unique_id=1873450218]
+script = ExtResource("41_prone")
+
+[node name="DivingState" type="Node" parent="StateMachine/StanceState" unique_id=1873450219]
+script = ExtResource("42_diving")
+
+[node name="WeaponStateChart" type="Node" parent="." unique_id=912833212]
+script = ExtResource("5_jhyir")
+metadata/_custom_type_script = "uid://couw105c3bde4"
+
+[node name="Root" type="Node" parent="WeaponStateChart" unique_id=516963180]
+script = ExtResource("6_74mp2")
+metadata/_custom_type_script = "uid://c1vp0ojjvaby1"
+
+[node name="Trigger" type="Node" parent="WeaponStateChart/Root" unique_id=648473644]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("IdleState")
+
+[node name="IdleState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=2069809072]
+script = ExtResource("8_06tpx")
+
+[node name="FiringState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1790034271]
+script = ExtResource("8_06tpx")
+
+[node name="EmptyState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1258316839]
+script = ExtResource("8_06tpx")
+
+[node name="ReloadState" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1097449954]
+script = ExtResource("8_06tpx")
+
+[node name="OnReloadFinish" type="Node" parent="WeaponStateChart/Root/Trigger/ReloadState" unique_id=326207974]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../IdleState")
+event = &"onReloadFinish"
+delay_in_seconds = "0.0"
+
+[node name="OnIdle" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1258442477]
+script = ExtResource("9_7g0yx")
+to = NodePath("../IdleState")
+event = &"onIdle"
+delay_in_seconds = "0.0"
+
+[node name="OnFiring" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=1563891002]
+script = ExtResource("9_7g0yx")
+to = NodePath("../FiringState")
+event = &"onFiring"
+delay_in_seconds = "0.0"
+
+[node name="OnEmpty" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=899367234]
+script = ExtResource("9_7g0yx")
+to = NodePath("../EmptyState")
+event = &"onEmpty"
+delay_in_seconds = "0.0"
+
+[node name="OnReload" type="Node" parent="WeaponStateChart/Root/Trigger" unique_id=792372889]
+script = ExtResource("9_7g0yx")
+to = NodePath("../ReloadState")
+event = &"onReload"
+delay_in_seconds = "0.0"
+
+[node name="Sight" type="Node" parent="WeaponStateChart/Root" unique_id=243993872]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("HipfireState")
+
+[node name="HipfireState" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=130068624]
+script = ExtResource("8_06tpx")
+
+[node name="OnAiming" type="Node" parent="WeaponStateChart/Root/Sight/HipfireState" unique_id=118431218]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../AimingState")
+event = &"onAiming"
+delay_in_seconds = "0.0"
+
+[node name="OnCanted" type="Node" parent="WeaponStateChart/Root/Sight/HipfireState" unique_id=1337344600]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../AimingState/CantedAimState")
+event = &"onCanted"
+delay_in_seconds = "0.0"
+
+[node name="AimingState" type="Node" parent="WeaponStateChart/Root/Sight" unique_id=138704057]
+script = ExtResource("7_oikmp")
+initial_state = NodePath("AimDownState")
+
+[node name="AimDownState" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=825454313]
+script = ExtResource("8_06tpx")
+
+[node name="CantedAimState" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=233984011]
+script = ExtResource("8_06tpx")
+
+[node name="OnADS" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=1579143707]
+script = ExtResource("9_7g0yx")
+to = NodePath("../AimDownState")
+event = &"onADS"
+delay_in_seconds = "0.0"
+
+[node name="OnHipfire" type="Node" parent="WeaponStateChart/Root/Sight/AimingState" unique_id=1278669015]
+script = ExtResource("9_7g0yx")
+to = NodePath("../../HipfireState")
+event = &"onHipfire"
+delay_in_seconds = "0.0"
+
+[node name="WeaponStateMachine" type="Node" parent="." unique_id=1692042775 node_paths=PackedStringArray("weapon_controller")]
+script = ExtResource("22_2ahak")
+debug = true
+weapon_controller = NodePath("../Component/WeaponController")
+
+[node name="Trigger" type="Node" parent="WeaponStateMachine" unique_id=2054061703]
+
+[node name="IdleState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=637678654]
+script = ExtResource("22_ur3l4")
+
+[node name="FiringState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=1734260946]
+script = ExtResource("23_2ahak")
+
+[node name="EmptyState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=1112135551]
+script = ExtResource("24_rukb4")
+
+[node name="ReloadState" type="Node" parent="WeaponStateMachine/Trigger" unique_id=1196378006]
+script = ExtResource("26_1agin")
+
+[node name="Sight" type="Node" parent="WeaponStateMachine" unique_id=1107421997]
+
+[node name="HipfireState" type="Node" parent="WeaponStateMachine/Sight" unique_id=1580461824]
+script = ExtResource("26_fcwna")
+
+[node name="AimingState" type="Node" parent="WeaponStateMachine/Sight" unique_id=533957520]
+
+[node name="ADSState" type="Node" parent="WeaponStateMachine/Sight/AimingState" unique_id=1323029264]
+script = ExtResource("27_1agin")
+
+[node name="CantedAimState" type="Node" parent="WeaponStateMachine/Sight/AimingState" unique_id=1531340813]
+script = ExtResource("28_2jnj1")
+
+[connection signal="armor_changed" from="HealthComponent" to="." method="_on_health_component_armor_changed"]
+[connection signal="died" from="HealthComponent" to="." method="_on_player_dead"]
+[connection signal="health_changed" from="HealthComponent" to="." method="_on_health_component_health_changed"]
+[connection signal="state_entered" from="Component/GrabController/InteractionStateChart/InteractionLogic/EmptyHands" to="Component/GrabController" method="_on_empty_hands_state_entered"]
+[connection signal="state_entered" from="Component/GrabController/InteractionStateChart/InteractionLogic/HoldingProp" to="Component/GrabController" method="_on_holding_prop_state_entered"]
+[connection signal="state_entered" from="Component/GrabController/InteractionStateChart/InteractionLogic/ThrowingProp" to="Component/GrabController" method="_on_throwing_prop_state_entered"]
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="StateMachine/MovementState/GroundedState" method="_on_grounded_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Idle" to="StateMachine/MovementState/GroundedState/IdleState" method="_on_idle_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded/Moving" to="StateMachine/MovementState/GroundedState/MovingState" method="_on_moving_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_entered"]
+[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Walking" to="StateMachine/MovementState/GroundedState/MovingState/WalkingState" method="_on_walking_state_processing"]
+[connection signal="state_entered" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_entered"]
+[connection signal="state_processing" from="StateChart/Root/Movement/Grounded/Moving/Sprinting" to="StateMachine/MovementState/GroundedState/MovingState/RunningState" method="_on_sprinting_state_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Movement/Airborne" to="StateMachine/MovementState/AirborneState" method="_on_airborne_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Standing" to="StateMachine/StanceState/StandingState" method="_on_standing_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Standing" to="StateMachine/StanceState/StandingState" method="_on_standing_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Crouching" to="StateMachine/StanceState/CrouchingState" method="_on_crouching_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Crouching" to="StateMachine/StanceState/CrouchingState" method="_on_crouching_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_entered"]
+[connection signal="state_exited" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_exited"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Sliding" to="StateMachine/StanceState/SlidingState" method="_on_sliding_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Prone" to="StateMachine/StanceState/ProneState" method="_on_prone_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Prone" to="StateMachine/StanceState/ProneState" method="_on_prone_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Stance/Diving" to="StateMachine/StanceState/DivingState" method="_on_diving_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Root/Stance/Diving" to="StateMachine/StanceState/DivingState" method="_on_diving_state_physics_processing"]
+[connection signal="state_exited" from="StateChart/Root/Stance/Diving" to="StateMachine/StanceState/DivingState" method="_on_diving_state_exited"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/IdleState" to="WeaponStateMachine/Trigger/IdleState" method="_on_idle_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/Trigger/FiringState" method="_on_firing_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/FiringState" to="WeaponStateMachine/Trigger/FiringState" method="_on_firing_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/Trigger/EmptyState" method="_on_empty_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Trigger/EmptyState" to="WeaponStateMachine/Trigger/EmptyState" method="_on_empty_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Trigger/ReloadState" to="WeaponStateMachine/Trigger/ReloadState" method="_on_reload_state_state_entered"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Sight/HipfireState" to="WeaponStateMachine/Sight/HipfireState" method="_on_hipfire_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/HipfireState" to="WeaponStateMachine/Sight/HipfireState" method="_on_hipfire_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/AimDownState" to="WeaponStateMachine/Sight/AimingState/ADSState" method="_on_aim_down_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/AimingState/AimDownState" to="WeaponStateMachine/Sight/AimingState/ADSState" method="_on_aim_down_state_state_physics_processing"]
+[connection signal="state_entered" from="WeaponStateChart/Root/Sight/AimingState/CantedAimState" to="WeaponStateMachine/Sight/AimingState/CantedAimState" method="_on_canted_aim_state_state_entered"]
+[connection signal="state_physics_processing" from="WeaponStateChart/Root/Sight/AimingState/CantedAimState" to="WeaponStateMachine/Sight/AimingState/CantedAimState" method="_on_canted_aim_state_state_physics_processing"]
