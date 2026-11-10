@@ -9,8 +9,8 @@ func _on_sliding_state_entered() -> void:
 	_slide_timer = player_controller.current_slide_duration
 
 func _on_sliding_state_physics_processing(delta: float) -> void:
-	_slide_timer -= delta
-	player_controller.camera.update_camera_height(delta, -2)
+	_slide_timer -= PlayerTime.move(delta)
+	player_controller.camera.update_camera_height(PlayerTime.real(delta), -2)
 
 	player_controller.slide_modifier = player_controller.current_slide_power * (_slide_timer / player_controller.current_slide_duration)
 

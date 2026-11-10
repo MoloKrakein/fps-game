@@ -101,6 +101,7 @@ func update_camera_rotation(input: Vector2) -> void:
 		print("Camera Rotation: ", _rotation)
 
 func _process(delta: float) -> void:
+	delta = PlayerTime.real(delta)
 	var mouse_input: Vector2 = component_mouse_capture._mouse_input
 	if mouse_input != Vector2.ZERO:
 		_cancel_climb_with_input(mouse_input)

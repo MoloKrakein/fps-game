@@ -42,6 +42,7 @@
 [ext_resource type="Resource" uid="uid://btxu4nilsejs6" path="res://Resources/Weapons/pistol.tres" id="33_1agin"]
 [ext_resource type="Script" uid="uid://cc54bsgitj271" path="res://_Assets/Player/States/prone_state.gd" id="41_prone"]
 [ext_resource type="Script" uid="uid://ddt2t533jgyjl" path="res://_Assets/Player/States/diving_state.gd" id="42_diving"]
+[ext_resource type="Script" uid="uid://bfiywiawv4lyq" path="res://_Assets/Player/components/bullet_time.gd" id="50_bullettime"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o08ba"]
 
@@ -290,6 +291,13 @@ script = ExtResource("20_ixrbb")
 [node name="WeaponMount" type="Node" parent="Component" unique_id=246722622]
 script = ExtResource("21_j6uq4")
 mount_action = &"combat_weapon_mount"
+mounted_recoil = 0.25
+mounted_spread = 0.25
+
+[node name="BulletTime" type="Node" parent="Component" unique_id=2107118801]
+script = ExtResource("50_bullettime")
+world_time_scale = 0.05
+use_focus = false
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")

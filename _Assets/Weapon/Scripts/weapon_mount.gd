@@ -110,6 +110,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # =========================================================================== decision
 func _physics_process(delta: float) -> void:
+	delta = PlayerTime.real(delta)
 	if not enabled or _player == null or _weapon == null:
 		return
 
@@ -296,6 +297,7 @@ func _ray(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3) -> Dicti
 
 # =========================================================================== visuals / multipliers
 func _process(delta: float) -> void:
+	delta = PlayerTime.real(delta)
 	if _weapon == null:
 		return
 

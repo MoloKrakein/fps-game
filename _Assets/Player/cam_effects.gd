@@ -95,7 +95,7 @@ func _ready() -> void:
 	_fov_smooth = fov
 
 func _process(delta: float) -> void:
-	calculate_view_offset(delta)
+	calculate_view_offset(PlayerTime.real(delta))
 
 	# if Input.is_action_just_pressed("combat_fire"):
 	#     add_fall_kick(2.0)
@@ -313,7 +313,7 @@ func add_screen_shake(intensity: float, duration: float) -> void:
 		_screen_shake_tween.kill()
 
 
-	_screen_shake_tween = create_tween()
+	_screen_shake_tween = PlayerTime.real_tween(create_tween())
 	_screen_shake_tween.tween_method(update_screen_shake.bind(intensity), 0.0, 1.0,duration).set_ease(Tween.EASE_OUT)
 
 
@@ -328,7 +328,7 @@ func _animate_fov(target_fov: float, duration: float) -> void:
 	if _fov_tween:
 		_fov_tween.kill()
 
-	_fov_tween = create_tween()
+	_fov_tween = PlayerTime.real_tween(create_tween())
 	_fov_tween.set_ease(Tween.EASE_OUT)
 	_fov_tween.set_trans(Tween.TRANS_SINE)
 
@@ -338,7 +338,7 @@ func _change_fov(target_fov: float) -> void:
 	if _fov_tween:
 		_fov_tween.kill()
 
-	_fov_tween = create_tween()
+	_fov_tween = PlayerTime.real_tween(create_tween())
 	_fov_tween.set_ease(Tween.EASE_OUT)
 	_fov_tween.set_trans(Tween.TRANS_SINE)
 

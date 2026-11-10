@@ -116,7 +116,8 @@ func _initilize_ui() -> void:
 	EventBus.player_armor_changed.emit(health_component.current_armor, health_component.armor_value)
 
 func _physics_process(delta: float) -> void:
-	
+	delta = PlayerTime.move(delta)
+
 #region Physics Process
 	previous_velocity = velocity
 	# var acceleration = 
@@ -208,7 +209,10 @@ func _physics_process(delta: float) -> void:
 
 
 	var was_on_floor: bool = is_on_floor()
+	var move_factor: float = PlayerTime.move_factor()
+	velocity *= move_factor
 	move_and_slide()
+	velocity /= move_factor
 
 	if is_on_floor() and y_velocity_before_on_floor < 0.0:
 		impact_velocity = y_velocity_before_on_floor
@@ -449,6 +453,9 @@ func _on_aiming_state_state_entered() -> void:
 func _on_player_dead() -> void:
 	# Disable player input and movement
 	disable_movement()
+	var bullet_time: BulletTime = get_node_or_null("Component/BulletTime") as BulletTime
+	if bullet_time != null:
+		bullet_time.cancel_immediately()
 
 
 #region Debugging

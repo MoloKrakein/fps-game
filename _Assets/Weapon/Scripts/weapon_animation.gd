@@ -16,6 +16,12 @@ class_name WeaponAnimation extends Node
 func _ready() -> void:
 	if weapon_animation_tree == null:
 		print("AnimationTree not assigned in WeaponAnimation script.")
+	else:
+		weapon_animation_tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+
+func _process(delta: float) -> void:
+	if weapon_animation_tree != null:
+		weapon_animation_tree.advance(PlayerTime.real(delta))
 
 func play_animation(animation_name: String) -> void:
 	if not weapon_animation_tree:
@@ -67,7 +73,7 @@ func set_bolt_position(is_open: bool) -> void:
 	if not weapon_animation_tree:
 		print("AnimationTree is not assigned. Cannot set bolt position.")
 		return
-	var bolt_tween = create_tween()
+	var bolt_tween = PlayerTime.real_tween(create_tween())
 	bolt_tween.set_trans(Tween.TRANS_SINE)
 	bolt_tween.set_ease(Tween.EASE_OUT)
 	bolt_tween.tween_property(weapon_animation_tree, "parameters/BoltPosition/blend_amount", 1.0 if is_open else 0.0, weapon_bolt_time)

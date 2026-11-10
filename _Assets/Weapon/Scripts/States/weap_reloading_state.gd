@@ -32,7 +32,7 @@ func _on_reload_state_state_entered() -> void:
 	weapon_controller.reload_timer_ui(reload_time)
 	
 	# Wait for this reload step to finish.
-	await get_tree().create_timer(reload_time).timeout
+	await PlayerTime.real_timer(reload_time).timeout
 	
 	# Perform one reload action (one shell for per-bullet weapons).
 	weapon_controller.execute_reload()

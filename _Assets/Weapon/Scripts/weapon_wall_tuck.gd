@@ -94,6 +94,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func _process(delta: float) -> void:
+	delta = PlayerTime.real(delta)
 	if _weapon == null or _weapon.current_weapon_model == null:
 		amount = 0.0
 		return

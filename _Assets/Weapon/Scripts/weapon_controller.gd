@@ -216,6 +216,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	delta = PlayerTime.real(delta)
 	if fire_timer > 0.0:
 		fire_timer = maxf(fire_timer - delta, 0.0)
 	if _rack_timer > 0.0:
@@ -653,7 +654,7 @@ func tween_weapon_to_position(target_position: Vector3, target_rotation: Vector3
 	if aim_tween:
 		aim_tween.kill()
 
-	aim_tween = create_tween()
+	aim_tween = PlayerTime.real_tween(create_tween())
 	aim_tween.set_trans(Tween.TRANS_SINE)
 	aim_tween.set_ease(Tween.EASE_IN_OUT)
 	aim_tween.set_parallel(true)

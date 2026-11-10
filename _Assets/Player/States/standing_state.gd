@@ -5,7 +5,7 @@ extends PlayerState
 
 func _on_standing_state_physics_processing(delta: float) -> void:
 
-	player_controller.camera.update_camera_height(delta, 1)
+	player_controller.camera.update_camera_height(PlayerTime.real(delta), 1)
 
 	# prone key: dive when the dive rules allow it, otherwise go prone
 	if Input.is_action_just_pressed("move_prone"):

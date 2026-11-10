@@ -7,7 +7,7 @@ func _on_prone_state_physics_processing(delta: float) -> void:
 	var cam: CameraController = player_controller.camera
 	var dive: ProneDiveComponent = player_controller.prone_dive
 	var cam_speed: float = dive.prone_camera_speed if dive else 3.0
-	cam.move_camera_to(delta, cam.prone_offset, cam_speed)
+	cam.move_camera_to(PlayerTime.real(delta), cam.prone_offset, cam_speed)
 
 	if not player_controller.is_on_floor():
 		return

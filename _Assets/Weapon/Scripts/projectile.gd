@@ -11,6 +11,7 @@ var explosion_force: float = 0.0
 var armor_penetration: float = 0.0
 var trail_start_timer: Timer
 var _has_detonated: bool = false
+var real_time: bool = false
 
 @export var trail_effect: MeshInstance3D
 # @export var trail_effect: GPUParticles3D
@@ -30,7 +31,8 @@ func _physics_process(delta: float) -> void:
 	# global_position += velocity * delta
 	var space_state = get_world_3d().direct_space_state
 	var start_position = global_position
-	var end_position = start_position + velocity * delta
+	var step: float = PlayerTime.real(delta) if real_time else delta
+	var end_position = start_position + velocity * step
 
 	var query = PhysicsRayQueryParameters3D.create(start_position, end_position)
 	query.exclude = [self]  # Exclude the projectile itself from the raycast
@@ -65,6 +67,9 @@ func setup(
 	explosion_falloff = clampf(_explosion_falloff, 0.0, 1.0)
 	explosion_force = maxf(_explosion_force, 0.0)
 	armor_penetration = clampf(_armor_penetration, 0.0, 1.0)
+	real_time = attacker != null and attacker.is_in_group("player")
+	if real_time and trail_start_timer != null:
+		trail_start_timer.ignore_time_scale = true
 
 
 func _on_body_entered(body: Node3D) -> void:
@@ -157,6 +162,7 @@ func _show_trail_effect() -> void:
 			trail_start_timer = Timer.new()
 			trail_start_timer.wait_time = 0.0289
 			trail_start_timer.one_shot = true
+			trail_start_timer.ignore_time_scale = real_time
 			trail_start_timer.timeout.connect(func() -> void: trail_effect.visible = true)
 			add_child(trail_start_timer)
 			trail_start_timer.start()

@@ -10,7 +10,7 @@ func _on_diving_state_physics_processing(delta: float) -> void:
 		return
 
 	var cam: CameraController = player_controller.camera
-	cam.move_camera_to(delta, cam.prone_offset, dive.dive_camera_speed)
+	cam.move_camera_to(PlayerTime.real(delta), cam.prone_offset, dive.dive_camera_speed)
 
 	if dive.should_land() or dive.timed_out():
 		player_controller.state_chart.send_event("onProne")

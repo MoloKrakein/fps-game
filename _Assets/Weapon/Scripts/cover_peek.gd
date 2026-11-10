@@ -82,6 +82,7 @@ func _ready() -> void:
 
 # =========================================================================== decision
 func _physics_process(delta: float) -> void:
+	delta = PlayerTime.real(delta)
 	_target_offset = Vector3.ZERO
 	_target_roll = 0.0
 	if not enabled or _player == null or _weapon == null or _rig == null:
@@ -120,6 +121,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _process(delta: float) -> void:
+	delta = PlayerTime.real(delta)
 	if _rig == null:
 		return
 	var goal_is_active := _target_offset != Vector3.ZERO
