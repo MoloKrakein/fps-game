@@ -235,7 +235,9 @@ func calculate_view_offset(delta):
 	angles.x += _dive_pitch
 
 	
-	position = offset
+	# Keep the camera at the rig origin and add the peek offset in the rig's local space.
+	var rig := get_parent() as CameraController
+	position = offset + (rig.get_peek_cam_offset() if rig != null else Vector3.ZERO)
 	rotation = angles
 	
 

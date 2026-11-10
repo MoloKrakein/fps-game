@@ -180,6 +180,11 @@ var wall_tuck: WeaponWallTuck
 var stance_accuracy_modifier: float = 1.0
 var accuracy_modifier: float = 1.0
 var dynamic_accuracy_spread: float = 0.0
+
+# Set by WeaponMount (all 1.0 = no change)
+var recoil_multiplier: float = 1.0
+var spread_multiplier: float = 1.0
+var sway_multiplier: float = 1.0
 #endregion
 
 
@@ -437,8 +442,10 @@ func _apply_recoil() -> void:
 		if is_aiming:
 			pitch *= 0.7
 			yaw *= 0.7
-		camera.add_weapon_recoil(pitch, yaw, current_weapon.recoil_cam_roll)
-		camera.add_fov_punch(current_weapon.recoil_fov_punch)
+		pitch *= recoil_multiplier
+		yaw *= recoil_multiplier
+		camera.add_weapon_recoil(pitch, yaw, current_weapon.recoil_cam_roll * recoil_multiplier)
+		camera.add_fov_punch(current_weapon.recoil_fov_punch * recoil_multiplier)
 	animator.add_recoil()
 
 

@@ -226,6 +226,7 @@ func add_recoil() -> void:
 	if is_aiming:
 		strength *= ctrl.recoil_ads_visual_multiplier
 	strength *= running_aim_multiplier
+	strength *= ctrl.recoil_multiplier
 
 	# A support hand keeps a long gun aligned with the bore. It still pushes
 	# the stock into the shoulder, but produces less muzzle climb and wobble.
@@ -298,6 +299,7 @@ func _update_idle_sway(delta: float) -> Vector3:
 	if is_aiming:
 		amplitude *= ctrl.aim_sway_multiplier
 	amplitude *= _running_aim_multiplier(weapon.running_aim_sway_multiplier)
+	amplitude *= ctrl.sway_multiplier
 	# Tiredness is applied AFTER the aim multiplier so aiming stays shaky when exhausted.
 	amplitude *= 1.0 + tiredness * 2.0
 
@@ -372,7 +374,7 @@ func _update_look_sway(delta: float) -> Vector3:
 	var fast_turn_strength: float = _fast_turn_strength()
 
 	# Tuned at 60 FPS, where one frame of rotation was the old unit.
-	var rate60: Vector2 = _look_rate / 60.0
+	var rate60: Vector2 = _look_rate / 60.0 * ctrl.sway_multiplier
 	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_lag_multiplier)
 	var stance_weight: float = ctrl.look_lag_ads_weight if is_aiming else ctrl.look_lag_hipfire_weight
 	var fast_turn_boost: float = 1.0 + fast_turn_strength * ctrl.look_lag_fast_turn_boost
@@ -398,7 +400,7 @@ func _update_look_rotation(delta: float) -> Vector3:
 		return Vector3.ZERO
 
 	var fast_turn_strength: float = _fast_turn_strength()
-	var rate60: Vector2 = _look_rate / 60.0
+	var rate60: Vector2 = _look_rate / 60.0 * ctrl.sway_multiplier
 	var stance_weight: float = ctrl.look_lag_ads_weight if is_aiming else ctrl.look_lag_hipfire_weight
 	var w: float = _weight()
 	var weight_scale: float = lerpf(0.8, 1.3, w)

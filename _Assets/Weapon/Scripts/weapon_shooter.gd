@@ -129,7 +129,7 @@ func get_effective_spread() -> float:
 
 	# 3. Combine base, stance, skills, movement, and bloom
 	var total_spread: float = (base_spread * ctrl.stance_accuracy_modifier * ctrl.accuracy_modifier * move_penalty) + ctrl.dynamic_accuracy_spread
-	return maxf(0.0, total_spread)
+	return maxf(0.0, total_spread * ctrl.spread_multiplier)
 #endregion
 
 

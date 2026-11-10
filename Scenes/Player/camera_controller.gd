@@ -19,6 +19,11 @@ class_name CameraController extends Node3D
 var _rotation: Vector3
 const DEFAULT_HEIGHT: float = 0.5
 
+var _limit_active: bool = false
+var _limit_yaw_center: float = 0.0
+var _limit_yaw_half: float = 0.0
+var _limit_pitch_min: float = 0.0
+var _limit_pitch_max: float = 0.0
 
 @export_group("Step Smoothing")
 @export var step_speed: float = 8.0
@@ -51,12 +56,24 @@ func set_peek(offset: Vector3, roll: float) -> void:
 	_peek_offset = offset
 	_peek_roll = roll
 
+## Peek displacement for the camera, in the rig's local space. CamEffects adds it to its own position.
+func get_peek_cam_offset() -> Vector3:
+	return transform.basis.inverse() * _peek_offset
+
 ## Where the camera would be with no peek applied (stable origin for cover probes).
 func get_base_eye_position() -> Vector3:
-	# pitch-only, so the roll we add for leaning can't feed back into the probes
-	var parent := get_parent_node_3d()
-	var pitch_only := Basis.from_euler(Vector3(rotation.x, 0.0, 0.0))
-	return global_position + parent.global_transform.basis * (pitch_only * _cam_base_position)
+	return global_position
+
+## Locks the view to an arc around where the player is looking right now (radians).
+func set_view_limits(yaw_half: float, pitch_down: float, pitch_up: float) -> void:
+	_limit_active = true
+	_limit_yaw_center = _rotation.y
+	_limit_yaw_half = yaw_half
+	_limit_pitch_min = maxf(_rotation.x - pitch_down, deg_to_rad(tilt_low_limit))
+	_limit_pitch_max = minf(_rotation.x + pitch_up, deg_to_rad(tilt_high_limit))
+
+func clear_view_limits() -> void:
+	_limit_active = false
 
 func _ready() -> void:
 	_rotation = player_controller.rotation
@@ -69,6 +86,9 @@ func update_camera_rotation(input: Vector2) -> void:
 	_rotation.x += input.y * (1 if is_Vertical_inverted else -1)
 	_rotation.y += input.x * (1 if is_Horizontal_inverted else -1)
 	_rotation.x = clamp(_rotation.x, deg_to_rad(tilt_low_limit), deg_to_rad(tilt_high_limit))
+	if _limit_active:
+		_rotation.y = _limit_yaw_center + clampf(wrapf(_rotation.y - _limit_yaw_center, -PI, PI), -_limit_yaw_half, _limit_yaw_half)
+		_rotation.x = clampf(_rotation.x, _limit_pitch_min, _limit_pitch_max)
 
 	var _player_rotation = Vector3(0.0, _rotation.y, 0.0)
 	var _camera_rotation = Vector3(_rotation.x, 0.0, 0.0)
@@ -81,7 +101,6 @@ func update_camera_rotation(input: Vector2) -> void:
 		print("Camera Rotation: ", _rotation)
 
 func _process(delta: float) -> void:
-	_apply_peek()
 	var mouse_input: Vector2 = component_mouse_capture._mouse_input
 	if mouse_input != Vector2.ZERO:
 		_cancel_climb_with_input(mouse_input)
@@ -94,7 +113,8 @@ func _process(delta: float) -> void:
 			_target_h = 0.0
 			_step_smoothing = false
 
-		position.y = offset_height + _target_h
+	position.y = offset_height + _target_h
+	_apply_peek()
 
 func smooth_step(height_change: float) -> void:
 	_target_h -= height_change
@@ -116,9 +136,8 @@ func update_camera_height(delta: float, direction: int) -> void:
 
 func _apply_peek() -> void:
 	if _cam:
-		# offset is player-local; this node is pitched, so undo the pitch for the child
-		var pitch_only := Basis.from_euler(Vector3(rotation.x, 0.0, 0.0))
-		_cam.position = _cam_base_position + pitch_only.inverse() * _peek_offset
+		# CamEffects re-adds the offset to the child; this node only keeps the roll.
+		_cam.position = _cam_base_position
 	rotation.z = _peek_roll
 
 

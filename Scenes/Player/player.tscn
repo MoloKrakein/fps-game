@@ -28,6 +28,7 @@
 [ext_resource type="Script" uid="uid://b2bvbjne20wye" path="res://_Assets/Weapon/Scripts/weapon_wall_tuck.gd" id="19_ogmfp"]
 [ext_resource type="Script" uid="uid://guhkdu35mp0" path="res://_Assets/Player/States/sliding_state.gd" id="19_rcvs5"]
 [ext_resource type="Script" uid="uid://dh7qxflao4e60" path="res://_Assets/Weapon/Scripts/cover_peek.gd" id="20_ixrbb"]
+[ext_resource type="Script" uid="uid://1k8cr3c61mqu" path="res://_Assets/Weapon/Scripts/weapon_mount.gd" id="21_j6uq4"]
 [ext_resource type="Script" uid="uid://wq07swbsgepb" path="res://_Assets/Weapon/Scripts/weapon_state_machine.gd" id="22_2ahak"]
 [ext_resource type="Script" uid="uid://dtkw3g0e1cx7o" path="res://_Assets/Weapon/Scripts/States/weap_idle_state.gd" id="22_ur3l4"]
 [ext_resource type="Script" uid="uid://d28nxftt0gg0j" path="res://_Assets/Weapon/Scripts/States/weap_firing_state.gd" id="23_2ahak"]
@@ -285,8 +286,10 @@ ads_strength = 0.65
 
 [node name="CoverPeek" type="Node" parent="Component" unique_id=1798423182]
 script = ExtResource("20_ixrbb")
-debug = true
-world_mask = 13
+
+[node name="WeaponMount" type="Node" parent="Component" unique_id=246722622]
+script = ExtResource("21_j6uq4")
+mount_action = &"combat_weapon_mount"
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")
