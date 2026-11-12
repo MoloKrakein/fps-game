@@ -40,8 +40,7 @@ func fire_hitscan() -> void:
 		var result: Dictionary = space_state.intersect_ray(query)
 
 		if result:
-			_spawn_impact_effect(result.position)
-			_apply_damage_to_target(result.collider, damage)
+			_resolve_hit(result, direction, damage, weapon)
 
 
 func fire_projectile() -> void:
@@ -86,7 +85,8 @@ func fire_projectile() -> void:
 			weapon.explosion_damage,
 			weapon.explosion_falloff,
 			weapon.explosion_force,
-			weapon.armor_penetration
+			weapon.armor_penetration,
+			weapon.headshot_multiplier
 		)
 
 
@@ -134,6 +134,24 @@ func get_effective_spread() -> float:
 
 
 #region Impact & damage
+## One hitscan hit: damage (with enemy hitboxes / headshots) and the matching effect.
+func _resolve_hit(result: Dictionary, direction: Vector3, damage: float, weapon: Weapon) -> void:
+	var hit: Dictionary = HitResolver.apply_hit(
+		result.collider,
+		result.position,
+		result.normal,
+		direction,
+		damage,
+		ctrl.owner as Node3D,
+		weapon.headshot_multiplier,
+		weapon.armor_penetration
+	)
+	if hit.flesh:
+		HitEffects.spawn_flesh_hit(ctrl.get_tree().current_scene, hit.position, result.normal, direction, hit.headshot)
+	else:
+		_spawn_impact_effect(result.position)
+
+
 func _spawn_impact_effect(hit_position: Vector3) -> void:
 	if IMPACT_DECAL:
 		var marker: Node3D = IMPACT_DECAL.instantiate()
@@ -144,6 +162,7 @@ func _spawn_impact_effect(hit_position: Vector3) -> void:
 		ctrl.get_tree().create_timer(IMPACT_LIFETIME).timeout.connect(marker.queue_free)
 
 
+## Legacy direct damage (no hitboxes / headshots). fire_hitscan() now goes through HitResolver.
 func _apply_damage_to_target(target: Node3D, damage: float) -> void:
 	if target == null or damage <= 0:
 		return

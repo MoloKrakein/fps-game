@@ -13,7 +13,7 @@ signal stumble_started()
 signal recovery_started()
 signal recovered()
 
-enum Phase { IDLE, STAGGER, FALL, RECOVER }
+enum Phase { IDLE, STAGGER, FALL, RECOVER, FLINCH }
 
 @export_group("References")
 @export var actor: CharacterBody3D
@@ -38,6 +38,11 @@ enum Phase { IDLE, STAGGER, FALL, RECOVER }
 @export var max_stagger_hits: int = 3
 ## How quickly the root's knockback slides to a stop (m/s^2).
 @export var knockback_friction: float = 9.0
+
+@export_group("Flinch")
+## Local reaction for hits too light to stagger: only the bones around the impact go limp.
+@export var flinch_duration: float = 0.28
+@export var flinch_recovery_time: float = 0.18
 
 @export_group("Stagger")
 @export var stagger_duration: float = 0.9
@@ -76,6 +81,8 @@ var _bones_by_name: Dictionary = {}
 var _stagger_set: Array[PhysicalBone3D] = []
 var _stagger_names: Array[StringName] = []
 var _servo_targets: Array[Basis] = []
+var _active_set: Array[PhysicalBone3D] = []
+var _recovering_light: bool = false
 var _root_bone: PhysicalBone3D
 var _root_rest_in_actor: Basis = Basis.IDENTITY
 
@@ -119,7 +126,7 @@ func _ready() -> void:
 #region Public API
 
 func can_begin() -> bool:
-	return phase == Phase.IDLE and _is_configured()
+	return (phase == Phase.IDLE or _is_light_phase()) and _is_configured()
 
 
 func is_active() -> bool:
@@ -131,6 +138,9 @@ func is_active() -> bool:
 func begin(direction: Vector3, force: float, intensity: float = 0.5, hit_position: Vector3 = Vector3.INF) -> void:
 	if not can_begin():
 		return
+	# A stagger or fall takes over from a light flinch.
+	if _is_light_phase():
+		_abort_light_phase()
 
 	direction = _flatten(direction)
 	intensity = clampf(intensity, 0.0, 1.0)
@@ -171,10 +181,73 @@ func add_hit(direction: Vector3, force: float, intensity: float = 0.5, hit_posit
 ## starts the full simulation itself.
 func cancel_for_death() -> void:
 	_kill_blend()
+	_recovering_light = false
 	phase = Phase.IDLE
 	set_physics_process(false)
 	if is_instance_valid(ragdoll_skeleton):
 		ragdoll_skeleton.influence = 1.0
+
+## Short, local reaction for hits too light to stagger: only the bones around the impact go limp for a
+## moment, so the enemy keeps walking and shooting but visibly reacts (head snaps, arm swings, torso jolts).
+## `speed` is the velocity change in m/s of the hit bone. Returns false when nothing could react.
+func flinch(direction: Vector3, speed: float, hit_bone_name: StringName = &"", hit_position: Vector3 = Vector3.INF) -> bool:
+	if not _is_configured() or not (phase == Phase.IDLE or _is_light_phase()):
+		return false
+	var names: Array[StringName] = _flinch_names(hit_bone_name)
+	if names.is_empty():
+		return false
+
+	direction = _flatten(direction)
+	if phase == Phase.RECOVER:
+		_abort_light_phase()
+
+	if phase == Phase.IDLE:
+		var flinch_set: Array[PhysicalBone3D] = []
+		for bone_name in names:
+			flinch_set.append(_bones_by_name[bone_name] as PhysicalBone3D)
+		_active_set = flinch_set
+		_capture_servo_targets()
+		ragdoll_skeleton.influence = 1.0
+		ragdoll_skeleton.active = true
+		ragdoll_skeleton.physical_bones_start_simulation(names)
+		phase = Phase.FLINCH
+		_phase_time = 0.0
+		_muscle_time = 0.0
+		set_physics_process(true)
+	else:
+		# Hit again while flinching: go limp again and extend the reaction a little.
+		_muscle_time = 0.0
+		_phase_time = minf(_phase_time, flinch_duration * 0.4)
+
+	var hit_bone: PhysicalBone3D = _bones_by_name.get(hit_bone_name) as PhysicalBone3D
+	if hit_bone == null or not _active_set.has(hit_bone):
+		hit_bone = _active_set[0]
+	var kick: Vector3 = (direction + Vector3.UP * 0.15).normalized()
+	var offset: Vector3 = Vector3.ZERO
+	if hit_position.is_finite():
+		offset = hit_position - hit_bone.global_position
+	hit_bone.apply_impulse(kick * speed * hit_bone.mass, offset)
+	return true
+
+
+## The killing blow shoves the whole ragdoll a little and the hit bone a lot (a headshot snaps the head
+## back). Call right after the death ragdoll has started simulating.
+func apply_death_impulse(direction: Vector3, speed: float, hit_bone_name: StringName = &"", hit_position: Vector3 = Vector3.INF) -> void:
+	if _bones.is_empty() or not is_instance_valid(actor):
+		return
+	direction = _flatten(direction)
+	var kick: Vector3 = (direction + Vector3.UP * 0.2).normalized()
+	for bone in _bones:
+		bone.apply_central_impulse(kick * speed * 0.35 * bone.mass)
+
+	var hit_bone: PhysicalBone3D = _bones_by_name.get(hit_bone_name) as PhysicalBone3D
+	if hit_bone == null:
+		hit_bone = stumble_bone
+	if hit_bone != null:
+		var offset: Vector3 = Vector3.ZERO
+		if hit_position.is_finite():
+			offset = hit_position - hit_bone.global_position
+		hit_bone.apply_impulse(kick * speed * hit_bone.mass, offset)
 
 #endregion
 
@@ -185,6 +258,7 @@ func _enter_stagger(direction: Vector3, force: float, intensity: float, hit_posi
 	phase = Phase.STAGGER
 	_phase_time = 0.0
 	_muscle_time = 0.0
+	_active_set = _stagger_set
 	_capture_servo_targets()
 
 	ragdoll_skeleton.influence = 1.0
@@ -213,10 +287,23 @@ func _physics_process(delta: float) -> void:
 	match phase:
 		Phase.STAGGER:
 			_step_stagger(delta)
+		Phase.FLINCH:
+			_step_flinch(delta)
 		Phase.FALL:
 			_step_fall(delta)
 		Phase.RECOVER:
-			_decay_knockback(delta)
+			# A flinch must not slow the enemy down, only a real stagger's knockback decays.
+			if not _recovering_light:
+				_decay_knockback(delta)
+
+
+func _step_flinch(delta: float) -> void:
+	_phase_time += delta
+	_muscle_time += delta
+	var ramp: float = smoothstep(0.0, 0.15, _muscle_time)
+	_run_balance_servo(delta, lerpf(limp_strength, 1.0, ramp))
+	if _phase_time >= flinch_duration:
+		_begin_recovery()
 
 
 func _step_stagger(delta: float) -> void:
@@ -247,8 +334,10 @@ func _step_fall(delta: float) -> void:
 
 func _begin_recovery() -> void:
 	var from_fall: bool = phase == Phase.FALL
+	_recovering_light = phase == Phase.FLINCH
 	phase = Phase.RECOVER
-	recovery_started.emit()
+	if not _recovering_light:
+		recovery_started.emit()
 
 	if from_fall:
 		# Put the actor under the body and face it the way the body lies, without dragging the
@@ -270,7 +359,7 @@ func _begin_recovery() -> void:
 	_blend_tween = create_tween()
 	_blend_tween.tween_property(
 		ragdoll_skeleton, "influence", 0.0,
-		getup_blend_time if from_fall else stagger_recovery_time
+		getup_blend_time if from_fall else (flinch_recovery_time if _recovering_light else stagger_recovery_time)
 	)
 	_blend_tween.finished.connect(_finish_recovery)
 
@@ -281,9 +370,13 @@ func _finish_recovery() -> void:
 	ragdoll_skeleton.active = false
 	ragdoll_skeleton.influence = 1.0
 	_restore_actor()
+	var was_light: bool = _recovering_light
+	_recovering_light = false
 	phase = Phase.IDLE
 	set_physics_process(false)
-	recovered.emit()
+	# A flinch is invisible to the AI, so it does not report a recovery.
+	if not was_light:
+		recovered.emit()
 
 #endregion
 
@@ -294,15 +387,15 @@ func _capture_servo_targets() -> void:
 	# Target pose = the pose each bone had (relative to the animated pelvis) at the moment of impact.
 	var inverse_root: Basis = _root_bone.global_basis.orthonormalized().inverse()
 	_servo_targets.clear()
-	for bone in _stagger_set:
+	for bone in _active_set:
 		_servo_targets.append(inverse_root * bone.global_basis.orthonormalized())
 
 
 func _run_balance_servo(delta: float, strength: float) -> void:
 	var root_basis: Basis = _root_bone.global_basis.orthonormalized()
 	var blend: float = clampf(strength * servo_response * delta, 0.0, 1.0)
-	for i in _stagger_set.size():
-		var bone: PhysicalBone3D = _stagger_set[i]
+	for i in _active_set.size():
+		var bone: PhysicalBone3D = _active_set[i]
 		var current: Basis = bone.global_basis.orthonormalized()
 		var target: Basis = root_basis * _servo_targets[i]
 
@@ -323,6 +416,39 @@ func _run_balance_servo(delta: float, strength: float) -> void:
 
 
 #region Helpers
+
+func _is_light_phase() -> bool:
+	return phase == Phase.FLINCH or (phase == Phase.RECOVER and _recovering_light)
+
+
+func _abort_light_phase() -> void:
+	_kill_blend()
+	ragdoll_skeleton.physical_bones_stop_simulation()
+	ragdoll_skeleton.influence = 1.0
+	_recovering_light = false
+	phase = Phase.IDLE
+
+
+## Bones that go limp for a flinch, depending on where the hit landed. Legs keep walking.
+func _flinch_names(hit_bone_name: StringName) -> Array[StringName]:
+	var wanted: Array[StringName] = []
+	match String(hit_bone_name):
+		"head":
+			wanted.assign([&"head", &"spine_02"])
+		"arm_l", "forearm_l":
+			wanted.assign([&"arm_l", &"forearm_l", &"spine_02"])
+		"arm_r", "forearm_r":
+			wanted.assign([&"arm_r", &"forearm_r", &"spine_02"])
+		"spine_01", "spine_02", "pelvis", "":
+			wanted.assign([&"spine_01", &"spine_02", &"head"])
+		_:
+			pass
+	var names: Array[StringName] = []
+	for bone_name in wanted:
+		if _bones_by_name.has(bone_name):
+			names.append(bone_name)
+	return names
+
 
 func _is_configured() -> bool:
 	return is_instance_valid(actor) and is_instance_valid(ragdoll_skeleton) and _root_bone != null

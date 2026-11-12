@@ -8,6 +8,7 @@ script = ExtResource("1_w7rt3")
 weapon_name = "npc_gun"
 mags_ammo = 40
 max_ammo = 999
+is_hitscan = false
 fire_rate_rpm = 300.0
 fire_rate = 300.0
 fire_mode = 1

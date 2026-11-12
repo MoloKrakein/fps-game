@@ -9,14 +9,18 @@ var explosion_damage: float = 0.0
 var explosion_falloff: float = 1.0
 var explosion_force: float = 0.0
 var armor_penetration: float = 0.0
+var headshot_multiplier: float = 1.0
 var trail_start_timer: Timer
 var _has_detonated: bool = false
+var _hit_normal: Vector3 = Vector3.UP
 var real_time: bool = false
 
 @export var trail_effect: MeshInstance3D
 # @export var trail_effect: GPUParticles3D
 @export var is_tracer: bool = false
 @export_flags_3d_physics var explosion_collision_mask: int = 15
+## Layers the projectile flies into: world (1) plus the enemy hitbox bones (8), so head and limb hits register.
+@export_flags_3d_physics var hit_collision_mask: int = 9
 
 
 func _ready() -> void:
@@ -36,11 +40,12 @@ func _physics_process(delta: float) -> void:
 
 	var query = PhysicsRayQueryParameters3D.create(start_position, end_position)
 	query.exclude = [self]  # Exclude the projectile itself from the raycast
-	query.collision_mask = 1  # Set the collision mask to detect only relevant layers
+	query.collision_mask = hit_collision_mask  # Set the collision mask to detect only relevant layers
 	var result = space_state.intersect_ray(query)
 	
 	if result:
 		global_position = result.position
+		_hit_normal = result.normal
 		_on_body_entered(result.collider)
 		return
 	
@@ -56,7 +61,8 @@ func setup(
 		_explosion_damage: float = 0.0,
 		_explosion_falloff: float = 1.0,
 		_explosion_force: float = 0.0,
-		_armor_penetration: float = 0.0
+		_armor_penetration: float = 0.0,
+		_headshot_multiplier: float = 1.0
 	) -> void:
 	velocity = _velocity
 	damage = _damage
@@ -67,6 +73,7 @@ func setup(
 	explosion_falloff = clampf(_explosion_falloff, 0.0, 1.0)
 	explosion_force = maxf(_explosion_force, 0.0)
 	armor_penetration = clampf(_armor_penetration, 0.0, 1.0)
+	headshot_multiplier = maxf(_headshot_multiplier, 1.0)
 	real_time = attacker != null and attacker.is_in_group("player")
 	if real_time and trail_start_timer != null:
 		trail_start_timer.ignore_time_scale = true
@@ -80,10 +87,14 @@ func _on_body_entered(body: Node3D) -> void:
 	if is_explosive:
 		_explode()
 	else:
-		_spawn_impact_effect(global_position)
-		var health_component: HealthComponent = _find_health_component(body)
-		if health_component:
-			health_component.take_damage(damage, attacker, false, false, armor_penetration)
+		var direction: Vector3 = velocity.normalized() if velocity.length_squared() > 0.0001 else Vector3.FORWARD
+		var hit: Dictionary = HitResolver.apply_hit(
+			body, global_position, _hit_normal, direction, damage, attacker, headshot_multiplier, armor_penetration
+		)
+		if hit.flesh:
+			HitEffects.spawn_flesh_hit(get_tree().current_scene, hit.position, _hit_normal, direction, hit.headshot)
+		else:
+			_spawn_impact_effect(global_position)
 	queue_free()
 
 
@@ -173,6 +184,3 @@ func _show_trail_effect() -> void:
 func _enable_trail_effect() -> void:
 	if trail_effect:
 		trail_effect.visible = true
-	
-	
-		

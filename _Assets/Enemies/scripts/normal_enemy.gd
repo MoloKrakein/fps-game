@@ -33,12 +33,27 @@ extends BaseEnemy
 ## Added to the reaction when a leg is hit, so shot legs buckle.
 @export var leg_hit_intensity_bonus: float = 0.35
 
+@export_group("Hit effects")
+## The head hitbox's collision shape is scaled by this so headshots are a bit forgiving.
+@export var head_hitbox_scale: float = 1.3
+## Light hits (below the stumble threshold) make the part that was hit flinch.
+@export var flinch_enabled: bool = true
+## Velocity change (m/s) of the hit bone for a full-strength flinch.
+@export var flinch_force: float = 2.6
+## The killing blow pushes the ragdoll: m/s per point of damage, clamped to the range below.
+@export var death_impulse_per_damage: float = 0.06
+@export var death_impulse_min: float = 3.0
+@export var death_impulse_max: float = 12.0
+
 var anim_tree_state: AnimationNodeStateMachinePlayback
 var is_stumbling: bool = false
 var pending_stumble_direction: Vector3 = Vector3.ZERO
 var pending_stumble_intensity: float = 0.0
 var pending_stumble_hit_position: Vector3 = Vector3.INF
 var stumble_cooldown_left: float = 0.0
+var _last_hit_info: DamageInfo
+var _last_hit_frame: int = -100
+var _death_impulse_applied: bool = false
 
 
 #region Lifecycle
@@ -47,6 +62,7 @@ func _ready() -> void:
 	super._ready()
 	anim_tree_state = anim_tree["parameters/playback"]
 	_setup_active_ragdoll()
+	_inflate_hitboxes()
 	if stumble_state:
 		stumble_state.state_entered.connect(_on_stumble_state_entered)
 
@@ -118,6 +134,10 @@ func _on_death_ragdoll() -> void:
 		ragdoll_skeleton.influence = 1.0
 		ragdoll_skeleton.active = true
 		ragdoll_skeleton.physical_bones_start_simulation()
+	# The killing blow pushes the body. If its damage info has not arrived yet, _on_damage_received
+	# applies it as soon as it does.
+	if _last_hit_info != null and Engine.get_physics_frames() - _last_hit_frame <= 1:
+		_apply_death_impulse(_last_hit_info)
 
 #endregion
 
@@ -125,10 +145,16 @@ func _on_death_ragdoll() -> void:
 #region Stumble / active ragdoll
 
 func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
+	_last_hit_info = info
+	_last_hit_frame = Engine.get_physics_frames()
 	super(info, applied_damage) # alert + remember where the shot came from
-	if is_dead or active_ragdoll_controller == null or health_component.current_health <= 0.0:
+	if is_dead:
+		_apply_death_impulse(info) # the killing blow, if the ragdoll started first
+		return
+	if active_ragdoll_controller == null or health_component.current_health <= 0.0:
 		return
 	if info.raw_damage < stumble_threshold:
+		_try_flinch(info)
 		return
 
 	var intensity: float = clampf(
@@ -148,12 +174,46 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 		return
 
 	if stumble_cooldown_left > 0.0:
+		_try_flinch(info)
 		return
 
 	pending_stumble_direction = direction
 	pending_stumble_intensity = intensity
 	pending_stumble_hit_position = hit_position
 	state_chart.send_event("toStumble")
+
+
+## Makes the head hitbox a little bigger than its ragdoll collider so headshots are forgiving.
+func _inflate_hitboxes() -> void:
+	if ragdoll_skeleton == null:
+		return
+	for child in ragdoll_skeleton.get_children():
+		var hitbox: EnemyHitbox = child as EnemyHitbox
+		if hitbox != null and hitbox.is_head:
+			hitbox.inflate_shape(head_hitbox_scale)
+
+
+## Light hit: only the part that was hit flinches, the enemy keeps walking and shooting.
+func _try_flinch(info: DamageInfo) -> void:
+	if not flinch_enabled or active_ragdoll_controller == null or is_stumbling or is_dead:
+		return
+	var ratio: float = clampf(info.raw_damage / maxf(stumble_threshold, 1.0), 0.2, 1.0)
+	var strength: float = flinch_force * (0.6 + 0.8 * ratio)
+	if info.is_headshot:
+		strength *= 1.4
+	var bone_name: StringName = info.get_meta(&"hit_bone", &"")
+	active_ragdoll_controller.flinch(_get_stumble_direction(info), strength, bone_name, _get_hit_position(info))
+
+
+func _apply_death_impulse(info: DamageInfo) -> void:
+	if _death_impulse_applied or active_ragdoll_controller == null:
+		return
+	_death_impulse_applied = true
+	var speed: float = clampf(info.raw_damage * death_impulse_per_damage, death_impulse_min, death_impulse_max)
+	if info.is_headshot:
+		speed *= 1.25
+	var bone_name: StringName = info.get_meta(&"hit_bone", &"")
+	active_ragdoll_controller.apply_death_impulse(_get_stumble_direction(info), speed, bone_name, _get_hit_position(info))
 
 
 func _get_hit_position(info: DamageInfo) -> Vector3:
