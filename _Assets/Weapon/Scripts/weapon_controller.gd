@@ -140,6 +140,7 @@ var animator: WeaponProceduralAnimator
 var shooter: WeaponShooter
 var reload: WeaponReload
 var attachments: WeaponAttachments
+var actions: WeaponActions
 
 # Cached data (avoids digging through singletons every frame)
 var active_weapon_data: WeaponData
@@ -194,6 +195,7 @@ func _init() -> void:
 	shooter = WeaponShooter.new(self)
 	reload = WeaponReload.new(self)
 	attachments = WeaponAttachments.new(self)
+	actions = WeaponActions.new(self)
 	attachments.changed.connect(_refresh_muzzle_effects)
 
 
@@ -223,6 +225,7 @@ func _process(delta: float) -> void:
 		_rack_timer = maxf(_rack_timer - delta, 0.0)
 
 	reload.process(delta)
+	actions.process(delta)
 	animator.apply_offsets(delta)
 	_handle_combat_input()
 
@@ -276,6 +279,7 @@ func initialize_weapon_data(weapon_data: WeaponData) -> void:
 	active_weapon_data = weapon_data
 	_sync_cached_state_from_active_data()
 	_set_and_persist_fire_mode(_resolve_initial_fire_mode_for_weapon_data())
+	actions.sync_slide_to_chamber()
 
 
 func _sync_cached_state_from_active_data() -> void:
@@ -481,7 +485,7 @@ func _cycle_weapon() -> void:
 	else:
 		_feed_chamber()
 
-	_play_animation("Loaded" if active_weapon_data.is_loaded else "Empty")
+	actions.on_shot_cycled()
 	update_weapon_ui()
 
 
@@ -499,25 +503,13 @@ func rack_slide() -> void:
 	if is_reloading or _rack_timer > 0.0 or current_weapon.is_open_bolt:
 		return
 
-	var chamber_was_loaded: bool = active_weapon_data.is_loaded
-	if not chamber_was_loaded and active_weapon_data.ammo_in_magazine <= 0:
+	if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine <= 0:
 		return
 
-	if chamber_was_loaded:
-		shooter.eject_casing("alive")
-
-	_feed_chamber()
-	_play_animation("Rack")
-	if chamber_was_loaded:
-		_play_animation("Loaded" if active_weapon_data.is_loaded else "Empty")
-
+	actions.start_rack()
 	_rack_timer = rack_lockout_time
 	fire_timer = maxf(fire_timer, rack_lockout_time)
 	reset_trigger()
-	update_weapon_ui()
-
-	if not chamber_was_loaded and active_weapon_data.is_loaded:
-		send_state_event("onIdle")
 
 
 func _play_animation(animation_name: String) -> void:
@@ -590,12 +582,14 @@ func _bind_model_nodes(model: WeaponModel) -> void:
 		print("WeaponAnimation node not found in the weapon model.")
 	else:
 		weapon_animation_player.play_animation("Equip")
+	actions.bind_animation(weapon_animation_player)
 
 
 func switch_weapon(weapon_data: WeaponData) -> void:
 	if is_reloading or weapon_data == null or weapon_data.weapon == null:
 		return
 
+	actions.on_weapon_switching()
 	shooter.flush_casing_tube()
 	current_weapon = weapon_data.weapon
 	# Cache the active data immediately so per-frame code doesn't have to query a manager.

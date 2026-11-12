@@ -1,6 +1,10 @@
 extends WeaponState
-# Attach this to your ReloadingState node in the State Chart
-var timer: float = 0.0
+# Attach this to your ReloadingState node in the State Chart.
+#
+# No await/timer any more: WeaponActions runs the reload on a timeline.
+# Ammo transfers on the clip's mag_in event (or when the action finishes if the
+# clip has none), then WeaponActions sends onReloadFinish and calls
+# finish_reload_step(), exactly as this script used to do after the timer.
 
 func _on_reload_state_state_entered() -> void:
 	if not weapon_controller or weapon_controller.current_weapon == null:
@@ -11,32 +15,10 @@ func _on_reload_state_state_entered() -> void:
 		weapon_controller.is_reloading = false
 		return
 
-	var reload_type: String = "empty_reload" if not weapon_controller.active_weapon_data.is_loaded else "loaded_reload"
-	if weapon_controller.weapon_animation_player != null:
-		timer = weapon_controller.weapon_animation_player.get_animation_length(reload_type)
-		weapon_controller.weapon_animation_player.reload_weapon_animation(reload_type)
+	var actions: WeaponActions = weapon_controller.actions
+	var reload_type: StringName = WeaponActions.RELOAD_LOADED if weapon_controller.active_weapon_data.is_loaded else WeaponActions.RELOAD_EMPTY
+	var duration: float = actions.get_reload_duration(reload_type)
 
-	weapon_controller.is_reloading = true
-	# For per-bullet weapons, each reload input inserts a single shell.
-	var weapon_reload_time: float = weapon_controller.current_weapon.get_calculated_reload_speed()
-	var reload_time: float = timer
-	if reload_time <= 0.0:
-		reload_time = weapon_reload_time
-	if weapon_controller.current_weapon.is_reload_per_bullet:
-		var magazine_capacity: int = weapon_controller.current_weapon.get_calculated_magazine_capacity()
-		if magazine_capacity > 0:
-			reload_time = weapon_reload_time / float(magazine_capacity)
-	elif weapon_controller.current_weapon.reload_time > 0.0:
-		reload_time *= weapon_reload_time / weapon_controller.current_weapon.reload_time
-
-	weapon_controller.reload_timer_ui(reload_time)
-	
-	# Wait for this reload step to finish.
-	await PlayerTime.real_timer(reload_time).timeout
-	
-	# Perform one reload action (one shell for per-bullet weapons).
-	weapon_controller.execute_reload()
-	
-	# Finish this reload state entry; additional shells require another reload input.
-	weapon_controller.weapon_state_chart.send_event("onReloadFinish")
-	weapon_controller.finish_reload_step()
+	weapon_controller.is_reloading = true # must be set before start_reload(): a 0s reload finishes inside it
+	weapon_controller.reload_timer_ui(duration)
+	actions.start_reload(reload_type, duration)
