@@ -71,6 +71,9 @@ fraction = 1.0
 [sub_resource type="Resource" id="ActionDef_rack"]
 script = ExtResource("6_def01")
 id = &"rack"
+clip_role = &"rack"
+fade_in = 0.05
+fade_out = 0.1
 events = Array[ExtResource("5_evt01")]([SubResource("Event_rack_pull"), SubResource("Event_rack_peak"), SubResource("Event_rack_release"), SubResource("Event_rack_closed")])
 
 [sub_resource type="Resource" id="Event_rl_out"]
@@ -86,6 +89,7 @@ fraction = 0.85
 [sub_resource type="Resource" id="ActionDef_reload_loaded"]
 script = ExtResource("6_def01")
 id = &"loaded_reload"
+clip_role = &"reload_loaded"
 events = Array[ExtResource("5_evt01")]([SubResource("Event_rl_out"), SubResource("Event_rl_in")])
 
 [sub_resource type="Resource" id="Event_re_out"]
@@ -101,42 +105,19 @@ fraction = 0.85
 [sub_resource type="Resource" id="ActionDef_reload_empty"]
 script = ExtResource("6_def01")
 id = &"empty_reload"
+clip_role = &"reload_empty"
 events = Array[ExtResource("5_evt01")]([SubResource("Event_re_out"), SubResource("Event_re_in")])
 
-[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_cbvsw"]
+[sub_resource type="Resource" id="ActionDef_equip"]
+script = ExtResource("6_def01")
+id = &"equip"
+clip_role = &"equip"
+fade_in = 0.0
+fade_out = 0.12
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uo56h"]
-animation = &"Close_bolt"
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_action"]
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2ib5x"]
-animation = &"Equip"
-
-[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_cbvsw"]
-filter_enabled = true
-filters = ["Armature/Skeleton3D:Body_2", "Armature/Skeleton3D:Mags_2", "Armature/Skeleton3D:dummy_2"]
-fadeout_time = 0.12
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2kfvb"]
-animation = &"Open_bolt"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_k02rg"]
-animation = &"Rack"
-
-[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_2kfvb"]
-filter_enabled = true
-filters = ["Armature/Skeleton3D:Body_2"]
-fadein_time = 0.05
-fadeout_time = 0.1
-
-[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_enst8"]
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_qkr1u"]
-animation = &"Reload_Empty"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cbvsw"]
-animation = &"Reload"
-
-[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_rjpr8"]
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_action"]
 filter_enabled = true
 filters = ["Armature/Skeleton3D:Body_2", "Armature/Skeleton3D:Mags_2", "Armature/Skeleton3D:dummy_2"]
 fadein_time = 0.1
@@ -144,34 +125,30 @@ fadeout_time = 0.15
 
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_2kfvb"]
 
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_cbvsw"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uo56h"]
+animation = &"Close_bolt"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2kfvb"]
+animation = &"Open_bolt"
+
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(-475.2934, 231.4653)
-nodes/output/position = Vector2(980, 100)
+graph_offset = Vector2(-592.628, 76.58383)
+nodes/output/position = Vector2(760, 100)
 nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_uo56h")
 nodes/CloseBolt/position = Vector2(-340, 40)
 nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_2kfvb")
 nodes/OpenBolt/position = Vector2(-340, 200)
 nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_cbvsw")
-nodes/BoltPosition/position = Vector2(-120, 80)
-nodes/ReloadLoaded/node = SubResource("AnimationNodeAnimation_cbvsw")
-nodes/ReloadLoaded/position = Vector2(-340, 400)
-nodes/ReloadEmpty/node = SubResource("AnimationNodeAnimation_qkr1u")
-nodes/ReloadEmpty/position = Vector2(-340, 560)
-nodes/ReloadBlend/node = SubResource("AnimationNodeBlend2_enst8")
-nodes/ReloadBlend/position = Vector2(-120, 440)
-nodes/ReloadTimeScale/node = SubResource("AnimationNodeTimeScale_2kfvb")
-nodes/ReloadTimeScale/position = Vector2(80, 440)
-nodes/ReloadOneShot/node = SubResource("AnimationNodeOneShot_rjpr8")
-nodes/ReloadOneShot/position = Vector2(300, 100)
-nodes/RackBody/node = SubResource("AnimationNodeAnimation_k02rg")
-nodes/RackBody/position = Vector2(320, 320)
-nodes/RackOneShot/node = SubResource("AnimationNodeOneShot_2kfvb")
-nodes/RackOneShot/position = Vector2(540, 100)
-nodes/EquipClip/node = SubResource("AnimationNodeAnimation_2ib5x")
-nodes/EquipClip/position = Vector2(560, 320)
-nodes/EquipOneShot/node = SubResource("AnimationNodeOneShot_cbvsw")
-nodes/EquipOneShot/position = Vector2(780, 100)
-node_connections = [&"output", 0, &"EquipOneShot", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"ReloadBlend", 0, &"ReloadLoaded", &"ReloadBlend", 1, &"ReloadEmpty", &"ReloadTimeScale", 0, &"ReloadBlend", &"ReloadOneShot", 0, &"BoltPosition", &"ReloadOneShot", 1, &"ReloadTimeScale", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"RackBody", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"EquipClip"]
+nodes/BoltPosition/position = Vector2(-100, 80)
+nodes/ActionClip/node = SubResource("AnimationNodeAnimation_action")
+nodes/ActionClip/position = Vector2(-120, 340)
+nodes/ActionSpeed/node = SubResource("AnimationNodeTimeScale_2kfvb")
+nodes/ActionSpeed/position = Vector2(140, 300)
+nodes/ActionLayer/node = SubResource("AnimationNodeOneShot_action")
+nodes/ActionLayer/position = Vector2(480, 100)
+node_connections = [&"output", 0, &"ActionLayer", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"ActionSpeed", 0, &"ActionClip", &"ActionLayer", 0, &"BoltPosition", &"ActionLayer", 1, &"ActionSpeed"]
 
 [node name="PistolModel" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "iron_sight_point", "ammo_display")]
 script = ExtResource("1_2kfvb")
@@ -236,25 +213,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.027523652, 0.18819112, -0.1
 script = ExtResource("3_uo56h")
 weapon_animation_tree = NodePath("../AnimationTree")
 animation_player = NodePath("../mk57/AnimationPlayer")
-actions = Array[ExtResource("6_def01")]([SubResource("ActionDef_rack"), SubResource("ActionDef_reload_loaded"), SubResource("ActionDef_reload_empty")])
+actions = Array[ExtResource("6_def01")]([SubResource("ActionDef_rack"), SubResource("ActionDef_reload_loaded"), SubResource("ActionDef_reload_empty"), SubResource("ActionDef_equip")])
 metadata/_custom_type_script = "uid://csp53xj462vmj"
 
-[node name="AnimationTree" type="AnimationTree" parent="." unique_id=834356458]
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1277320455]
 root_node = NodePath("../mk57")
 tree_root = SubResource("AnimationNodeBlendTree_bhunq")
 anim_player = NodePath("../mk57/AnimationPlayer")
 parameters/BoltPosition/blend_amount = 0.0
-parameters/ReloadBlend/blend_amount = 0.0
-parameters/ReloadTimeScale/scale = 30.520000000000003
-parameters/ReloadOneShot/active = false
-parameters/ReloadOneShot/internal_active = false
-parameters/ReloadOneShot/request = 0
-parameters/RackOneShot/active = false
-parameters/RackOneShot/internal_active = false
-parameters/RackOneShot/request = 0
-parameters/EquipOneShot/active = false
-parameters/EquipOneShot/internal_active = false
-parameters/EquipOneShot/request = 0
+parameters/ActionSpeed/scale = 1.0
+parameters/ActionLayer/active = false
+parameters/ActionLayer/internal_active = false
+parameters/ActionLayer/request = 0
 
 [node name="Magazine" type="Node3D" parent="." unique_id=2029134148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)

@@ -45,10 +45,20 @@ default_speed = 6.0
 [node name="HealthComponent" parent="CurrentLevel/PlayerController" index="1" unique_id=1115016750]
 start_with_armor = true
 
+[node name="BulletTime" parent="CurrentLevel/PlayerController/Component" parent_id_path=PackedInt32Array(1796224466, 2093724721) index="9" unique_id=2107118801 node_paths=PackedStringArray("effect_target")]
+effect_target = NodePath("../../../../PostProcessingLayer/ColorRect")
+effect_saturation = 2.0
+effect_chromatic_aberration = 0.02
+effect_vignette_strength = 1.0
+
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]
 
 [node name="PostProcessingLayer" parent="." unique_id=1547687983 instance=ExtResource("10_76v2p")]
 visible = false
+
+[node name="ColorRect" parent="PostProcessingLayer" index="0" unique_id=1099157815]
+visible = false
+color = Color(1, 1, 1, 0.40392157)
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=285879250]
 anchors_preset = 15
@@ -61,7 +71,7 @@ stretch = true
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1828947772]
 transparent_bg = true
 handle_input_locally = false
-size = Vector2i(1366, 720)
+size = Vector2i(1920, 1080)
 render_target_update_mode = 4
 
 [node name="UserInterface" parent="SubViewportContainer/SubViewport" unique_id=2116638828 instance=ExtResource("2_jv6wh")]

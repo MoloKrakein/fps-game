@@ -13,6 +13,7 @@ signal world_event(action: StringName, event_name: StringName)
 const RELOAD_EMPTY: StringName = &"empty_reload"
 const RELOAD_LOADED: StringName = &"loaded_reload"
 const RACK: StringName = &"rack"
+const EQUIP: StringName = &"equip"
 
 # --- Slide tuning (move to the Weapon resource / debug menu later) ---
 var fire_travel: float = 1.0           # how far the slide blows back on a shot (0..1)
@@ -22,6 +23,9 @@ var shot_back_min_max: Vector2 = Vector2(0.02, 0.07)
 var shot_return_min_max: Vector2 = Vector2(0.04, 0.16)
 var rack_pull_curve: float = 0.5
 var rack_release_curve: float = 2.2
+
+## Set to true (e.g. in WeaponController._init) to print the slide state on every shot.
+var debug_slide: bool = false
 
 var ctrl: WeaponController
 var timeline: ActionTimeline = ActionTimeline.new()
@@ -78,6 +82,22 @@ func sync_slide_to_chamber() -> void:
 	slide.snap(1.0 if open else 0.0)
 	if open:
 		slide.lock(1.0)
+	_debug_slide("sync to chamber")
+
+
+func _debug_slide(label: String) -> void:
+	if not debug_slide:
+		return
+	var data: WeaponData = ctrl.active_weapon_data
+	var tree_value: Variant = null
+	if anim != null and anim.weapon_animation_tree != null:
+		tree_value = anim.weapon_animation_tree.get(anim.slide_blend_param)
+	print("[slide] ", label,
+		" | is_loaded=", data.is_loaded if data != null else "no data",
+		" mag=", data.ammo_in_magazine if data != null else "-",
+		" | driver value=", snappedf(slide.value, 0.01), " locked=", slide.locked,
+		" apply_valid=", slide.apply.is_valid(),
+		" | tree param=", tree_value)
 #endregion
 
 
@@ -92,6 +112,7 @@ func on_shot_cycled() -> void:
 	var back: float = clampf(interval * shot_back_fraction, shot_back_min_max.x, shot_back_min_max.y)
 	var ret: float = clampf(interval * shot_return_fraction, shot_return_min_max.x, shot_return_min_max.y)
 	slide.kick(fire_travel, back, ret, not data.is_loaded)
+	_debug_slide("shot cycled")
 #endregion
 
 
@@ -126,15 +147,11 @@ func start_reload(reload_type: StringName, duration: float) -> void:
 
 	_reload_committed = false
 
+	var def: ActionDef = _get_def(reload_type)
 	if anim != null:
-		var clip_len: float = anim.get_animation_length(String(reload_type))
-		var time_scale: float = 1.0
-		if clip_len > 0.0:
-			time_scale = 100.0 if duration <= 0.0 else clip_len / duration
-		anim.set_reload_time_scale(time_scale)
-		anim.reload_weapon_animation(String(reload_type))
+		anim.play_action(def, _clip_speed(String(reload_type), duration))
 
-	timeline.start(_get_def(reload_type), duration)
+	timeline.start(def, duration)
 
 
 func cancel_reload() -> void:
@@ -164,8 +181,12 @@ func start_rack() -> void:
 	if data == null:
 		return
 	_rack_chamber_was_loaded = data.is_loaded
-	ctrl._play_animation("Rack") # body motion only: remove Slider_2 from the RackOneShot filter
-	timeline.start(_get_def(RACK), ctrl.rack_lockout_time)
+
+	var duration: float = ctrl.rack_lockout_time
+	var def: ActionDef = _get_def(RACK)
+	if anim != null:
+		anim.play_action(def, _clip_speed("Rack", duration))
+	timeline.start(def, duration)
 
 
 func _on_rack_event(event_name: StringName) -> void:
@@ -195,6 +216,24 @@ func _on_rack_event(event_name: StringName) -> void:
 				ctrl.send_state_event("onIdle")
 
 
+## Playback speed that makes a clip last `duration` seconds (1.0 when unknown).
+func _clip_speed(clip_name: String, duration: float) -> float:
+	if anim == null:
+		return 1.0
+	var clip_len: float = anim.get_animation_length(clip_name)
+	if clip_len <= 0.0:
+		return 1.0
+	if duration <= 0.0:
+		return 100.0
+	return clip_len / duration
+
+
+## Fade the action layer out (no-op if its clip already ended).
+func _end_clip() -> void:
+	if anim != null:
+		anim.end_action()
+
+
 func _span(from_event: StringName, to_event: StringName) -> float:
 	var f: float = timeline.fraction_of(to_event, 1.0) - timeline.fraction_of(from_event, 0.0)
 	return maxf(f, 0.0) * timeline.duration
@@ -213,8 +252,11 @@ func _on_event(action: StringName, event_name: StringName) -> void:
 
 func _on_finished(action: StringName) -> void:
 	match action:
+		RACK:
+			_end_clip()
 		RELOAD_EMPTY, RELOAD_LOADED:
 			_commit_reload() # fallback when the clip has no mag_in event
+			_end_clip()
 			ctrl.send_state_event("onReloadFinish")
 			ctrl.finish_reload_step()
 
@@ -223,34 +265,19 @@ func _on_cancelled(action: StringName, _progress: float) -> void:
 	match action:
 		RELOAD_EMPTY, RELOAD_LOADED:
 			# No commit: if mag_in never happened, no ammo is transferred.
+			_end_clip()
 			ctrl.send_state_event("onReloadFinish")
 			ctrl.finish_reload_step()
 #endregion
 
 
-#region Default action definitions
-## Used when the model's WeaponAnimation has no ActionDef for this action,
-## so each weapon can be migrated one at a time.
+#region Action definitions
+## The weapon's own ActionDef when it has one, otherwise the built-in default
+## (ActionDef.make_default), so each weapon can be migrated one at a time.
 func _get_def(id: StringName) -> ActionDef:
 	if anim != null:
 		var def: ActionDef = anim.get_action_def(id)
 		if def != null:
 			return def
-
-	match id:
-		RACK:
-			return _make_def(id, {&"pull": 0.0, &"peak": 0.45, &"release": 0.55, &"closed": 1.0})
-		_:
-			return _make_def(id, {}) # reloads: ammo commits on finish
-
-
-static func _make_def(id: StringName, fractions: Dictionary) -> ActionDef:
-	var def: ActionDef = ActionDef.new()
-	def.id = id
-	for key: StringName in fractions:
-		var ev: ActionEvent = ActionEvent.new()
-		ev.event_name = key
-		ev.fraction = float(fractions[key])
-		def.events.append(ev)
-	return def
+	return ActionDef.make_default(id)
 #endregion

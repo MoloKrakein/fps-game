@@ -103,28 +103,22 @@ In `switch_weapon()`, right after the guard clause and before `current_weapon = 
 
 ---
 
-# Scene (.tscn) changes for the pistol
+# Scene and tree changes
 
-1. **ReloadTimeScale node.** In the AnimationTree, add an `AnimationNodeTimeScale`
-   named `ReloadTimeScale` between `ReloadBlend` (Blend2 output) and the
-   `ReloadOneShot` shot input. Its parameter becomes
-   `parameters/ReloadTimeScale/scale`. Until it exists, reloads play at 1x and
-   nothing breaks.
-2. **Rack filter.** Remove `Slider_2` from the `RackOneShot` filter list (the code
-   owns the slide now). Keep `Body_2`.
-3. **Equip filter.** Equip is currently unfiltered, so it keys every bone including
-   the slide. Switch it to filtered and include every bone except `Slider_2`.
-4. **WeaponAnimation node.** Optional `actions` list on the `WeaponAnimation` node.
-   Without it, rack uses the defaults in `WeaponActions._get_def()`
-   (pull 0.0, peak 0.45, release 0.55, closed 1.0) and reloads commit ammo when
-   they finish, which is the old behaviour. To get ammo on the visible frame, add
-   an `ActionDef` with id `empty_reload` / `loaded_reload` and a `mag_in` event.
-5. The old `weapon_bolt_time` export on `WeaponAnimation` is gone. Godot drops the
-   stale value from the scene on the next save.
+The AnimationTree is now one state machine instead of chained OneShots. Use the edited
+`scenes/pistol_model.tscn` as the reference and read `weapon_template_guide.md`.
+
+You must add one clip in Blender (or Godot) before opening the scene: a pose clip named
+`Idle` that keys `Body_2`, `Mags_2` and `dummy_2` in their resting position (2 identical
+frames is enough). Without it the tree prints "Animation not found: Idle" every frame.
+
+The old `weapon_bolt_time` export on `WeaponAnimation` is gone. Godot drops the stale value
+from the scene on the next save.
 
 # Blender checklist
 
-- Reload and equip clips must not key the slide bone.
+- Add the `Idle` pose clip (see above).
+- Reload, rack and equip clips must not key the slide bone.
 - Event fraction = (frame - clip_start) / (clip_end - clip_start).
 
 # What to test, in order

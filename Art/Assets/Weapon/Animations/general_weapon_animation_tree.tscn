@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://c3l7qo7dkkxio"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_action"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_action"]
+filter_enabled = true
+filters = ["Armature/Skeleton3D:Body_2", "Armature/Skeleton3D:Mags_2", "Armature/Skeleton3D:dummy_2"]
+fadein_time = 0.1
+fadeout_time = 0.15
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_2kfvb"]
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_cbvsw"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uo56h"]
+animation = &"Close_bolt"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2kfvb"]
+animation = &"Open_bolt"
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
+graph_offset = Vector2(-467.72998, 99.91733)
+nodes/output/position = Vector2(760, 100)
+nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_uo56h")
+nodes/CloseBolt/position = Vector2(-340, 40)
+nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_2kfvb")
+nodes/OpenBolt/position = Vector2(-340, 200)
+nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_cbvsw")
+nodes/BoltPosition/position = Vector2(-100, 80)
+nodes/ActionClip/node = SubResource("AnimationNodeAnimation_action")
+nodes/ActionClip/position = Vector2(-120, 340)
+nodes/ActionSpeed/node = SubResource("AnimationNodeTimeScale_2kfvb")
+nodes/ActionSpeed/position = Vector2(140, 300)
+nodes/ActionLayer/node = SubResource("AnimationNodeOneShot_action")
+nodes/ActionLayer/position = Vector2(480, 100)
+node_connections = [&"output", 0, &"ActionLayer", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"ActionSpeed", 0, &"ActionClip", &"ActionLayer", 0, &"BoltPosition", &"ActionLayer", 1, &"ActionSpeed"]
+
+[node name="AnimationTree" type="AnimationTree" unique_id=1277320455]
+root_node = NodePath("../mk57")
+tree_root = SubResource("AnimationNodeBlendTree_bhunq")
+anim_player = NodePath("../mk57/AnimationPlayer")
+parameters/BoltPosition/blend_amount = 0.0
+parameters/ActionSpeed/scale = 1.0
+parameters/ActionLayer/active = false
+parameters/ActionLayer/internal_active = false
+parameters/ActionLayer/request = 0

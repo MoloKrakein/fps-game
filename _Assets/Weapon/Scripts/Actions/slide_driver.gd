@@ -73,6 +73,9 @@ func release() -> void:
 
 func tick(delta: float) -> void:
 	if not _moving:
+		# Pin the pose every frame so nothing else can silently reset the blend value.
+		if apply.is_valid():
+			apply.call(value)
 		return
 	_t += delta
 	var k: float = clampf(_t / _dur, 0.0, 1.0) # _dur > 0 here, see _next()
