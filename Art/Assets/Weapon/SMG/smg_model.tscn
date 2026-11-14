@@ -44,21 +44,29 @@ metadata/_custom_type_script = "uid://drvmna7qr33n4"
 [sub_resource type="Resource" id="Resource_ceeie"]
 script = ExtResource("12_2v2p1")
 event_name = &"pull"
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_4hent"]
 script = ExtResource("12_2v2p1")
 event_name = &"peak"
 fraction = 0.45
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_t51ng"]
 script = ExtResource("12_2v2p1")
 event_name = &"release"
 fraction = 0.55
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_c0ndq"]
 script = ExtResource("12_2v2p1")
 event_name = &"closed"
 fraction = 1.0
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_t85nw"]
 script = ExtResource("11_o5oma")
@@ -72,11 +80,15 @@ events = Array[ExtResource("12_2v2p1")]([SubResource("Resource_ceeie"), SubResou
 script = ExtResource("12_2v2p1")
 event_name = &"mag_out"
 fraction = 0.3
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_mvn38"]
 script = ExtResource("12_2v2p1")
 event_name = &"mag_in"
 fraction = 0.85
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_2jnlp"]
 script = ExtResource("11_o5oma")
@@ -88,11 +100,15 @@ events = Array[ExtResource("12_2v2p1")]([SubResource("Resource_gftys"), SubResou
 script = ExtResource("12_2v2p1")
 event_name = &"mag_out"
 fraction = 0.3
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_ptr1h"]
 script = ExtResource("12_2v2p1")
 event_name = &"mag_in"
 fraction = 0.85
+show_parts = null
+hide_parts = null
 
 [sub_resource type="Resource" id="Resource_pbttx"]
 script = ExtResource("11_o5oma")
@@ -157,10 +173,10 @@ transform = Transform3D(-3.8903135e-08, 0, 0.89, 0, 0.89, 0, -0.89, 0, -3.890313
 [node name="Skeleton3D" parent="Btr_m10/Armature" parent_id_path=PackedInt32Array(1248920148, 1426276471) index="0" unique_id=1172525189]
 bones/0/position = Vector3(-0.874269, -1.6634544, -1.0603409e-07)
 bones/0/rotation = Quaternion(-2.6692554e-08, 1.1098623e-07, -0.7071067, 0.7071068)
-bones/1/position = Vector3(0.006288347, -1.0680345, -1.4461325e-07)
+bones/1/position = Vector3(0.005608854, -1.0680345, -1.4515186e-07)
 bones/3/position = Vector3(-0.4950065, 0.3009991, 5.4895978e-08)
 bones/3/rotation = Quaternion(-0.70710707, 2.779951e-07, 0.7071066, 5.338495e-08)
-bones/4/position = Vector3(-2.491345e-07, 1.0586644, -0.38315547)
+bones/4/position = Vector3(-2.8968248e-06, 1.0586625, -0.44288158)
 
 [node name="UnderBarrel" type="BoneAttachment3D" parent="Btr_m10/Armature/Skeleton3D" index="0" unique_id=501094456]
 transform = Transform3D(1.7881393e-07, 0.9999999, 1.9470721e-07, -0.99999994, 1.7881392e-07, -1.1920923e-07, -1.1920927e-07, -1.9470717e-07, 1, -0.874269, -1.6634544, -1.0603409e-07)
@@ -168,10 +184,10 @@ bone_name = "bdy"
 bone_idx = 0
 
 [node name="Underbarrel" type="Marker3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1652760825]
-transform = Transform3D(4.9113922e-08, 2.9272232e-07, 1.1235956, -1.1235956, -2.1877202e-07, 4.9113837e-08, 2.1877203e-07, -1.1235955, 2.9272195e-07, 0.64009607, -0.8703815, -0.47584224)
+transform = Transform3D(4.9113922e-08, 2.9272232e-07, 1.1235956, -1.1235956, -2.1877202e-07, 4.9113837e-08, 2.1877202e-07, -1.1235955, 2.9272195e-07, -2.3770547, -0.8703808, -0.47584248)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1728137422]
-transform = Transform3D(-4.977033, -5.933655e-07, -0.07011776, 0.070118345, 1.5242101e-06, -4.977033, 6.147787e-07, -4.9775267, -1.5157018e-06, 0.257941, -1.0957528, -1.6039271)
+transform = Transform3D(-4.977033, -5.933655e-07, -0.07011775, 0.07011834, 1.5242101e-06, -4.977033, 6.147787e-07, -4.9775267, -1.5157018e-06, -1.5827388, -1.0957525, -1.6039273)
 
 [node name="GUI" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("5_mtaa1")]
 
