@@ -8,7 +8,7 @@ class_name ActionTimeline extends RefCounted
 ##
 ## Do not start a new action from inside an event handler.
 
-signal event(action: StringName, event_name: StringName)
+signal event(action: StringName, event_name: StringName, source: ActionEvent)
 signal finished(action: StringName)
 signal cancelled(action: StringName, progress: float)
 
@@ -59,7 +59,7 @@ func tick(delta: float) -> void:
 	while _next < _events.size() and _events[_next].fraction <= p:
 		var ev: ActionEvent = _events[_next]
 		_next += 1
-		event.emit(action, ev.event_name)
+		event.emit(action, ev.event_name, ev)
 		if serial != _serial or not running:
 			return # a handler stopped or replaced us
 

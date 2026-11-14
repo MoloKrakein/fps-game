@@ -13,6 +13,9 @@ var back_curve: float = 0.35
 var return_curve: float = 2.2
 
 var value: float = 0.0
+## Where the slide rests when nothing is happening.
+## 0 = closed (closed-bolt guns), 1 = open (open-bolt guns).
+var rest_value: float = 0.0
 ## While locked the slide is held open: shots and kicks are ignored until release().
 var locked: bool = false
 var lock_value: float = 1.0
@@ -44,8 +47,10 @@ func move_to(target: float, duration: float, curve: float = 1.0, replace: bool =
 		_next()
 
 
-## One shot cycle: blow back to `peak`, then return to closed.
-## stay_open = true (last round): blow back and hold open.
+## One shot cycle: move to `peak`, then return to the rest position.
+##   closed-bolt: peak = 1 (blowback), rest = 0 (closed)
+##   open-bolt:   peak = 0 (bolt slams forward), rest = 1 (open)
+## stay_open = true (last round of a closed-bolt gun): blow back and hold open.
 func kick(peak: float, back_time: float, return_time: float, stay_open: bool = false) -> void:
 	if locked:
 		return
@@ -56,7 +61,7 @@ func kick(peak: float, back_time: float, return_time: float, stay_open: bool = f
 		if absf(peak - lock_value) > 0.001:
 			move_to(lock_value, return_time * 0.5, 1.0, false)
 	else:
-		move_to(0.0, return_time, return_curve, false)
+		move_to(rest_value, return_time, return_curve, false)
 
 
 ## Hold the slide open at `at`.

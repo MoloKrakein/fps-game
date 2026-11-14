@@ -11,6 +11,11 @@ class_name WeaponAnimation extends Node
 ## The tree stays 7 nodes however many actions or naming styles exist:
 ##   CloseBolt, OpenBolt -> BoltPosition -> ActionLayer (OneShot) -> output
 ##   ActionClip -> ActionSpeed -> ActionLayer (shot)
+##
+## USED AS A COMPONENT: instance weapon_animation_rig.tscn under the weapon model root and
+## name it "WeaponAnimation". With auto_wire on (default) it finds the model's
+## AnimationPlayer and skeleton itself and gives the weapon its own copy of the tree.
+## The only per-weapon data is `actions` and, optionally, `clip_map`.
 
 ## Node names inside the AnimationTree (part of the scene contract).
 const NODE_CLOSE_BOLT: StringName = &"CloseBolt"
@@ -18,7 +23,13 @@ const NODE_OPEN_BOLT: StringName = &"OpenBolt"
 const NODE_ACTION_CLIP: StringName = &"ActionClip"
 const NODE_ACTION_LAYER: StringName = &"ActionLayer"
 
+@export_category("Wiring")
+## On: find the model's AnimationPlayer and point the tree at it (no paths to set).
+## Off: use the tree / player assigned in the scene, as a hand-wired weapon does.
+@export var auto_wire: bool = true
+## Found automatically as the "AnimationTree" child when empty.
 @export var weapon_animation_tree: AnimationTree
+## Found automatically under the model root when empty.
 @export var animation_player: AnimationPlayer
 
 @export_category("Naming")
@@ -40,12 +51,19 @@ const NODE_ACTION_LAYER: StringName = &"ActionLayer"
 ## role -> resolved clip name ("" = not found)
 var _clips: Dictionary = {}
 var _warned_roles: Dictionary = {}
+var _part_cache: Dictionary = {}     # part name -> Node3D (or null)
+var _part_original: Dictionary = {}  # Node3D -> visibility before the action changed it
+var _warned_parts: Dictionary = {}
 
 
 func _ready() -> void:
+	if auto_wire:
+		_auto_wire()
 	if weapon_animation_tree == null:
 		print("AnimationTree not assigned in WeaponAnimation script.")
 		return
+	if auto_wire:
+		_make_tree_unique()
 	weapon_animation_tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	resolve_names()
 
@@ -53,6 +71,63 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if weapon_animation_tree != null:
 		weapon_animation_tree.advance(PlayerTime.real(delta))
+
+
+#region Component wiring
+## Finds the AnimationTree child and the model's AnimationPlayer, and points the tree at them.
+func _auto_wire() -> void:
+	if weapon_animation_tree == null:
+		weapon_animation_tree = find_child("AnimationTree", false, false) as AnimationTree
+	if weapon_animation_tree == null:
+		push_warning("WeaponAnimation: no AnimationTree child found. Instance weapon_animation_rig.tscn.")
+		return
+
+	if animation_player == null:
+		animation_player = _find_animation_player()
+	if animation_player == null:
+		push_warning("WeaponAnimation: no AnimationPlayer found under the weapon model.")
+		return
+
+	# Track paths are relative to the player's root node, so the tree must use the same one.
+	var anim_root: Node = animation_player.get_node_or_null(animation_player.root_node)
+	if anim_root != null:
+		weapon_animation_tree.root_node = weapon_animation_tree.get_path_to(anim_root)
+	weapon_animation_tree.anim_player = weapon_animation_tree.get_path_to(animation_player)
+
+
+## The first AnimationPlayer under the model root (the rig's parent) that has clips.
+func _find_animation_player() -> AnimationPlayer:
+	var model_root: Node = get_parent()
+	if model_root == null:
+		return null
+	var first: AnimationPlayer = null
+	for node: Node in model_root.find_children("*", "AnimationPlayer", true, false):
+		var player: AnimationPlayer = node as AnimationPlayer
+		if first == null:
+			first = player
+		if not player.get_animation_list().is_empty():
+			return player
+	return first
+
+
+## Every weapon gets its own copy of the tree, so two weapons alive at once (held, dropped,
+## held by an enemy) never share and overwrite each other's clip names and fades.
+func _make_tree_unique() -> void:
+	var original: AnimationRootNode = weapon_animation_tree.tree_root
+	if original == null:
+		return
+	var copy: AnimationRootNode = original.duplicate(true) as AnimationRootNode
+	if copy == null:
+		return
+	weapon_animation_tree.tree_root = copy
+
+	# Sanity check: the nodes we write to at runtime must not be shared with the original.
+	var a: AnimationNodeBlendTree = original as AnimationNodeBlendTree
+	var b: AnimationNodeBlendTree = copy as AnimationNodeBlendTree
+	if a != null and b != null and a.has_node(NODE_ACTION_LAYER) and b.has_node(NODE_ACTION_LAYER):
+		if a.get_node(NODE_ACTION_LAYER) == b.get_node(NODE_ACTION_LAYER):
+			push_warning("WeaponAnimation: the tree copy still shares nodes with the original. Two weapons alive at once may overwrite each other's clips.")
+#endregion
 
 
 #region Name resolution (animator-friendly naming)
@@ -138,10 +213,13 @@ func _apply_action_filter() -> PackedStringArray:
 
 	var explicit: PackedStringArray = clip_map.slide_bones if clip_map != null else PackedStringArray()
 	var slide_bones: PackedStringArray = ClipResolver.resolve_slide_bones(bones, explicit)
-	if slide_bones.is_empty():
-		return slide_bones # keep the filter authored in the scene
-
 	var layer: AnimationNodeOneShot = _action_layer()
+	if slide_bones.is_empty():
+		# No slide bone to protect: let the actions drive every bone so they still show.
+		if layer != null:
+			layer.filter_enabled = false
+		return slide_bones
+
 	var root: Node = weapon_animation_tree.get_node_or_null(weapon_animation_tree.root_node)
 	if layer == null or root == null:
 		return slide_bones
@@ -245,6 +323,47 @@ func _note_missing_role(role: StringName) -> void:
 		return
 	_warned_roles[role] = true
 	print("[WeaponAnimation] no clip for role '", role, "' yet: its visual is skipped (gameplay timing still runs).")
+#endregion
+
+
+#region Part visibility
+## Show / hide named nodes of the weapon model (for example a dummy magazine). The original
+## visibility of every touched node is remembered and put back by restore_parts().
+func set_parts_visible(show_names: PackedStringArray, hide_names: PackedStringArray) -> void:
+	_set_parts(show_names, true)
+	_set_parts(hide_names, false)
+
+
+func restore_parts() -> void:
+	for key: Variant in _part_original.keys():
+		if is_instance_valid(key):
+			(key as Node3D).visible = _part_original[key]
+	_part_original.clear()
+
+
+func _set_parts(part_names: PackedStringArray, make_visible: bool) -> void:
+	for part_name: String in part_names:
+		var node: Node3D = _find_part(part_name)
+		if node == null:
+			continue
+		if not _part_original.has(node):
+			_part_original[node] = node.visible
+		node.visible = make_visible
+
+
+func _find_part(part_name: String) -> Node3D:
+	if _part_cache.has(part_name):
+		return _part_cache[part_name]
+
+	var found: Node3D = null
+	var model_root: Node = get_parent()
+	if model_root != null:
+		found = model_root.find_child(part_name, true, false) as Node3D
+	if found == null and not _warned_parts.has(part_name):
+		_warned_parts[part_name] = true
+		push_warning("WeaponAnimation: no part named '%s' under the weapon model (check the name in the ActionEvent)." % part_name)
+	_part_cache[part_name] = found
+	return found
 #endregion
 
 

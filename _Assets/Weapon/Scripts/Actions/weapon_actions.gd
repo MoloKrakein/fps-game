@@ -74,14 +74,22 @@ func on_weapon_switching() -> void:
 		timeline.finish_now()
 
 
-## Slide pose follows the chamber: empty chamber = locked open, otherwise closed.
+## Slide pose for the current weapon:
+##   open-bolt:   always rests open (loaded or not), no rack needed
+##   closed-bolt: empty chamber = locked open, otherwise closed
 func sync_slide_to_chamber() -> void:
 	var data: WeaponData = ctrl.active_weapon_data
-	var open: bool = data != null and not data.is_loaded
+	var open_bolt: bool = ctrl.current_weapon != null and ctrl.current_weapon.is_open_bolt
+	slide.rest_value = 1.0 if open_bolt else 0.0
 	slide.release()
-	slide.snap(1.0 if open else 0.0)
-	if open:
-		slide.lock(1.0)
+
+	if open_bolt:
+		slide.snap(1.0)
+	else:
+		var open: bool = data != null and not data.is_loaded
+		slide.snap(1.0 if open else 0.0)
+		if open:
+			slide.lock(1.0)
 	_debug_slide("sync to chamber")
 
 
@@ -111,7 +119,11 @@ func on_shot_cycled() -> void:
 	var interval: float = ctrl.current_weapon.get_fire_interval_seconds()
 	var back: float = clampf(interval * shot_back_fraction, shot_back_min_max.x, shot_back_min_max.y)
 	var ret: float = clampf(interval * shot_return_fraction, shot_return_min_max.x, shot_return_min_max.y)
-	slide.kick(fire_travel, back, ret, not data.is_loaded)
+	if ctrl.current_weapon.is_open_bolt:
+		# The bolt rests open: it slams forward to fire, then recoils back to the open rest position.
+		slide.kick(0.0, back, ret, false)
+	else:
+		slide.kick(fire_travel, back, ret, not data.is_loaded)
 	_debug_slide("shot cycled")
 #endregion
 
@@ -240,9 +252,25 @@ func _span(from_event: StringName, to_event: StringName) -> float:
 #endregion
 
 
+#region Part visibility (dummy magazines and similar swaps)
+func _apply_parts(source: ActionEvent) -> void:
+	if source == null or anim == null:
+		return
+	if source.show_parts.is_empty() and source.hide_parts.is_empty():
+		return
+	anim.set_parts_visible(source.show_parts, source.hide_parts)
+
+
+func _restore_parts() -> void:
+	if anim != null:
+		anim.restore_parts()
+#endregion
+
+
 #region Timeline signals
-func _on_event(action: StringName, event_name: StringName) -> void:
+func _on_event(action: StringName, event_name: StringName, source: ActionEvent) -> void:
 	world_event.emit(action, event_name)
+	_apply_parts(source)
 	match action:
 		RACK:
 			_on_rack_event(event_name)
@@ -254,9 +282,11 @@ func _on_finished(action: StringName) -> void:
 	match action:
 		RACK:
 			_end_clip()
+			_restore_parts()
 		RELOAD_EMPTY, RELOAD_LOADED:
 			_commit_reload() # fallback when the clip has no mag_in event
 			_end_clip()
+			_restore_parts()
 			ctrl.send_state_event("onReloadFinish")
 			ctrl.finish_reload_step()
 
@@ -266,6 +296,7 @@ func _on_cancelled(action: StringName, _progress: float) -> void:
 		RELOAD_EMPTY, RELOAD_LOADED:
 			# No commit: if mag_in never happened, no ammo is transferred.
 			_end_clip()
+			_restore_parts()
 			ctrl.send_state_event("onReloadFinish")
 			ctrl.finish_reload_step()
 #endregion

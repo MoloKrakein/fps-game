@@ -36,7 +36,7 @@ size = Vector3(0.1, 0.1, 0.1)
 [sub_resource type="Resource" id="Resource_m8xuj"]
 script = ExtResource("10_qgqgv")
 reload_loaded = "Partial_Reload"
-reload_empty = "Empty_Reload"
+reload_empty = "Empty_reload"
 rack = "Rack"
 slide_bones = null
 metadata/_custom_type_script = "uid://drvmna7qr33n4"
@@ -127,7 +127,6 @@ animation = &"Close_bolt"
 animation = &"Open_bolt"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(-348.628, 17.583832)
 nodes/output/position = Vector2(760, 100)
 nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_uo56h")
 nodes/CloseBolt/position = Vector2(-340, 40)
@@ -155,13 +154,13 @@ ammo_display = NodePath("Btr_m10/Armature/Skeleton3D/UnderBarrel/AmmoCounterPosi
 [node name="Btr_m10" parent="." unique_id=1248920148 instance=ExtResource("2_bedmg")]
 transform = Transform3D(-3.8903135e-08, 0, 0.89, 0, 0.89, 0, -0.89, 0, -3.8903135e-08, 0, -0.90004766, -1.1813678)
 
-[node name="Skeleton3D" parent="Btr_m10/Armature" parent_id_path=PackedInt32Array(1248920148, 808742256) index="0" unique_id=2047029531]
+[node name="Skeleton3D" parent="Btr_m10/Armature" parent_id_path=PackedInt32Array(1248920148, 1426276471) index="0" unique_id=1172525189]
 bones/0/position = Vector3(-0.874269, -1.6634544, -1.0603409e-07)
 bones/0/rotation = Quaternion(-2.6692554e-08, 1.1098623e-07, -0.7071067, 0.7071068)
-bones/1/position = Vector3(0.005608854, -1.0680345, -1.4515186e-07)
+bones/1/position = Vector3(0.006288347, -1.0680345, -1.4461325e-07)
 bones/3/position = Vector3(-0.4950065, 0.3009991, 5.4895978e-08)
 bones/3/rotation = Quaternion(-0.70710707, 2.779951e-07, 0.7071066, 5.338495e-08)
-bones/4/position = Vector3(-1.579079e-05, 1.058642, -42.507427)
+bones/4/position = Vector3(-2.491345e-07, 1.0586644, -0.38315547)
 
 [node name="UnderBarrel" type="BoneAttachment3D" parent="Btr_m10/Armature/Skeleton3D" index="0" unique_id=501094456]
 transform = Transform3D(1.7881393e-07, 0.9999999, 1.9470721e-07, -0.99999994, 1.7881392e-07, -1.1920923e-07, -1.1920927e-07, -1.9470717e-07, 1, -0.874269, -1.6634544, -1.0603409e-07)
@@ -228,5 +227,11 @@ parameters/ActionSpeed/scale = 1.0
 parameters/ActionLayer/active = false
 parameters/ActionLayer/internal_active = false
 parameters/ActionLayer/request = 0
+
+[node name="SupportHand" type="Marker3D" parent="." unique_id=208269160]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.030979095, -1.4959488)
+
+[node name="GripHand" type="Marker3D" parent="." unique_id=1988719755]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.47601122, 0.098496675)
 
 [editable path="Btr_m10"]
