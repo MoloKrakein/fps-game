@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="1_wanim"]
+
+[sub_resource type="AnimationNodeAnimation" id="Anim_close_bolt"]
+
+[sub_resource type="AnimationNodeAnimation" id="Anim_open_bolt"]
+
+[sub_resource type="AnimationNodeBlend2" id="Blend_bolt_position"]
+
+[sub_resource type="AnimationNodeAnimation" id="Anim_action_clip"]
+
+[sub_resource type="AnimationNodeTimeScale" id="TimeScale_action_speed"]
+
+[sub_resource type="AnimationNodeOneShot" id="OneShot_action_layer"]
+fadein_time = 0.1
+fadeout_time = 0.15
+filter_enabled = true
+
+[sub_resource type="AnimationNodeBlendTree" id="BlendTree_rig"]
+graph_offset = Vector2(-380, -40)
+nodes/output/position = Vector2(760, 100)
+nodes/CloseBolt/node = SubResource("Anim_close_bolt")
+nodes/CloseBolt/position = Vector2(-340, 40)
+nodes/OpenBolt/node = SubResource("Anim_open_bolt")
+nodes/OpenBolt/position = Vector2(-340, 200)
+nodes/BoltPosition/node = SubResource("Blend_bolt_position")
+nodes/BoltPosition/position = Vector2(-100, 80)
+nodes/ActionClip/node = SubResource("Anim_action_clip")
+nodes/ActionClip/position = Vector2(-100, 300)
+nodes/ActionSpeed/node = SubResource("TimeScale_action_speed")
+nodes/ActionSpeed/position = Vector2(140, 300)
+nodes/ActionLayer/node = SubResource("OneShot_action_layer")
+nodes/ActionLayer/position = Vector2(480, 100)
+node_connections = [&"output", 0, &"ActionLayer", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"ActionSpeed", 0, &"ActionClip", &"ActionLayer", 0, &"BoltPosition", &"ActionLayer", 1, &"ActionSpeed"]
+
+[node name="WeaponAnimation" type="Node" node_paths=PackedStringArray("weapon_animation_tree")]
+script = ExtResource("1_wanim")
+weapon_animation_tree = NodePath("AnimationTree")
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("BlendTree_rig")
+parameters/BoltPosition/blend_amount = 0.0
+parameters/ActionSpeed/scale = 1.0
+parameters/ActionLayer/active = false
+parameters/ActionLayer/internal_active = false
+parameters/ActionLayer/request = 0
