@@ -15,6 +15,10 @@ class_name ActionDef extends Resource
 ## Which clip plays: one of ClipResolver.ROLE_*. Leave empty to use the default for this id.
 ## If the weapon has no clip for the role yet, the visual is skipped and gameplay still runs.
 @export var clip_role: StringName = &""
+## The clip is blended with the rest pose during its FIRST `fade_in` seconds and its LAST
+## `fade_out` seconds. A part that is teleported inside those windows (a magazine swap,
+## a bone that jumps) is blended too, so you see it slide for a few frames instead of
+## popping. For clips that teleport parts near the start or end, set both to 0.
 @export_range(0.0, 1.0, 0.01, "suffix:s") var fade_in: float = 0.1
 @export_range(0.0, 1.0, 0.01, "suffix:s") var fade_out: float = 0.15
 

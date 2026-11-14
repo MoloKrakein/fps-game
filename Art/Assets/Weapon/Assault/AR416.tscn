@@ -137,25 +137,12 @@ fraction = 0.85
 show_parts = PackedStringArray("dummy_mag", "")
 hide_parts = PackedStringArray("Magazine", "")
 
-[sub_resource type="Resource" id="Resource_oh2wu"]
-script = ExtResource("16_oh2wu")
-event_name = &"hide_mag"
-fraction = 0.646
-show_parts = PackedStringArray()
-hide_parts = PackedStringArray("Magazine")
-metadata/_custom_type_script = "uid://c284xg3j4logh"
-
-[sub_resource type="Resource" id="Resource_ex8ux"]
-script = ExtResource("16_oh2wu")
-event_name = &"hide_dummy"
-show_parts = PackedStringArray()
-hide_parts = null
-metadata/_custom_type_script = "uid://c284xg3j4logh"
-
 [sub_resource type="Resource" id="Resource_1pwij"]
 script = ExtResource("15_ex8ux")
 id = &"loaded_reload"
-events = Array[ExtResource("16_oh2wu")]([SubResource("Resource_v2um4"), SubResource("Resource_ovw1m"), SubResource("Resource_oh2wu"), SubResource("Resource_ex8ux")])
+fade_in = 0.0
+fade_out = 0.0
+events = Array[ExtResource("16_oh2wu")]([SubResource("Resource_v2um4"), SubResource("Resource_ovw1m")])
 
 [sub_resource type="Resource" id="Resource_r7v6a"]
 script = ExtResource("16_oh2wu")
