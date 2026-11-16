@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="WeaponActionProfile" format=3 uid="uid://hafskmbichva"]
+
+[ext_resource type="Script" uid="uid://45ljaim4pd2t" path="res://_Assets/Weapon/Scripts/Actions/weapon_action_profile.gd" id="1_decco"]
+
+[resource]
+script = ExtResource("1_decco")
+metadata/_custom_type_script = "uid://45ljaim4pd2t"

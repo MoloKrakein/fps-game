@@ -12,6 +12,8 @@ class_name ClipResolver extends RefCounted
 const ROLE_IDLE: StringName = &"idle"
 const ROLE_RELOAD_LOADED: StringName = &"reload_loaded"
 const ROLE_RELOAD_EMPTY: StringName = &"reload_empty"
+## Quick reload (double-tap reload: the magazine is dumped). Optional: without its own clip a weapon uses the empty reload.
+const ROLE_RELOAD_QUICK: StringName = &"reload_quick"
 const ROLE_RACK: StringName = &"rack"
 const ROLE_EQUIP: StringName = &"equip"
 const ROLE_SLIDE_OPEN: StringName = &"slide_open"
@@ -25,6 +27,14 @@ const ALL_ROLES: Array[StringName] = [
 	ROLE_EQUIP, ROLE_SLIDE_OPEN, ROLE_SLIDE_CLOSED,
 ]
 
+## Roles a weapon may provide but does not have to. A missing one falls back to ROLE_FALLBACKS.
+const OPTIONAL_ROLES: Array[StringName] = [ROLE_RELOAD_QUICK]
+
+## role -> role to use when the weapon has no clip for it
+const ROLE_FALLBACKS: Dictionary = {
+	&"reload_quick": &"reload_empty",
+}
+
 ## Roles the code-driven slide cannot work without.
 const CRITICAL_ROLES: Array[StringName] = [ROLE_SLIDE_OPEN, ROLE_SLIDE_CLOSED]
 
@@ -36,7 +46,11 @@ const RULES: Dictionary = {
 	},
 	&"reload_loaded": {
 		"tokens": ["reloadloaded", "reloadtactical", "tacticalreload", "tacreload", "reloadfull", "reloadmag", "magchange", "reload"],
-		"banned": ["empty", "dry"],
+		"banned": ["empty", "dry", "quick", "dump", "fast", "speed", "emergency"],
+	},
+	&"reload_quick": {
+		"tokens": ["quickreload", "reloadquick", "dumpreload", "reloaddump", "fastreload", "speedreload", "emergencyreload"],
+		"banned": [],
 	},
 	&"reload_empty": {
 		"tokens": ["reloadempty", "emptyreload", "reloaddry", "dryreload", "reloadfromempty", "reloadlocked"],
@@ -62,6 +76,10 @@ const RULES: Dictionary = {
 
 ## Bone name tokens that identify the slide / bolt bone(s).
 const SLIDE_BONE_TOKENS: Array[String] = ["slider", "slide", "bolt", "carrier"]
+
+## Bone name tokens that identify the weapon body / root bone(s), the ones that carry the whole
+## weapon when a clip moves it. Used to pin the body while reloading in aim down sights.
+const BODY_BONE_TOKENS: Array[String] = ["body", "root", "receiver", "frame"]
 
 
 ## lowercase, letters and digits only
@@ -113,6 +131,28 @@ static func resolve_slide_bones(bone_names: PackedStringArray, explicit: PackedS
 	for bone: String in bone_names:
 		if _contains_any(normalize(bone), SLIDE_BONE_TOKENS):
 			found.append(bone)
+	return found
+
+
+## Body / root bone names: the explicit list if given, otherwise every bone whose name contains a
+## body token, otherwise the skeleton's root bones (no parent). The slide bone(s) are never included.
+static func resolve_body_bones(bone_names: PackedStringArray, explicit: PackedStringArray, slide_bones: PackedStringArray, root_bones: PackedStringArray) -> PackedStringArray:
+	var found: PackedStringArray = PackedStringArray()
+	if not explicit.is_empty():
+		for bone: String in explicit:
+			if bone_names.has(bone) and not slide_bones.has(bone):
+				found.append(bone)
+		return found
+
+	for bone: String in bone_names:
+		if slide_bones.has(bone):
+			continue
+		if _contains_any(normalize(bone), BODY_BONE_TOKENS):
+			found.append(bone)
+	if found.is_empty():
+		for bone: String in root_bones:
+			if not slide_bones.has(bone):
+				found.append(bone)
 	return found
 
 

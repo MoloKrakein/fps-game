@@ -39,6 +39,12 @@ func process(delta: float) -> void:
 
 #region Input
 func request_reload() -> void:
+	# An open-bolt gun with a closed bolt must be racked open first (or racks itself).
+	if ctrl.actions.needs_rack_before_reload():
+		_cancel_double_tap()
+		ctrl.actions.handle_reload_with_closed_bolt()
+		return
+
 	if weapon != null and weapon.is_reload_per_bullet:
 		_cancel_double_tap()
 		if ctrl.is_reloading:
@@ -61,6 +67,8 @@ func _cancel_double_tap() -> void:
 	_tap_timer = 0.0
 
 
+## The quick reload. The reloading state picks the quick reload variant for it, which uses the
+## weapon's quick reload clip, or its empty reload clip when it has none.
 func dump_magazine_and_reload() -> void:
 	if not can_reload():
 		return
@@ -69,6 +77,7 @@ func dump_magazine_and_reload() -> void:
 	# so is_loaded is left untouched.
 	weapon_data.ammo_in_magazine = 0
 	ctrl.update_weapon_ui()
+	ctrl.actions.request_quick_reload()
 	ctrl.send_state_event("onReload")
 
 
@@ -85,6 +94,10 @@ func finish_reload_step() -> void:
 func can_reload() -> bool:
 	if weapon == null or weapon_data == null:
 		print("No weapon or weapon data available.")
+		return false
+
+	if ctrl.actions.needs_rack_before_reload():
+		print("Rack the bolt open before reloading.")
 		return false
 
 	if weapon_data.reserve_ammo <= 0:

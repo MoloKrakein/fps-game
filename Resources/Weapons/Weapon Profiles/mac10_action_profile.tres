@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WeaponActionProfile" format=3 uid="uid://c7nlrc82lvtcu"]
+
+[ext_resource type="Script" uid="uid://45ljaim4pd2t" path="res://_Assets/Weapon/Scripts/Actions/weapon_action_profile.gd" id="1_7pamc"]
+
+[resource]
+script = ExtResource("1_7pamc")
+reload_with_closed_bolt = 2
+pin_body_in_ads_reload = true
+pin_body_in_ads_rack = true
+metadata/_custom_type_script = "uid://45ljaim4pd2t"

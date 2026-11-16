@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c21m2545cxjl5"
-path="res://.godot/imported/Rifle Idle.fbx-fcbdf07eff112181d8dda82bf5b122d6.scn"
+uid="uid://cnd1y0anqvyo4"
+path="res://.godot/imported/test_Security.glb-34ebd24c2816646034b943a0a874e1a1.scn"
 
 [deps]
 
-source_file="res://Art/3D/Blender/HumanoidModel/animation/Rifle Idle.fbx"
-dest_files=["res://.godot/imported/Rifle Idle.fbx-fcbdf07eff112181d8dda82bf5b122d6.scn"]
+source_file="res://Art/3D/Blender/HumanoidModel/test_Security.glb"
+dest_files=["res://.godot/imported/test_Security.glb-34ebd24c2816646034b943a0a874e1a1.scn"]
 
 [params]
 
@@ -32,15 +32,23 @@ meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
 animation/fps=30
-animation/trimming=true
+animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={}
-fbx/importer=0
-fbx/allow_geometry_helper_nodes=false
-fbx/embedded_image_handling=1
-fbx/naming_version=2
+_subresources={
+"nodes": {
+"PATH:Armature/CharacterMesh/CharacterMesh_001": {
+"import/skip_import": true
+},
+"PATH:Armature/Skeleton3D/ArmorV1": {
+"import/skip_import": true
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=1
+gltf/texture_map_mode=1

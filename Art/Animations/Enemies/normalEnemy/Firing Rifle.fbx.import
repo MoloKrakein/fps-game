@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://de1u3m4kqq5qr"
-path="res://.godot/imported/Firing Rifle.fbx-ad82e5adc154c2c428272542b7dfa50c.scn"
+uid="uid://bx1nqm7jywra0"
+path="res://.godot/imported/Firing Rifle.fbx-1aaa4a02082c4c11f802e79445357ee6.scn"
 
 [deps]
 
-source_file="res://Art/3D/Blender/HumanoidModel/animation/Firing Rifle.fbx"
-dest_files=["res://.godot/imported/Firing Rifle.fbx-ad82e5adc154c2c428272542b7dfa50c.scn"]
+source_file="res://Art/Animations/Enemies/normalEnemy/Firing Rifle.fbx"
+dest_files=["res://.godot/imported/Firing Rifle.fbx-1aaa4a02082c4c11f802e79445357ee6.scn"]
 
 [params]
 

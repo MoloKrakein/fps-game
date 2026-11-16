@@ -386,7 +386,7 @@ func can_fire() -> bool:
 		return false
 
 	if current_weapon.is_open_bolt:
-		if active_weapon_data.ammo_in_magazine <= 0:
+		if active_weapon_data.ammo_in_magazine <= 0 or not actions.is_bolt_ready():
 			return false
 	elif not active_weapon_data.is_loaded:
 		return false
@@ -455,7 +455,8 @@ func _apply_recoil() -> void:
 
 
 func _play_fire_feedback() -> void:
-	shooter.eject_casing()
+	if not actions.is_manual_cycle():
+		shooter.eject_casing()
 
 	if _muzzle_flash != null:
 		_muzzle_flash.flash(
@@ -482,6 +483,9 @@ func _cycle_weapon() -> void:
 	if current_weapon.is_open_bolt:
 		active_weapon_data.ammo_in_magazine = maxi(active_weapon_data.ammo_in_magazine - 1, 0)
 		active_weapon_data.is_loaded = active_weapon_data.ammo_in_magazine > 0
+	elif actions.is_manual_cycle():
+		active_weapon_data.is_loaded = false
+		active_weapon_data.chamber_spent = true
 	else:
 		_feed_chamber()
 
@@ -500,15 +504,18 @@ func _feed_chamber() -> void:
 func rack_slide() -> void:
 	if current_weapon == null or active_weapon_data == null:
 		return
-	if is_reloading or _rack_timer > 0.0 or current_weapon.is_open_bolt:
+
+	if is_reloading:
+		actions.try_active_rack()
 		return
 
-	if not active_weapon_data.is_loaded and active_weapon_data.ammo_in_magazine <= 0:
+	if _rack_timer > 0.0 or not actions.can_rack():
 		return
 
+	var duration: float = actions.get_rack_duration()
 	actions.start_rack()
-	_rack_timer = rack_lockout_time
-	fire_timer = maxf(fire_timer, rack_lockout_time)
+	_rack_timer = duration
+	fire_timer = maxf(fire_timer, duration)
 	reset_trigger()
 
 

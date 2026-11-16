@@ -89,6 +89,7 @@ size = Vector2(5, 5)
 [sub_resource type="Resource" id="Resource_o08ba"]
 script = ExtResource("14_614sg")
 slide_bones = null
+body_bones = null
 metadata/_custom_type_script = "uid://drvmna7qr33n4"
 
 [sub_resource type="Resource" id="Resource_bwwb7"]
@@ -121,6 +122,8 @@ hide_parts = null
 [sub_resource type="Resource" id="Resource_ias4y"]
 script = ExtResource("15_ex8ux")
 id = &"rack"
+fade_in = 0.03
+fade_out = 0.07
 events = Array[ExtResource("16_oh2wu")]([SubResource("Resource_bwwb7"), SubResource("Resource_egbc5"), SubResource("Resource_ffg4n"), SubResource("Resource_xaoo8")])
 
 [sub_resource type="Resource" id="Resource_v2um4"]
@@ -161,6 +164,8 @@ hide_parts = null
 [sub_resource type="Resource" id="Resource_2vgj4"]
 script = ExtResource("15_ex8ux")
 id = &"empty_reload"
+fade_in = 0.0
+fade_out = 0.0
 events = Array[ExtResource("16_oh2wu")]([SubResource("Resource_r7v6a"), SubResource("Resource_823op")])
 
 [node name="AR416_model" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("muzzle_socket", "ejection_socket", "optic_socket", "underbarrel_socket", "muzzle_socket_attachment", "builtin_iron_sight_mesh", "default_stock_mesh", "default_grip_mesh", "default_magazine_mesh", "iron_sight_point", "ammo_display")]
@@ -227,7 +232,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.
 [node name="AR416" parent="." unique_id=1425081176 instance=ExtResource("3_omrth")]
 transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
 
-[node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 995622234) index="0" unique_id=968420334]
+[node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 1395129327) index="0" unique_id=84785033]
 bones/0/position = Vector3(-0.9637607, 0.38923222, -0.015709063)
 bones/0/rotation = Quaternion(-0.05506173, 0.027154926, 0.09375918, 0.9937002)
 bones/3/position = Vector3(-0.49308458, -2.4697914, -2.7660192e-07)

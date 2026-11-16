@@ -47,10 +47,16 @@ const NODE_ACTION_LAYER: StringName = &"ActionLayer"
 @export var action_request_param: String = "parameters/ActionLayer/request"
 ## TimeScale node on the action clip. Scales the playing clip.
 @export var action_speed_param: String = "parameters/ActionSpeed/scale"
+## True while the ActionLayer shot is playing or fading out.
+@export var action_active_param: String = "parameters/ActionLayer/active"
 
 ## role -> resolved clip name ("" = not found)
 var _clips: Dictionary = {}
 var _warned_roles: Dictionary = {}
+var _body_bones: PackedStringArray = PackedStringArray()
+var _body_paths: Array[String] = []  # track paths of the body bones, as written in the layer filter
+var _body_pinned: bool = false
+var _warned_body: bool = false
 var _part_cache: Dictionary = {}     # part name -> Node3D (or null)
 var _part_original: Dictionary = {}  # Node3D -> visibility before the action changed it
 var _warned_parts: Dictionary = {}
@@ -71,6 +77,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if weapon_animation_tree != null:
 		weapon_animation_tree.advance(PlayerTime.real(delta))
+		# The body bone goes back into the filter only after the shot has fully faded out,
+		# so nothing pops while it fades.
+		if _body_pinned and not bool(weapon_animation_tree.get(action_active_param)):
+			set_body_pinned(false)
 
 
 #region Component wiring
@@ -143,12 +153,17 @@ func resolve_names() -> void:
 	var lines: PackedStringArray = PackedStringArray()
 	var missing: PackedStringArray = PackedStringArray()
 	var critical_missing: PackedStringArray = PackedStringArray()
-	for role: StringName in ClipResolver.ALL_ROLES:
+	var roles: Array[StringName] = []
+	roles.append_array(ClipResolver.ALL_ROLES)
+	roles.append_array(ClipResolver.OPTIONAL_ROLES)
+	for role: StringName in roles:
 		var explicit: String = clip_map.get_explicit(role) if clip_map != null else ""
 		var clip: String = ClipResolver.resolve_clip(role, available, explicit)
 		_clips[role] = clip
 
-		if clip == "":
+		if clip == "" and ClipResolver.OPTIONAL_ROLES.has(role):
+			lines.append("  %s -> uses the %s clip" % [String(role).rpad(14), ClipResolver.ROLE_FALLBACKS.get(role, "")])
+		elif clip == "":
 			missing.append(String(role))
 			if ClipResolver.CRITICAL_ROLES.has(role):
 				critical_missing.append(String(role))
@@ -167,11 +182,21 @@ func resolve_names() -> void:
 		var explicit_bones: bool = clip_map != null and not clip_map.slide_bones.is_empty()
 		lines.append("  slide bones    -> %s (%s)" % [", ".join(slide_bones), "clip_map" if explicit_bones else "auto"])
 
+	if _body_bones.is_empty():
+		lines.append("  body bones     -> none found (ADS reload pinning unavailable)")
+	else:
+		var explicit_body: bool = clip_map != null and not clip_map.body_bones.is_empty()
+		lines.append("  body bones     -> %s (%s)" % [", ".join(_body_bones), "clip_map" if explicit_body else "auto"])
+
 	_report(lines, critical_missing, slide_bones.is_empty(), available)
 
 
+## The clip for a role. A role with no clip of its own uses its fallback (quick reload -> empty reload).
 func get_clip(role: StringName) -> String:
-	return _clips.get(role, "")
+	var clip: String = _clips.get(role, "")
+	if clip == "" and ClipResolver.ROLE_FALLBACKS.has(role):
+		return get_clip(ClipResolver.ROLE_FALLBACKS[role])
+	return clip
 
 
 func get_clip_length(role: StringName) -> float:
@@ -229,6 +254,17 @@ func _apply_action_filter() -> PackedStringArray:
 	for bone: String in bones:
 		if not slide_bones.has(bone):
 			filters.append("%s:%s" % [skeleton_path, bone])
+
+	# The weapon body / root bone(s), remembered so they can be pinned during an ADS reload.
+	var root_bones: PackedStringArray = PackedStringArray()
+	for i: int in skeleton.get_bone_count():
+		if skeleton.get_bone_parent(i) == -1:
+			root_bones.append(skeleton.get_bone_name(i))
+	var explicit_body: PackedStringArray = clip_map.body_bones if clip_map != null else PackedStringArray()
+	_body_bones = ClipResolver.resolve_body_bones(bones, explicit_body, slide_bones, root_bones)
+	_body_paths.clear()
+	for bone: String in _body_bones:
+		_body_paths.append("%s:%s" % [skeleton_path, bone])
 	layer.set("filters", filters)
 	layer.filter_enabled = true
 	return slide_bones
@@ -260,7 +296,7 @@ func _report(lines: PackedStringArray, critical_missing: PackedStringArray, no_s
 ## Plays an action's clip through the ActionLayer. Returns false when the weapon has no
 ## clip for that role yet: the visual is skipped, gameplay timing is unaffected.
 ## `speed` scales the clip (1.0 = authored speed).
-func play_action(def: ActionDef, speed: float = 1.0) -> bool:
+func play_action(def: ActionDef, speed: float = 1.0, pin_body: bool = false) -> bool:
 	if weapon_animation_tree == null or def == null:
 		return false
 
@@ -283,6 +319,7 @@ func play_action(def: ActionDef, speed: float = 1.0) -> bool:
 	clip_node.animation = StringName(clip)
 	layer.fadein_time = def.fade_in
 	layer.fadeout_time = def.fade_out
+	set_body_pinned(pin_body)
 	set_action_speed(speed)
 	weapon_animation_tree.set(action_request_param, AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 	return true
@@ -294,6 +331,25 @@ func end_action() -> void:
 		return
 	set_action_speed(1.0)
 	weapon_animation_tree.set(action_request_param, AnimationNodeOneShot.ONE_SHOT_REQUEST_FADE_OUT)
+
+
+## Pin the weapon body: the layer stops applying the clip's body / root bone, so the weapon stays
+## where the aim stance put it and only the other bones animate. Released automatically when the
+## action has fully faded out.
+func set_body_pinned(pinned: bool) -> void:
+	if pinned == _body_pinned:
+		return
+	var layer: AnimationNodeOneShot = _action_layer()
+	if layer == null:
+		return
+	if _body_paths.is_empty():
+		if pinned and not _warned_body:
+			_warned_body = true
+			push_warning("WeaponAnimation: no body bone found, so the body cannot be pinned. Set body_bones in a WeaponClipMap.")
+		return
+	for path: String in _body_paths:
+		layer.set_filter_path(NodePath(path), not pinned)
+	_body_pinned = pinned
 
 
 func set_action_speed(speed: float) -> void:
@@ -426,6 +482,8 @@ func get_animation_length(animation_name: String) -> float:
 	match animation_name.to_lower():
 		"empty_reload":
 			role = ClipResolver.ROLE_RELOAD_EMPTY
+		"quick_reload":
+			role = ClipResolver.ROLE_RELOAD_QUICK
 		"loaded_reload", "reload":
 			role = ClipResolver.ROLE_RELOAD_LOADED
 		"rack":

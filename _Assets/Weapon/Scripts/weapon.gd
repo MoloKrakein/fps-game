@@ -59,6 +59,9 @@ enum WeaponAmmoType {
 @export var can_change_fire_mode: bool = false
 @export var has_burst_mode: bool = false
 @export var is_open_bolt: bool = false
+## Pump / bolt-action, empty-reload style, open-bolt cocking, quick reload and active reload.
+## Empty = automatic action, as before.
+@export var action_profile: WeaponActionProfile
 @export var ammo_type: WeaponAmmoType = WeaponAmmoType.LIGHT
 @export var projectile_speed: float = 50.0
 @export_group("Explosive Ammo")

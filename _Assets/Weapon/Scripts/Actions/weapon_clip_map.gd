@@ -10,6 +10,8 @@ class_name WeaponClipMap extends Resource
 @export var idle: String = ""
 @export var reload_loaded: String = ""
 @export var reload_empty: String = ""
+## Optional. Empty = auto-detect, and a weapon with no quick reload clip uses its empty reload.
+@export var reload_quick: String = ""
 @export var rack: String = ""
 @export var equip: String = ""
 @export var slide_open: String = ""
@@ -19,6 +21,10 @@ class_name WeaponClipMap extends Resource
 ## Bone(s) moved by the code-driven slide. Everything else on the skeleton is
 ## treated as "body" and comes from the action clips.
 @export var slide_bones: PackedStringArray = PackedStringArray()
+## The weapon body / root bone(s): the ones that carry the whole weapon. Only used to pin the
+## body while reloading in aim down sights (see WeaponActionProfile). Empty = auto-detect
+## (a bone named body / root / receiver / frame, otherwise the skeleton's root bone).
+@export var body_bones: PackedStringArray = PackedStringArray()
 
 
 func get_explicit(role: StringName) -> String:
@@ -29,6 +35,8 @@ func get_explicit(role: StringName) -> String:
 			return reload_loaded
 		ClipResolver.ROLE_RELOAD_EMPTY:
 			return reload_empty
+		ClipResolver.ROLE_RELOAD_QUICK:
+			return reload_quick
 		ClipResolver.ROLE_RACK:
 			return rack
 		ClipResolver.ROLE_EQUIP:
