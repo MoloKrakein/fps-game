@@ -16,6 +16,6 @@ is_loaded = true
 fire_mode = 1
 equipped_attachment_data = Dictionary[int, ExtResource("1_ac8k0")]({
 0: ExtResource("2_mg82a"),
-2: ExtResource("3_ymdu4")
+6: ExtResource("3_ymdu4")
 })
 metadata/_custom_type_script = "uid://qd0wv6hu5uby"

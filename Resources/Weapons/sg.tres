@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_awtbi"]
 [ext_resource type="PackedScene" uid="uid://cs7xd43kmv5cg" path="res://Art/Assets/Weapon/Projectile/buckshot_casing.tscn" id="1_dv3g3"]
 [ext_resource type="PackedScene" uid="uid://cfdj0j3pd1bfv" path="res://Art/Assets/Weapon/Projectile/buckshot.tscn" id="1_i6r2f"]
+[ext_resource type="Resource" uid="uid://dgq7nvi71atdb" path="res://Resources/Weapons/Weapon Profiles/pump_action_profile.tres" id="1_j2xcc"]
 [ext_resource type="PackedScene" uid="uid://6baebp0xgdtr" path="res://Art/Assets/Weapon/SG/sg_model.tscn" id="3_dv3g3"]
 
 [resource]
@@ -20,6 +21,7 @@ accuracy = 67.391
 spread_angle = 0.135
 pellet_count = 8
 reload_time = 2.5
+action_profile = ExtResource("1_j2xcc")
 projectile_speed = 600.0
 aim_accuracy_modifier = 100.0
 aim_ADS_position = Vector3(0, -0.142, -0.348)

@@ -92,6 +92,7 @@ func is_busy() -> bool:
 ## Call after a new weapon model (and its WeaponAnimation) has been bound.
 func bind_animation(model_anim: WeaponAnimation) -> void:
 	timeline.stop()
+	_apply_fov_blend(0.0)
 	if model_anim != null:
 		slide.apply = model_anim.set_slide_value
 	else:
@@ -230,7 +231,8 @@ func start_reload(reload_type: StringName, duration: float) -> void:
 	var def: ActionDef = _get_def(reload_type)
 	_reload_base_speed = _clip_speed(String(reload_type), duration)
 	if anim != null:
-		anim.play_action(def, _reload_base_speed, _pin_body(false))
+		anim.play_action(def, _reload_base_speed, _body_motion(false))
+	_apply_fov_blend(_fov_blend(false))
 
 	timeline.start(def, duration)
 	# The magazine seats at the mag_in event (the end of the reload if the card has none).
@@ -273,7 +275,8 @@ func start_rack() -> void:
 	var duration: float = get_rack_duration()
 	var def: ActionDef = _get_def(RACK)
 	if anim != null:
-		anim.play_action(def, _clip_speed("Rack", duration), _pin_body(true))
+		anim.play_action(def, _clip_speed("Rack", duration), _body_motion(true))
+	_apply_fov_blend(_fov_blend(true))
 	timeline.start(def, duration)
 
 
@@ -329,6 +332,7 @@ func _clip_speed(clip_name: String, duration: float) -> float:
 
 ## Fade the action layer out (no-op if its clip already ended).
 func _end_clip() -> void:
+	_apply_fov_blend(0.0)
 	if anim != null:
 		anim.end_action()
 
@@ -509,10 +513,32 @@ func _reset_active() -> void:
 
 ## Keep the weapon body where the aim stance put it while this action plays? Decided once, when
 ## the action starts. ADS and canted aim both set is_aiming.
-func _pin_body(is_rack: bool) -> bool:
+func _ads_enabled(is_rack: bool) -> bool:
 	if not ctrl.is_aiming:
 		return false
-	return profile.pin_body_in_ads_rack if is_rack else profile.pin_body_in_ads_reload
+	return profile.ads_rack_enabled if is_rack else profile.ads_reload_enabled
+
+
+## Scale of the weapon body's movement (x) and rotation (y) for this action. Vector2.ONE = as authored.
+func _body_motion(is_rack: bool) -> Vector2:
+	if not _ads_enabled(is_rack):
+		return Vector2.ONE
+	return Vector2(profile.ads_body_position_scale, profile.ads_body_rotation_scale)
+
+
+## How far the camera FOV is pulled back toward the hip FOV while this action plays.
+func _fov_blend(is_rack: bool) -> float:
+	return profile.ads_fov_blend if _ads_enabled(is_rack) else 0.0
+
+
+## Needs set_reload_fov_blend() in cam_effects.gd (see weapon_controller_changes.md).
+func _apply_fov_blend(blend: float) -> void:
+	var player: Object = ctrl.player
+	if player == null:
+		return
+	var cam: Object = player.cam_effects
+	if cam != null and cam.has_method(&"set_reload_fov_blend"):
+		cam.set_reload_fov_blend(blend)
 
 
 func _is_reload(action: StringName) -> bool:

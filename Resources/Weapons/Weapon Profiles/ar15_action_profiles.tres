@@ -4,4 +4,7 @@
 
 [resource]
 script = ExtResource("1_decco")
+ads_reload_enabled = true
+ads_body_position_scale = 0.63
+ads_fov_blend = 0.17
 metadata/_custom_type_script = "uid://45ljaim4pd2t"

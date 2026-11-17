@@ -39,6 +39,7 @@ reload_loaded = "Partial_Reload"
 reload_empty = "Empty_reload"
 rack = "Rack"
 slide_bones = null
+body_bones = null
 metadata/_custom_type_script = "uid://drvmna7qr33n4"
 
 [sub_resource type="Resource" id="Resource_ceeie"]
@@ -72,8 +73,8 @@ hide_parts = null
 script = ExtResource("11_o5oma")
 id = &"rack"
 clip_role = &"rack"
-fade_in = 0.05
-fade_out = 0.1
+fade_in = 0.0
+fade_out = 0.0
 events = Array[ExtResource("12_2v2p1")]([SubResource("Resource_ceeie"), SubResource("Resource_4hent"), SubResource("Resource_t51ng"), SubResource("Resource_c0ndq")])
 
 [sub_resource type="Resource" id="Resource_gftys"]
@@ -158,19 +159,20 @@ nodes/ActionLayer/node = SubResource("AnimationNodeOneShot_action")
 nodes/ActionLayer/position = Vector2(480, 100)
 node_connections = [&"output", 0, &"ActionLayer", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"ActionSpeed", 0, &"ActionClip", &"ActionLayer", 0, &"BoltPosition", &"ActionLayer", 1, &"ActionSpeed"]
 
-[node name="SmgModel" type="Node3D" unique_id=1004586577 node_paths=PackedStringArray("muzzle_socket", "underbarrel_socket", "muzzle_socket_attachment", "ammo_display")]
+[node name="SmgModel" type="Node3D" unique_id=1004586577 node_paths=PackedStringArray("muzzle_socket", "underbarrel_socket", "muzzle_socket_attachment", "accessory_socket", "ammo_display")]
 transform = Transform3D(0.16, 0, 0, 0, 0.16, 0, 0, 0, 0.16, 0, 0, 0)
 script = ExtResource("1_mcvyo")
 muzzle_socket = NodePath("Muzzle")
 underbarrel_socket = NodePath("Btr_m10/Armature/Skeleton3D/UnderBarrel/Underbarrel")
 muzzle_socket_attachment = NodePath("Btr_m10/Armature/Skeleton3D/Muzzle/Muzzle_Slot")
+accessory_socket = NodePath("Btr_m10/Armature/Skeleton3D/UnderBarrel/Accessory")
 attachment_fits = Array[ExtResource("2_ry0qi")]([SubResource("Resource_mcvyo")])
 ammo_display = NodePath("Btr_m10/Armature/Skeleton3D/UnderBarrel/AmmoCounterPosition")
 
 [node name="Btr_m10" parent="." unique_id=1248920148 instance=ExtResource("2_bedmg")]
 transform = Transform3D(-3.8903135e-08, 0, 0.89, 0, 0.89, 0, -0.89, 0, -3.8903135e-08, 0, -0.90004766, -1.1813678)
 
-[node name="Skeleton3D" parent="Btr_m10/Armature" parent_id_path=PackedInt32Array(1248920148, 46638457) index="0" unique_id=331671508]
+[node name="Skeleton3D" parent="Btr_m10/Armature" parent_id_path=PackedInt32Array(1248920148, 489396448) index="0" unique_id=35397260]
 bones/0/position = Vector3(-0.874269, -1.6634544, -1.0603409e-07)
 bones/0/rotation = Quaternion(-2.6692554e-08, 1.1098623e-07, -0.7071067, 0.7071068)
 bones/1/position = Vector3(0.0014254423, -1.0680345, -1.484686e-07)
@@ -184,6 +186,9 @@ bone_name = "bdy"
 bone_idx = 0
 
 [node name="Underbarrel" type="Marker3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1652760825]
+transform = Transform3D(4.9113922e-08, 2.9272232e-07, 1.1235956, -1.1235956, -2.1877202e-07, 4.9113837e-08, 2.1877202e-07, -1.1235955, 2.9272195e-07, -2.3770547, -0.8703808, -0.47584248)
+
+[node name="Accessory" type="Marker3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1386549325]
 transform = Transform3D(4.9113922e-08, 2.9272232e-07, 1.1235956, -1.1235956, -2.1877202e-07, 4.9113837e-08, 2.1877202e-07, -1.1235955, 2.9272195e-07, -2.3770547, -0.8703808, -0.47584248)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1728137422]

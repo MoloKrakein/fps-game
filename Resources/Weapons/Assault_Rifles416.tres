@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://djw8732o0svqt" path="res://Art/Assets/Weapon/Projectile/Casing/bullet_casing_rifle_556.tscn" id="1_f5shg"]
 [ext_resource type="Resource" uid="uid://b4cku8crdkhvu" path="res://_Assets/Weapon/resources/generic_casing_prof.tres" id="2_4sqev"]
 [ext_resource type="PackedScene" uid="uid://uh6cfflmaimf" path="res://Art/Assets/Weapon/Assault/AR416.tscn" id="2_a7i0a"]
+[ext_resource type="PackedScene" uid="uid://db2cvarm1t1v0" path="res://Art/Assets/Weapon/Projectile/Casing/live_casing_rifle_556.tscn" id="2_btno7"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="2_f5shg"]
 
 [resource]
@@ -34,6 +35,7 @@ ejection_smoke_scale = 7.51
 weapon_model = ExtResource("2_a7i0a")
 projectile_scene = ExtResource("2_f5shg")
 bullet_case_scene = ExtResource("1_f5shg")
+alive_bullet_scene = ExtResource("2_btno7")
 casing_profile = ExtResource("2_4sqev")
 weapon_scale = Vector3(0.4, 0.4, 0.4)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)
