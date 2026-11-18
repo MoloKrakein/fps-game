@@ -5,6 +5,12 @@
 [ext_resource type="PackedScene" uid="uid://d2d67es7hovrb" path="res://Art/Assets/Weapon/Attachment/Scope/Reticle/reticle.tscn" id="2_xkwwo"]
 [ext_resource type="Shader" uid="uid://c3yj4mxisrqka" path="res://Art/Shader/ScopeShader/scope.gdshader" id="3_8g36r"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_os2yl"]
+albedo_color = Color(0.25, 0.25, 0.25, 1)
+metallic = 0.4
+metallic_specular = 0.67
+roughness = 0.69
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glslj"]
 resource_name = "material_0"
 transparency = 2
@@ -85,6 +91,9 @@ orientation = 2
 [node name="blockbench_export" parent="." unique_id=1290800655 instance=ExtResource("1_ywwve")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 
+[node name="cylinder" parent="blockbench_export" index="0" unique_id=1311218591]
+surface_material_override/0 = SubResource("StandardMaterial3D_os2yl")
+
 [node name="cylinder_selection" parent="blockbench_export" index="1" unique_id=1548973484]
 surface_material_override/0 = ExtResource("2_ebv3f")
 
@@ -108,7 +117,7 @@ use_hdr_2d = true
 
 [node name="Camera3D" type="Camera3D" parent="display/ScopeView" unique_id=1578499935]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)
-fov = 5.9
+fov = 9.1
 
 [node name="RemoteTransform3D" type="RemoteTransform3D" parent="display" unique_id=2089060351]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19237578, -0.24950984)

@@ -6,10 +6,9 @@
 render_priority = 0
 shader = ExtResource("1_rcmju")
 shader_parameter/core_color = Color(1, 0.95, 0.8, 1)
-shader_parameter/spike_sharpness = 6.0
-shader_parameter/spike_length = 0.95
+shader_parameter/petal_sharpness = 5.0
+shader_parameter/petal_length = 0.8
 shader_parameter/core_size = 0.2
-shader_parameter/jitter = 0.35
 
 [resource]
 next_pass = SubResource("ShaderMaterial_2v2p1")

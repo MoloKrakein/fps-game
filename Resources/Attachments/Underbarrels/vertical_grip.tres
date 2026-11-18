@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Attachment" format=3 uid="uid://c64camypxducp"]
+
+[ext_resource type="PackedScene" uid="uid://segp5oa84ftm" path="res://Art/Assets/Weapon/Attachment/Underbarrels/vertical_grip.tscn" id="1_17o43"]
+[ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="1_k2e6j"]
+
+[resource]
+script = ExtResource("1_k2e6j")
+attachment_slot = 2
+attachment_model = ExtResource("1_17o43")
+accuracy_bonus = -100.0
+recoil_multiplier = 0.0
+metadata/_custom_type_script = "uid://byjrogv1mqm35"

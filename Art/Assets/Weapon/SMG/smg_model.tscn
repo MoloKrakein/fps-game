@@ -6,9 +6,9 @@
 [ext_resource type="Material" uid="uid://bttkkl63jo7ha" path="res://_Assets/VFX/Muzzle_flash.tres" id="2_mf45t"]
 [ext_resource type="Script" uid="uid://c6s8by6wlubla" path="res://_Assets/Weapon/attachment/Scripts/attachment_fit.gd" id="2_ry0qi"]
 [ext_resource type="Resource" uid="uid://bewoeqyukvpk6" path="res://Resources/Attachments/Module/Laser/laser1.tres" id="3_y71i0"]
-[ext_resource type="PackedScene" uid="uid://dbvm232i3jjhh" path="res://_Assets/VFX/VFX_SCENE/wpn_smoke_vfx.tscn" id="4_bedmg"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="5_c8wk2"]
 [ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="5_mtaa1"]
+[ext_resource type="Shader" uid="uid://bjx0hmvh4awfw" path="res://_Assets/VFX/muzzle_blast.gdshader" id="8_gp3bu"]
 [ext_resource type="Script" uid="uid://drvmna7qr33n4" path="res://_Assets/Weapon/Scripts/Actions/weapon_clip_map.gd" id="10_qgqgv"]
 [ext_resource type="Script" uid="uid://chw0y0ybqasl0" path="res://_Assets/Weapon/Scripts/Actions/action_def.gd" id="11_o5oma"]
 [ext_resource type="Script" uid="uid://c284xg3j4logh" path="res://_Assets/Weapon/Scripts/Actions/action_event.gd" id="12_2v2p1"]
@@ -16,6 +16,8 @@
 [sub_resource type="Resource" id="Resource_mcvyo"]
 script = ExtResource("2_ry0qi")
 attachment = ExtResource("3_y71i0")
+position_offset = Vector3(0, -0.04, 0)
+scale_multiplier = Vector3(2, 2, 2)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vslle"]
@@ -32,6 +34,30 @@ scale_max = 1.3
 [sub_resource type="PrismMesh" id="PrismMesh_rcmju"]
 material = ExtResource("2_mf45t")
 size = Vector3(0.1, 0.1, 0.1)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_qgqgv"]
+angle_max = 360.0
+direction = Vector3(0, 0, -1)
+spread = 14.0
+initial_velocity_min = 1.5
+initial_velocity_max = 3.5
+gravity = Vector3(0, 0.08, 0)
+damping_min = 6.0
+damping_max = 10.0
+scale_min = 0.7
+scale_max = 1.2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_blast"]
+render_priority = 0
+shader = ExtResource("8_gp3bu")
+shader_parameter/start_size = 0.96700004267262
+shader_parameter/noise_scale = 5.27
+shader_parameter/flow_speed = 8.095
+shader_parameter/softness = 0.35000001499506
+shader_parameter/fade_power = -0.015
+
+[sub_resource type="QuadMesh" id="QuadMesh_o5oma"]
+material = SubResource("ShaderMaterial_blast")
 
 [sub_resource type="Resource" id="Resource_m8xuj"]
 script = ExtResource("10_qgqgv")
@@ -172,47 +198,40 @@ ammo_display = NodePath("Btr_m10/Armature/Skeleton3D/UnderBarrel/AmmoCounterPosi
 [node name="Btr_m10" parent="." unique_id=1248920148 instance=ExtResource("2_bedmg")]
 transform = Transform3D(-3.8903135e-08, 0, 0.89, 0, 0.89, 0, -0.89, 0, -3.8903135e-08, 0, -0.90004766, -1.1813678)
 
-[node name="Skeleton3D" parent="Btr_m10/Armature" parent_id_path=PackedInt32Array(1248920148, 489396448) index="0" unique_id=35397260]
-bones/0/position = Vector3(-0.874269, -1.6634544, -1.0603409e-07)
-bones/0/rotation = Quaternion(-2.6692554e-08, 1.1098623e-07, -0.7071067, 0.7071068)
-bones/1/position = Vector3(0.0014254423, -1.0680345, -1.484686e-07)
-bones/3/position = Vector3(-0.4950065, 0.3009991, 5.4895978e-08)
-bones/3/rotation = Quaternion(-0.70710707, 2.779951e-07, 0.7071066, 5.338495e-08)
-bones/4/position = Vector3(-2.491345e-07, 1.0586644, -0.38315547)
-
-[node name="UnderBarrel" type="BoneAttachment3D" parent="Btr_m10/Armature/Skeleton3D" index="0" unique_id=501094456]
-transform = Transform3D(1.7881393e-07, 0.9999999, 1.9470721e-07, -0.99999994, 1.7881392e-07, -1.1920923e-07, -1.1920927e-07, -1.9470717e-07, 1, -0.874269, -1.6634544, -1.0603409e-07)
+[node name="UnderBarrel" type="BoneAttachment3D" parent="Btr_m10/Armature/Skeleton3D" parent_id_path=PackedInt32Array(1248920148, 845541214) index="0" unique_id=501094456]
+transform = Transform3D(0, 0.99999994, 2.6871768e-07, -1, 0, -4.3711417e-08, -4.371143e-08, -2.6871763e-07, 1, -0.87426895, -1.6634545, -1.0603413e-07)
 bone_name = "bdy"
 bone_idx = 0
 
 [node name="Underbarrel" type="Marker3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1652760825]
-transform = Transform3D(4.9113922e-08, 2.9272232e-07, 1.1235956, -1.1235956, -2.1877202e-07, 4.9113837e-08, 2.1877202e-07, -1.1235955, 2.9272195e-07, -2.3770547, -0.8703808, -0.47584248)
+transform = Transform3D(4.3711438e-08, -8.7422784e-08, -1, 6.2783283e-07, -0.99999964, 8.742281e-08, -1, -6.278327e-07, -4.3711374e-08, -3.0887127, -0.11234416, 0.010874643)
 
 [node name="Accessory" type="Marker3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1386549325]
-transform = Transform3D(4.9113922e-08, 2.9272232e-07, 1.1235956, -1.1235956, -2.1877202e-07, 4.9113837e-08, 2.1877202e-07, -1.1235955, 2.9272195e-07, -2.3770547, -0.8703808, -0.47584248)
+transform = Transform3D(4.9113922e-08, 2.927223e-07, 1.1235956, -1.1235956, -2.1877204e-07, 4.9113822e-08, 2.1877204e-07, -1.1235955, 2.9272195e-07, -1.9556919, -1.0440178, 0.4258166)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1728137422]
 transform = Transform3D(-4.977033, -5.933655e-07, -0.07011775, 0.07011834, 1.5242101e-06, -4.977033, 6.147787e-07, -4.9775267, -1.5157018e-06, -1.5827388, -1.0957525, -1.6039273)
 
 [node name="GUI" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("5_mtaa1")]
 
-[node name="Muzzle" type="BoneAttachment3D" parent="Btr_m10/Armature/Skeleton3D" index="2" unique_id=405865687]
-transform = Transform3D(1.7881393e-07, 0.9999999, 1.9470721e-07, -0.99999994, 1.7881392e-07, -1.1920923e-07, -1.1920927e-07, -1.9470717e-07, 1, -0.874269, -1.6634544, -1.0603409e-07)
+[node name="Muzzle" type="BoneAttachment3D" parent="Btr_m10/Armature/Skeleton3D" parent_id_path=PackedInt32Array(1248920148, 845541214) index="2" unique_id=405865687]
+transform = Transform3D(0, 0.99999994, 2.6871768e-07, -1, 0, -4.3711417e-08, -4.371143e-08, -2.6871763e-07, 1, -0.87426895, -1.6634545, -1.0603413e-07)
 bone_name = "bdy"
 bone_idx = 0
 
 [node name="Muzzle_Slot" type="Marker3D" parent="Btr_m10/Armature/Skeleton3D/Muzzle" unique_id=1527877394]
-transform = Transform3D(6.0666184e-07, 3.8471542e-14, -3.275281, 8.801259e-07, -3.2752812, 1.6302079e-13, -3.275281, -8.8012575e-07, -6.066619e-07, 1.5973092, -0.1227476, 3.3786307e-10)
+transform = Transform3D(6.0666184e-07, 0, -3.27528, 8.801256e-07, -3.2752802, -5.684342e-14, -3.275281, -8.8012536e-07, -6.0666184e-07, -0.00076556206, -0.007899404, -9.795167e-08)
 
-[node name="Muzzle" type="Node3D" parent="." unique_id=227635064 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
+[node name="Muzzle" type="Node3D" parent="." unique_id=227635064 node_paths=PackedStringArray("particles", "blast_particles", "blast_particles_alt", "light")]
 transform = Transform3D(0.9999417, 0.009721402, 0.0046989457, -0.009678353, 0.9999118, -0.009100334, -0.0047869855, 0.009054332, 0.99994755, -0.062213432, 0.6318785, -2.9197752)
 script = ExtResource("1_mf45t")
 particles = NodePath("MuzzleFlash")
-smoke_particles = [NodePath("Smoke")]
+blast_particles = NodePath("Blast")
+blast_particles_alt = NodePath("BlastAlt")
 light = NodePath("OmniLight3D")
-
-[node name="Smoke" parent="Muzzle" unique_id=2001100571 instance=ExtResource("4_bedmg")]
-emitting = false
+flash_strength = 2.0
+blast_opacity = 0.05
+blast_delay = 0.003
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Muzzle" unique_id=1357457869]
 emitting = false
@@ -227,6 +246,32 @@ draw_pass_1 = SubResource("PrismMesh_rcmju")
 draw_pass_2 = null
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=1057061963]
+
+[node name="Blast" type="GPUParticles3D" parent="Muzzle" unique_id=344258674]
+cast_shadow = 0
+emitting = false
+amount = 5
+lifetime = 0.3
+one_shot = true
+explosiveness = 0.67
+randomness = 0.4
+fixed_fps = 24
+collision_base_size = 0.0
+trail_lifetime = 1.2
+process_material = SubResource("ParticleProcessMaterial_qgqgv")
+draw_pass_1 = SubResource("QuadMesh_o5oma")
+
+[node name="BlastAlt" type="GPUParticles3D" parent="Muzzle" unique_id=96476458]
+cast_shadow = 0
+emitting = false
+amount = 5
+lifetime = 0.3
+one_shot = true
+explosiveness = 0.7
+randomness = 0.4
+fixed_fps = 24
+process_material = SubResource("ParticleProcessMaterial_qgqgv")
+draw_pass_1 = SubResource("QuadMesh_o5oma")
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=919837844]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0010569347, 0.71043104, -0.007704174)
@@ -250,7 +295,7 @@ parameters/ActionLayer/internal_active = false
 parameters/ActionLayer/request = 0
 
 [node name="SupportHand" type="Marker3D" parent="." unique_id=208269160]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.030979095, -1.4959488)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.030979095, -1.7937399)
 
 [node name="GripHand" type="Marker3D" parent="." unique_id=1988719755]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.47601122, 0.098496675)

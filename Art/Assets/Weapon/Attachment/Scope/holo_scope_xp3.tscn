@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://q3rignm8x472"]
 
 [ext_resource type="PackedScene" uid="uid://d2573a1o6up3y" path="res://Art/3D/Blender/Weapon/attachment/Exp3.glb" id="1_je0o2"]
+[ext_resource type="Texture2D" uid="uid://dh52rdbggi6vd" path="res://Art/2D/reticle/552_reticle.png" id="3_oblna"]
 [ext_resource type="Shader" uid="uid://b0ymona6un2bx" path="res://Art/Shader/ScopeShader/red_dot.gdshader" id="3_oqvbb"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dxpo7"]
@@ -16,15 +17,38 @@ shader_parameter/poa_subdivision = 0.2500000037253
 shader_parameter/poa_elevation = 0
 shader_parameter/poa_windage = 0
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6fa4u"]
+render_priority = 0
+shader = ExtResource("3_oqvbb")
+shader_parameter/reticle_texture = ExtResource("3_oblna")
+shader_parameter/reticle_color = Color(1, 0.050000012, 0.050000012, 1)
+shader_parameter/glass_color = Color(1, 1, 1, 0.1)
+shader_parameter/reticle_emission = 1.4210000674975
+shader_parameter/ref_element_size = 0.999999977648
+shader_parameter/ref_target_moa = 25.53000121197648
+shader_parameter/poa_use_moa = 0.0
+shader_parameter/poa_subdivision = 0.5000000074506
+shader_parameter/poa_elevation = 0
+shader_parameter/poa_windage = 0
+
+[sub_resource type="QuadMesh" id="QuadMesh_o08ba"]
+material = SubResource("ShaderMaterial_6fa4u")
+size = Vector2(0.2, 0.195)
+
 [node name="Holo_Scope" type="Node3D" unique_id=400638620]
 
 [node name="SightPoint" type="Marker3D" parent="." unique_id=792289536]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0750899, 0.2728709)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12006998, 0.2728709)
 
 [node name="Exp3" parent="." unique_id=162764243 instance=ExtResource("1_je0o2")]
 transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
 
 [node name="Screen" parent="Exp3" index="7" unique_id=1148220489]
+visible = false
 surface_material_override/0 = SubResource("ShaderMaterial_dxpo7")
+
+[node name="Screen" type="MeshInstance3D" parent="." unique_id=1316650337]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.111400016, 0.015299529)
+mesh = SubResource("QuadMesh_o08ba")
 
 [editable path="Exp3"]

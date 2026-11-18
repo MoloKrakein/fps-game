@@ -12,5 +12,6 @@ model_scale = Vector3(0.65, 0.65, 0.65)
 accuracy_bonus = 0.385
 ammo_capacity_bonus = 5
 is_optic = true
+override_ads_fov = 45.0
 override_ads_position = Vector3(0, -0.105, -0.21)
 metadata/_custom_type_script = "uid://byjrogv1mqm35"

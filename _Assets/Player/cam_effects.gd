@@ -192,11 +192,11 @@ func calculate_view_offset(delta):
 		offset.y += headbob_height
 
 	# apply slide effect
-	var target_fov = _base_fov
+	var target_fov = _aim_fov
 	if enable_slide_effect and player.is_sliding:
 		target_fov = slide_fov
 	elif player.is_diving and player.prone_dive:
-		target_fov = _base_fov + player.prone_dive.dive_fov_boost
+		target_fov = _aim_fov + player.prone_dive.dive_fov_boost
 
 	_fov_smooth = lerpf(_fov_smooth, target_fov, delta * fov_transition_speed)
 	var fov_d: float = minf(delta, 0.05)

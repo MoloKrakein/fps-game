@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://segp5oa84ftm"]
+
+[ext_resource type="PackedScene" uid="uid://bawvajlapl76k" path="res://Art/3D/Blender/Weapon/attachment/Vertical_Grip.gltf" id="1_bjkpu"]
+
+[node name="Vertical_Grip" type="Node3D" unique_id=1151762301]
+
+[node name="blockbench_export" parent="." unique_id=788652246 instance=ExtResource("1_bjkpu")]
+transform = Transform3D(-6.556708e-08, 0, 1.5, 0, 1.5, 0, -1.5, 0, -6.556708e-08, 0, -0.5083084, 0)

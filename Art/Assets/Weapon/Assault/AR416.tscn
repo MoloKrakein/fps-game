@@ -11,9 +11,9 @@
 [ext_resource type="Shader" uid="uid://ok0pd3nwhf5w" path="res://_Assets/VFX/muzzle_flash.gdshader" id="6_qrkt3"]
 [ext_resource type="Resource" uid="uid://c2pwq7v11v2gy" path="res://Resources/Attachments/Muzzle Device/Supp_gen_1.tres" id="6_uer85"]
 [ext_resource type="Resource" uid="uid://dconbcf2phnk6" path="res://Resources/Attachments/Optics/holo_sight.tres" id="7_oh2wu"]
-[ext_resource type="Material" uid="uid://bq0k71nxq3n07" path="res://_Assets/VFX/material/smoke_haze.tres" id="7_qrkt3"]
-[ext_resource type="PackedScene" uid="uid://dbvm232i3jjhh" path="res://_Assets/VFX/VFX_SCENE/wpn_smoke_vfx.tscn" id="8_qrkt3"]
+[ext_resource type="Resource" uid="uid://c64camypxducp" path="res://Resources/Attachments/Underbarrels/vertical_grip.tres" id="8_bwwb7"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="13_75jmf"]
+[ext_resource type="Shader" uid="uid://bjx0hmvh4awfw" path="res://_Assets/VFX/muzzle_blast.gdshader" id="13_egbc5"]
 [ext_resource type="Script" uid="uid://drvmna7qr33n4" path="res://_Assets/Weapon/Scripts/Actions/weapon_clip_map.gd" id="14_614sg"]
 [ext_resource type="Script" uid="uid://chw0y0ybqasl0" path="res://_Assets/Weapon/Scripts/Actions/action_def.gd" id="15_ex8ux"]
 [ext_resource type="Script" uid="uid://c284xg3j4logh" path="res://_Assets/Weapon/Scripts/Actions/action_event.gd" id="16_oh2wu"]
@@ -22,14 +22,15 @@
 [sub_resource type="Resource" id="Resource_qllkt"]
 script = ExtResource("2_oo46r")
 attachment = ExtResource("3_jtlrl")
-ads_offset = Vector3(0, 0.08, 0)
+scale_multiplier = Vector3(1.3, 1.3, 1.3)
+ads_offset = Vector3(0, 0.04, 0)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="Resource" id="Resource_mg82a"]
 script = ExtResource("2_oo46r")
 attachment = ExtResource("4_jtlrl")
-scale_multiplier = Vector3(0.8, 0.8, 0.8)
-ads_offset = Vector3(0, 0.089, 0.135)
+scale_multiplier = Vector3(1.4, 1.4, 1.4)
+ads_offset = Vector3(0, 0.045, 0)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="Resource" id="Resource_5yekf"]
@@ -41,14 +42,20 @@ metadata/_custom_type_script = "uid://c6s8by6wlubla"
 [sub_resource type="Resource" id="Resource_3dwt8"]
 script = ExtResource("2_oo46r")
 attachment = ExtResource("6_uer85")
-scale_multiplier = Vector3(0.5, 0.5, 0.5)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="Resource" id="Resource_dwpih"]
 script = ExtResource("2_oo46r")
 attachment = ExtResource("7_oh2wu")
-position_offset = Vector3(0, 0, 0.008)
-ads_offset = Vector3(0, 0.06, 0.419)
+position_offset = Vector3(0, 0.001, 0.008)
+scale_multiplier = Vector3(1.5, 1.5, 1.5)
+ads_offset = Vector3(0, 0.1, 0.254)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
+
+[sub_resource type="Resource" id="Resource_oh2wu"]
+script = ExtResource("2_oo46r")
+attachment = ExtResource("8_bwwb7")
+scale_multiplier = Vector3(0.4, 0.4, 0.4)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
@@ -68,31 +75,39 @@ scale_max = 1.3
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_75jmf"]
 render_priority = 0
 shader = ExtResource("6_qrkt3")
-shader_parameter/core_color = Color(1, 0.95, 0.8, 1)
-shader_parameter/spike_sharpness = 12.0
-shader_parameter/spike_length = 0.95
-shader_parameter/core_size = 0.09
-shader_parameter/jitter = 0.35
+shader_parameter/core_color = Color(1, 0.95, 0.85, 0.2901961)
+shader_parameter/petal_sharpness = 6.205
+shader_parameter/petal_length = 0.37
+shader_parameter/core_size = 0.145
 
 [sub_resource type="QuadMesh" id="QuadMesh_5i3wd"]
 lightmap_size_hint = Vector2i(25, 12)
 material = SubResource("ShaderMaterial_75jmf")
-size = Vector2(5, 3.8)
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vx3u4"]
-direction = Vector3(0, 0, -1)
-spread = 20.0
-initial_velocity_min = 0.049999997
-initial_velocity_max = 0.35
-gravity = Vector3(0, 0.05, 0)
-damping_min = 1.0
-damping_max = 2.5
-scale_min = 0.19999999
-scale_max = 0.5
-
-[sub_resource type="QuadMesh" id="QuadMesh_0cluu"]
-material = ExtResource("7_qrkt3")
 size = Vector2(5, 5)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bwwb7"]
+angle_max = 360.0
+direction = Vector3(0, 0, -1)
+spread = 14.0
+initial_velocity_min = 1.5
+initial_velocity_max = 3.5
+gravity = Vector3(0, 0.08, 0)
+damping_min = 6.0
+damping_max = 10.0
+scale_min = 0.7
+scale_max = 1.2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oh2wu"]
+render_priority = 0
+shader = ExtResource("13_egbc5")
+shader_parameter/start_size = 0.96700004267262
+shader_parameter/noise_scale = 5.27
+shader_parameter/flow_speed = 8.095
+shader_parameter/softness = 0.35000001499506
+shader_parameter/fade_power = -0.015
+
+[sub_resource type="QuadMesh" id="QuadMesh_egbc5"]
+material = SubResource("ShaderMaterial_oh2wu")
 
 [sub_resource type="Resource" id="Resource_o08ba"]
 script = ExtResource("14_614sg")
@@ -189,29 +204,23 @@ default_stock_mesh = NodePath("AR416/Armature/Skeleton3D/Stock")
 default_grip_mesh = NodePath("AR416/Armature/Skeleton3D/Grip")
 default_magazine_mesh = NodePath("AR416/Armature/Skeleton3D/Magazine")
 iron_sight_point = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Optics")
-attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a"), SubResource("Resource_5yekf"), SubResource("Resource_3dwt8"), SubResource("Resource_dwpih")])
+attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a"), SubResource("Resource_5yekf"), SubResource("Resource_3dwt8"), SubResource("Resource_dwpih"), SubResource("Resource_oh2wu")])
 ammo_display = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/AmmoCounterPosition")
 
-[node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045668572, -2.4102664)
+[node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "blast_particles", "blast_particles_alt", "light")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17400041, -3.4161327)
 script = ExtResource("5_vgxpt")
 flash_chance = 0.5
 particles = NodePath("Flash")
-smoke_particles = [NodePath("Smoke")]
+blast_particles = NodePath("Blast")
+blast_particles_alt = NodePath("BlastAlt")
 light = NodePath("OmniLight3D")
-barrel_smoke_burst = 0.3
-barrel_smoke_opacity = 1.0
-barrel_smoke_thickness = 3.0
-barrel_smoke_stretch = 4.0
-eject_smoke_on_fire = false
-heat_per_shot = 1.5
-heat_cool_rate = 1.49
-max_heat_burst_multiplier = 2.0
+flash_strength = 1.2
+blast_opacity = 0.03
 
 [node name="Flash" type="GPUParticles3D" parent="Muzzle" unique_id=25292793]
 transform = Transform3D(1, -1.7484555e-07, 7.642742e-15, 0, -4.371139e-08, -1, 1.7484555e-07, 1, -4.371139e-08, 0, -0.036215067, 0.015399456)
-emitting = false
-amount = 3
+amount = 1
 lifetime = 0.03
 explosiveness = 1.0
 local_coords = true
@@ -220,25 +229,37 @@ draw_pass_1 = SubResource("QuadMesh_5i3wd")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=681250775]
 
-[node name="barrel" type="GPUParticles3D" parent="Muzzle" unique_id=1031145191]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.047214374, 0.004047394)
-visible = false
+[node name="Blast" type="GPUParticles3D" parent="Muzzle" unique_id=1762465310]
+cast_shadow = 0
 emitting = false
-amount = 3
+amount = 5
+lifetime = 0.3
 one_shot = true
-fixed_fps = 12
-process_material = SubResource("ParticleProcessMaterial_vx3u4")
-draw_pass_1 = SubResource("QuadMesh_0cluu")
+explosiveness = 0.67
+randomness = 0.4
+fixed_fps = 24
+collision_base_size = 0.0
+trail_lifetime = 1.2
+process_material = SubResource("ParticleProcessMaterial_bwwb7")
+draw_pass_1 = SubResource("QuadMesh_egbc5")
 
-[node name="Smoke" parent="Muzzle" unique_id=2001100571 instance=ExtResource("8_qrkt3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.045668572, 0.005574703)
+[node name="BlastAlt" type="GPUParticles3D" parent="Muzzle" unique_id=1411321833]
+cast_shadow = 0
 emitting = false
+amount = 5
+lifetime = 0.3
+one_shot = true
+explosiveness = 0.7
+randomness = 0.4
+fixed_fps = 24
+process_material = SubResource("ParticleProcessMaterial_bwwb7")
+draw_pass_1 = SubResource("QuadMesh_egbc5")
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.39674383)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1286308, 0.17789151, -0.39674383)
 
 [node name="AR416" parent="." unique_id=1425081176 instance=ExtResource("3_omrth")]
-transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, -0.27754605, -0.46143073)
 
 [node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 335068162) index="0" unique_id=2044268670]
 bones/0/position = Vector3(0, 0, 0)
@@ -261,28 +282,28 @@ use_external_skeleton = true
 external_skeleton = NodePath("..")
 
 [node name="Optics" type="Marker3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=581117067]
-transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572923e-06, 2.8865568e-05, -77.692276, 77.692276, -3.3960357e-06, -7.872699e-06, -0.55788517, -0.8997011, 1.9872097e-08)
+transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, -0.661, -1.195, 0)
 
 [node name="MuzzleDevice" type="Marker3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=52446211]
-transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572923e-06, 2.8865568e-05, -77.692276, 77.692276, -3.3960357e-06, -7.872699e-06, -0.19254667, 4.3496065, 5.677633e-07)
+transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, -0.19254667, 4.3496065, 5.677633e-07)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=629444751]
-transform = Transform3D(-3.3960375e-06, -73.051155, -26.450232, -5.5572923e-06, 26.450266, -73.051155, 77.692276, -5.1291454e-07, -8.558581e-06, 0.69287366, -1.1826636, 1.0749747)
+transform = Transform3D(3.463174e-08, -0.9402628, -0.34044933, -7.152957e-08, 0.34044933, -0.9402628, 1, 5.691513e-08, -5.5466245e-08, -0.12785116, 0.3130052, -2.0481813)
 
 [node name="GUI" parent="AR416/Armature/Skeleton3D/BodySkelleton/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
-transform = Transform3D(1.0000004, -1.0658141e-14, -4.2632564e-14, 0, 1.0000002, -3.2782555e-07, -1.2434498e-14, 2.9802322e-08, 1.0000002, -0.035971098, 0.010502523, -0.0055913813)
+transform = Transform3D(1.0000006, -7.1054274e-15, -4.2632564e-14, -2.6645353e-15, 1.0000005, -2.682209e-07, -1.5987212e-14, -2.9802322e-08, 1.0000004, -0.040603045, 0.023514083, -0.030486345)
 
 [node name="Underbarrels" type="Marker3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=216068345]
-transform = Transform3D(-3.3960375e-06, -77.692276, -3.1180945e-05, -5.5572923e-06, 2.8865568e-05, -77.692276, 77.692276, -3.3960357e-06, -7.872699e-06, 0.1545935, 1.243, 6.757503e-09)
+transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, 0.1545935, 1.243, 6.757503e-09)
 
 [node name="GripHand" type="Marker3D" parent="." unique_id=1897020530]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.47601122, 0.098496675)
 
 [node name="SupportHand" type="Marker3D" parent="." unique_id=816410030]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.10096738, -1.2005291)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.046890527, -1.3306532)
 
 [node name="RecoilPivot" type="Marker3D" parent="." unique_id=1733188836]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07424399, 0.9025229)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05807057, 1.1021491)
 
 [node name="WeaponAnimation" type="Node" parent="." unique_id=1110659900 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
 script = ExtResource("13_75jmf")
