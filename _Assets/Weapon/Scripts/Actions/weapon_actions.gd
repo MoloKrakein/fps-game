@@ -58,6 +58,7 @@ var _reload_committed: bool = false
 var _rack_chamber_was_loaded: bool = false
 var _rack_chamber_spent: bool = false
 var _rack_cocking: bool = false          # this rack cocks an open bolt (no round is fed or ejected)
+var _rack_hold: bool = false             # this rack pulls the bolt back and holds it there
 var _reload_after_rack: bool = false     # AUTO_RACK: start the reload when the rack finishes
 var _quick_flag_left: float = 0.0        # seconds the quick reload request stays valid
 
@@ -123,7 +124,7 @@ func sync_slide_to_chamber() -> void:
 		slide.snap(1.0 if cocked else 0.0)
 	else:
 		slide.rest_value = 0.0
-		var open: bool = data != null and not data.is_loaded and profile.locks_open_when_empty()
+		var open: bool = data != null and (data.bolt_held_open or (not data.is_loaded and profile.locks_open_when_empty()))
 		slide.snap(1.0 if open else 0.0)
 		if open:
 			slide.lock(1.0)
@@ -271,6 +272,7 @@ func start_rack() -> void:
 	# For an open-bolt gun is_loaded only mirrors "has rounds": there is no chambered round to eject.
 	_rack_chamber_was_loaded = data.is_loaded and not _rack_cocking
 	_rack_chamber_spent = data.chamber_spent
+	_rack_hold = not _rack_cocking and profile.rack_holds_bolt_open and not profile.is_manual_cycle() and not data.bolt_held_open
 
 	var duration: float = get_rack_duration()
 	var def: ActionDef = _get_def(RACK)
@@ -301,6 +303,8 @@ func _on_rack_event(event_name: StringName) -> void:
 		&"release":
 			if _rack_cocking:
 				pass # the sear catches the bolt: it stays open
+			elif _rack_hold:
+				slide.lock(1.0) # held back until the player racks again
 			elif data.ammo_in_magazine > 0 or not profile.locks_open_when_empty():
 				slide.move_to(0.0, _span(&"release", &"closed"), rack_release_curve)
 			else:
@@ -312,6 +316,11 @@ func _on_rack_event(event_name: StringName) -> void:
 				slide.release()
 				ctrl.update_weapon_ui()
 				return
+			if _rack_hold:
+				data.bolt_held_open = true # no round is chambered: the bolt waits for the next rack
+				ctrl.update_weapon_ui()
+				return
+			data.bolt_held_open = false
 			ctrl._feed_chamber()
 			ctrl.update_weapon_ui()
 			if not _rack_chamber_was_loaded and data.is_loaded:
@@ -356,6 +365,10 @@ func can_rack() -> bool:
 	if ctrl.current_weapon.is_open_bolt:
 		# Racking cocks the bolt open. Only useful (and allowed) while it is closed.
 		return profile.cocks_open_bolt() and not data.bolt_open
+	if data.bolt_held_open:
+		return true # let the held bolt go forward
+	if profile.rack_holds_bolt_open and not profile.is_manual_cycle():
+		return true # pull the bolt back and hold it, even with nothing to chamber
 	if data.chamber_spent or data.is_loaded:
 		return true # eject the fired case / the live round
 	return data.ammo_in_magazine > 0 # chamber empty: feed one
@@ -394,6 +407,17 @@ func needs_rack_before_reload() -> bool:
 	if not profile.cocks_open_bolt() or data.bolt_open:
 		return false
 	return profile.reload_with_closed_bolt != WeaponActionProfile.ReloadWithClosedBolt.RELOAD_THEN_RACK
+
+
+## Is a rack playing right now?
+func is_racking() -> bool:
+	return timeline.running and timeline.action == RACK
+
+
+## A reload was pressed during a rack: it starts the moment the rack ends, instead of cutting
+## the rack off or being ignored.
+func queue_reload_after_rack() -> void:
+	_reload_after_rack = true
 
 
 ## The reload key was pressed while the bolt is closed.
@@ -471,6 +495,7 @@ func _perform_active_hit() -> void:
 		ctrl.update_weapon_ui()
 	else:
 		# The same things a manual rack would do, packed into the reload.
+		data.bolt_held_open = false
 		if data.chamber_spent:
 			_eject_spent_case(data)
 		ctrl._feed_chamber()

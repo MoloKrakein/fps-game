@@ -39,6 +39,12 @@ func process(delta: float) -> void:
 
 #region Input
 func request_reload() -> void:
+	# A reload pressed during a rack waits for the rack to end (the rack is not cut off).
+	if ctrl.actions.is_racking():
+		_cancel_double_tap()
+		ctrl.actions.queue_reload_after_rack()
+		return
+
 	# An open-bolt gun with a closed bolt must be racked open first (or racks itself).
 	if ctrl.actions.needs_rack_before_reload():
 		_cancel_double_tap()
@@ -50,6 +56,14 @@ func request_reload() -> void:
 		if ctrl.is_reloading:
 			_queued_shell_reloads += 1
 		else:
+			ctrl.send_state_event("onReload")
+		return
+
+	# With nothing in the magazine there is nothing to dump, so there is no double-tap to wait for:
+	# the reload starts at once instead of after the double-tap window.
+	if weapon_data != null and weapon_data.ammo_in_magazine <= 0:
+		_cancel_double_tap()
+		if not ctrl.is_reloading:
 			ctrl.send_state_event("onReload")
 		return
 

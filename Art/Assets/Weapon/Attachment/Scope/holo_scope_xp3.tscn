@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://q3rignm8x472"]
+
+[ext_resource type="PackedScene" uid="uid://d2573a1o6up3y" path="res://Art/3D/Blender/Weapon/attachment/Exp3.glb" id="1_je0o2"]
+[ext_resource type="Shader" uid="uid://b0ymona6un2bx" path="res://Art/Shader/ScopeShader/red_dot.gdshader" id="3_oqvbb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dxpo7"]
+render_priority = 0
+shader = ExtResource("3_oqvbb")
+shader_parameter/reticle_color = Color(0.7262233, 3.4172833e-06, 5.7756904e-07, 1)
+shader_parameter/glass_color = Color(0.6018906, 0.552156, 0.590676, 0.1764706)
+shader_parameter/reticle_emission = 1.4000000665
+shader_parameter/ref_element_size = 0.999999977648
+shader_parameter/ref_target_moa = 6.23400029541648
+shader_parameter/poa_use_moa = 1.0
+shader_parameter/poa_subdivision = 0.2500000037253
+shader_parameter/poa_elevation = 0
+shader_parameter/poa_windage = 0
+
+[node name="Holo_Scope" type="Node3D" unique_id=400638620]
+
+[node name="SightPoint" type="Marker3D" parent="." unique_id=792289536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0750899, 0.2728709)
+
+[node name="Exp3" parent="." unique_id=162764243 instance=ExtResource("1_je0o2")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
+
+[node name="Screen" parent="Exp3" index="7" unique_id=1148220489]
+surface_material_override/0 = SubResource("ShaderMaterial_dxpo7")
+
+[editable path="Exp3"]

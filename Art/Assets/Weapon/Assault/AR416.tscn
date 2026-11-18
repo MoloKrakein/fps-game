@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="5_vgxpt"]
 [ext_resource type="Shader" uid="uid://ok0pd3nwhf5w" path="res://_Assets/VFX/muzzle_flash.gdshader" id="6_qrkt3"]
 [ext_resource type="Resource" uid="uid://c2pwq7v11v2gy" path="res://Resources/Attachments/Muzzle Device/Supp_gen_1.tres" id="6_uer85"]
+[ext_resource type="Resource" uid="uid://dconbcf2phnk6" path="res://Resources/Attachments/Optics/holo_sight.tres" id="7_oh2wu"]
 [ext_resource type="Material" uid="uid://bq0k71nxq3n07" path="res://_Assets/VFX/material/smoke_haze.tres" id="7_qrkt3"]
 [ext_resource type="PackedScene" uid="uid://dbvm232i3jjhh" path="res://_Assets/VFX/VFX_SCENE/wpn_smoke_vfx.tscn" id="8_qrkt3"]
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="13_75jmf"]
@@ -41,6 +42,13 @@ metadata/_custom_type_script = "uid://c6s8by6wlubla"
 script = ExtResource("2_oo46r")
 attachment = ExtResource("6_uer85")
 scale_multiplier = Vector3(0.5, 0.5, 0.5)
+metadata/_custom_type_script = "uid://c6s8by6wlubla"
+
+[sub_resource type="Resource" id="Resource_dwpih"]
+script = ExtResource("2_oo46r")
+attachment = ExtResource("7_oh2wu")
+position_offset = Vector3(0, 0, 0.008)
+ads_offset = Vector3(0, 0.06, 0.419)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
@@ -181,7 +189,7 @@ default_stock_mesh = NodePath("AR416/Armature/Skeleton3D/Stock")
 default_grip_mesh = NodePath("AR416/Armature/Skeleton3D/Grip")
 default_magazine_mesh = NodePath("AR416/Armature/Skeleton3D/Magazine")
 iron_sight_point = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Optics")
-attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a"), SubResource("Resource_5yekf"), SubResource("Resource_3dwt8")])
+attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a"), SubResource("Resource_5yekf"), SubResource("Resource_3dwt8"), SubResource("Resource_dwpih")])
 ammo_display = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/AmmoCounterPosition")
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
@@ -232,23 +240,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07610689, 0.0075836927, -0.
 [node name="AR416" parent="." unique_id=1425081176 instance=ExtResource("3_omrth")]
 transform = Transform3D(-2.8412401e-08, 0, 0.65, 0, 0.65, 0, -0.65, 0, -2.8412401e-08, 0, -0.27754605, -0.46143073)
 
-[node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 1395129327) index="0" unique_id=84785033]
-bones/0/position = Vector3(-0.9637607, 0.38923222, -0.015709063)
-bones/0/rotation = Quaternion(-0.05506173, 0.027154926, 0.09375918, 0.9937002)
-bones/3/position = Vector3(-0.49308458, -2.4697914, -2.7660192e-07)
-bones/4/position = Vector3(0.2675931, 1.2130873, 1.2703562e-07)
-bones/10/position = Vector3(2.203052, -7.4996185, -2.5435808)
-bones/10/rotation = Quaternion(-0.3068254, 0.63707584, 0.6221967, 0.33595228)
-bones/11/position = Vector3(-8.4135294e-08, 1.0414237, -0.5360675)
-bones/13/position = Vector3(-7.133918e-08, 0.94727063, -0.5385453)
-bones/15/position = Vector3(0.2515676, -1.1540473, -0.06510224)
-bones/17/rotation = Quaternion(1, -4.2695436e-07, -7.549789e-08, -5.985527e-07)
-bones/21/position = Vector3(0.30952585, -0.11935902, -0.008646544)
-bones/21/rotation = Quaternion(-0.5453551, 0.48734397, 0.53985804, 0.41669765)
+[node name="Skeleton3D" parent="AR416/Armature" parent_id_path=PackedInt32Array(1425081176, 335068162) index="0" unique_id=2044268670]
+bones/0/position = Vector3(0, 0, 0)
+bones/0/rotation = Quaternion(-6.177454e-24, 1.5777218e-30, 0, 1)
+bones/3/position = Vector3(-0.49308467, -2.4697914, -2.7660187e-07)
+bones/4/position = Vector3(0.2675931, 1.2130874, 1.2703553e-07)
+bones/10/position = Vector3(1.1312768, -0.5149673, -2.7858312e-07)
+bones/10/rotation = Quaternion(-0.49999994, 0.50000006, 0.49999997, 0.5)
+bones/11/position = Vector3(-8.41353e-08, 1.0414236, -0.5360675)
+bones/13/position = Vector3(-7.13392e-08, 0.9472706, -0.53854525)
+bones/15/position = Vector3(0.2515676, -1.1540471, -0.065102234)
+bones/21/position = Vector3(1.1312768, -13.059398, -2.785831e-07)
 bones/21/scale = Vector3(1, 0.99999994, 0.99999994)
 
 [node name="BodySkelleton" type="BoneAttachment3D" parent="AR416/Armature/Skeleton3D" index="0" unique_id=1242988179]
-transform = Transform3D(0.9809437, -0.1893274, 0.043642618, 0.18334661, 0.97635484, 0.114521734, -0.06429279, -0.10433765, 0.9924616, -0.9637606, 0.38923216, -0.015709063)
+transform = Transform3D(1, 0, 3.1554436e-30, 1.1e-44, 1, -3.5527137e-15, -3.1554436e-30, 3.5527137e-15, 1, 0, 0, 0)
 bone_name = "body"
 bone_idx = 0
 use_external_skeleton = true

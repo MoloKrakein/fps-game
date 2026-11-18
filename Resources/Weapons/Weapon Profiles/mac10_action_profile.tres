@@ -7,5 +7,4 @@ script = ExtResource("1_7pamc")
 ads_reload_enabled = true
 ads_body_position_scale = 0.0
 ads_body_rotation_scale = 0.31
-rack_time = 0.04
 metadata/_custom_type_script = "uid://45ljaim4pd2t"

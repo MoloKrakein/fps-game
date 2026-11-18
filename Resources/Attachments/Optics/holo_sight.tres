@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Attachment" format=3 uid="uid://dconbcf2phnk6"]
+
+[ext_resource type="PackedScene" uid="uid://q3rignm8x472" path="res://Art/Assets/Weapon/Attachment/Scope/holo_scope_xp3.tscn" id="1_tofw0"]
+[ext_resource type="Script" uid="uid://byjrogv1mqm35" path="res://_Assets/Weapon/attachment/Scripts/attachment.gd" id="2_o3kai"]
+
+[resource]
+script = ExtResource("2_o3kai")
+attachment_name = "Red Dot"
+attachment_model = ExtResource("1_tofw0")
+model_position = Vector3(0, 0.001, 0)
+model_scale = Vector3(0.65, 0.65, 0.65)
+accuracy_bonus = 0.385
+ammo_capacity_bonus = 5
+is_optic = true
+override_ads_position = Vector3(0, -0.105, -0.21)
+metadata/_custom_type_script = "uid://byjrogv1mqm35"

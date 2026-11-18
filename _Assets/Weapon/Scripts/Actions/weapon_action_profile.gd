@@ -79,6 +79,10 @@ enum ReloadWithClosedBolt {
 @export_group("Rack / pump / bolt")
 ## Seconds a rack takes. 0 = use WeaponController.rack_lockout_time.
 @export_range(0.0, 3.0, 0.01, "suffix:s") var rack_time: float = 0.0
+## Charging-handle guns (MP5, G3): the first rack pulls the bolt back and HOLDS it there. The player
+## reloads with the bolt held open, then presses rack again to let it go forward and chamber a round.
+## Off: a rack pulls and releases in one go. Only for AUTOMATIC weapons.
+@export var rack_holds_bolt_open: bool = false
 
 @export_group("Active reload")
 ## Pressing the rack key while the new magazine goes in chambers the round right away and
