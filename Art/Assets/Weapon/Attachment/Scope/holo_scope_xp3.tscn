@@ -38,7 +38,7 @@ size = Vector2(0.2, 0.195)
 [node name="Holo_Scope" type="Node3D" unique_id=400638620]
 
 [node name="SightPoint" type="Marker3D" parent="." unique_id=792289536]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12006998, 0.2728709)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14455855, 0.30190766)
 
 [node name="Exp3" parent="." unique_id=162764243 instance=ExtResource("1_je0o2")]
 transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)

@@ -1,0 +1,148 @@
+class_name GasBurst extends GPUParticles3D
+## Small gas puff for the muzzle or the ejection port. Put it on a GPUParticles3D whose draw pass
+## uses muzzle_blast.gdshader, then call play() on every shot (MuzzleFlash does this for you).
+##
+## How it stays cheap: about 24 particles, 0.3 s lifetime, and the emitter idles at
+## amount_ratio 0 between shots. A shot only raises the ratio for a few milliseconds.
+
+enum GasMode {
+	FORWARD,  ## leaves along the barrel (-Z), together with the bullet
+	EXPAND,   ## stays at the spot and just swells
+	SIDE,     ## leaves to the side (+X / -X), like a muzzle brake or an open ejection port
+	CUSTOM,   ## leaves along custom_direction
+}
+enum VentSide { RIGHT, LEFT, BOTH }
+
+@export var enabled: bool = true
+@export var mode: GasMode = GasMode.EXPAND
+## SIDE only. BOTH adds a mirrored copy of this node, so it vents to both sides.
+@export var side: VentSide = VentSide.BOTH
+## CUSTOM only. Direction in this node's local space.
+@export var custom_direction: Vector3 = Vector3.UP
+
+@export_group("Motion")
+## Speed range in m/s. EXPAND uses a tenth of it, so the puff stays put.
+@export var speed_min: float = 1.5
+@export var speed_max: float = 3.5
+@export_range(0.0, 180.0, 1.0) var spread_degrees: float = 14.0
+## Higher damping = the gas stops sooner.
+@export var damping_min: float = 6.0
+@export var damping_max: float = 10.0
+## Slow upward drift in m/s^2.
+@export var drift_up: float = 0.08
+
+@export_group("Shot")
+## Puffs per shot (each one is a particle).
+@export_range(1, 8) var puffs_per_shot: int = 3
+## Seconds after the shot before the gas appears.
+@export var delay: float = 0.008
+
+@export_group("Look")
+@export_range(0.0, 1.0, 0.01) var opacity: float = 0.14
+@export var color: Color = Color(0.92, 0.94, 1.0)
+## Size multiplier on top of the mesh size.
+@export var size: float = 1.0
+
+var _material: ParticleProcessMaterial
+var _burst_tween: Tween
+var _twin: GasBurst
+var _is_twin: bool = false
+
+
+func _ready() -> void:
+	_is_twin = has_meta("gas_twin")
+	one_shot = false
+	explosiveness = 0.0
+	local_coords = false
+	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+	# Own copy of the process material, so several GasBursts can share one resource.
+	if process_material is ParticleProcessMaterial:
+		_material = (process_material as ParticleProcessMaterial).duplicate() as ParticleProcessMaterial
+		process_material = _material
+	_apply_motion()
+	_apply_look()
+
+	amount_ratio = 0.0
+	emitting = true
+
+	if mode == GasMode.SIDE and side == VentSide.BOTH and not _is_twin:
+		_make_twin()
+
+
+## Call on every shot.
+func play() -> void:
+	if not enabled:
+		return
+	if _twin != null and is_instance_valid(_twin):
+		_twin.play()
+	if delay > 0.0:
+		var wait: Tween = create_tween()
+		wait.tween_interval(delay)
+		wait.tween_callback(_burst)
+	else:
+		_burst()
+
+
+## Used by MuzzleFlash to apply the weapon's smoke color and scale.
+func set_look(new_color: Color, new_size: float) -> void:
+	color = new_color
+	size = new_size
+	_apply_look()
+	if _twin != null:
+		_twin.set_look(new_color, new_size)
+
+
+func _burst() -> void:
+	var rate: float = float(amount) / maxf(lifetime, 0.01)            # particles per second at full ratio
+	var seconds: float = float(puffs_per_shot) / maxf(rate, 1.0)
+	amount_ratio = 1.0
+	if _burst_tween != null and _burst_tween.is_valid():
+		_burst_tween.kill()
+	_burst_tween = create_tween()
+	_burst_tween.tween_interval(seconds)
+	_burst_tween.tween_callback(func() -> void: amount_ratio = 0.0)
+
+
+func _apply_motion() -> void:
+	if _material == null:
+		return
+	_material.direction = _direction()
+	if mode == GasMode.EXPAND:
+		_material.spread = 180.0
+		_material.initial_velocity_min = speed_min * 0.1
+		_material.initial_velocity_max = speed_max * 0.1
+	else:
+		_material.spread = spread_degrees
+		_material.initial_velocity_min = speed_min
+		_material.initial_velocity_max = speed_max
+	_material.damping_min = damping_min
+	_material.damping_max = damping_max
+	_material.gravity = Vector3(0.0, drift_up, 0.0)
+
+
+func _apply_look() -> void:
+	set_instance_shader_parameter("blast_color", color)
+	set_instance_shader_parameter("blast_opacity", opacity)
+	set_instance_shader_parameter("size_mult", size)
+
+
+func _direction() -> Vector3:
+	match mode:
+		GasMode.FORWARD:
+			return Vector3(0.0, 0.0, -1.0)
+		GasMode.SIDE:
+			var sign_x: float = -1.0 if side == VentSide.LEFT else 1.0
+			return Vector3(sign_x, 0.15, 0.0).normalized()
+		GasMode.CUSTOM:
+			return custom_direction.normalized() if custom_direction.length() > 0.001 else Vector3.UP
+	return Vector3.UP  # EXPAND: the 180 degree spread covers every direction
+
+
+func _make_twin() -> void:
+	var twin: GasBurst = duplicate() as GasBurst
+	twin.set_meta("gas_twin", true)
+	twin.side = VentSide.LEFT
+	twin.name = String(name) + "Twin"
+	_twin = twin
+	get_parent().add_child.call_deferred(twin)

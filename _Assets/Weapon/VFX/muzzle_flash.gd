@@ -1,47 +1,39 @@
 class_name MuzzleFlash extends Node3D
-## Simple muzzle effect: a short flash, a light flick, and the muzzle blast (gas leaving with the bullet).
-## Sparks, barrel haze and ejection smoke are removed for now.
+## Simple muzzle effect: a short flash, a light flick, muzzle gas and ejection port gas.
 
 @export var enabled: bool = true
 @export_range(0.0, 1.0, 0.01) var flash_chance: float = 1.0
 ## Flash quad (muzzle_flash.gdshader), one-shot
 @export var particles: GPUParticles3D
-## Muzzle blast puffs (muzzle_blast.gdshader), one-shot. The second emitter is optional:
-## shots alternate between the two so a fast burst does not cut the previous puff short.
-@export var blast_particles: GPUParticles3D
-@export var blast_particles_alt: GPUParticles3D
+## Gas at the muzzle (GasBurst). Set its mode to Forward, Expand, Side or Custom.
+@export var muzzle_gas: GasBurst
+## Gas at the ejection port (GasBurst), usually under the EjectionPort node.
+@export var ejection_gas: GasBurst
 @export var light: OmniLight3D
 
 @export_group("Flash")
 ## Multiplies the weapon's flash intensity. Lower = more subtle.
 @export_range(0.0, 2.0, 0.05) var flash_strength: float = 0.4
 
-@export_group("Blast")
-## Peak alpha of the blast puff
-@export_range(0.0, 1.0, 0.01) var blast_opacity: float = 0.14
-## Seconds after the flash before the blast starts
-@export var blast_delay: float = 0.008
-
 var _light_tween: Tween
-var _blast_enabled: bool = true
-var _use_alt_blast: bool = false
+var _muzzle_gas_enabled: bool = true
+var _ejection_gas_enabled: bool = true
+var _eject_on_fire: bool = true
 
 
 func _ready() -> void:
-	for particle: GPUParticles3D in _one_shot_emitters():
-		particle.one_shot = true
-		particle.emitting = false
-	if blast_particles:
-		blast_particles.local_coords = false
-	if blast_particles_alt:
-		blast_particles_alt.local_coords = false
+	if particles:
+		particles.one_shot = true
+		particles.emitting = false
 	if light:
 		light.light_energy = 0.0
 
 
 func configure(weapon: Weapon) -> void:
 	enabled = weapon.is_muzzle_flash_enabled
-	_blast_enabled = weapon.barrel_smoke_enabled
+	_muzzle_gas_enabled = weapon.barrel_smoke_enabled
+	_ejection_gas_enabled = weapon.ejection_smoke_enabled
+	_eject_on_fire = weapon.eject_smoke_on_fire
 
 	if particles:
 		particles.scale = Vector3.ONE * weapon.muzzle_flash_scale
@@ -49,10 +41,10 @@ func configure(weapon: Weapon) -> void:
 		particles.set_instance_shader_parameter("intensity", weapon.muzzle_flash_intensity * flash_strength)
 		particles.set_instance_shader_parameter("spikes", float(weapon.muzzle_flash_spikes))
 
-	for particle: GPUParticles3D in _blast_emitters():
-		particle.set_instance_shader_parameter("blast_color", weapon.barrel_smoke_color)
-		particle.set_instance_shader_parameter("size_mult", weapon.barrel_smoke_scale)
-		particle.set_instance_shader_parameter("blast_opacity", blast_opacity)
+	if muzzle_gas:
+		muzzle_gas.set_look(weapon.barrel_smoke_color, weapon.barrel_smoke_scale)
+	if ejection_gas:
+		ejection_gas.set_look(weapon.ejection_smoke_color, weapon.ejection_smoke_scale)
 
 
 ## Old entry point, kept so existing callers keep working.
@@ -67,8 +59,10 @@ func trigger(color: Color, energy: float, duration: float) -> void:
 	if show_flash and particles:
 		particles.restart()
 
-	if _blast_enabled:
-		_play_blast()
+	if muzzle_gas and _muzzle_gas_enabled:
+		muzzle_gas.play()
+	if _eject_on_fire:
+		eject_smoke()
 
 	if show_flash and light:
 		light.light_color = color
@@ -79,40 +73,10 @@ func trigger(color: Color, energy: float, duration: float) -> void:
 		_light_tween.tween_property(light, "light_energy", 0.0, duration)
 
 
-## Kept so older calls do not break. The ejection port smoke is removed for now.
+## Call when the case leaves the weapon (bolt / pump weapons: set eject_smoke_on_fire to false).
 func eject_smoke() -> void:
-	pass
-
-
-func _play_blast() -> void:
-	var emitter: GPUParticles3D = blast_particles
-	if _use_alt_blast and blast_particles_alt != null:
-		emitter = blast_particles_alt
-	_use_alt_blast = not _use_alt_blast
-	if emitter == null:
-		return
-	if blast_delay <= 0.0:
-		emitter.restart()
-		return
-	var tween: Tween = create_tween().bind_node(self)
-	tween.tween_interval(blast_delay)
-	tween.tween_callback(emitter.restart)
-
-
-func _blast_emitters() -> Array[GPUParticles3D]:
-	var all: Array[GPUParticles3D] = []
-	if blast_particles != null:
-		all.append(blast_particles)
-	if blast_particles_alt != null:
-		all.append(blast_particles_alt)
-	return all
-
-
-func _one_shot_emitters() -> Array[GPUParticles3D]:
-	var all: Array[GPUParticles3D] = _blast_emitters()
-	if particles != null:
-		all.append(particles)
-	return all
+	if ejection_gas and _ejection_gas_enabled:
+		ejection_gas.play()
 
 
 func _exit_tree() -> void:
