@@ -58,19 +58,19 @@ shader_parameter/use_alpha_channel = true
 shader_parameter/frames_h = 1
 shader_parameter/frames_v = 0
 shader_parameter/texture_contrast = 0.5
-shader_parameter/start_size = 0.17100000486262001
+shader_parameter/start_size = 0.17100000486262
 shader_parameter/noise_scale = 2.4
 shader_parameter/flow_speed = 1.2
 shader_parameter/softness = 0.22600000910506
 shader_parameter/fade_power = 1.3
+shader_parameter/shape_warp = 0.6
 
 [sub_resource type="QuadMesh" id="QuadMesh_o5oma"]
 material = SubResource("ShaderMaterial_blast")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o5oma"]
 angle_max = 360.0
-scale_min = 0.8
-scale_max = 1.2
+scale_max = 1.5
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2v2p1"]
 render_priority = 0
@@ -79,16 +79,17 @@ shader_parameter/use_texture = false
 shader_parameter/use_alpha_channel = false
 shader_parameter/frames_h = 1
 shader_parameter/frames_v = 1
-shader_parameter/texture_contrast = 1.0
-shader_parameter/start_size = 0.35
+shader_parameter/texture_contrast = 0.8290000156274999
+shader_parameter/start_size = 0.72000003094012
 shader_parameter/noise_scale = 2.4
 shader_parameter/flow_speed = 1.2
 shader_parameter/softness = 0.35
 shader_parameter/fade_power = 1.3
+shader_parameter/shape_warp = 0.6
 
 [sub_resource type="QuadMesh" id="QuadMesh_kde2l"]
 material = SubResource("ShaderMaterial_2v2p1")
-size = Vector2(0.1, 0.1)
+size = Vector2(0.12, 0.12)
 
 [sub_resource type="Resource" id="Resource_m8xuj"]
 script = ExtResource("10_qgqgv")
@@ -288,27 +289,30 @@ trail_lifetime = 1.2
 process_material = SubResource("ParticleProcessMaterial_qgqgv")
 draw_pass_1 = SubResource("QuadMesh_o5oma")
 script = ExtResource("9_qgqgv")
-opacity = 0.1
+opacity = 0.07
 size = 0.74
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=553518216]
 
-[node name="EjectionGas" type="GPUParticles3D" parent="EjectionPort" unique_id=2021259023]
-transform = Transform3D(1, 0, 0, 0, 0.9995328, -0.030563673, 0, 0.030563673, 0.9995328, 0.3559561, 0.8807474, 0.07773622)
+[node name="EjectionGas" type="GPUParticles3D" parent="EjectionPort" unique_id=134879439]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43705246, 0.7709266, -0.12819883)
 cast_shadow = 0
-amount = 24
-lifetime = 0.3
+amount = 10
+lifetime = 0.05
 process_material = SubResource("ParticleProcessMaterial_o5oma")
 draw_pass_1 = SubResource("QuadMesh_kde2l")
 script = ExtResource("9_qgqgv")
 mode = 2
 side = 0
-custom_direction = Vector3(0, 1.325, 0)
-spread_degrees = 141.0
-drift_up = 7.9
-puffs_per_shot = 8
-opacity = 0.18
-size = 16.275
+side_lift = 0.5
+speed_min = 10.88
+speed_max = 15.72
+damping_min = 4.31
+damping_max = 6.54
+jet_length = 3.5
+puffs_per_shot = 4
+opacity = 0.06
+size = 10.545
 
 [node name="WeaponAnimation" type="Node" parent="." unique_id=1878486645 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
 script = ExtResource("5_c8wk2")
