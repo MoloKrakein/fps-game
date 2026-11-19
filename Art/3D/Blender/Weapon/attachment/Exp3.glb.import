@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dniupd7i0mqqs"
-path="res://.godot/imported/Rifle Run.fbx-1b71f36bb0e7caea487c2df675a691f5.scn"
+uid="uid://d2573a1o6up3y"
+path="res://.godot/imported/Exp3.glb-72bb6196d0e61effac8b1a49b717a71f.scn"
 
 [deps]
 
-source_file="res://Art/3D/Blender/HumanoidModel/animation/Rifle Run.fbx"
-dest_files=["res://.godot/imported/Rifle Run.fbx-1b71f36bb0e7caea487c2df675a691f5.scn"]
+source_file="res://Art/3D/Blender/Weapon/attachment/Exp3.glb"
+dest_files=["res://.godot/imported/Exp3.glb-72bb6196d0e61effac8b1a49b717a71f.scn"]
 
 [params]
 
@@ -32,7 +32,7 @@ meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
 animation/fps=30
-animation/trimming=true
+animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
@@ -40,7 +40,6 @@ materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={}
-fbx/importer=0
-fbx/allow_geometry_helper_nodes=false
-fbx/embedded_image_handling=1
-fbx/naming_version=2
+gltf/naming_version=2
+gltf/embedded_image_handling=1
+gltf/texture_map_mode=1

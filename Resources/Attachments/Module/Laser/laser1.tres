@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_vdjql")
 attachment_name = "Simple Laser Module"
-attachment_slot = 2
+attachment_slot = 6
 attachment_model = ExtResource("1_ycwwm")
 model_scale = Vector3(0.5, 0.5, 0.5)
 recoil_multiplier = 0.0

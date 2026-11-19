@@ -47,10 +47,28 @@ const NODE_ACTION_LAYER: StringName = &"ActionLayer"
 @export var action_request_param: String = "parameters/ActionLayer/request"
 ## TimeScale node on the action clip. Scales the playing clip.
 @export var action_speed_param: String = "parameters/ActionSpeed/scale"
+## True while the ActionLayer shot is playing or fading out.
+@export var action_active_param: String = "parameters/ActionLayer/active"
+
+@export_category("Body motion and physics")
+## How fast the ADS body scaling eases in and out.
+@export_range(0.0, 1.0, 0.01, "suffix:s") var body_damping_blend_time: float = 0.12
+## Influence of spring bone physics (a SpringBoneSimulator3D under the skeleton) while an action
+## plays. 1 = unchanged. Lower it to calm jiggle during reloads.
+@export_range(0.0, 1.0, 0.01) var action_physics_influence: float = 1.0
 
 ## role -> resolved clip name ("" = not found)
 var _clips: Dictionary = {}
 var _warned_roles: Dictionary = {}
+var _skeleton: Skeleton3D
+var _body_bones: PackedStringArray = PackedStringArray()
+var _body_bone_idx: PackedInt32Array = PackedInt32Array()
+var _damp_pos: float = 1.0         # body movement kept while scaling is fully on (1 = no change)
+var _damp_rot: float = 1.0         # body rotation kept
+var _damp_requested: bool = false  # the current action asked for body scaling
+var _damp_blend: float = 0.0       # 0 = clip as authored, 1 = fully scaled
+var _physics_nodes: Array[SkeletonModifier3D] = []
+var _physics_blend: float = 1.0
 var _part_cache: Dictionary = {}     # part name -> Node3D (or null)
 var _part_original: Dictionary = {}  # Node3D -> visibility before the action changed it
 var _warned_parts: Dictionary = {}
@@ -69,8 +87,16 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if weapon_animation_tree != null:
-		weapon_animation_tree.advance(PlayerTime.real(delta))
+	if weapon_animation_tree == null:
+		return
+	var dt: float = PlayerTime.real(delta)
+	weapon_animation_tree.advance(dt)
+
+	# advance() has just written the animated pose into the skeleton, so what follows adjusts
+	# that pose before it is drawn.
+	var active: bool = bool(weapon_animation_tree.get(action_active_param))
+	_update_body_scaling(dt, active)
+	_update_physics_influence(dt, active)
 
 
 #region Component wiring
@@ -143,12 +169,17 @@ func resolve_names() -> void:
 	var lines: PackedStringArray = PackedStringArray()
 	var missing: PackedStringArray = PackedStringArray()
 	var critical_missing: PackedStringArray = PackedStringArray()
-	for role: StringName in ClipResolver.ALL_ROLES:
+	var roles: Array[StringName] = []
+	roles.append_array(ClipResolver.ALL_ROLES)
+	roles.append_array(ClipResolver.OPTIONAL_ROLES)
+	for role: StringName in roles:
 		var explicit: String = clip_map.get_explicit(role) if clip_map != null else ""
 		var clip: String = ClipResolver.resolve_clip(role, available, explicit)
 		_clips[role] = clip
 
-		if clip == "":
+		if clip == "" and ClipResolver.OPTIONAL_ROLES.has(role):
+			lines.append("  %s -> uses the %s clip" % [String(role).rpad(14), ClipResolver.ROLE_FALLBACKS.get(role, "")])
+		elif clip == "":
 			missing.append(String(role))
 			if ClipResolver.CRITICAL_ROLES.has(role):
 				critical_missing.append(String(role))
@@ -167,11 +198,23 @@ func resolve_names() -> void:
 		var explicit_bones: bool = clip_map != null and not clip_map.slide_bones.is_empty()
 		lines.append("  slide bones    -> %s (%s)" % [", ".join(slide_bones), "clip_map" if explicit_bones else "auto"])
 
+	if _body_bones.is_empty():
+		lines.append("  body bones     -> none found (ADS reload pinning unavailable)")
+	else:
+		var explicit_body: bool = clip_map != null and not clip_map.body_bones.is_empty()
+		lines.append("  body bones     -> %s (%s)" % [", ".join(_body_bones), "clip_map" if explicit_body else "auto"])
+	if not _physics_nodes.is_empty():
+		lines.append("  physics        -> %d spring bone simulator(s) under the skeleton" % _physics_nodes.size())
+
 	_report(lines, critical_missing, slide_bones.is_empty(), available)
 
 
+## The clip for a role. A role with no clip of its own uses its fallback (quick reload -> empty reload).
 func get_clip(role: StringName) -> String:
-	return _clips.get(role, "")
+	var clip: String = _clips.get(role, "")
+	if clip == "" and ClipResolver.ROLE_FALLBACKS.has(role):
+		return get_clip(ClipResolver.ROLE_FALLBACKS[role])
+	return clip
 
 
 func get_clip_length(role: StringName) -> float:
@@ -229,6 +272,26 @@ func _apply_action_filter() -> PackedStringArray:
 	for bone: String in bones:
 		if not slide_bones.has(bone):
 			filters.append("%s:%s" % [skeleton_path, bone])
+
+	# The weapon body / root bone(s), remembered so their motion can be scaled during an ADS reload.
+	var root_bones: PackedStringArray = PackedStringArray()
+	for i: int in skeleton.get_bone_count():
+		if skeleton.get_bone_parent(i) == -1:
+			root_bones.append(skeleton.get_bone_name(i))
+	var explicit_body: PackedStringArray = clip_map.body_bones if clip_map != null else PackedStringArray()
+	_body_bones = ClipResolver.resolve_body_bones(bones, explicit_body, slide_bones, root_bones)
+	_skeleton = skeleton
+	_body_bone_idx.clear()
+	for bone: String in _body_bones:
+		var idx: int = skeleton.find_bone(bone)
+		if idx >= 0:
+			_body_bone_idx.append(idx)
+
+	# Spring bone physics under the skeleton, so it can be calmed while an action plays.
+	_physics_nodes.clear()
+	for node: Node in skeleton.find_children("*", "SkeletonModifier3D", true, false):
+		if node.get_class() == "SpringBoneSimulator3D":
+			_physics_nodes.append(node as SkeletonModifier3D)
 	layer.set("filters", filters)
 	layer.filter_enabled = true
 	return slide_bones
@@ -260,7 +323,9 @@ func _report(lines: PackedStringArray, critical_missing: PackedStringArray, no_s
 ## Plays an action's clip through the ActionLayer. Returns false when the weapon has no
 ## clip for that role yet: the visual is skipped, gameplay timing is unaffected.
 ## `speed` scales the clip (1.0 = authored speed).
-func play_action(def: ActionDef, speed: float = 1.0) -> bool:
+## `body_motion` scales the clip's movement (x) and rotation (y) of the weapon body bone, for
+## reloads while aiming down sights. Vector2.ONE leaves the clip as authored.
+func play_action(def: ActionDef, speed: float = 1.0, body_motion: Vector2 = Vector2.ONE) -> bool:
 	if weapon_animation_tree == null or def == null:
 		return false
 
@@ -283,6 +348,9 @@ func play_action(def: ActionDef, speed: float = 1.0) -> bool:
 	clip_node.animation = StringName(clip)
 	layer.fadein_time = def.fade_in
 	layer.fadeout_time = def.fade_out
+	_damp_pos = body_motion.x
+	_damp_rot = body_motion.y
+	_damp_requested = body_motion.x < 1.0 or body_motion.y < 1.0
 	set_action_speed(speed)
 	weapon_animation_tree.set(action_request_param, AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 	return true
@@ -294,6 +362,39 @@ func end_action() -> void:
 		return
 	set_action_speed(1.0)
 	weapon_animation_tree.set(action_request_param, AnimationNodeOneShot.ONE_SHOT_REQUEST_FADE_OUT)
+
+
+## Scales the clip's movement and rotation of the body bone(s) around their rest pose. The weapon
+## model is already placed at the aim by the procedural stance, so scaling the body's own motion
+## keeps the weapon near the aim while the other bones animate normally. Eases in and out.
+func _update_body_scaling(dt: float, active: bool) -> void:
+	var target: float = 1.0 if (active and _damp_requested) else 0.0
+	var step: float = dt / maxf(body_damping_blend_time, 0.001)
+	_damp_blend = move_toward(_damp_blend, target, step)
+	if _damp_blend <= 0.0001 or _skeleton == null:
+		return
+
+	var pos_scale: float = lerpf(1.0, _damp_pos, _damp_blend)
+	var rot_scale: float = lerpf(1.0, _damp_rot, _damp_blend)
+	for idx: int in _body_bone_idx:
+		var rest: Transform3D = _skeleton.get_bone_rest(idx)
+		var rest_pos: Vector3 = rest.origin
+		var rest_rot: Quaternion = rest.basis.get_rotation_quaternion()
+		var pos: Vector3 = _skeleton.get_bone_pose_position(idx)
+		var rot: Quaternion = _skeleton.get_bone_pose_rotation(idx)
+		_skeleton.set_bone_pose_position(idx, rest_pos + (pos - rest_pos) * pos_scale)
+		_skeleton.set_bone_pose_rotation(idx, rest_rot.slerp(rot, rot_scale))
+
+
+## Calms spring bone physics while an action plays (action_physics_influence).
+func _update_physics_influence(dt: float, active: bool) -> void:
+	if _physics_nodes.is_empty():
+		return
+	var target: float = action_physics_influence if active else 1.0
+	_physics_blend = move_toward(_physics_blend, target, dt * 6.0)
+	for node: SkeletonModifier3D in _physics_nodes:
+		if is_instance_valid(node):
+			node.influence = _physics_blend
 
 
 func set_action_speed(speed: float) -> void:
@@ -426,6 +527,8 @@ func get_animation_length(animation_name: String) -> float:
 	match animation_name.to_lower():
 		"empty_reload":
 			role = ClipResolver.ROLE_RELOAD_EMPTY
+		"quick_reload":
+			role = ClipResolver.ROLE_RELOAD_QUICK
 		"loaded_reload", "reload":
 			role = ClipResolver.ROLE_RELOAD_LOADED
 		"rack":

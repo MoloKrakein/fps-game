@@ -8,6 +8,7 @@ class_name WeaponModel extends Node3D
 @export var optic_socket: Marker3D
 @export var underbarrel_socket: Marker3D
 @export var muzzle_socket_attachment: Marker3D
+@export var accessory_socket: Marker3D
 
 @export_category("Replaceable Attachment Sockets")
 @export var stock_socket: Marker3D
@@ -58,6 +59,7 @@ func get_socket_for_slot(slot: Attachment.AttachmentSlot) -> Node3D:
 		Attachment.AttachmentSlot.OPTIC: return optic_socket
 		Attachment.AttachmentSlot.UNDERBARREL: return underbarrel_socket
 		Attachment.AttachmentSlot.MUZZLE: return muzzle_socket_attachment
+		Attachment.AttachmentSlot.ACCESSORY: return accessory_socket
 		Attachment.AttachmentSlot.STOCK: return stock_socket
 		Attachment.AttachmentSlot.GRIP: return grip_socket
 		Attachment.AttachmentSlot.MAGAZINE: return magazine_socket

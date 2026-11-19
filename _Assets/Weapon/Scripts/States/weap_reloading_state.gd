@@ -16,7 +16,8 @@ func _on_reload_state_state_entered() -> void:
 		return
 
 	var actions: WeaponActions = weapon_controller.actions
-	var reload_type: StringName = WeaponActions.RELOAD_LOADED if weapon_controller.active_weapon_data.is_loaded else WeaponActions.RELOAD_EMPTY
+	# quick (double-tap), loaded or empty; consumes a pending quick reload request
+	var reload_type: StringName = actions.pick_reload_type()
 	var duration: float = actions.get_reload_duration(reload_type)
 
 	weapon_controller.is_reloading = true # must be set before start_reload(): a 0s reload finishes inside it

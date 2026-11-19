@@ -1,9 +1,19 @@
 [gd_scene format=3 uid="uid://d2d67es7hovrb"]
 
+[ext_resource type="Texture2D" uid="uid://cd6iv21x20isc" path="res://Art/2D/reticle/Trijicon_Reticle.png" id="1_ws0e7"]
+
 [node name="Node2D" type="Node2D" unique_id=1434229546]
 
 [node name="Line2D" type="Line2D" parent="." unique_id=1148221373]
+visible = false
 points = PackedVector2Array(512, 256, 0, 256)
+width = 4.0
 
 [node name="Line2D2" type="Line2D" parent="." unique_id=217292504]
+visible = false
 points = PackedVector2Array(256, 0, 256, 512)
+width = 4.0
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=582376170]
+position = Vector2(256, 258)
+texture = ExtResource("1_ws0e7")

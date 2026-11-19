@@ -12,7 +12,8 @@ enum AttachmentSlot {
 	UNDERBARREL,
 	MAGAZINE,
 	STOCK,
-	GRIP
+	GRIP,
+	ACCESSORY
 }
 enum AttachmentType {
 	ADDITIVE,

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://de1u3m4kqq5qr"
-path="res://.godot/imported/Firing Rifle.fbx-ad82e5adc154c2c428272542b7dfa50c.scn"
+uid="uid://bawvajlapl76k"
+path="res://.godot/imported/Vertical_Grip.gltf-c9cee0d82a6269f4ae8974d1c3a556d0.scn"
 
 [deps]
 
-source_file="res://Art/3D/Blender/HumanoidModel/animation/Firing Rifle.fbx"
-dest_files=["res://.godot/imported/Firing Rifle.fbx-ad82e5adc154c2c428272542b7dfa50c.scn"]
+source_file="res://Art/3D/Blender/Weapon/attachment/Vertical_Grip.gltf"
+dest_files=["res://.godot/imported/Vertical_Grip.gltf-c9cee0d82a6269f4ae8974d1c3a556d0.scn"]
 
 [params]
 
@@ -32,7 +32,7 @@ meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
 animation/fps=30
-animation/trimming=true
+animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
@@ -40,7 +40,6 @@ materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={}
-fbx/importer=0
-fbx/allow_geometry_helper_nodes=false
-fbx/embedded_image_handling=1
-fbx/naming_version=2
+gltf/naming_version=2
+gltf/embedded_image_handling=1
+gltf/texture_map_mode=1

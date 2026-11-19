@@ -6,7 +6,8 @@ class_name ActionDef extends Resource
 ## The AnimationTree never contains per-action nodes or clip names. WeaponAnimation
 ## writes the clip and the fades into the single ActionLayer right before an action plays.
 ##
-## Action ids used by the code: &"rack", &"empty_reload", &"loaded_reload", &"equip".
+## Action ids used by the code: &"rack", &"empty_reload", &"loaded_reload", &"quick_reload", &"equip".
+## A weapon with no &"quick_reload" card reuses its &"empty_reload" card for the quick reload.
 ## An action with no ActionDef uses make_default(), so weapons can be migrated one at a time.
 
 @export var id: StringName = &""
@@ -38,6 +39,10 @@ const _DEFAULTS: Dictionary = {
 	},
 	&"loaded_reload": {
 		"role": ClipResolver.ROLE_RELOAD_LOADED, "fade_in": 0.1, "fade_out": 0.15,
+		"events": {},
+	},
+	&"quick_reload": {
+		"role": ClipResolver.ROLE_RELOAD_QUICK, "fade_in": 0.1, "fade_out": 0.15,
 		"events": {},
 	},
 	&"equip": {

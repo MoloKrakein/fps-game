@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c21m2545cxjl5"
-path="res://.godot/imported/Rifle Idle.fbx-fcbdf07eff112181d8dda82bf5b122d6.scn"
+uid="uid://d3ju1fhuribdb"
+path="res://.godot/imported/Rifle Run.fbx-861782fea4de9e42c2bb2bcd19df5512.scn"
 
 [deps]
 
-source_file="res://Art/3D/Blender/HumanoidModel/animation/Rifle Idle.fbx"
-dest_files=["res://.godot/imported/Rifle Idle.fbx-fcbdf07eff112181d8dda82bf5b122d6.scn"]
+source_file="res://Art/Animations/Enemies/normalEnemy/Rifle Run.fbx"
+dest_files=["res://.godot/imported/Rifle Run.fbx-861782fea4de9e42c2bb2bcd19df5512.scn"]
 
 [params]
 

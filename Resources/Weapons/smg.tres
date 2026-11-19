@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://bjop8ilrehk8q"]
 
+[ext_resource type="Resource" uid="uid://c7nlrc82lvtcu" path="res://Resources/Weapons/Weapon Profiles/mac10_action_profile.tres" id="1_3o3m0"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="1_7kahr"]
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_a81bq"]
 [ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/Casing/bullet_casing_generic.tscn" id="1_mgcc5"]
@@ -26,9 +27,10 @@ reload_time = 2.4
 fire_mode = 1
 can_change_fire_mode = true
 is_open_bolt = true
+action_profile = ExtResource("1_3o3m0")
 projectile_speed = 2450.0
 handling_weight = 0.3
-aim_ADS_position = Vector3(0.006221235, -0.25546837, -0.65980077)
+aim_ADS_position = Vector3(0, -0.211, -0.66)
 canted_sight_position = Vector3(0.235, -0.268, -0.67)
 canted_sight_rotation = Vector3(0, 0, 1.5358897)
 weapon_model = ExtResource("3_mgcc5")

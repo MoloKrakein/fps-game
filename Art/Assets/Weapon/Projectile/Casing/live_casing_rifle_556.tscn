@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://db2cvarm1t1v0"]
+
+[ext_resource type="Script" uid="uid://dlvl4srer712l" path="res://Art/Assets/Weapon/Projectile/bullet_casing.gd" id="1_tuop7"]
+[ext_resource type="Material" uid="uid://du71p3tdgcqxd" path="res://_Assets/VFX/material/casing_streak.tres" id="2_7r4sf"]
+[ext_resource type="PackedScene" uid="uid://bt1jj4asammqe" path="res://Art/3D/Blender/Weapon/AR416/556_alive.glb" id="3_tuop7"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_5yekf"]
+rough = true
+bounce = 0.05
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tuop7"]
+points = PackedVector3Array(-0.060976338, -0.25290918, 2.6077032e-08, -0.030488145, -0.25290918, -0.052807067, -0.030488145, -0.25290918, 0.05280712, -0.060976338, -0.23996405, 2.6077032e-08, 0.030476306, -0.25290918, -0.052807067, -0.030488145, -0.23996405, -0.052807067, 0.030488241, -0.25290918, 0.052796785, -0.030488145, -0.23996405, 0.05280712, -0.056153618, 0.1653926, -1.0311604e-05, 0.060976434, -0.25290918, -1.0311604e-05, 0.030476306, -0.23996405, -0.052807067, -0.028076783, 0.1653926, -0.04863047, 0.030488241, -0.23996405, 0.052796785, 0.028064948, 0.1653926, 0.04860984, -0.028076783, 0.1653926, 0.04860984, -0.016461667, 0.31390744, 0.028502207, -0.032923378, 0.31390744, -1.0311604e-05, 0.0609645, -0.23996405, -1.0311604e-05, 0.028064948, 0.1653926, -0.04863047, 0.056141775, 0.1653926, -1.0311604e-05, -0.016461667, 0.31390744, -0.028512497, 0.016449828, 0.31390744, 0.028502207, -0.011782192, 0.358346, 0.020386789, -0.023564436, 0.358346, -1.0311604e-05, 0.016449828, 0.31390744, -0.028512497, 0.032911543, 0.31390744, -1.0311604e-05, -0.011782192, 0.358346, -0.020407412, 0.011770356, 0.358346, 0.020386789, -0.0035811774, 0.40497422, 0.0061925575, -0.007162407, 0.40497422, -1.0311604e-05, -0.0035811774, 0.40503865, -0.006202843, 0.011770356, 0.358346, -0.020407412, 0.023540657, 0.358346, -1.0311604e-05, 0.007150572, 0.40497422, -1.0311604e-05, 0.0035693385, 0.40497422, 0.0061925575, 0.0035693385, 0.40503865, -0.006202843)
+
+[node name="Bullet Casing" type="RigidBody3D" unique_id=692806909]
+transform = Transform3D(-1.4901161e-07, 0, -1, 0, 1, 0, 1, 0, -1.4901161e-07, 0, 0, 0)
+collision_layer = 8
+collision_mask = 9
+physics_material_override = SubResource("PhysicsMaterial_5yekf")
+gravity_scale = 3.0
+script = ExtResource("1_tuop7")
+lifetime = 30.0
+streak_material = ExtResource("2_7r4sf")
+streak_time = 0.018
+streak_min_speed = 5.0
+streak_alpha = 1.0
+streak_width = 0.084
+streak_color = Color(0.42745098, 0.32156864, 0.13333334, 1)
+despawn_after_rest = 10.0
+metadata/collision_preset_name = &"__custom__"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1786366192]
+transform = Transform3D(-1.1920929e-07, 0.99999994, 0, -0.99999994, -1.1920929e-07, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_tuop7")
+
+[node name="556_alive" parent="." unique_id=1479280882 instance=ExtResource("3_tuop7")]
+
+[editable path="556_alive"]
