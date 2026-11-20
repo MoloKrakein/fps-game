@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b1qst7e4wv1qe"
+path="res://.godot/imported/678885__drinkingwindgames__firearm-casing-bounce-4.wav-e3034b121e0ee78b72f71f0f25e40b62.sample"
+
+[deps]
+
+source_file="res://Art/sounds/SFX/Download/Brass Casing/678885__drinkingwindgames__firearm-casing-bounce-4.wav"
+dest_files=["res://.godot/imported/678885__drinkingwindgames__firearm-casing-bounce-4.wav-e3034b121e0ee78b72f71f0f25e40b62.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

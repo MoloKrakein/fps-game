@@ -230,7 +230,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.027523652, 0.18819112, -0.1
 
 [node name="EjectionGas" type="GPUParticles3D" parent="EjectionPort" unique_id=515035309]
 cast_shadow = 0
-amount = 24
+amount = 4
 lifetime = 0.25
 process_material = SubResource("ParticleProcessMaterial_eject")
 draw_pass_1 = SubResource("QuadMesh_eject")
@@ -241,8 +241,7 @@ side_lift = 0.5
 reach = 0.7
 spread_degrees = 18.0
 drift_up = 0.0
-jet_length = 3.5
-puffs_per_shot = 4
+jet_length = 2.3
 opacity = 0.3
 
 [node name="WeaponAnimation" parent="." unique_id=2133800285 node_paths=PackedStringArray("animation_player") instance=ExtResource("7_rig01")]

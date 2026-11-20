@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="WeaponSoundProfile" format=3]
+
+[ext_resource type="Script" path="res://_Assets/Audio/weapon_sound_profile.gd" id="1_profile"]
+[ext_resource type="Resource" path="res://Resources/Audio/enemy_player_fire.tres" id="2_fire"]
+
+[resource]
+script = ExtResource("1_profile")
+fire = ExtResource("2_fire")

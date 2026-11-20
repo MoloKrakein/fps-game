@@ -42,6 +42,12 @@ static var _alive: Array[BulletCasing] = []
 ## Meshes disappear beyond this distance in metres (0 = off).
 @export var max_visible_distance: float = 30.0
 
+@export_group("Sound")
+@export var impact_sound: SoundEventDef = preload("res://Resources/Audio/brass_casing_impact.tres")
+@export var impact_min_speed: float = 0.8
+@export var impact_full_speed: float = 6.0
+@export var max_impact_sounds: int = 3
+
 var _age: float = 0.0
 var _rest_time: float = 0.0
 var _launched: bool = false
@@ -49,9 +55,14 @@ var _retiring: bool = false
 var _fade_left: float = 0.0
 var _streak: MeshInstance3D
 var _meshes: Array[MeshInstance3D] = []
+var _prev_speed: float = 0.0
+var _impact_count: int = 0
 
 
 func _ready() -> void:
+	contact_monitor = true
+	max_contacts_reported = 4
+	body_entered.connect(_on_body_entered)
 	if streak_material != null:
 		_create_streak()
 	for node in find_children("*", "MeshInstance3D", true, false):
@@ -70,6 +81,7 @@ func _exit_tree() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_prev_speed = linear_velocity.length()
 	_age += delta
 
 	if _retiring:
@@ -83,6 +95,22 @@ func _physics_process(delta: float) -> void:
 	if _launched:
 		_track_rest(delta)
 	_update_streak()
+
+
+func _on_body_entered(_body: Node) -> void:
+	if impact_sound == null or _age < 0.1 or _impact_count >= maxi(max_impact_sounds, 0):
+		return
+	if _prev_speed < impact_min_speed:
+		return
+	_impact_count += 1
+	var loudness: float = remap(_prev_speed, impact_min_speed, impact_full_speed, 0.2, 1.0)
+	SoundEngine.play_sound(
+		impact_sound,
+		global_position,
+		clampf(loudness, 0.2, 1.0),
+		1.0,
+		true
+	)
 
 
 ## Old entry point, kept so the current shooter code keeps working.

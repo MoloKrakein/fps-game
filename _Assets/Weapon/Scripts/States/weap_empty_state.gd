@@ -7,4 +7,5 @@ func _on_empty_state_state_entered() -> void:
 
 func _on_empty_state_state_physics_processing(_delta: float) -> void:
 	if Input.is_action_just_pressed("combat_fire"):
+		weapon_controller.play_dry_fire_sound()
 		print("Cannot fire. Weapon is empty.")

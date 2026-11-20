@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WeaponSoundProfile" format=3 uid="uid://drd5whsdiimds"]
+
+[ext_resource type="Resource" uid="uid://b7qioxe0j7hqo" path="res://Resources/Sounds/SFX/Weapons/Rifles/HK416_firing_sound.tres" id="1_gbosy"]
+[ext_resource type="Script" uid="uid://oiftbbq5bm00" path="res://_Assets/Audio/weapon_sound_profile.gd" id="1_xvier"]
+
+[resource]
+script = ExtResource("1_xvier")
+fire = ExtResource("1_gbosy")
+metadata/_custom_type_script = "uid://oiftbbq5bm00"

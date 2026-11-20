@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SoundEventDef" format=3]
+
+[ext_resource type="Script" path="res://_Assets/Audio/sound_event_def.gd" id="1_def"]
+[ext_resource type="AudioStream" path="res://Art/sounds/SFX/Audacity/Gunshot1/shoot_sfx_test.wav" id="2_fire"]
+
+[resource]
+script = ExtResource("1_def")
+streams = Array[AudioStream]([ExtResource("2_fire")])
+volume_db = -4.0
+pitch_min = 0.98
+pitch_max = 1.02
+max_instances = 24
+cooldown = 0.02

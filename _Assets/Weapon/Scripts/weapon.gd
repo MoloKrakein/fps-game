@@ -131,6 +131,7 @@ enum WeaponAmmoType {
 @export var projectile_scene: PackedScene
 @export var bullet_case_scene: PackedScene
 @export var alive_bullet_scene: PackedScene
+@export var sound_profile: WeaponSoundProfile = preload("res://Resources/Audio/generic_weapon_sound_profile.tres")
 ## Optional casing behavior profile. Leave empty to use the legacy ejection impulse.
 @export var casing_profile: CasingEjectionProfile
 @export_group("Other Model Setting")
