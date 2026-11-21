@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SoundEventDef" format=3 uid="uid://hi7vkpn43jtd"]
+
+[ext_resource type="Script" uid="uid://c44ui3q546r65" path="res://_Assets/Audio/sound_event_def.gd" id="1_vwhpm"]
+[ext_resource type="AudioStream" uid="uid://bqwls57r3pri6" path="res://Art/sounds/SFX/Audacity/Gunshot1/Shotgun_sfx_test_var1.wav" id="2_h62ao"]
+[ext_resource type="AudioStream" uid="uid://dgs61rm5b5kyn" path="res://Art/sounds/SFX/Audacity/Gunshot1/Shotgun_sfx_test_var2.wav" id="3_f7r14"]
+
+[resource]
+script = ExtResource("1_vwhpm")
+streams = Array[AudioStream]([ExtResource("2_h62ao"), ExtResource("3_f7r14")])
+volume_db = -5.0
+volume_jitter_db = 1.2
+pitch_min = 0.77
+pitch_max = 0.93
+metadata/_custom_type_script = "uid://c44ui3q546r65"

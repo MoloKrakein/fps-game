@@ -293,9 +293,10 @@ opacity = 0.07
 size = 0.74
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=553518216]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2738106, 0.800875, 0)
 
 [node name="EjectionGas" type="GPUParticles3D" parent="EjectionPort" unique_id=134879439]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43705246, 0.7709266, -0.12819883)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43705246, 0.13610405, -0.12819883)
 cast_shadow = 0
 amount = 10
 lifetime = 0.05
@@ -305,10 +306,6 @@ script = ExtResource("9_qgqgv")
 mode = 2
 side = 0
 side_lift = 0.5
-speed_min = 10.88
-speed_max = 15.72
-damping_min = 4.31
-damping_max = 6.54
 jet_length = 3.5
 puffs_per_shot = 4
 opacity = 0.06

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponSoundProfile" format=3 uid="uid://ur2ivv0jywcs"]
+
+[ext_resource type="Script" uid="uid://oiftbbq5bm00" path="res://_Assets/Audio/weapon_sound_profile.gd" id="1_0oina"]
+[ext_resource type="Resource" uid="uid://hi7vkpn43jtd" path="res://Resources/Sounds/SFX/Weapons/Shotgun/generic_sg_sfx.tres" id="1_byg0f"]
+[ext_resource type="Script" uid="uid://c44ui3q546r65" path="res://_Assets/Audio/sound_event_def.gd" id="2_gffqv"]
+[ext_resource type="AudioStream" uid="uid://bqwls57r3pri6" path="res://Art/sounds/SFX/Audacity/Gunshot1/Shotgun_sfx_test_var1.wav" id="3_gffqv"]
+
+[sub_resource type="Resource" id="Resource_end7h"]
+script = ExtResource("2_gffqv")
+streams = Array[AudioStream]([ExtResource("3_gffqv")])
+volume_db = -12.8
+volume_jitter_db = 0.6
+pitch_min = 0.85
+metadata/_custom_type_script = "uid://c44ui3q546r65"
+
+[resource]
+script = ExtResource("1_0oina")
+fire = ExtResource("1_byg0f")
+fire_tail = SubResource("Resource_end7h")
+metadata/_custom_type_script = "uid://oiftbbq5bm00"
