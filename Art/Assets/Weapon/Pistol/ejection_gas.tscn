@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://b3omxsrtjs340"]
+
+[ext_resource type="Shader" path="res://_Assets/VFX/ejection_gas.gdshader" id="1_ejection"]
+[ext_resource type="Script" uid="uid://d3g0bspq6rbg" path="res://_Assets/Weapon/VFX/gas_burst.gd" id="2_u0rmt"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_eject"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ejection"]
+render_priority = 0
+shader = ExtResource("1_ejection")
+
+[sub_resource type="QuadMesh" id="QuadMesh_eject"]
+material = SubResource("ShaderMaterial_ejection")
+size = Vector2(0.2, 0.2)
+
+[node name="EjectionGas" type="GPUParticles3D" unique_id=905505901]
+cast_shadow = 0
+amount = 12
+lifetime = 0.3
+process_material = SubResource("ParticleProcessMaterial_eject")
+draw_pass_1 = SubResource("QuadMesh_eject")
+script = ExtResource("2_u0rmt")
+mode = 2
+side = 0
+side_lift = 0.5
+duration = 0.3
+reach = 0.6
+spread_degrees = 25.0
+drift_up = 0.0

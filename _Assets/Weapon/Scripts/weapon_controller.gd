@@ -590,9 +590,6 @@ func _bind_model_nodes(model: WeaponModel) -> void:
 		_muzzle_flash = (found[0] as MuzzleFlash) if not found.is_empty() else null
 		print("Muzzle flash found: ", _muzzle_flash != null)
 		if _muzzle_flash:
-			var ejection_port_smoke: GPUParticles3D = model.get_node_or_null("EjectionPort/Smoke") as GPUParticles3D
-			if ejection_port_smoke != null:
-				_muzzle_flash.ejection_smoke = ejection_port_smoke
 			_muzzle_flash.configure(current_weapon)
 
 	var smear_nodes: Array[Node] = model.find_children("*", "MotionSmear", true, false)

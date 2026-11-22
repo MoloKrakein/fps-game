@@ -556,7 +556,6 @@ func _fov_blend(is_rack: bool) -> float:
 	return profile.ads_fov_blend if _ads_enabled(is_rack) else 0.0
 
 
-## Needs set_reload_fov_blend() in cam_effects.gd (see weapon_controller_changes.md).
 func _apply_fov_blend(blend: float) -> void:
 	var player: Object = ctrl.player
 	if player == null:
