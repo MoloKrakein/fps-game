@@ -455,6 +455,7 @@ func _apply_recoil() -> void:
 
 
 func _play_fire_feedback() -> void:
+	_play_fire_sound()
 	if not actions.is_manual_cycle():
 		shooter.eject_casing()
 
@@ -463,6 +464,23 @@ func _play_fire_feedback() -> void:
    		current_weapon.muzzle_light_color,
    		current_weapon.muzzle_light_energy * attachments.get_muzzle_flash_energy_multiplier(),
    		current_weapon.muzzle_light_duration)
+
+
+func _play_fire_sound() -> void:
+	if current_weapon == null or current_weapon.sound_profile == null:
+		return
+	var profile: WeaponSoundProfile = current_weapon.sound_profile
+	var pos: Vector3 = shoot_position.global_position if is_instance_valid(shoot_position) else Vector3.ZERO
+	SoundEngine.play_sound(profile.fire, pos, 1.0, 1.0, false)
+	SoundEngine.play_sound(profile.fire_tail, pos, 1.0, 1.0, false)
+
+
+func play_dry_fire_sound() -> void:
+	if current_weapon == null or current_weapon.sound_profile == null:
+		return
+	var pos: Vector3 = shoot_position.global_position if is_instance_valid(shoot_position) else Vector3.ZERO
+	SoundEngine.play_sound(current_weapon.sound_profile.dry_fire, pos, 1.0, 1.0, false)
+
 
 # Override muzzle flash
 func _refresh_muzzle_effects() -> void:
@@ -572,9 +590,6 @@ func _bind_model_nodes(model: WeaponModel) -> void:
 		_muzzle_flash = (found[0] as MuzzleFlash) if not found.is_empty() else null
 		print("Muzzle flash found: ", _muzzle_flash != null)
 		if _muzzle_flash:
-			var ejection_port_smoke: GPUParticles3D = model.get_node_or_null("EjectionPort/Smoke") as GPUParticles3D
-			if ejection_port_smoke != null:
-				_muzzle_flash.ejection_smoke = ejection_port_smoke
 			_muzzle_flash.configure(current_weapon)
 
 	var smear_nodes: Array[Node] = model.find_children("*", "MotionSmear", true, false)

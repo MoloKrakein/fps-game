@@ -12,6 +12,7 @@
 [ext_resource type="Resource" uid="uid://ckk3s0l53w6i4" path="res://Resources/Weapons/Assault_Rifles416_data.tres" id="7_76v2p"]
 [ext_resource type="Resource" uid="uid://b15yby6glemy0" path="res://Resources/Weapons/AutoSg_data.tres" id="8_drdnd"]
 [ext_resource type="Resource" uid="uid://bulqjfu7p4m6d" path="res://Resources/Weapons/autoSniper_data.tres" id="9_ioaeq"]
+[ext_resource type="Script" uid="uid://b26lrkrgjqcol" path="res://_Assets/Audio/sound_engine.gd" id="10_7ewk0"]
 [ext_resource type="PackedScene" uid="uid://br62nk21xm7fu" path="res://Scenes/post_processing/post_processing_layer.tscn" id="10_76v2p"]
 
 [node name="MainScene" type="Node" unique_id=1881302021]
@@ -35,6 +36,10 @@ weapons = Dictionary[int, ExtResource("3_m1efj")]({
 player = NodePath("../../CurrentLevel/PlayerController")
 
 [node name="UIManager" type="Node" parent="Managers" unique_id=1809892748]
+
+[node name="SoundEngine" type="Node" parent="Managers" unique_id=459887435]
+script = ExtResource("10_7ewk0")
+metadata/_custom_type_script = "uid://b26lrkrgjqcol"
 
 [node name="CurrentLevel" type="Node3D" parent="." unique_id=1396905234]
 

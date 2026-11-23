@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://uh6cfflmaimf" path="res://Art/Assets/Weapon/Assault/AR416.tscn" id="2_a7i0a"]
 [ext_resource type="PackedScene" uid="uid://db2cvarm1t1v0" path="res://Art/Assets/Weapon/Projectile/Casing/live_casing_rifle_556.tscn" id="2_btno7"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="2_f5shg"]
+[ext_resource type="Resource" uid="uid://drd5whsdiimds" path="res://Resources/Sounds/Profiles/Weapon Profiles/Rifle/HK416_Sound_Profile.tres" id="3_sound"]
 
 [resource]
 script = ExtResource("1_35nmv")
@@ -18,7 +19,8 @@ max_ammo = 400
 is_hitscan = false
 recoil_cam_yaw = 0.5
 recoil_cam_roll = 0.2
-recoil_weapon_kick = 0.08
+recoil_weapon_kick = 0.04
+recoil_weapon_rise = 4.0
 fire_rate_rpm = 800.0
 accuracy = 70.0
 reload_time = 1.5
@@ -31,11 +33,11 @@ canted_sight_position = Vector3(-0.075, -0.168, -0.305)
 canted_sight_rotation = Vector3(0, 0, 0.465)
 muzzle_light_energy = 0.58
 muzzle_flash_scale = 0.31
-ejection_smoke_scale = 7.51
 weapon_model = ExtResource("2_a7i0a")
 projectile_scene = ExtResource("2_f5shg")
 bullet_case_scene = ExtResource("1_f5shg")
 alive_bullet_scene = ExtResource("2_btno7")
+sound_profile = ExtResource("3_sound")
 casing_profile = ExtResource("2_4sqev")
 weapon_scale = Vector3(0.2, 0.2, 0.2)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)

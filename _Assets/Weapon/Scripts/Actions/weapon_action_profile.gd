@@ -68,7 +68,8 @@ enum ReloadWithClosedBolt {
 ## How much of the clip's body ROTATION is kept. Keeping more rotation than movement avoids a stiff look.
 @export_range(0.0, 1.0, 0.01) var ads_body_rotation_scale: float = 0.6
 ## Pull the camera FOV back toward the hip FOV by this fraction while the action plays
-## (0 = keep the ADS FOV, 0.25 = a quarter of the way back). Needs the cam_effects.gd edit.
+## (0 = keep the ADS FOV, 0.25 = a quarter of the way back). Reload actions use this to enable
+## a brief hip-FOV reset while aiming.
 @export_range(0.0, 1.0, 0.01) var ads_fov_blend: float = 0.25
 
 @export_group("Quick reload (double-tap reload)")

@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cfdj0j3pd1bfv" path="res://Art/Assets/Weapon/Projectile/buckshot.tscn" id="1_i6r2f"]
 [ext_resource type="Resource" uid="uid://dgq7nvi71atdb" path="res://Resources/Weapons/Weapon Profiles/pump_action_profile.tres" id="1_j2xcc"]
 [ext_resource type="PackedScene" uid="uid://6baebp0xgdtr" path="res://Art/Assets/Weapon/SG/sg_model.tscn" id="3_dv3g3"]
+[ext_resource type="Resource" uid="uid://ur2ivv0jywcs" path="res://Resources/Sounds/Profiles/Weapon Profiles/SG/shotgun_profile.tres" id="5_6ttat"]
 
 [resource]
 script = ExtResource("1_awtbi")
@@ -30,6 +31,7 @@ canted_sight_rotation = Vector3(0, 0, 0.7889586)
 weapon_model = ExtResource("3_dv3g3")
 projectile_scene = ExtResource("1_i6r2f")
 bullet_case_scene = ExtResource("1_dv3g3")
+sound_profile = ExtResource("5_6ttat")
 weapon_position = Vector3(0.044, -0.227, -0.378)
 weapon_scale = Vector3(0.6, 0.6, 0.6)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)

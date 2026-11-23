@@ -78,6 +78,7 @@ var _fov_aim_tween: Tween
 var _fov_smooth: float = 90.0
 var _fov_punch: float = 0.0
 var _fov_punch_vel: float = 0.0
+var _reload_fov_blend: float = 0.0
 
 var _current_run_pitch: float = 0.0
 var _current_run_roll: float = 0.0
@@ -197,6 +198,9 @@ func calculate_view_offset(delta):
 		target_fov = slide_fov
 	elif player.is_diving and player.prone_dive:
 		target_fov = _aim_fov + player.prone_dive.dive_fov_boost
+
+	if _reload_fov_blend > 0.0:
+		target_fov = lerpf(target_fov, _base_fov, _reload_fov_blend)
 
 	_fov_smooth = lerpf(_fov_smooth, target_fov, delta * fov_transition_speed)
 	var fov_d: float = minf(delta, 0.05)
@@ -361,6 +365,20 @@ func reset_fov() -> void:
 		_fov_aim_tween.kill()
 
 	_aim_fov = _base_fov
+
+
+## Keeps the camera at the hip FOV for the reload duration. _apply_fov_blend(0.0)
+## is called when the reload finishes or cancels, restoring the active ADS FOV.
+func set_reload_fov_blend(blend: float) -> void:
+	if blend <= 0.0:
+		_reload_fov_blend = 0.0
+		return
+
+	if is_equal_approx(_aim_fov, _base_fov):
+		_reload_fov_blend = 0.0
+		return
+
+	_reload_fov_blend = 1.0
 
 
 func get_bob_phase() -> float:

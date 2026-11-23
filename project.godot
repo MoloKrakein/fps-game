@@ -24,6 +24,7 @@ config/icon="res://icon.svg"
 Manager="*uid://c8w3y7525ega7"
 EventBus="*uid://c6bv4siycophu"
 CollisionPresetRuntime="*uid://u810pt6u5apa"
+AudioSettings="*uid://wooi643ql7u0"
 
 [display]
 

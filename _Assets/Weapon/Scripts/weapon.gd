@@ -118,6 +118,14 @@ enum WeaponAmmoType {
 @export var ejection_smoke_enabled: bool = true
 @export var ejection_smoke_color: Color = Color(0.8, 0.8, 0.82, 0.8)
 @export var ejection_smoke_scale: float = 1.0
+@export_range(0.05, 1.0, 0.01) var ejection_gas_duration: float = 0.30
+@export_range(0.25, 4.0, 0.05) var ejection_gas_tempo: float = 1.0
+@export_range(0.0, 3.0, 0.01) var ejection_gas_reach: float = 0.65
+@export_range(0.0, 180.0, 1.0) var ejection_gas_spread_degrees: float = 25.0
+@export_range(0.0, 1.0, 0.05) var ejection_gas_upward_lift: float = 0.05
+@export_range(1, 8) var ejection_gas_puffs: int = 3
+@export_range(0.0, 0.05, 0.001) var ejection_gas_delay: float = 0.004
+@export_range(0.0, 1.0, 0.01) var ejection_gas_opacity: float = 0.28
 ## Set to false for bolt-action and pump weapons; call MuzzleFlash.eject_smoke()
 ## when the case is actually ejected.
 @export var eject_smoke_on_fire: bool = true
@@ -131,6 +139,7 @@ enum WeaponAmmoType {
 @export var projectile_scene: PackedScene
 @export var bullet_case_scene: PackedScene
 @export var alive_bullet_scene: PackedScene
+@export var sound_profile: WeaponSoundProfile = preload("res://Resources/Audio/generic_weapon_sound_profile.tres")
 ## Optional casing behavior profile. Leave empty to use the legacy ejection impulse.
 @export var casing_profile: CasingEjectionProfile
 @export_group("Other Model Setting")

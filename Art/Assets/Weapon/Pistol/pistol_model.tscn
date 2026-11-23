@@ -10,9 +10,10 @@
 [ext_resource type="Script" uid="uid://c284xg3j4logh" path="res://_Assets/Weapon/Scripts/Actions/action_event.gd" id="5_evt01"]
 [ext_resource type="Script" uid="uid://chw0y0ybqasl0" path="res://_Assets/Weapon/Scripts/Actions/action_def.gd" id="6_def01"]
 [ext_resource type="PackedScene" path="res://_Assets/Weapon/Rig/weapon_animation_rig.tscn" id="7_rig01"]
-[ext_resource type="Shader" uid="uid://ok0pd3nwhf5w" path="res://_Assets/VFX/muzzle_flash.gdshader" id="8_flashsh"]
-[ext_resource type="Shader" uid="uid://bjx0hmvh4awfw" path="res://_Assets/VFX/muzzle_blast.gdshader" id="9_blastsh"]
+[ext_resource type="Texture2D" uid="uid://c2qcunyo5bi4n" path="res://_Assets/VFX/Textures/muzzle_flash_sheet.png" id="8_flashtex"]
+[ext_resource type="Texture2D" uid="uid://c1amatg6j1arj" path="res://_Assets/VFX/Textures/gas_puff_sheet.png" id="9_gastex"]
 [ext_resource type="Script" uid="uid://d3g0bspq6rbg" path="res://_Assets/Weapon/VFX/gas_burst.gd" id="10_gas"]
+[ext_resource type="PackedScene" uid="uid://b3omxsrtjs340" path="res://Art/Assets/Weapon/Pistol/ejection_gas.tscn" id="11_tdxsd"]
 
 [sub_resource type="Resource" id="Resource_cbvsw"]
 script = ExtResource("2_cbvsw")
@@ -27,46 +28,42 @@ scale_multiplier = Vector3(0.3, 0.3, 0.3)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_flash"]
-angle_max = 360.0
 gravity = Vector3(0, 0, 0)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_flash"]
-render_priority = 0
-shader = ExtResource("8_flashsh")
-shader_parameter/core_color = Color(1, 0.95, 0.85, 1)
-shader_parameter/petal_sharpness = 5.0
-shader_parameter/petal_length = 0.8
-shader_parameter/core_size = 0.22
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flash"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("8_flashtex")
+disable_receive_shadows = true
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 2
+particles_anim_v_frames = 2
+particles_anim_loop = false
 
 [sub_resource type="QuadMesh" id="QuadMesh_flash"]
-material = SubResource("ShaderMaterial_flash")
-size = Vector2(0.18, 0.18)
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_blast"]
-angle_max = 360.0
-scale_max = 1.6
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_blast"]
-render_priority = 0
-shader = ExtResource("9_blastsh")
-shader_parameter/start_size = 0.35
-shader_parameter/noise_scale = 2.4
-shader_parameter/flow_speed = 1.2
-shader_parameter/softness = 0.35
-shader_parameter/fade_power = 1.3
-
-[sub_resource type="QuadMesh" id="QuadMesh_blast"]
-material = SubResource("ShaderMaterial_blast")
+material = SubResource("StandardMaterial3D_flash")
 size = Vector2(0.2, 0.2)
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_eject"]
-angle_max = 360.0
-scale_min = 0.8
-scale_max = 1.2
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_blast"]
 
-[sub_resource type="QuadMesh" id="QuadMesh_eject"]
-material = SubResource("ShaderMaterial_blast")
-size = Vector2(0.1, 0.1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bwwb7"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("9_gastex")
+disable_receive_shadows = true
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 4
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_blast"]
+material = SubResource("StandardMaterial3D_bwwb7")
+size = Vector2(0.4, 0.4)
 
 [sub_resource type="Resource" id="Event_rack_pull"]
 script = ExtResource("5_evt01")
@@ -206,37 +203,21 @@ local_coords = true
 process_material = SubResource("ParticleProcessMaterial_flash")
 draw_pass_1 = SubResource("QuadMesh_flash")
 
-[node name="MuzzleGas" type="GPUParticles3D" parent="Muzzle" unique_id=271195800]
+[node name="MuzzleGas" type="GPUParticles3D" parent="Muzzle" unique_id=581755438]
 cast_shadow = 0
-amount = 24
-lifetime = 0.3
+amount = 12
+lifetime = 0.25
 process_material = SubResource("ParticleProcessMaterial_blast")
 draw_pass_1 = SubResource("QuadMesh_blast")
 script = ExtResource("10_gas")
+reach = 0.35
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=681250775]
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.027523652, 0.18819112, -0.13024393)
 
-[node name="EjectionGas" type="GPUParticles3D" parent="EjectionPort" unique_id=648317000]
-transform = Transform3D(1, 0, 0, 0, 0.9995328, -0.030563673, 0, 0.030563673, 0.9995328, 0, 0, 0.0854404)
-cast_shadow = 0
-amount = 24
-lifetime = 0.3
-process_material = SubResource("ParticleProcessMaterial_eject")
-draw_pass_1 = SubResource("QuadMesh_eject")
-script = ExtResource("10_gas")
-mode = 2
-side = 0
-speed_min = 0.4
-speed_max = 1.0
-spread_degrees = 25.0
-damping_min = 3.0
-damping_max = 5.0
-puffs_per_shot = 8
-opacity = 0.18
-size = 1.175
+[node name="EjectionGas" parent="EjectionPort" unique_id=905505901 instance=ExtResource("11_tdxsd")]
 
 [node name="WeaponAnimation" parent="." unique_id=2133800285 node_paths=PackedStringArray("animation_player") instance=ExtResource("7_rig01")]
 animation_player = NodePath("../mk57/AnimationPlayer")

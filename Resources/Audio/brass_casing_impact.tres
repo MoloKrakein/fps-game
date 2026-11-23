@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SoundEventDef" format=3]
+
+[ext_resource type="Script" path="res://_Assets/Audio/sound_event_def.gd" id="1_def"]
+[ext_resource type="AudioStream" path="res://Art/sounds/SFX/Download/Brass Casing/678882__drinkingwindgames__firearm-casing-bounce-1.wav" id="2_1"]
+[ext_resource type="AudioStream" path="res://Art/sounds/SFX/Download/Brass Casing/678884__drinkingwindgames__firearm-casing-bounce-3.wav" id="2_3"]
+[ext_resource type="AudioStream" path="res://Art/sounds/SFX/Download/Brass Casing/678885__drinkingwindgames__firearm-casing-bounce-4.wav" id="2_4"]
+[ext_resource type="AudioStream" path="res://Art/sounds/SFX/Download/Brass Casing/678886__drinkingwindgames__firearm-casing-bounce-5.wav" id="2_5"]
+[ext_resource type="AudioStream" path="res://Art/sounds/SFX/Download/Brass Casing/678887__drinkingwindgames__firearm-casing-bounce-6.wav" id="2_6"]
+
+[resource]
+script = ExtResource("1_def")
+streams = Array[AudioStream]([ExtResource("2_1"), ExtResource("2_3"), ExtResource("2_4"), ExtResource("2_5"), ExtResource("2_6")])
+volume_db = -5.0
+volume_jitter_db = 1.0
+pitch_min = 0.96
+pitch_max = 1.04
+max_instances = 6
+cooldown = 0.03

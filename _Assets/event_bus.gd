@@ -25,4 +25,7 @@ signal sound_requested(
 	volume_scale: float,
 	pitch_scale: float,
 	spatial: bool
+	
 )
+@warning_ignore("unused_signal")
+signal bullet_time_changed(intensity: float)
