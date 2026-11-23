@@ -21,6 +21,9 @@ extends Resource
 @export var max_distance: float = 0.0
 ## Leave empty for the SFX bus. Set to e.g. &"Music" for other buses.
 @export var bus: StringName = &""
+## How strongly bullet time slows this sound. 1 = fully (gunshots, casings),
+## 0 = never (hitmarker, UI ticks that should stay crisp).
+@export_range(0.0, 1.0, 0.05) var slowmo_amount: float = 1.0
 
 # Runtime bookkeeping, not saved.
 var last_played_at: float = -INF

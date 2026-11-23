@@ -34,7 +34,10 @@ func fire() -> void:
 		
 	# 2. Apply cooldown
 	fire_timer = 60.0 / weapon_data.fire_rate_rpm 
-	
+
+	_play_fire_sound()
+
+	# 3. Shoot!
 	# 3. Shoot!
 	if weapon_data.is_hitscan:
 		_fire_hitscan(weapon_data)
@@ -69,6 +72,7 @@ func _fire_hitscan(data: Weapon) -> void:
 	var direction = (forward + (right * acc_x) + (up * acc_y)).normalized()
 	
 	var end_pos = start_pos + (direction * data.shoot_range)
+	
 	
 	var query = PhysicsRayQueryParameters3D.create(start_pos, end_pos)
 	query.exclude = _get_ray_exclusions()
@@ -154,3 +158,11 @@ func _spawn_impact_effect(hit_position: Vector3, hit_normal: Vector3) -> void:
 	elif hit_normal == Vector3.DOWN:
 		impact.rotation_degrees.x = 90
 #endregion
+
+func _play_fire_sound() -> void:
+	var profile: WeaponSoundProfile = weapon_data.sound_profile
+	if profile == null:
+		return
+	var pos: Vector3 = shoot_position.global_position
+	SoundEngine.play_sound(profile.fire, pos, 1.0, 1.0, true)
+	SoundEngine.play_sound(profile.fire_tail, pos, 1.0, 1.0, true)

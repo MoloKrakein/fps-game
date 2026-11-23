@@ -7,6 +7,7 @@ extends Node
 
 ## Set in _ready, so any script can call SoundEngine.play_sound() without a node path.
 static var instance: SoundEngine
+static var _warned_no_instance: bool = false
 
 @export_group("Buses")
 @export var sfx_bus_name: StringName = &"SFX"
@@ -14,6 +15,13 @@ static var instance: SoundEngine
 @export_group("Playback")
 @export var max_players: int = 48
 @export var default_max_distance: float = 40.0
+
+@export_group("Bullet time")
+## Pitch of a fully slowed sound (1.0 = no change). Real time_scale is far lower than this,
+## but a pitch that deep just sounds like a rumble. 0.5 - 0.7 reads as slow motion.
+@export_range(0.2, 1.0, 0.01) var slowmo_pitch: float = 0.6
+## The SFX bus is muffled towards this cutoff during bullet time. 20000 = no muffling.
+@export_range(500.0, 20000.0, 50.0) var slowmo_lowpass_hz: float = 5000.0
 
 @export_group("Events")
 ## Sounds that are requested by name. Each SoundEventDef needs an event_id.
@@ -23,6 +31,8 @@ var _definitions: Dictionary[StringName, SoundEventDef] = {}
 var _players_3d: Array[AudioStreamPlayer3D] = []
 var _players_2d: Array[AudioStreamPlayer] = []
 var _warned_events: Dictionary[StringName, bool] = {}
+var _slowmo: float = 0.0 # 0..1, fed by EventBus.bullet_time_changed
+var _lowpass: AudioEffectLowPassFilter
 
 
 func _ready() -> void:
@@ -31,7 +41,12 @@ func _ready() -> void:
 	for def: SoundEventDef in events:
 		if def != null and def.event_id != &"":
 			_definitions[def.event_id] = def
+	_setup_slowmo_filter()
 	EventBus.sound_requested.connect(_on_sound_requested)
+	if EventBus.has_signal(&"bullet_time_changed"):
+		EventBus.connect(&"bullet_time_changed", _on_bullet_time_changed)
+	else:
+		push_warning("SoundEngine: EventBus has no 'bullet_time_changed' signal, so sounds will not slow down in bullet time.")
 
 
 func _exit_tree() -> void:
@@ -50,6 +65,9 @@ static func play_sound(
 ) -> void:
 	if instance != null:
 		instance.play_def(def, world_position, volume_scale, pitch_scale, spatial)
+	elif def != null and not _warned_no_instance:
+		_warned_no_instance = true
+		push_warning("SoundEngine.play_sound() was called but no SoundEngine node is in the running scene.")
 
 
 ## Code registration, for events you would rather not author as resources.
@@ -112,7 +130,8 @@ func play_def(
 		return
 
 	var stream: AudioStream = _pick_stream(def)
-	var pitch: float = randf_range(def.pitch_min, def.pitch_max) * pitch_scale
+	var base_pitch: float = randf_range(def.pitch_min, def.pitch_max) * pitch_scale
+	var pitch: float = base_pitch * _slow_factor(def)
 	var volume: float = def.volume_db + linear_to_db(volume_scale)
 	if def.volume_jitter_db > 0.0:
 		volume += randf_range(-def.volume_jitter_db, def.volume_jitter_db)
@@ -127,6 +146,7 @@ func play_def(
 		player_3d.max_distance = def.max_distance if def.max_distance > 0.0 else default_max_distance
 		player_3d.global_position = world_position
 		player_3d.set_meta(&"def", def)
+		player_3d.set_meta(&"base_pitch", base_pitch)
 		player_3d.set_meta(&"started_at", now)
 		player_3d.play()
 	else:
@@ -136,6 +156,7 @@ func play_def(
 		player.volume_db = volume
 		player.pitch_scale = pitch
 		player.set_meta(&"def", def)
+		player.set_meta(&"base_pitch", base_pitch)
 		player.set_meta(&"started_at", now)
 		player.play()
 
@@ -151,6 +172,60 @@ func _on_sound_requested(
 	spatial: bool
 ) -> void:
 	play_event(event_id, world_position, volume_scale, pitch_scale, spatial)
+
+
+#region Bullet time
+func _on_bullet_time_changed(intensity: float) -> void:
+	_slowmo = clampf(intensity, 0.0, 1.0)
+	# Sounds that are already playing (tails, casings mid-bounce) slow down and speed up live.
+	for player: AudioStreamPlayer3D in _players_3d:
+		if player.playing:
+			player.pitch_scale = _voice_pitch(player)
+	for player: AudioStreamPlayer in _players_2d:
+		if player.playing:
+			player.pitch_scale = _voice_pitch(player)
+	_update_slowmo_filter()
+
+
+func _slow_factor(def: SoundEventDef) -> float:
+	return lerpf(1.0, slowmo_pitch, _slowmo * def.slowmo_amount)
+
+
+func _voice_pitch(player: Node) -> float:
+	var def: SoundEventDef = player.get_meta(&"def", null)
+	if def == null:
+		return 1.0
+	return maxf(player.get_meta(&"base_pitch", 1.0) * _slow_factor(def), 0.01)
+
+
+func _setup_slowmo_filter() -> void:
+	var bus_index: int = AudioServer.get_bus_index(sfx_bus_name)
+	if bus_index < 0:
+		return
+	# The bus outlives scene reloads, so drop the filter a previous SoundEngine left behind.
+	for index: int in range(AudioServer.get_bus_effect_count(bus_index) - 1, -1, -1):
+		if AudioServer.get_bus_effect(bus_index, index).resource_name == &"SlowmoLowpass":
+			AudioServer.remove_bus_effect(bus_index, index)
+	_lowpass = AudioEffectLowPassFilter.new()
+	_lowpass.resource_name = &"SlowmoLowpass"
+	_lowpass.cutoff_hz = 20000.0
+	AudioServer.add_bus_effect(bus_index, _lowpass)
+	AudioServer.set_bus_effect_enabled(bus_index, AudioServer.get_bus_effect_count(bus_index) - 1, false)
+
+
+func _update_slowmo_filter() -> void:
+	if _lowpass == null:
+		return
+	var bus_index: int = AudioServer.get_bus_index(sfx_bus_name)
+	if bus_index < 0:
+		return
+	# Interpolate in log space so the sweep sounds even.
+	_lowpass.cutoff_hz = exp(lerpf(log(20000.0), log(slowmo_lowpass_hz), _slowmo))
+	# Only pay for the filter while bullet time is on.
+	for index: int in AudioServer.get_bus_effect_count(bus_index):
+		if AudioServer.get_bus_effect(bus_index, index) == _lowpass:
+			AudioServer.set_bus_effect_enabled(bus_index, index, _slowmo > 0.001)
+#endregion
 
 
 ## Random take, never the same one twice in a row (when there is a choice).
