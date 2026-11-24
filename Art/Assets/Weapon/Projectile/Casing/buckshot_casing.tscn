@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://cs7xd43kmv5cg"]
 
-[ext_resource type="Script" uid="uid://dlvl4srer712l" path="res://Art/Assets/Weapon/Projectile/bullet_casing.gd" id="1_ne3gm"]
-[ext_resource type="PackedScene" uid="uid://cl8qvsrjserr7" path="res://Art/3D/Blender/buckshot_shell_case.glb" id="2_ne3gm"]
+[ext_resource type="Script" uid="uid://dlvl4srer712l" path="res://Art/Assets/Weapon/Projectile/bullet_casing.gd" id="1_2wk7y"]
+[ext_resource type="Material" uid="uid://du71p3tdgcqxd" path="res://_Assets/VFX/material/casing_streak.tres" id="2_m15of"]
+[ext_resource type="PackedScene" uid="uid://cl8qvsrjserr7" path="res://Art/3D/Blender/buckshot_shell_case.glb" id="3_8bq66"]
+[ext_resource type="Resource" uid="uid://kehk4oerbqc0" path="res://Resources/Audio/shell_casing_impact.tres" id="3_m15of"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_5yekf"]
 rough = true
@@ -16,8 +18,12 @@ collision_layer = 8
 collision_mask = 9
 physics_material_override = SubResource("PhysicsMaterial_5yekf")
 gravity_scale = 3.0
-script = ExtResource("1_ne3gm")
+script = ExtResource("1_2wk7y")
 lifetime = 30.0
+streak_material = ExtResource("2_m15of")
+streak_alpha = 0.24
+streak_color = Color(1, 0, 0.016666412, 1)
+impact_sound = ExtResource("3_m15of")
 metadata/collision_preset_name = &"ragdoll"
 metadata/collision_preset_id = &"7381442230917582739"
 
@@ -25,7 +31,7 @@ metadata/collision_preset_id = &"7381442230917582739"
 transform = Transform3D(-3.2127872e-08, -0.955, 0, 0, 0, 0.735, -0.735, 4.174437e-08, 0, -0.04874796, -0.010416657, 7.264012e-09)
 shape = SubResource("ConvexPolygonShape3D_qov6q")
 
-[node name="blockbench_export" parent="." unique_id=1981456482 instance=ExtResource("2_ne3gm")]
+[node name="blockbench_export" parent="." unique_id=1981456482 instance=ExtResource("3_8bq66")]
 transform = Transform3D(-3.2127872e-08, 0, 0.955, 0, 0.735, 0, -0.735, 0, -4.1744375e-08, -0.04874796, -0.010416657, 7.264012e-09)
 
 [editable path="blockbench_export"]

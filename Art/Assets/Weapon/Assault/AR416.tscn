@@ -209,13 +209,12 @@ iron_sight_point = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/Optics")
 attachment_fits = Array[ExtResource("2_oo46r")]([SubResource("Resource_qllkt"), SubResource("Resource_mg82a"), SubResource("Resource_5yekf"), SubResource("Resource_3dwt8"), SubResource("Resource_dwpih"), SubResource("Resource_oh2wu")])
 ammo_display = NodePath("AR416/Armature/Skeleton3D/BodySkelleton/AmmoCounterPosition")
 
-[node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "muzzle_gas", "ejection_gas", "light")]
+[node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "muzzle_gas", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17400041, -3.4161327)
 script = ExtResource("5_vgxpt")
 flash_chance = 0.45
 particles = NodePath("Flash")
 muzzle_gas = NodePath("Blast")
-ejection_gas = NodePath("")
 light = NodePath("OmniLight3D")
 
 [node name="Flash" type="GPUParticles3D" parent="Muzzle" unique_id=25292793]

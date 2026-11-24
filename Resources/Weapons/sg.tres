@@ -1,9 +1,10 @@
 [gd_resource type="Resource" script_class="Weapon" format=3 uid="uid://csw2i3ljsxa6g"]
 
 [ext_resource type="Script" uid="uid://djccd7pdwygtl" path="res://_Assets/Weapon/Scripts/weapon.gd" id="1_awtbi"]
-[ext_resource type="PackedScene" uid="uid://cs7xd43kmv5cg" path="res://Art/Assets/Weapon/Projectile/buckshot_casing.tscn" id="1_dv3g3"]
 [ext_resource type="PackedScene" uid="uid://cfdj0j3pd1bfv" path="res://Art/Assets/Weapon/Projectile/buckshot.tscn" id="1_i6r2f"]
 [ext_resource type="Resource" uid="uid://dgq7nvi71atdb" path="res://Resources/Weapons/Weapon Profiles/pump_action_profile.tres" id="1_j2xcc"]
+[ext_resource type="PackedScene" uid="uid://cs7xd43kmv5cg" path="res://Art/Assets/Weapon/Projectile/Casing/buckshot_casing.tscn" id="2_end7h"]
+[ext_resource type="Resource" uid="uid://b4cku8crdkhvu" path="res://_Assets/Weapon/resources/generic_casing_prof.tres" id="3_1er8x"]
 [ext_resource type="PackedScene" uid="uid://6baebp0xgdtr" path="res://Art/Assets/Weapon/SG/sg_model.tscn" id="3_dv3g3"]
 [ext_resource type="Resource" uid="uid://ur2ivv0jywcs" path="res://Resources/Sounds/Profiles/Weapon Profiles/SG/shotgun_profile.tres" id="5_6ttat"]
 
@@ -30,8 +31,9 @@ canted_sight_position = Vector3(0.03, -0.135, -0.345)
 canted_sight_rotation = Vector3(0, 0, 0.7889586)
 weapon_model = ExtResource("3_dv3g3")
 projectile_scene = ExtResource("1_i6r2f")
-bullet_case_scene = ExtResource("1_dv3g3")
+bullet_case_scene = ExtResource("2_end7h")
 sound_profile = ExtResource("5_6ttat")
+casing_profile = ExtResource("3_1er8x")
 weapon_position = Vector3(0.044, -0.227, -0.378)
 weapon_scale = Vector3(0.6, 0.6, 0.6)
 bullet_case_scale = Vector3(0.2, 0.2, 0.2)

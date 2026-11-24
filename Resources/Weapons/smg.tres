@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dr0q2hevdy3wl" path="res://Art/Assets/Weapon/Projectile/live_bullet_casing_9mm.tscn" id="1_vkwdw"]
 [ext_resource type="Resource" uid="uid://b4cku8crdkhvu" path="res://_Assets/Weapon/resources/generic_casing_prof.tres" id="3_fl0k3"]
 [ext_resource type="PackedScene" uid="uid://bisdgbfcek7ee" path="res://Art/Assets/Weapon/SMG/smg_model.tscn" id="3_mgcc5"]
+[ext_resource type="Resource" uid="uid://v4ajybjsbu3e" path="res://Resources/Audio/generic_weapon_sound_profile.tres" id="7_q08jq"]
 
 [resource]
 script = ExtResource("1_a81bq")
@@ -19,7 +20,7 @@ recoil_cam_pitch = 0.94
 recoil_cam_yaw = 0.195
 recoil_cam_roll = 0.175
 recoil_cam_recovery_speed = 4.9350000000000005
-recoil_weapon_rise = 1.46
+recoil_weapon_rise = 3.9699999999999998
 recoil_fov_punch = -0.75
 fire_rate_rpm = 1300.0
 accuracy = 60.0
