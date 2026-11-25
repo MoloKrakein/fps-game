@@ -284,10 +284,10 @@ transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1
 transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, -1.0658141e-14, -4.371139e-08, -1, 1, -4.371139e-08, -1.0658141e-14, -0.19254667, 1.2824063, 0.4132454)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=629444751]
-transform = Transform3D(3.463174e-08, -0.9402628, -0.34044933, -7.152957e-08, 0.34044933, -0.9402628, 1, 5.691513e-08, -5.5466245e-08, -0.12785116, 0.3130052, -2.0481813)
+transform = Transform3D(2.5108012e-08, -0.6816906, -0.2468258, -5.185894e-08, 0.2468258, -0.6816906, 0.725, 4.126348e-08, -4.0213028e-08, -0.12785116, 0.3130052, -2.0481813)
 
 [node name="GUI" parent="AR416/Armature/Skeleton3D/BodySkelleton/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_631vl")]
-transform = Transform3D(1.0000006, -7.1054274e-15, -4.2632564e-14, -2.6645353e-15, 1.0000005, -2.682209e-07, -1.5987212e-14, -2.9802322e-08, 1.0000004, -0.040603045, 0.023514083, -0.030486345)
+transform = Transform3D(1.0000006, 2.6645346e-15, 1.5987205e-14, -2.6645353e-15, 1.0000005, 2.9802322e-08, -1.598721e-14, -2.9802326e-08, 1.0000004, -0.040603045, 0.023514083, -0.030486345)
 
 [node name="Underbarrels" type="Marker3D" parent="AR416/Armature/Skeleton3D/BodySkelleton" unique_id=216068345]
 transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, 0.1545935, 1.243, 6.757503e-09)

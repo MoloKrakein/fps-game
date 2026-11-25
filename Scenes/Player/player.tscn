@@ -33,6 +33,7 @@
 [ext_resource type="Script" uid="uid://dtkw3g0e1cx7o" path="res://_Assets/Weapon/Scripts/States/weap_idle_state.gd" id="22_ur3l4"]
 [ext_resource type="Script" uid="uid://d28nxftt0gg0j" path="res://_Assets/Weapon/Scripts/States/weap_firing_state.gd" id="23_2ahak"]
 [ext_resource type="Script" uid="uid://gwkuothaiqkm" path="res://Scenes/Player/step_handler.gd" id="23_jincj"]
+[ext_resource type="Script" uid="uid://c8tja0p2yetmv" path="res://_Assets/Utility/Viewmodel_clip.gd" id="23_po18e"]
 [ext_resource type="Script" uid="uid://bdvwooe4dfsx0" path="res://_Assets/Weapon/Scripts/weapon_controller.gd" id="24_qr1w5"]
 [ext_resource type="Script" uid="uid://dwaido63afkrc" path="res://_Assets/Weapon/Scripts/States/weap_empty_state.gd" id="24_rukb4"]
 [ext_resource type="Script" uid="uid://vkhddca7hyn2" path="res://_Assets/Weapon/Scripts/States/weap_reloading_state.gd" id="26_1agin"]
@@ -301,6 +302,10 @@ mounted_spread = 0.25
 script = ExtResource("50_bullettime")
 movement_ratio = 0.05
 use_focus = false
+
+[node name="ViewmodelClipFix" type="Node" parent="Component" unique_id=1890187224]
+script = ExtResource("23_po18e")
+debug = true
 
 [node name="StateChart" type="Node" parent="." unique_id=596134014]
 script = ExtResource("5_jhyir")
