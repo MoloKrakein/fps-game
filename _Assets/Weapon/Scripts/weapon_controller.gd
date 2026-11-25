@@ -619,6 +619,7 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	_sync_cached_state_from_active_data()
 	_set_and_persist_fire_mode(_resolve_initial_fire_mode_for_weapon_data())
 	reset_trigger()
+	# update the UI immediately so the player sees the new ammo counts right away.
 	fire_timer = 0.0
 
 	# Inject stats into the weapon for damage calculations
@@ -629,6 +630,7 @@ func switch_weapon(weapon_data: WeaponData) -> void:
 	send_state_event("onIdle")
 
 	spawn_weapon_model(weapon_data.weapon)
+	update_weapon_ui()
 
 
 func get_weapon_position() -> Vector3:

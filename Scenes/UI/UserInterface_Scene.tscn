@@ -271,3 +271,5 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_sn0t7")
 layout_mode = 2
 offset_transform_enabled = true
 offset_transform_position = Vector2(0, -6.36)
+
+[editable path="AmmoContainer/Control2"]

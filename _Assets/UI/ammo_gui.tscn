@@ -30,7 +30,7 @@ mesh = SubResource("PlaneMesh_o08ba")
 
 [node name="SubViewport" type="SubViewport" parent="." unique_id=1854354564]
 transparent_bg = true
-size = Vector2i(148, 44)
+size = Vector2i(149, 51)
 
 [node name="Control" parent="SubViewport" unique_id=1625207807 node_paths=PackedStringArray("hud_mesh") instance=ExtResource("1_gmndq")]
 hud_mesh = NodePath("../../GUI_mesh")
