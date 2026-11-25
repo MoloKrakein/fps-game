@@ -223,6 +223,7 @@ func add_recoil() -> void:
 	var running_aim_multiplier: float = _running_aim_multiplier(weapon.running_aim_recoil_multiplier)
 	# Up to +40% recoil when fully exhausted.
 	var strength: float = 1.0 + _tiredness_factor() * 0.4
+	strength *= weapon.get_calculated_recoil_multiplier()
 	if is_aiming:
 		strength *= ctrl.recoil_ads_visual_multiplier
 	strength *= running_aim_multiplier

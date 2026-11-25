@@ -179,7 +179,9 @@ var wall_tuck: WeaponWallTuck
 
 # Accuracy
 var stance_accuracy_modifier: float = 1.0
+# Spread multiplier for the current aiming stance.
 var accuracy_modifier: float = 1.0
+# Additional spread in degrees, added after weapon accuracy and stance modifiers.
 var dynamic_accuracy_spread: float = 0.0
 
 # Set by WeaponMount (all 1.0 = no change)
@@ -442,15 +444,15 @@ func _register_shot() -> void:
 
 func _apply_recoil() -> void:
 	if camera != null:
+		var recoil_scale: float = current_weapon.get_calculated_recoil_multiplier() * recoil_multiplier
 		var pitch: float = current_weapon.get_calculated_recoil() * randf_range(0.9, 1.1)
-		var yaw: float = current_weapon.recoil_cam_yaw
+		var yaw: float = current_weapon.recoil_cam_yaw * recoil_scale
 		if is_aiming:
 			pitch *= 0.7
 			yaw *= 0.7
 		pitch *= recoil_multiplier
-		yaw *= recoil_multiplier
-		camera.add_weapon_recoil(pitch, yaw, current_weapon.recoil_cam_roll * recoil_multiplier)
-		camera.add_fov_punch(current_weapon.recoil_fov_punch * recoil_multiplier)
+		camera.add_weapon_recoil(pitch, yaw, current_weapon.recoil_cam_roll * recoil_scale)
+		camera.add_fov_punch(current_weapon.recoil_fov_punch * recoil_scale)
 	animator.add_recoil()
 
 
@@ -648,6 +650,7 @@ func get_weapon_position() -> Vector3:
 func aim_hipfire() -> void:
 	if current_weapon:
 		EventBus.change_visibility_of_crosshair.emit(true)
+		is_aiming = false
 		accuracy_modifier = 1.0
 		player.cam_effects.reset_fov()
 		tween_weapon_to_position(current_weapon.weapon_position, current_weapon.weapon_rotation)
@@ -656,7 +659,8 @@ func aim_hipfire() -> void:
 func aim_ads() -> void:
 	if current_weapon:
 		EventBus.change_visibility_of_crosshair.emit(false)
-		accuracy_modifier = current_weapon.aim_accuracy_modifier
+		is_aiming = true
+		accuracy_modifier = current_weapon.get_ads_spread_multiplier()
 		player.cam_effects.apply_ads_fov(get_effective_ads_fov())
 		tween_weapon_to_position(get_effective_ads_position(), get_effective_ads_rotation())
 
@@ -664,6 +668,8 @@ func aim_ads() -> void:
 func aim_canted() -> void:
 	if current_weapon:
 		EventBus.change_visibility_of_crosshair.emit(false)
+		is_aiming = true
+		accuracy_modifier = current_weapon.get_ads_spread_multiplier()
 		player.cam_effects.apply_ads_fov(current_weapon.canted_sight_fov)
 		tween_weapon_to_position(current_weapon.canted_sight_position, current_weapon.canted_sight_rotation)
 

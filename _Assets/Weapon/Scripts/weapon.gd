@@ -1,5 +1,9 @@
 class_name Weapon extends Resource
 
+const MIN_ACCURACY_SPREAD_DEGREES: float = 0.03
+const MAX_ACCURACY_SPREAD_DEGREES: float = 0.8
+const ACCURACY_SPREAD_CUTOFF_SIGMAS: float = 3.0
+
 enum WeaponType {
 	PISTOL,
 	RIFLE,
@@ -76,7 +80,7 @@ enum WeaponAmmoType {
 @export var aim_fov: float = 60.0
 @export var aim_sensitivity: float = 0.5
 @export var vertical_lag_multiplier: float = 1.0
-@export_range(0, 100) var aim_accuracy_modifier: float = 0.5 # higher value means more accurate when aiming down sights
+@export_range(0, 100) var aim_accuracy_modifier: float = 50.0 # ADS accuracy improvement; 100 halves spread
 @export var aim_sway: float = 0.5
 @export var aim_recoil_reduction: float = 0.5
 @export_group("Aim Visuals")
@@ -220,6 +224,30 @@ func get_calculated_accuracy() -> float:
 				final_accuracy += att.accuracy_bonus
 	return clampf(final_accuracy, 0.0, 100.0)
 
+func get_accuracy_spread_degrees() -> float:
+	var accuracy_ratio: float = get_calculated_accuracy() / 100.0
+	return lerpf(MAX_ACCURACY_SPREAD_DEGREES, MIN_ACCURACY_SPREAD_DEGREES, accuracy_ratio)
+
+func get_ads_spread_multiplier() -> float:
+	var improvement: float = clampf(aim_accuracy_modifier, 0.0, 100.0) / 100.0
+	return lerpf(1.0, 0.5, improvement)
+
+static func sample_accuracy_direction(muzzle_basis: Basis, spread_degrees: float) -> Vector3:
+	var forward: Vector3 = -muzzle_basis.z
+	var spread_radians: float = deg_to_rad(maxf(spread_degrees, 0.0))
+	if spread_radians <= 0.0:
+		return forward
+
+	var cutoff: float = spread_radians * ACCURACY_SPREAD_CUTOFF_SIGMAS
+	var horizontal_angle: float = clampf(randfn(0.0, spread_radians), -cutoff, cutoff)
+	var vertical_angle: float = clampf(randfn(0.0, spread_radians), -cutoff, cutoff)
+	var direction: Vector3 = (
+		forward
+		+ muzzle_basis.x * tan(horizontal_angle)
+		+ muzzle_basis.y * tan(vertical_angle)
+	)
+	return direction.normalized()
+
 func get_calculated_magazine_capacity() -> int:
 	var final_capacity: int = mags_ammo
 	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
@@ -228,19 +256,20 @@ func get_calculated_magazine_capacity() -> int:
 				final_capacity += att.ammo_capacity_bonus
 	return maxi(final_capacity, 0)
 
-func get_calculated_recoil() -> float:
-	var final_recoil: float = recoil_cam_pitch
+func get_calculated_recoil_multiplier() -> float:
+	var final_multiplier: float = 1.0
 	if stats_component:
-		final_recoil *= stats_component.get_stat("recoil_stability", 1.0)
+		final_multiplier *= stats_component.get_stat("recoil_stability", 1.0)
 
-	# --- ADD THIS: Apply Attachment Recoil Multipliers ---
 	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
-		for slot in active_weapon_data_ref.equipped_attachment_data:
-			var att = active_weapon_data_ref.equipped_attachment_data[slot]
-			if att and "recoil_multiplier" in att:
-				final_recoil *= att.recoil_multiplier
+		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
+			if att:
+				final_multiplier *= att.recoil_multiplier
 
-	return max(final_recoil, 0.0)
+	return maxf(final_multiplier, 0.0)
+
+func get_calculated_recoil() -> float:
+	return maxf(recoil_cam_pitch, 0.0) * get_calculated_recoil_multiplier()
 
 func get_calculated_reload_speed() -> float:
 	var final_reload_speed:float = reload_time

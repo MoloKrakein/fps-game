@@ -54,22 +54,15 @@ func _handle_ammo_consumption() -> bool:
 func _fire_hitscan(data: Weapon) -> void:
 	var space_state = get_world_3d().direct_space_state
 	var start_pos = shoot_position.global_position
-	
-	var forward = -shoot_position.global_transform.basis.z
-	
-	# 1. Calculate the spread (Matches your WeaponController math)
-	# A perfectly accurate gun (100.0) has 0 spread.
-	var base_spread: float = (100.0 - data.accuracy) / 1000.0 
-	var final_spread: float = base_spread * external_accuracy_multiplier
-	
-	# 2. Randomize X and Y offsets based on the final spread
-	var acc_x: float = randf_range(-final_spread, final_spread)
-	var acc_y: float = randf_range(-final_spread, final_spread)
-	
-	# 3. Apply offsets relative to the barrel's actual rotation
-	var right = shoot_position.global_transform.basis.x
-	var up = shoot_position.global_transform.basis.y
-	var direction = (forward + (right * acc_x) + (up * acc_y)).normalized()
+
+	var final_spread_degrees: float = (
+		data.get_accuracy_spread_degrees()
+		* maxf(external_accuracy_multiplier, 0.0)
+	)
+	var direction: Vector3 = Weapon.sample_accuracy_direction(
+		shoot_position.global_transform.basis,
+		final_spread_degrees
+	)
 	
 	var end_pos = start_pos + (direction * data.shoot_range)
 	
@@ -134,7 +127,14 @@ func _fire_projectile(data: Weapon) -> void:
 	get_tree().root.add_child(projectile)
 	projectile.global_position = shoot_position.global_position
 	projectile.global_rotation = shoot_position.global_rotation
-	var direction: Vector3 = -shoot_position.global_transform.basis.z
+	var final_spread_degrees: float = (
+		data.get_accuracy_spread_degrees()
+		* maxf(external_accuracy_multiplier, 0.0)
+	)
+	var direction: Vector3 = Weapon.sample_accuracy_direction(
+		shoot_position.global_transform.basis,
+		final_spread_degrees
+	)
 	projectile.setup(
 		direction * data.get_muzzle_velocity_mps(),
 		data.get_calculated_damage(),
@@ -146,6 +146,7 @@ func _fire_projectile(data: Weapon) -> void:
 		data.explosion_force,
 		data.armor_penetration
 	)
+	projectile.look_at(projectile.global_position + direction, Vector3.UP)
 
 func _spawn_impact_effect(hit_position: Vector3, hit_normal: Vector3) -> void:
 	var impact = IMPACT_DECAL.instantiate()
