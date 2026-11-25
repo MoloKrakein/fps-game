@@ -211,7 +211,7 @@ reach = 0.35
 [node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=681250775]
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.060356483, 0.18819112, -0.11664744)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04194942, 0.15890002, -0.11664744)
 
 [node name="EjectionGas" parent="EjectionPort" unique_id=905505901 instance=ExtResource("11_tdxsd")]
 
@@ -223,6 +223,6 @@ actions = Array[ExtResource("6_def01")]([SubResource("ActionDef_rack"), SubResou
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
 
 [node name="GripHand" type="Marker3D" parent="." unique_id=166587296]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07926726, 0.098496675)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07926726, 0.05194989)
 
 [editable path="Husqvarna m40"]
