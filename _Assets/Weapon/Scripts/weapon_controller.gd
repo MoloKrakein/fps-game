@@ -578,7 +578,7 @@ func spawn_weapon_model(weapon: Weapon) -> void:
 func _bind_model_nodes(model: WeaponModel) -> void:
 	var muzzle: Node3D = model.get_node_or_null("Muzzle") as Node3D
 	var ejection_port: Node3D = model.get_node_or_null("EjectionPort") as Node3D
-
+	# set the firing state to EmptyState first so the when playing the equip animation, the weapon doesn't try to play a fire animation on the first frame.
 	_muzzle_flash = null
 	_weapon_smear = null
 	if muzzle != null:
@@ -603,9 +603,13 @@ func _bind_model_nodes(model: WeaponModel) -> void:
 	if weapon_animation_player == null:
 		print("WeaponAnimation node not found in the weapon model.")
 	else:
+		# make the weapon not be able to fire until the equip animation is done playing, so the player can't shoot before the weapon is fully equipped.
+		fire_timer = weapon_animation_player.get_animation_length("Equip")
 		weapon_animation_player.play_animation("Equip")
-	actions.bind_animation(weapon_animation_player)
+		
 
+
+	actions.bind_animation(weapon_animation_player)
 
 func switch_weapon(weapon_data: WeaponData) -> void:
 	if is_reloading or weapon_data == null or weapon_data.weapon == null:
