@@ -6,7 +6,8 @@ class_name ActionDef extends Resource
 ## The AnimationTree never contains per-action nodes or clip names. WeaponAnimation
 ## writes the clip and the fades into the single ActionLayer right before an action plays.
 ##
-## Action ids used by the code: &"rack", &"empty_reload", &"loaded_reload", &"quick_reload", &"equip".
+## Action ids used by the code: &"rack", &"rack_hold", &"rack_release", &"empty_reload", &"loaded_reload",
+## &"quick_reload", &"equip". The rack_hold / rack_release cards are for charging-handle guns (rack_holds_bolt_open).
 ## A weapon with no &"quick_reload" card reuses its &"empty_reload" card for the quick reload.
 ## An action with no ActionDef uses make_default(), so weapons can be migrated one at a time.
 
@@ -22,6 +23,12 @@ class_name ActionDef extends Resource
 ## popping. For clips that teleport parts near the start or end, set both to 0.
 @export_range(0.0, 1.0, 0.01, "suffix:s") var fade_in: float = 0.1
 @export_range(0.0, 1.0, 0.01, "suffix:s") var fade_out: float = 0.15
+## On: this action's clip animates the slide / charging handle bone itself (the bone is keyed in the
+## clip), instead of the code moving it between the Open and Close poses. The first frame of the clip
+## must match the pose before the action and the last frame the pose after it. Fades are ignored
+## (treated as 0). Use it when the handle needs more than a straight pull: locking into a notch, a slap
+## with a bounce. Off (default): the code moves the slide.
+@export var drives_slide: bool = false
 
 @export_group("Events")
 ## Moments inside the action as 0..1 fractions (see ActionEvent).
@@ -40,6 +47,14 @@ const _DEFAULTS: Dictionary = {
 	&"loaded_reload": {
 		"role": ClipResolver.ROLE_RELOAD_LOADED, "fade_in": 0.1, "fade_out": 0.15,
 		"events": {},
+	},
+	&"rack_hold": {
+		"role": ClipResolver.ROLE_RACK_HOLD, "fade_in": 0.05, "fade_out": 0.1,
+		"events": {&"pull": 0.0, &"peak": 0.7, &"closed": 1.0},
+	},
+	&"rack_release": {
+		"role": ClipResolver.ROLE_RACK_RELEASE, "fade_in": 0.0, "fade_out": 0.08,
+		"events": {&"release": 0.0, &"closed": 0.6},
 	},
 	&"quick_reload": {
 		"role": ClipResolver.ROLE_RELOAD_QUICK, "fade_in": 0.1, "fade_out": 0.15,

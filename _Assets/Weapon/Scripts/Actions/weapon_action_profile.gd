@@ -68,8 +68,7 @@ enum ReloadWithClosedBolt {
 ## How much of the clip's body ROTATION is kept. Keeping more rotation than movement avoids a stiff look.
 @export_range(0.0, 1.0, 0.01) var ads_body_rotation_scale: float = 0.6
 ## Pull the camera FOV back toward the hip FOV by this fraction while the action plays
-## (0 = keep the ADS FOV, 0.25 = a quarter of the way back). Reload actions use this to enable
-## a brief hip-FOV reset while aiming.
+## (0 = keep the ADS FOV, 0.25 = a quarter of the way back). Needs the cam_effects.gd edit.
 @export_range(0.0, 1.0, 0.01) var ads_fov_blend: float = 0.25
 
 @export_group("Quick reload (double-tap reload)")
@@ -84,6 +83,15 @@ enum ReloadWithClosedBolt {
 ## reloads with the bolt held open, then presses rack again to let it go forward and chamber a round.
 ## Off: a rack pulls and releases in one go. Only for AUTOMATIC weapons.
 @export var rack_holds_bolt_open: bool = false
+## With rack_holds_bolt_open: how long pulling the handle back to the locked position takes.
+## 0 = the same as rack_time.
+@export_range(0.0, 3.0, 0.01, "suffix:s") var rack_hold_time: float = 0.0
+## With rack_holds_bolt_open: how long the slap forward takes. 0 = half of rack_time.
+@export_range(0.0, 3.0, 0.01, "suffix:s") var rack_release_time: float = 0.0
+## Does the slide / charging handle move when the gun fires? Turn it off for guns whose handle stays
+## still while firing (MP5, G3, and other charging handles that do not move with the bolt).
+## Closed-bolt weapons only. The handle still moves when the player racks.
+@export var slide_moves_when_firing: bool = true
 
 @export_group("Active reload")
 ## Pressing the rack key while the new magazine goes in chambers the round right away and

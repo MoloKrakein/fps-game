@@ -15,6 +15,9 @@ const ROLE_RELOAD_EMPTY: StringName = &"reload_empty"
 ## Quick reload (double-tap reload: the magazine is dumped). Optional: without its own clip a weapon uses the empty reload.
 const ROLE_RELOAD_QUICK: StringName = &"reload_quick"
 const ROLE_RACK: StringName = &"rack"
+## Charging-handle guns with a two-step rack. Optional: without their own clip they use the rack clip.
+const ROLE_RACK_HOLD: StringName = &"rack_hold"        # pull the handle back to the locked position
+const ROLE_RACK_RELEASE: StringName = &"rack_release"  # let the handle go forward (the slap)
 const ROLE_EQUIP: StringName = &"equip"
 const ROLE_SLIDE_OPEN: StringName = &"slide_open"
 const ROLE_SLIDE_CLOSED: StringName = &"slide_closed"
@@ -28,11 +31,13 @@ const ALL_ROLES: Array[StringName] = [
 ]
 
 ## Roles a weapon may provide but does not have to. A missing one falls back to ROLE_FALLBACKS.
-const OPTIONAL_ROLES: Array[StringName] = [ROLE_RELOAD_QUICK]
+const OPTIONAL_ROLES: Array[StringName] = [ROLE_RELOAD_QUICK, ROLE_RACK_HOLD, ROLE_RACK_RELEASE]
 
 ## role -> role to use when the weapon has no clip for it
 const ROLE_FALLBACKS: Dictionary = {
 	&"reload_quick": &"reload_empty",
+	&"rack_hold": &"rack",
+	&"rack_release": &"rack",
 }
 
 ## Roles the code-driven slide cannot work without.
@@ -45,7 +50,7 @@ const RULES: Dictionary = {
 		"banned": [],
 	},
 	&"reload_loaded": {
-		"tokens": ["reloadloaded", "reloadtactical", "tacticalreload", "tacreload", "reloadfull", "reloadmag", "magchange", "reload"],
+		"tokens": ["reloadloaded", "reloadtactical", "tacticalreload", "tacreload", "reloadfull", "reloadmag", "magchange", "loadshell", "shellload", "insertshell", "reload"],
 		"banned": ["empty", "dry", "quick", "dump", "fast", "speed", "emergency"],
 	},
 	&"reload_quick": {
@@ -57,25 +62,33 @@ const RULES: Dictionary = {
 		"banned": [],
 	},
 	&"rack": {
-		"tokens": ["rack", "charge", "chamber", "pullslide", "cock"],
-		"banned": ["reload", "unrack"],
+		"tokens": ["rack", "charge", "chamber", "pullslide", "cock", "pump", "boltcycle"],
+		"banned": ["reload", "unrack", "hold", "release", "slap"],
+	},
+	&"rack_hold": {
+		"tokens": ["rackhold", "holdrack", "chargehold", "chargingpull", "handlepull", "handlehold", "pullhold"],
+		"banned": [],
+	},
+	&"rack_release": {
+		"tokens": ["rackrelease", "releaserack", "chargerelease", "chargingrelease", "handlerelease", "handleslap", "slapforward", "slap"],
+		"banned": [],
 	},
 	&"equip": {
 		"tokens": ["equip", "draw", "pullout", "deploy", "ready"],
 		"banned": ["unequip", "holster"],
 	},
 	&"slide_open": {
-		"tokens": ["openbolt", "boltopen", "slideopen", "openslide", "lockback", "slidelock", "slideback", "boltback"],
+		"tokens": ["openbolt", "boltopen", "slideopen", "openslide", "lockback", "slidelock", "slideback", "boltback", "forendback", "pumpback", "pumpopen", "handleback", "handlelocked", "chargingback", "chargingopen"],
 		"banned": [],
 	},
 	&"slide_closed": {
-		"tokens": ["closebolt", "closedbolt", "boltclose", "boltclosed", "slideclose", "closeslide", "slideclosed", "closedslide", "slideforward", "boltforward", "slidereturn", "boltreturn"],
+		"tokens": ["closebolt", "closedbolt", "boltclose", "boltclosed", "slideclose", "closeslide", "slideclosed", "closedslide", "slideforward", "boltforward", "slidereturn", "boltreturn", "forendforward", "pumpforward", "pumpclosed", "handleforward", "handlereleased", "chargingforward", "chargingclosed"],
 		"banned": [],
 	},
 }
 
 ## Bone name tokens that identify the slide / bolt bone(s).
-const SLIDE_BONE_TOKENS: Array[String] = ["slider", "slide", "bolt", "carrier"]
+const SLIDE_BONE_TOKENS: Array[String] = ["slider", "slide", "bolt", "carrier", "forend", "pump", "charging"]
 
 ## Bone name tokens that identify the weapon body / root bone(s), the ones that carry the whole
 ## weapon when a clip moves it. Used to pin the body while reloading in aim down sights.
