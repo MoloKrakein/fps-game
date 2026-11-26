@@ -70,7 +70,7 @@ const RULES: Dictionary = {
 		"banned": [],
 	},
 	&"rack_release": {
-		"tokens": ["rackrelease", "releaserack", "chargerelease", "chargingrelease", "handlerelease", "handleslap", "slapforward", "slap"],
+		"tokens": ["rackrelease", "releaserack", "chargerelease", "chargingrelease", "chargingclose", "handlerelease", "handleslap", "slapforward", "slap"],
 		"banned": [],
 	},
 	&"equip": {
