@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="WeaponActionProfile" format=3 uid="uid://bhgfgnckjplrr"]
+
+[ext_resource type="Script" uid="uid://45ljaim4pd2t" path="res://_Assets/Weapon/Scripts/Actions/weapon_action_profile.gd" id="1_dw0lu"]
+
+[resource]
+script = ExtResource("1_dw0lu")
+empty_reload_style = 1
+metadata/_custom_type_script = "uid://45ljaim4pd2t"
