@@ -24,6 +24,18 @@ func _ready() -> void:
 	EventBus.change_visibility_of_crosshair.connect(set_crosshair_visibility)
 	EventBus.weapon_2d_ammo_visibility_changed.connect(set_2d_ammo_visibility)
 
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if (
+		event is InputEventKey
+		and event.pressed
+		and not event.echo
+		and event.keycode == KEY_K
+	):
+		$BuildMenu.toggle()
+		get_viewport().set_input_as_handled()
+
+
 func set_health_value(health: float, max_health: float) -> void:
 	if health_bar:
 		# print("Setting health value: ", health, " / ", max_health)

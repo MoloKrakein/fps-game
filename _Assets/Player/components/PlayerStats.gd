@@ -41,6 +41,8 @@ var active_flags: Dictionary = {}
 var equipped_weapons: Array[WeaponData] = []
 
 var _skill_ranks: Dictionary = {}
+var _build_perk_modifiers: Array[StatModifier] = []
+var _build_skill_modifiers: Array[StatModifier] = []
 var _manual_stat_overrides: Dictionary = {}
 var _manual_flags: Dictionary = {}
 var _is_sprinting: bool = false
@@ -98,6 +100,14 @@ func set_perk_deck_slot(slot: int, perk: StatModifier) -> void:
 	recalculate_stats()
 
 
+func set_build_modifiers(
+	perk_modifiers: Array[StatModifier], skill_modifiers: Array[StatModifier]
+) -> void:
+	_build_perk_modifiers.assign(perk_modifiers)
+	_build_skill_modifiers.assign(skill_modifiers)
+	recalculate_stats()
+
+
 func set_armor_rig(rig: ArmorRigResource) -> void:
 	armor_rig = rig
 	recalculate_stats()
@@ -148,6 +158,8 @@ func recalculate_stats() -> void:
 		if perk:
 			var slot_modifiers: Array[StatModifier] = [perk]
 			_collect_modifiers(slot_modifiers, flat, multipliers, flags)
+	_collect_modifiers(_build_perk_modifiers, flat, multipliers, flags)
+	_collect_modifiers(_build_skill_modifiers, flat, multipliers, flags)
 
 	for skill: SkillResource in _skill_ranks:
 		var rank: int = int(_skill_ranks[skill])
