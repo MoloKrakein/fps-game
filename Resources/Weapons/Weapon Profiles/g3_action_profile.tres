@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_dw0lu")
 empty_reload_style = 1
+rack_time = 1.03
 rack_holds_bolt_open = true
 slide_moves_when_firing = false
 metadata/_custom_type_script = "uid://45ljaim4pd2t"

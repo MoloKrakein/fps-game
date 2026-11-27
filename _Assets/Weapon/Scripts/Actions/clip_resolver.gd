@@ -66,7 +66,7 @@ const RULES: Dictionary = {
 		"banned": ["reload", "unrack", "hold", "release", "slap"],
 	},
 	&"rack_hold": {
-		"tokens": ["rackhold", "holdrack", "chargehold", "chargingpull", "handlepull", "handlehold", "pullhold"],
+		"tokens": ["rackhold", "holdrack", "chargehold", "chargingopening", "chargingpull", "handlepull", "handlehold", "pullhold"],
 		"banned": [],
 	},
 	&"rack_release": {
