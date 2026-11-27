@@ -34,6 +34,10 @@ enum WeaponAmmoType {
 @export_range(0, 100) var armor_penetration: float = 0.0
 @export var crit_rate: float = 0.0
 @export var crit_damage: float = 0.0
+@export_range(0.0, 100.0, 0.1) var loadout_weight: float = 15.0
+@export_range(0.0, 5.0, 0.05) var impact_multiplier: float = 1.0
+@export var bypass_armor_gating: bool = false
+@export var stat_modifiers: Array[StatModifier] = []
 @export var mags_ammo: int = 7
 @export var max_ammo: int = 90
 # @export var ammo_per_clip: int = 7 #for future use, if we want to implement a reload system with clips
@@ -180,9 +184,14 @@ func get_muzzle_velocity_kmh() -> float:
 	return get_muzzle_velocity_mps() * 3.6
 
 func get_ads_time() -> float:
+	var handling_modifier: float = stats_component.get_stat("weapon_handling", 1.0) if stats_component else 1.0
+	var ads_time: float
 	if ads_time_override > 0.0:
-		return ads_time_override
-	return lerpf(0.12, 0.30, handling_weight)
+		ads_time = ads_time_override
+	else:
+		ads_time = lerpf(0.12, 0.30, handling_weight)
+	ads_time /= maxf(handling_modifier, 0.1)
+	return maxf(_apply_equipped_stat_modifiers(&"ads_time_multiplier", ads_time), 0.0)
 
 func get_fire_rate_rpm() -> float:
 
@@ -204,17 +213,20 @@ func get_fire_interval_seconds() -> float:
 # Dynamic Stats getters, these can be used to modify the weapon's attributes based on player stats or other game mechanics.
 
 func get_calculated_damage() -> float:
-	var final_damage: float = damage
+	return get_calculated_damage_for(damage)
+
+
+func get_calculated_damage_for(base_damage: float) -> float:
+	var final_damage: float = base_damage
 	if stats_component:
 		final_damage *= stats_component.get_stat("damage_modifier", 1.0)
 
 	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
-		for slot in active_weapon_data_ref.equipped_attachment_data:
-			var att = active_weapon_data_ref.equipped_attachment_data[slot]
+		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
 			if att:
 				final_damage += att.damage_bonus
 
-	return max(final_damage, 0.0)
+	return maxf(_apply_equipped_stat_modifiers(&"damage", final_damage), 0.0)
 
 func get_calculated_accuracy() -> float:
 	var final_accuracy: float = accuracy
@@ -222,7 +234,7 @@ func get_calculated_accuracy() -> float:
 		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
 			if att:
 				final_accuracy += att.accuracy_bonus
-	return clampf(final_accuracy, 0.0, 100.0)
+	return clampf(_apply_equipped_stat_modifiers(&"accuracy", final_accuracy), 0.0, 100.0)
 
 func get_accuracy_spread_degrees() -> float:
 	var accuracy_ratio: float = get_calculated_accuracy() / 100.0
@@ -254,19 +266,20 @@ func get_calculated_magazine_capacity() -> int:
 		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
 			if att:
 				final_capacity += att.ammo_capacity_bonus
-	return maxi(final_capacity, 0)
+	return maxi(roundi(_apply_equipped_stat_modifiers(&"magazine_capacity", float(final_capacity))), 0)
 
 func get_calculated_recoil_multiplier() -> float:
 	var final_multiplier: float = 1.0
 	if stats_component:
 		final_multiplier *= stats_component.get_stat("recoil_stability", 1.0)
+		final_multiplier *= stats_component.get_stat("recoil_multiplier", 1.0)
 
 	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
 		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
 			if att:
 				final_multiplier *= att.recoil_multiplier
 
-	return maxf(final_multiplier, 0.0)
+	return maxf(_apply_equipped_stat_modifiers(&"recoil_multiplier", final_multiplier), 0.0)
 
 func get_calculated_recoil() -> float:
 	return maxf(recoil_cam_pitch, 0.0) * get_calculated_recoil_multiplier()
@@ -276,13 +289,52 @@ func get_calculated_reload_speed() -> float:
 	if stats_component:
 		# reload speed multiplier (example: 0.8 means 20% faster reload, 1.2 means 20% slower reload)
 		final_reload_speed *= stats_component.get_stat("reload_speed", 1.0)
+		final_reload_speed /= maxf(stats_component.get_stat("weapon_handling", 1.0), 0.1)
 
 	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
 		for slot in active_weapon_data_ref.equipped_attachment_data:
 			var att = active_weapon_data_ref.equipped_attachment_data[slot]
 			if att and "reload_time_multiplier" in att:
 				final_reload_speed *= att.reload_time_multiplier
-	return max(final_reload_speed, 0.0)
+	return maxf(_apply_equipped_stat_modifiers(&"reload_time_multiplier", final_reload_speed), 0.0)
+
+
+func get_calculated_crit_chance() -> float:
+	var chance: float = stats_component.get_stat("crit_chance", 0.05) if stats_component else 0.0
+	chance += crit_rate
+	return clampf(_apply_equipped_stat_modifiers(&"crit_chance", chance), 0.0, 0.45)
+
+
+func get_calculated_crit_multiplier() -> float:
+	var multiplier: float = stats_component.get_stat("crit_multiplier", 2.0) if stats_component else 2.0
+	multiplier += crit_damage
+	return maxf(_apply_equipped_stat_modifiers(&"crit_multiplier", multiplier), 1.0)
+
+
+func get_calculated_impact_multiplier() -> float:
+	var multiplier: float = impact_multiplier
+	if stats_component:
+		multiplier *= stats_component.get_stat("impact_multiplier", 1.0)
+	return maxf(_apply_equipped_stat_modifiers(&"impact_multiplier", multiplier), 0.0)
+
+
+func get_loadout_weight(weapon_data: WeaponData = null) -> float:
+	var total: float = loadout_weight
+	var data: WeaponData = weapon_data if weapon_data != null else active_weapon_data_ref
+	if data and data.equipped_attachment_data:
+		for att: Attachment in data.equipped_attachment_data.values():
+			if att:
+				total += att.loadout_weight
+	return total
+
+
+func _apply_equipped_stat_modifiers(stat_name: StringName, base_value: float) -> float:
+	var modifiers: Array[StatModifier] = stat_modifiers.duplicate()
+	if active_weapon_data_ref and active_weapon_data_ref.equipped_attachment_data:
+		for att: Attachment in active_weapon_data_ref.equipped_attachment_data.values():
+			if att:
+				modifiers.append_array(att.stat_modifiers)
+	return StatModifier.apply_to_value(stat_name, base_value, modifiers)
 
 # stats related functions, these can be used to modify the weapon's attributes based on player stats or other game mechanics.
 

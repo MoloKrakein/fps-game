@@ -153,12 +153,13 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 		return
 	if active_ragdoll_controller == null or health_component.current_health <= 0.0:
 		return
-	if info.raw_damage < stumble_threshold:
+	var impact_damage: float = info.raw_damage * maxf(info.impact_multiplier, 0.0)
+	if impact_damage < stumble_threshold:
 		_try_flinch(info)
 		return
 
 	var intensity: float = clampf(
-		inverse_lerp(stumble_threshold, maxf(stumble_heavy_threshold, stumble_threshold + 0.01), info.raw_damage),
+		inverse_lerp(stumble_threshold, maxf(stumble_heavy_threshold, stumble_threshold + 0.01), impact_damage),
 		0.0, 1.0
 	)
 	if info.is_headshot:
@@ -197,7 +198,11 @@ func _inflate_hitboxes() -> void:
 func _try_flinch(info: DamageInfo) -> void:
 	if not flinch_enabled or active_ragdoll_controller == null or is_stumbling or is_dead:
 		return
-	var ratio: float = clampf(info.raw_damage / maxf(stumble_threshold, 1.0), 0.2, 1.0)
+	var ratio: float = clampf(
+		(info.raw_damage * maxf(info.impact_multiplier, 0.0)) / maxf(stumble_threshold, 1.0),
+		0.2,
+		1.0
+	)
 	var strength: float = flinch_force * (0.6 + 0.8 * ratio)
 	if info.is_headshot:
 		strength *= 1.4

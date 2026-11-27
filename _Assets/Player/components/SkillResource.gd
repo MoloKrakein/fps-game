@@ -25,18 +25,21 @@ enum SkillSet{
 @export var skill_cost_advanced: int = 3 # Cost to use the advanced version of the skill, can be
 
 @export_group("Basic Skill Effect")
-# Stat multipliers added when Basic is unlocked. Key: Stat name, Value: modifier offset.
+# Legacy additive stat changes when Basic is unlocked. Prefer basic_stat_modifiers
+# when an effect needs distinct flat and multiplicative values.
 # Example: {"recoil_multiplier": -0.15, "movement_speed": 0.10}
 @export var basic_stats_changes: Dictionary = {} # Dictionary to hold basic skill effect stats, can be used to modify player attributes or apply effects
+@export var basic_stat_modifiers: Array[StatModifier] = []
 # Game rule flags enabled when Basic is unlocked.
 # Example: ["fire_while_sprinting"]
 @export var basic_rule_flags: Array = [] # Array to hold basic skill effect rule flags, can be used to enable or disable certain game mechanics
 
 @export_group("Advanced Skill Effect")
-# Stat multipliers added when Advanced is unlocked. Key: Stat name, Value: modifier offset
+# Legacy additive stat changes when Advanced is unlocked.
 # Example: {"recoil_multiplier": -0.30, "movement_speed": 0.20}
 @export var advanced_stats_changes: Dictionary = {} # Dictionary to hold advanced skill effect stats,
 # can be used to modify player attributes or apply effects
+@export var advanced_stat_modifiers: Array[StatModifier] = []
 # Game rule flags enabled when Advanced is unlocked.
 # Example: ["fire_while_sprinting", "increased_critical_chance"]
 @export var advanced_rule_flags: Array = [] # Array to hold advanced skill effect rule flags

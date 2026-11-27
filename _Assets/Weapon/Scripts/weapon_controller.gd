@@ -199,6 +199,7 @@ func _init() -> void:
 	attachments = WeaponAttachments.new(self)
 	actions = WeaponActions.new(self)
 	attachments.changed.connect(_refresh_muzzle_effects)
+	attachments.changed.connect(_on_attachments_changed)
 
 
 func _ready() -> void:
@@ -217,6 +218,11 @@ func _ready() -> void:
 		is_loaded = current_ammo > 0
 
 	call_deferred("update_weapon_ui")
+
+
+func _on_attachments_changed() -> void:
+	if player_stats_component:
+		player_stats_component.recalculate_stats()
 
 
 func _process(delta: float) -> void:

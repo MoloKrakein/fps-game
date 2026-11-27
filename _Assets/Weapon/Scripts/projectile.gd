@@ -10,6 +10,10 @@ var explosion_falloff: float = 1.0
 var explosion_force: float = 0.0
 var armor_penetration: float = 0.0
 var headshot_multiplier: float = 1.0
+var is_critical: bool = false
+var crit_multiplier: float = 1.0
+var impact_multiplier: float = 1.0
+var bypass_armor_gating: bool = false
 var trail_start_timer: Timer
 var _has_detonated: bool = false
 var _hit_normal: Vector3 = Vector3.UP
@@ -79,6 +83,18 @@ func setup(
 		trail_start_timer.ignore_time_scale = true
 
 
+func set_combat_modifiers(
+		critical: bool,
+		critical_multiplier: float,
+		impact: float,
+		gate_bypass: bool
+) -> void:
+	is_critical = critical
+	crit_multiplier = maxf(critical_multiplier, 1.0)
+	impact_multiplier = maxf(impact, 0.0)
+	bypass_armor_gating = gate_bypass
+
+
 func _on_body_entered(body: Node3D) -> void:
 	if _has_detonated:
 		return
@@ -89,7 +105,8 @@ func _on_body_entered(body: Node3D) -> void:
 	else:
 		var direction: Vector3 = velocity.normalized() if velocity.length_squared() > 0.0001 else Vector3.FORWARD
 		var hit: Dictionary = HitResolver.apply_hit(
-			body, global_position, _hit_normal, direction, damage, attacker, headshot_multiplier, armor_penetration
+			body, global_position, _hit_normal, direction, damage, attacker, headshot_multiplier,
+			armor_penetration, is_critical, crit_multiplier, impact_multiplier, bypass_armor_gating
 		)
 		if hit.flesh:
 			HitEffects.spawn_flesh_hit(get_tree().current_scene, hit.position, _hit_normal, direction, hit.headshot)
@@ -105,10 +122,13 @@ func _explode() -> void:
 
 	var data: ExplosionData = ExplosionData.new()
 	data.radius = explosion_radius
-	data.damage = explosion_damage
+	data.damage = explosion_damage * (crit_multiplier if is_critical else 1.0)
 	data.falloff = explosion_falloff
 	data.force = explosion_force
 	data.armor_penetration = armor_penetration
+	data.bypass_armor_gating = bypass_armor_gating
+	data.is_critical = is_critical
+	data.impact_multiplier = impact_multiplier
 	data.target_mask = explosion_collision_mask
 	data.requires_line_of_sight = false
 	Explosion.detonate(self, blast_position, data, attacker)

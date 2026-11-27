@@ -120,6 +120,9 @@ static func _affect(
 			var info: DamageInfo = DamageInfo.new(amount, attacker, "explosive")
 			info.armor_penetration = data.armor_penetration
 			info.bypass_evasion = true # a blast can't be dodged
+			info.bypass_armor_gating = data.bypass_armor_gating
+			info.is_critical = data.is_critical
+			info.impact_multiplier = data.impact_multiplier
 			info.impact_direction = direction
 			info.impact_position = origin
 			victim.health.take_damage_with_info(info)

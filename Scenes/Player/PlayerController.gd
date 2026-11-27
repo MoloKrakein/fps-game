@@ -20,7 +20,7 @@ class_name PlayerController extends CharacterBody3D
 @export_category("Movement")
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1
-@export var sprint_speed: float = 0.5
+@export_range(0.0, 2.0, 0.01) var sprint_speed: float = 0.45
 @export var crouch_speed: float = -5.0
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
@@ -83,6 +83,9 @@ const THROW_HOLD_THRESHOLD: float = 0.5 # Time in seconds to hold the drop butto
 func _ready() -> void:
 	if prone_dive == null:
 		prone_dive = get_node_or_null("Component/ProneDive") as ProneDiveComponent
+	if player_stats:
+		player_stats.stats_changed.connect(_on_player_stats_changed)
+		_on_player_stats_changed(player_stats.stats)
 	health_component.damage_taken.connect(_on_damage_taken)
 	health_component.damage_received.connect(_on_damage_received)
 	# if ammo_counter_ui:
@@ -105,6 +108,10 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
 	print("Armor changed: ", new_armor, " / ", max_armor)
 	EventBus.player_armor_changed.emit(new_armor, max_armor)
+
+func _on_player_stats_changed(stats: Dictionary) -> void:
+	_player_max_tiredness = maxf(0.0, float(stats.get("stamina_pool", 100.0)))
+	_player_current_tiredness = minf(_player_current_tiredness, _player_max_tiredness)
 
 func _initilize_ui() -> void:
 	# print("Initializing UI with current health and armor values")
@@ -161,11 +168,12 @@ func _physics_process(delta: float) -> void:
 
 
 	var speed_modifier: float = sprint_modifier + crouch_modifier + (_hold_item_mass * 0.5) # Adjust the multiplier as needed for balance
-	var raw_speed: float = default_speed + speed_modifier + slide_modifier
+	var movement_multiplier: float = player_stats.get_stat("movement_speed", 1.0) if player_stats else 1.0
+	var raw_speed: float = (default_speed + speed_modifier + slide_modifier) * movement_multiplier
 	speed = maxf(0.5, raw_speed)
 	# prone crawls slower than the crouch floor above, so it gets its own value
 	if is_prone and prone_dive:
-		speed = prone_dive.get_prone_speed()
+		speed = prone_dive.get_prone_speed() * movement_multiplier
 
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
@@ -190,6 +198,8 @@ func _physics_process(delta: float) -> void:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
 
 	var is_moving:bool = direction != Vector3.ZERO
+	if player_stats:
+		player_stats.set_action_state(is_sprinting, is_sliding, is_diving and not is_on_floor())
 	_handle_tiredness(delta, is_moving)
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
@@ -239,20 +249,25 @@ func _handle_tiredness(delta: float, is_moving: bool) -> void:
 
 	if is_moving:
 		if is_sprinting:
-			rate = 25.0 # Tires out very fast while sprinting
+			rate = 25.0 * _stamina_drain_multiplier() # Tires out very fast while sprinting
 		elif is_crouching:
-			rate = -5.0 # Slowly recovers while crouch-walking (tactical!)
+			rate = -5.0 * _stamina_recovery_multiplier() # Slowly recovers while crouch-walking (tactical!)
 		else:
-			rate = 5.0 # Normal walking slowly increases tiredness
+			rate = 5.0 * _stamina_drain_multiplier() # Normal walking slowly increases tiredness
 	else:
 		if is_crouching and not is_sprinting and not is_sliding:
-			rate = -20.0 # Rapid recovery while idle and crouched
+			rate = -20.0 * _stamina_recovery_multiplier() # Rapid recovery while idle and crouched
 		else:
-			rate = -10.0 # Normal recovery while idle and standing
-
+			rate = -10.0 * _stamina_recovery_multiplier() # Normal recovery while idle and standing
 	# Apply the rate and clamp it between 0 and Max
 	_player_current_tiredness += rate * delta
 	_player_current_tiredness = clamp(_player_current_tiredness, 0.0, _player_max_tiredness)
+
+func _stamina_drain_multiplier() -> float:
+	return player_stats.get_stat("stamina_drain_multiplier", 1.0) if player_stats else 1.0
+
+func _stamina_recovery_multiplier() -> float:
+	return player_stats.get_stat("stamina_recovery_multiplier", 1.0) if player_stats else 1.0
 
 func increase_tiredness(amount: float) -> void:
 	_player_current_tiredness += amount
@@ -272,7 +287,7 @@ func sprint() -> void:
 	if not is_on_floor() or is_prone or is_diving:
 		walk()
 		return
-	sprint_modifier = sprint_speed
+	sprint_modifier = default_speed * sprint_speed
 	is_sprinting = true
 	if debug:
 		print("Changed sprint modifier to: ", sprint_modifier)
@@ -399,6 +414,8 @@ func can_slide() -> bool:
 
 func end_slide() -> void:
 	is_sliding = false
+	if player_stats:
+		player_stats.notify_slide_or_vault()
 	standing_col.disabled = false
 	crouching_col.disabled = true
 	_slide_direction = Vector3.ZERO

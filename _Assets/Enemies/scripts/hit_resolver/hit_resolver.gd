@@ -19,7 +19,11 @@ static func apply_hit(
 		damage: float,
 		attacker: Node3D,
 		headshot_multiplier: float = 1.0,
-		armor_penetration: float = 0.0
+		armor_penetration: float = 0.0,
+		is_critical: bool = false,
+		crit_multiplier: float = 1.0,
+		impact_multiplier: float = 1.0,
+		bypass_armor_gating: bool = false
 ) -> Dictionary:
 	var outcome: Dictionary = {
 		"handled": false,
@@ -40,20 +44,32 @@ static func apply_hit(
 	var hitbox: EnemyHitbox = target as EnemyHitbox
 	if hitbox != null:
 		var hit: Dictionary = hitbox.apply_weapon_hit(
-			damage, attacker, outcome["position"], direction, headshot_multiplier, pen
+			damage, attacker, outcome["position"], direction, headshot_multiplier, pen,
+			is_critical, crit_multiplier, impact_multiplier, bypass_armor_gating
 		)
 		outcome["handled"] = true
 		outcome["flesh"] = true
 		outcome["headshot"] = hit.get("headshot", false)
 		outcome["damage"] = hit.get("damage", 0.0)
+		outcome["critical"] = hit.get("critical", false)
 		return outcome
 
 	# 2. Anything with a HealthComponent (crates, the enemy capsule when no bone was on the path, ...).
 	var health: HealthComponent = _find_health_component(target)
 	if health != null:
-		health.take_damage(damage, attacker, false, false, pen)
+		var damage_info := DamageInfo.new(
+			damage * (crit_multiplier if is_critical else 1.0),
+			attacker,
+			"bullet"
+		)
+		damage_info.is_critical = is_critical
+		damage_info.impact_multiplier = impact_multiplier
+		damage_info.armor_penetration = pen
+		damage_info.bypass_armor_gating = bypass_armor_gating
+		health.take_damage_with_info(damage_info)
 		outcome["handled"] = true
-		outcome["damage"] = damage
+		outcome["damage"] = damage_info.raw_damage
+		outcome["critical"] = is_critical
 		outcome["flesh"] = _find_enemy(target) != null
 	return outcome
 

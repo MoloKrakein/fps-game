@@ -27,6 +27,7 @@ func fire_hitscan() -> void:
 	for i in range(weapon.pellet_count):
 		var direction: Vector3 = Weapon.sample_accuracy_direction(muzzle_basis, accuracy_spread_degrees)
 		var damage: float = weapon.get_calculated_damage()
+		var is_critical: bool = randf() < weapon.get_calculated_crit_chance()
 
 		if weapon.pellet_count > 1:
 			direction = (direction + _pellet_spread(muzzle_basis)).normalized()
@@ -37,7 +38,7 @@ func fire_hitscan() -> void:
 		var result: Dictionary = space_state.intersect_ray(query)
 
 		if result:
-			_resolve_hit(result, direction, damage, weapon)
+			_resolve_hit(result, direction, damage, weapon, is_critical)
 
 
 func fire_projectile() -> void:
@@ -56,6 +57,7 @@ func fire_projectile() -> void:
 
 		var direction: Vector3 = Weapon.sample_accuracy_direction(muzzle_basis, accuracy_spread_degrees)
 		var damage: float = weapon.get_calculated_damage()
+		var is_critical: bool = randf() < weapon.get_calculated_crit_chance()
 
 		if weapon.pellet_count > 1:
 			direction = (direction + _pellet_spread(muzzle_basis)).normalized()
@@ -70,11 +72,17 @@ func fire_projectile() -> void:
 			ctrl.player,
 			weapon.ammo_type == Weapon.WeaponAmmoType.EXPLOSIVE,
 			weapon.explosion_radius,
-			weapon.explosion_damage,
+			weapon.get_calculated_damage_for(weapon.explosion_damage),
 			weapon.explosion_falloff,
 			weapon.explosion_force,
 			weapon.armor_penetration,
 			weapon.headshot_multiplier
+		)
+		projectile.set_combat_modifiers(
+			is_critical,
+			weapon.get_calculated_crit_multiplier(),
+			weapon.get_calculated_impact_multiplier() * (1.5 if is_critical else 1.0),
+			weapon.bypass_armor_gating
 		)
 
 
@@ -129,7 +137,13 @@ func get_effective_spread() -> float:
 
 #region Impact & damage
 ## One hitscan hit: damage (with enemy hitboxes / headshots) and the matching effect.
-func _resolve_hit(result: Dictionary, direction: Vector3, damage: float, weapon: Weapon) -> void:
+func _resolve_hit(
+		result: Dictionary,
+		direction: Vector3,
+		damage: float,
+		weapon: Weapon,
+		is_critical: bool
+) -> void:
 	var hit: Dictionary = HitResolver.apply_hit(
 		result.collider,
 		result.position,
@@ -138,7 +152,11 @@ func _resolve_hit(result: Dictionary, direction: Vector3, damage: float, weapon:
 		damage,
 		ctrl.owner as Node3D,
 		weapon.headshot_multiplier,
-		weapon.armor_penetration
+		weapon.armor_penetration,
+		is_critical,
+		weapon.get_calculated_crit_multiplier(),
+		weapon.get_calculated_impact_multiplier() * (1.5 if is_critical else 1.0),
+		weapon.bypass_armor_gating
 	)
 	if hit.flesh:
 		HitEffects.spawn_flesh_hit(ctrl.get_tree().current_scene, hit.position, result.normal, direction, hit.headshot)
