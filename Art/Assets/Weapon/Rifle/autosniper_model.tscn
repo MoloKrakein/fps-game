@@ -1,15 +1,15 @@
-[gd_scene format=3 uid="uid://cu06ajduxlmxo"]
+[gd_scene format=3 uid="uid://gsui7l1uxjml"]
 
-[ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_dg8lt"]
-[ext_resource type="Script" uid="uid://c6s8by6wlubla" path="res://_Assets/Weapon/attachment/Scripts/attachment_fit.gd" id="2_lbst0"]
-[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="3_1n0k8"]
-[ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="3_6v2q4"]
-[ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="3_ty10y"]
-[ext_resource type="PackedScene" uid="uid://vfrm18t1v1gi" path="res://Art/3D/Blender/Weapon/AutoSniperRifle.gltf" id="4_1n0k8"]
+[ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_jdq6j"]
+[ext_resource type="Script" uid="uid://c6s8by6wlubla" path="res://_Assets/Weapon/attachment/Scripts/attachment_fit.gd" id="2_5iefl"]
+[ext_resource type="Resource" uid="uid://dq37t57tyb7v5" path="res://Resources/Attachments/Optics/red_dot.tres" id="3_lw1jb"]
+[ext_resource type="PackedScene" uid="uid://vfrm18t1v1gi" path="res://Art/3D/Blender/Weapon/AutoSniperRifle.gltf" id="4_h3vrb"]
+[ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="5_tbkl3"]
+[ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="6_4xo1r"]
 
 [sub_resource type="Resource" id="Resource_dg8lt"]
-script = ExtResource("2_lbst0")
-attachment = ExtResource("3_1n0k8")
+script = ExtResource("2_5iefl")
+attachment = ExtResource("3_lw1jb")
 scale_multiplier = Vector3(0.3, 0.3, 0.3)
 ads_offset = Vector3(0, 0.04, 0)
 metadata/_custom_type_script = "uid://c6s8by6wlubla"
@@ -108,13 +108,13 @@ nodes/ReloadBlend/position = Vector2(180, 560)
 node_connections = [&"output", 0, &"EquipOneShot", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"OpenBolt", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"Animation", &"ReloadOneShot", 0, &"FireOneShot", &"ReloadOneShot", 1, &"ReloadBlend", &"RackOneShot", 0, &"ReloadOneShot", &"RackOneShot", 1, &"rack", &"EquipOneShot", 0, &"RackOneShot", &"EquipOneShot", 1, &"equiped", &"ReloadBlend", 0, &"reload", &"ReloadBlend", 1, &"EmptyReload"]
 
 [node name="WA2k" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("optic_socket", "iron_sight_point", "ammo_display")]
-script = ExtResource("1_dg8lt")
+script = ExtResource("1_jdq6j")
 optic_socket = NodePath("blockbench_export/scope_socket")
 iron_sight_point = NodePath("blockbench_export/scope_socket")
-attachment_fits = Array[ExtResource("2_lbst0")]([SubResource("Resource_dg8lt")])
+attachment_fits = Array[ExtResource("2_5iefl")]([SubResource("Resource_dg8lt")])
 ammo_display = NodePath("AmmoCounterPosition")
 
-[node name="blockbench_export" parent="." unique_id=1753243563 instance=ExtResource("4_1n0k8")]
+[node name="blockbench_export" parent="." unique_id=1753243563 instance=ExtResource("4_h3vrb")]
 transform = Transform3D(-3.4969112e-08, 0, 0.8, 0, 0.8, 0, -0.8, 0, -3.4969112e-08, 0, -0.104756206, 0)
 
 [node name="scope_socket" type="Marker3D" parent="blockbench_export" unique_id=692444622]
@@ -122,7 +122,7 @@ transform = Transform3D(-5.4639234e-08, 0, -1.25, 0, 1.25, 0, 1.25, 0, -5.463923
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.003387332, -0.35141167)
-script = ExtResource("3_ty10y")
+script = ExtResource("5_tbkl3")
 particles = NodePath("GPUParticles3D")
 light = NodePath("OmniLight3D")
 
@@ -164,7 +164,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
 [node name="AmmoCounterPosition" type="Node3D" parent="." unique_id=1112189428]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18046615, 0.027169734, -0.2633954)
 
-[node name="GUI" parent="AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("3_6v2q4")]
+[node name="GUI" parent="AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("6_4xo1r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.044470966, -0.028495118, 0.10883766)
 
 [node name="GripHand" type="Marker3D" parent="." unique_id=1073744102]

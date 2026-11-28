@@ -47,6 +47,8 @@ enum MuzzleFlashMode {
 @export var damage_bonus: float = 0.0               # Flat bonus / penalty to damage
 @export var reload_time_multiplier: float = 1.0     # 1.0 = no change, <1.0 = faster reload, >1.0 = slower reload
 @export var ammo_capacity_bonus: int = 0            # Flat bonus / penalty to ammo capacity
+@export_range(0.0, 100.0, 0.1) var loadout_weight: float = 0.0
+@export var stat_modifiers: Array[StatModifier] = []
 
 @export_category("Muzzle Effects")
 @export var muzzle_flash_mode: MuzzleFlashMode = MuzzleFlashMode.KEEP_WEAPON

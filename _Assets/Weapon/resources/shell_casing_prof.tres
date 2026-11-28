@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CasingEjectionProfile" format=3 uid="uid://b2llrbw6smyqo"]
+
+[ext_resource type="Script" uid="uid://ddepm2ivt2tgf" path="res://Art/Assets/Weapon/Projectile/casing_ejection_profile.gd" id="1_27tne"]
+
+[resource]
+script = ExtResource("1_27tne")
+power = 1.09
+inherit_velocity = 0.65
+spin_min = 7.87
+mass = 0.008
+linear_damp = 0.025
+angular_damp = 0.235
+gravity_scale = 0.95
+bounce = 0.63
+friction = 0.23
+metadata/_custom_type_script = "uid://ddepm2ivt2tgf"

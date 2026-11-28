@@ -25,6 +25,7 @@ streak_min_speed = 5.0
 streak_alpha = 1.0
 streak_width = 0.084
 streak_color = Color(0.69411767, 0.6745098, 0.45490196, 0.99607843)
+skip_chance = 0.19
 despawn_after_rest = 30.0
 metadata/collision_preset_name = &"__custom__"
 

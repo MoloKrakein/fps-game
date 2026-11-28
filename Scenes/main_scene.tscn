@@ -10,10 +10,12 @@
 [ext_resource type="Resource" uid="uid://b4wuvyceoofh6" path="res://Resources/Weapons/sg_data.tres" id="5_76v2p"]
 [ext_resource type="Resource" uid="uid://c7li8s4pv7rdi" path="res://Resources/Weapons/smg_data.tres" id="6_m1efj"]
 [ext_resource type="Resource" uid="uid://ckk3s0l53w6i4" path="res://Resources/Weapons/Assault_Rifles416_data.tres" id="7_76v2p"]
-[ext_resource type="Resource" uid="uid://b15yby6glemy0" path="res://Resources/Weapons/AutoSg_data.tres" id="8_drdnd"]
+[ext_resource type="Resource" uid="uid://b3k1tnomnmsp1" path="res://Resources/Weapons/battle_rifle_g3_data.tres" id="8_7ewk0"]
 [ext_resource type="Resource" uid="uid://bulqjfu7p4m6d" path="res://Resources/Weapons/autoSniper_data.tres" id="9_ioaeq"]
 [ext_resource type="Script" uid="uid://b26lrkrgjqcol" path="res://_Assets/Audio/sound_engine.gd" id="10_7ewk0"]
 [ext_resource type="PackedScene" uid="uid://br62nk21xm7fu" path="res://Scenes/post_processing/post_processing_layer.tscn" id="10_76v2p"]
+[ext_resource type="Script" uid="uid://bf2ggyt2t7faj" path="res://_Assets/Enemies/components/enemy_spawn_component.gd" id="13_lhp3t"]
+[ext_resource type="PackedScene" uid="uid://ymhcm0a4omay" path="res://Scenes/Enemies/normal_enemy.tscn" id="14_gnsmo"]
 
 [node name="MainScene" type="Node" unique_id=1881302021]
 
@@ -30,10 +32,11 @@ weapons = Dictionary[int, ExtResource("3_m1efj")]({
 2: ExtResource("5_76v2p"),
 3: ExtResource("6_m1efj"),
 4: ExtResource("7_76v2p"),
-5: ExtResource("8_drdnd"),
+5: ExtResource("8_7ewk0"),
 6: ExtResource("9_ioaeq")
 })
 player = NodePath("../../CurrentLevel/PlayerController")
+loadout_weapon_slots = PackedInt32Array(1, 3)
 
 [node name="UIManager" type="Node" parent="Managers" unique_id=1809892748]
 
@@ -44,7 +47,7 @@ metadata/_custom_type_script = "uid://b26lrkrgjqcol"
 [node name="CurrentLevel" type="Node3D" parent="." unique_id=1396905234]
 
 [node name="PlayerController" parent="CurrentLevel" unique_id=1796224466 instance=ExtResource("2_x6ack")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.809613, 5.8104715, 0.61031055)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.987646, 0.46856356, 6.229393)
 default_speed = 6.0
 
 [node name="HealthComponent" parent="CurrentLevel/PlayerController" index="1" unique_id=1115016750]
@@ -57,6 +60,138 @@ effect_chromatic_aberration = 0.02
 effect_vignette_strength = 1.0
 
 [node name="TrenchbroomTest" parent="CurrentLevel" unique_id=25843268 instance=ExtResource("3_iacmt")]
+
+[node name="entity_1_office_celling_lamp" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="1" unique_id=1708216938]
+visible = false
+
+[node name="entity_2_office_celling_lamp" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="2" unique_id=1336554549]
+visible = false
+
+[node name="entity_3_office_celling_lamp" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="3" unique_id=962699459]
+visible = false
+
+[node name="entity_4_office_celling_lamp" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="4" unique_id=1173044473]
+visible = false
+
+[node name="entity_5_office_celling_lamp" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="5" unique_id=975397963]
+visible = false
+
+[node name="entity_6_office_celling_lamp" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="6" unique_id=1643838624]
+visible = false
+
+[node name="entity_7_item_ammo_pistol" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="7" unique_id=990496783]
+visible = false
+
+[node name="entity_8_office_celling_lamp" parent="CurrentLevel/TrenchbroomTest/FuncGodotMap" parent_id_path=PackedInt32Array(25843268, 2078604912) index="8" unique_id=1064587020]
+visible = false
+
+[node name="NormalEnemy" parent="CurrentLevel/TrenchbroomTest" index="5" unique_id=1253637122]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.053032, 10.565584, 8.094069)
+morale_enabled = false
+
+[node name="Armature" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified" parent_id_path=PackedInt32Array(25843268, 1253637122, 1256437525) index="0" unique_id=1265390248]
+transform = Transform3D(0.00988511, 0.00013001687, -0.001505821, -0.00011127413, 0.009998489, 0.00013282793, 0.0015073218, -0.00011454611, 0.009885073, -0.024028858, -0.021641871, 0.06755038)
+
+[node name="GeneralSkeleton" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature" index="1" unique_id=519690024]
+bones/2/rotation = Quaternion(-0.05771904, 0.010730459, -0.001232818, 0.99827445)
+bones/3/rotation = Quaternion(0.0038286615, 0.02177734, -0.001521606, 0.99975437)
+bones/4/rotation = Quaternion(0.10208118, 0.0930389, -0.81366265, 0.5646913)
+bones/5/rotation = Quaternion(0.31567085, 0.32831088, -0.2514917, 0.8539999)
+bones/6/rotation = Quaternion(0.21713135, -0.041038062, -0.0014560402, 0.9752784)
+bones/7/rotation = Quaternion(0.009802894, -0.31981406, -0.12362161, 0.93932986)
+bones/20/rotation = Quaternion(0.04208309, -0.11511638, 0.80276316, 0.58356535)
+bones/21/rotation = Quaternion(0.38844723, -0.38250342, 0.2842119, 0.78868467)
+bones/22/rotation = Quaternion(0.21578352, 0.040807243, 0.001446247, 0.97558707)
+bones/23/rotation = Quaternion(0.065182574, 0.5495353, -0.15913649, 0.81758046)
+bones/36/rotation = Quaternion(0.18531272, 0.049815625, -0.07901588, 0.9782301)
+bones/37/rotation = Quaternion(0.11965136, 0.03595437, -0.08621153, 0.98841214)
+bones/39/rotation = Quaternion(0.975645, 0.10384754, -0.16782166, 0.09575214)
+bones/40/rotation = Quaternion(0.23876576, -0.021568099, 0.0024761562, 0.9708345)
+bones/41/rotation = Quaternion(-0.0057088863, 0.7890575, -0.60826147, 0.08587113)
+bones/42/rotation = Quaternion(0.18368477, -0.035842378, 0.004446689, 0.9823215)
+bones/44/rotation = Quaternion(0.98727024, -0.054328617, 0.10191939, 0.10935405)
+bones/45/rotation = Quaternion(0.24674341, 0.07263152, 0.029826604, 0.9658948)
+bones/46/rotation = Quaternion(0.0012315966, 0.78912127, -0.6065886, -0.09662527)
+
+[node name="Physical Bone pelvis" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="0" unique_id=426337273]
+transform = Transform3D(0.945252, -0.13602635, -0.015233281, -0.009339628, 0.041950915, -0.9541432, 0.13655767, 0.9444434, 0.04018774, 0.022483826, 0.98802185, -0.06713486)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.003131215, 0.00086407585, 0.10441899)
+body_offset = Transform3D(0.95511085, -5.8412552e-05, -1.3876706e-07, -9.313226e-08, 0.00029977039, -0.9551107, 5.8442354e-05, 0.95511085, 0.0002996996, 0.0029907227, 0.099731445, -0.00085639954)
+
+[node name="Physical Bone spine_01" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="1" unique_id=1090958245]
+transform = Transform3D(0.9476498, -0.11210039, -0.040373445, -0.021574084, 0.15684992, -0.9418966, 0.11717965, 0.9354507, 0.15309253, 0.026805878, 1.1961622, -0.089897156)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0007858256, -0.0010091689, 0.13654271)
+body_offset = Transform3D(0.9550788, 0.0006070137, -0.007825192, -0.007828753, 0.0058427155, -0.95506114, -0.00055906177, 0.955093, 0.005847439, 0.0018196106, 0.13040638, 0.00016498566)
+
+[node name="Physical Bone spine_02" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="2" unique_id=667933377]
+transform = Transform3D(0.9512157, -0.06089741, -0.060965862, -0.050079018, 0.15923531, -0.940411, 0.07012434, 0.93977237, 0.15539289, 0.040489197, 1.4275198, -0.12794638)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0037874144, 0.00050317566, 0.1370753)
+body_offset = Transform3D(0.9547096, 0.010302007, -0.025699645, -0.025876675, 0.016641557, -0.95461524, -0.009848818, 0.95491046, 0.016913608, 0.007133484, 0.1307478, -0.0028362274)
+
+[node name="Physical Bone arm_l" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="3" unique_id=497293025]
+transform = Transform3D(-0.3519405, -0.8260661, -0.32555988, -0.42199844, -0.15250179, 0.84314716, -0.7812116, 0.45452672, -0.3087883, 0.28162384, 1.3428726, -0.086256504)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0018379797, 0.013358996, 0.12981017)
+body_offset = Transform3D(0.9544427, -0.035465926, -0.0043246746, -0.0044760704, -0.0039955825, -0.9550921, 0.03544706, 0.95444393, -0.004158914, -0.00071907043, 0.12404227, -0.012275696)
+
+[node name="Physical Bone forearm_l" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="4" unique_id=103739969]
+transform = Transform3D(-0.42393774, -0.8541166, 0.05475547, -0.41574344, 0.25891936, 0.81997234, -0.7481114, 0.34012076, -0.48670694, 0.31875992, 1.1200542, 0.019237041)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00090032845, 0.008875638, 0.12121004)
+body_offset = Transform3D(0.9544019, -0.03484799, 0.011843681, 0.011464864, -0.010572381, -0.95498353, 0.034974188, 0.9544165, -0.010146216, -0.00198555, 0.1158371, -0.0072727203)
+
+[node name="Physical Bone arm_r" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="5" unique_id=953289153]
+transform = Transform3D(-0.42714173, 0.78683805, 0.33267456, 0.4008032, -0.14388093, 0.854922, 0.75441575, 0.52193934, -0.26584318, -0.1995163, 1.3703384, -0.14205742)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.003992683, 0.0019363984, 0.11471644)
+body_offset = Transform3D(0.9546902, 0.027342588, -0.00750345, -0.0075351745, 0.0010071695, -0.9550804, -0.027333617, 0.9547188, 0.0012224317, 0.0046195984, 0.1095314, -0.0020980835)
+
+[node name="Physical Bone forearm_r" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="6" unique_id=1643874089]
+transform = Transform3D(-0.48982558, 0.81983674, 0.013234466, 0.3958117, 0.22292195, 0.8401639, 0.718081, 0.43636006, -0.454077, -0.24663162, 1.144434, -0.045806408)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.006671259, -0.006563319, 0.11100336)
+body_offset = Transform3D(0.95478094, 0.016761065, -0.01870045, -0.01941976, 0.041861817, -0.95399535, -0.015921742, 0.954046, 0.042188063, 0.008555412, 0.10604191, 0.0014724731)
+
+[node name="Physical Bone head" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="7" unique_id=1407245123]
+transform = Transform3D(0.8816063, -0.012078553, -0.36723423, -0.33359677, -0.42643994, -0.7868282, -0.1540131, 0.8545405, -0.39784026, 0.07791138, 1.6431494, -0.115128994)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.008602814, 0.014428483, 0.05515057)
+body_offset = Transform3D(0.9541375, -0.010159342, -0.0419042, -0.04173872, 0.015288532, -0.9540763, 0.010818966, 0.95493484, 0.014828742, 0.010665894, 0.052038193, -0.014503002)
+
+[node name="Physical Bone thigh_l" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="8" unique_id=669678010]
+transform = Transform3D(0.9226506, -0.156323, -0.19109072, 0.1478649, -0.2421146, 0.91200495, -0.19770816, -0.9105932, -0.20968507, 0.15670395, 0.7309103, -0.0330019)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.003617752, 0.0020273284, 0.20740747)
+body_offset = Transform3D(0.95500517, 0.013057128, -0.005172629, -0.0051279617, -0.0033017248, -0.95509154, -0.013074804, 0.955015, -0.003231421, 0.004501343, 0.19808125, -0.0013132095)
+
+[node name="Physical Bone calf_l" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="9" unique_id=1262126083]
+transform = Transform3D(0.90335184, -0.29415697, -0.098303765, 0.16708396, 0.20651996, 0.9174252, -0.26129463, -0.8849055, 0.24678719, 0.22858429, 0.3241644, -0.05360222)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.01688613, -0.008683272, 0.22618656)
+body_offset = Transform3D(0.9544091, -0.021304883, -0.02969486, -0.029957185, -0.0115250945, -0.95457166, 0.020934746, 0.95480317, -0.012184203, 0.022647858, 0.21530533, 0.011400223)
+
+[node name="Physical Bone thigh_r" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="10" unique_id=76253100]
+transform = Transform3D(0.8837192, 0.32547155, 0.15920188, -0.07778239, -0.23946534, 0.92132664, 0.35387403, -0.8654254, -0.19506028, -0.09944153, 0.7292385, -0.062681675)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0028656598, -0.0002716151, 0.20765528)
+body_offset = Transform3D(0.95495087, 0.017747283, 0.0009486005, 0.0013378412, -0.02094768, -0.9548807, -0.01772216, 0.95471835, -0.020969003, 0.002544403, 0.19828415, 0.0045628548)
+
+[node name="Physical Bone calf_r" parent="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified/Armature/GeneralSkeleton/PhysicalBoneSimulator3D" parent_id_path=PackedInt32Array(25843268, 1253637122, 81423128) index="11" unique_id=133120859]
+transform = Transform3D(0.8323501, 0.4684334, -0.0001543872, -0.12917213, 0.22982599, 0.91800386, 0.4502715, -0.79999167, 0.26363876, -0.12867737, 0.32351685, -0.08090305)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0050036833, -0.01511376, 0.22490028)
+body_offset = Transform3D(0.9550017, -0.014755964, -0.0008107871, -0.0013191998, -0.0329006, -0.9545439, 0.014720291, 0.95443165, -0.032918498, 0.004737854, 0.21417332, 0.021902084)
+
+[node name="NavigationAgent3D" parent="CurrentLevel/TrenchbroomTest/NormalEnemy" index="7" unique_id=792034714]
+debug_enabled = false
+
+[node name="EnemySpawnComponent" type="Node3D" parent="CurrentLevel/TrenchbroomTest" unique_id=384484523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9022751, 3.701664, 0)
+script = ExtResource("13_lhp3t")
+enemy_scene = ExtResource("14_gnsmo")
+spawn_interval_seconds = 10.0
+enemies_per_spawn = 20
+spawn_radius = 0.1
+
+[node name="EnemySpawnComponent2" type="Node3D" parent="CurrentLevel/TrenchbroomTest" unique_id=1724526513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.668386, 2.5283985, -5.8162103)
+script = ExtResource("13_lhp3t")
+enemy_scene = ExtResource("14_gnsmo")
+spawn_interval_seconds = 30.0
+enemies_per_spawn = 5
+max_alive = 4
+spawn_radius = 0.1
 
 [node name="PostProcessingLayer" parent="." unique_id=1547687983 instance=ExtResource("10_76v2p")]
 visible = false
@@ -83,5 +218,10 @@ render_target_update_mode = 4
 layer = 100
 
 [editable path="CurrentLevel/PlayerController"]
+[editable path="CurrentLevel/TrenchbroomTest"]
+[editable path="CurrentLevel/TrenchbroomTest/NormalEnemy"]
+[editable path="CurrentLevel/TrenchbroomTest/NormalEnemy/Zombified"]
+[editable path="CurrentLevel/TrenchbroomTest/NormalEnemy/BodyKicker"]
 [editable path="PostProcessingLayer"]
 [editable path="SubViewportContainer/SubViewport/UserInterface"]
+[editable path="SubViewportContainer/SubViewport/UserInterface/AmmoContainer/Control2"]

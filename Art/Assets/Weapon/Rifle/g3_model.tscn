@@ -1,0 +1,266 @@
+[gd_scene format=3 uid="uid://cu06ajduxlmxo"]
+
+[ext_resource type="Script" uid="uid://5t8m65hpuu7i" path="res://_Assets/Weapon/Scripts/Model/Scripts/weapon_model.gd" id="1_3py5y"]
+[ext_resource type="PackedScene" uid="uid://wcnvgquebw0v" path="res://Art/3D/Blender/Weapon/BTR G3/G3.glb" id="2_dk45d"]
+[ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="3_31vj4"]
+[ext_resource type="PackedScene" uid="uid://n4eg2b33nndo" path="res://_Assets/UI/ammo_gui.tscn" id="4_25e73"]
+[ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="5_1jtc1"]
+[ext_resource type="Script" uid="uid://c284xg3j4logh" path="res://_Assets/Weapon/Scripts/Actions/action_event.gd" id="6_evt01"]
+[ext_resource type="Script" uid="uid://chw0y0ybqasl0" path="res://_Assets/Weapon/Scripts/Actions/action_def.gd" id="7_def01"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6f8o3"]
+angle_min = -179.99998
+angle_max = 180.00002
+direction = Vector3(0, 0, -1)
+spread = 25.0
+initial_velocity_min = 0.39999998
+initial_velocity_max = 1.1999999
+gravity = Vector3(0, 0, 0)
+scale_min = 0.59999996
+scale_max = 1.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uo56h"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 0.73333335, 0, 1)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_riqys"]
+material = SubResource("StandardMaterial3D_uo56h")
+size = Vector2(0.2, 0.2)
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_action"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_action"]
+filter_enabled = true
+filters = ["Armature/Skeleton3D:Body_2", "Armature/Skeleton3D:Mags_2", "Armature/Skeleton3D:dummy_2"]
+fadein_time = 0.1
+fadeout_time = 0.15
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_2kfvb"]
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_cbvsw"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uo56h"]
+animation = &"Close_bolt"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2kfvb"]
+animation = &"Open_bolt"
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
+graph_offset = Vector2(-467.72998, 99.91733)
+nodes/output/position = Vector2(760, 100)
+nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_uo56h")
+nodes/CloseBolt/position = Vector2(-340, 40)
+nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_2kfvb")
+nodes/OpenBolt/position = Vector2(-340, 200)
+nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_cbvsw")
+nodes/BoltPosition/position = Vector2(-100, 80)
+nodes/ActionClip/node = SubResource("AnimationNodeAnimation_action")
+nodes/ActionClip/position = Vector2(-120, 340)
+nodes/ActionSpeed/node = SubResource("AnimationNodeTimeScale_2kfvb")
+nodes/ActionSpeed/position = Vector2(140, 300)
+nodes/ActionLayer/node = SubResource("AnimationNodeOneShot_action")
+nodes/ActionLayer/position = Vector2(480, 100)
+node_connections = [&"output", 0, &"ActionLayer", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"ActionSpeed", 0, &"ActionClip", &"ActionLayer", 0, &"BoltPosition", &"ActionLayer", 1, &"ActionSpeed"]
+
+[sub_resource type="Resource" id="Event_rack_hold_pull"]
+script = ExtResource("6_evt01")
+event_name = &"pull"
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="Event_rack_hold_peak"]
+script = ExtResource("6_evt01")
+event_name = &"peak"
+fraction = 0.9
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="Event_rack_hold_release"]
+script = ExtResource("6_evt01")
+event_name = &"release"
+fraction = 0.95
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="Event_rack_hold_closed"]
+script = ExtResource("6_evt01")
+event_name = &"closed"
+fraction = 1.0
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="ActionDef_rack_hold"]
+script = ExtResource("7_def01")
+id = &"rack_hold"
+clip_role = &"rack_hold"
+fade_in = 0.0
+fade_out = 0.0
+drives_slide = true
+events = Array[ExtResource("6_evt01")]([SubResource("Event_rack_hold_pull"), SubResource("Event_rack_hold_peak"), SubResource("Event_rack_hold_release"), SubResource("Event_rack_hold_closed")])
+
+[sub_resource type="Resource" id="Event_rack_release_release"]
+script = ExtResource("6_evt01")
+event_name = &"release"
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="Event_rack_release_closed"]
+script = ExtResource("6_evt01")
+event_name = &"closed"
+fraction = 1.0
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="ActionDef_rack_release"]
+script = ExtResource("7_def01")
+id = &"rack_release"
+clip_role = &"rack_release"
+fade_in = 0.0
+fade_out = 0.0
+drives_slide = true
+events = Array[ExtResource("6_evt01")]([SubResource("Event_rack_release_release"), SubResource("Event_rack_release_closed")])
+
+[sub_resource type="Resource" id="Event_reload_empty_mag_out"]
+script = ExtResource("6_evt01")
+event_name = &"mag_out"
+fraction = 0.3
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="Event_reload_empty_mag_in"]
+script = ExtResource("6_evt01")
+event_name = &"mag_in"
+fraction = 0.92
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="ActionDef_reload_empty"]
+script = ExtResource("7_def01")
+id = &"empty_reload"
+clip_role = &"reload_empty"
+events = Array[ExtResource("6_evt01")]([SubResource("Event_reload_empty_mag_out"), SubResource("Event_reload_empty_mag_in")])
+
+[sub_resource type="Resource" id="Event_reload_loaded_mag_out"]
+script = ExtResource("6_evt01")
+event_name = &"mag_out"
+fraction = 0.3
+show_parts = null
+hide_parts = null
+
+[sub_resource type="Resource" id="Event_reload_loaded_mag_in"]
+script = ExtResource("6_evt01")
+event_name = &"mag_in"
+fraction = 0.92
+show_parts = PackedStringArray()
+hide_parts = PackedStringArray()
+
+[sub_resource type="Resource" id="ActionDef_reload_loaded"]
+script = ExtResource("7_def01")
+id = &"loaded_reload"
+clip_role = &"reload_loaded"
+fade_in = 0.0
+fade_out = 0.0
+events = Array[ExtResource("6_evt01")]([SubResource("Event_reload_loaded_mag_out"), SubResource("Event_reload_loaded_mag_in")])
+
+[sub_resource type="Resource" id="ActionDef_quick_reload"]
+script = ExtResource("7_def01")
+id = &"quick_reload"
+clip_role = &"reload_empty"
+events = Array[ExtResource("6_evt01")]([SubResource("Event_reload_empty_mag_out"), SubResource("Event_reload_empty_mag_in")])
+
+[node name="G3" type="Node3D" unique_id=1425760719 node_paths=PackedStringArray("ejection_socket", "optic_socket", "iron_sight_point", "ammo_display")]
+script = ExtResource("1_3py5y")
+ejection_socket = NodePath("EjectionPort")
+optic_socket = NodePath("G3/Armature/Skeleton3D/body/scope_socket")
+iron_sight_point = NodePath("G3/Armature/Skeleton3D/body/scope_socket")
+ammo_display = NodePath("AmmoCounterPosition")
+
+[node name="G3" parent="." unique_id=1213099812 instance=ExtResource("2_dk45d")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -0.0097254515, -0.265995, -0.6683363)
+
+[node name="Skeleton3D" parent="G3/Armature" parent_id_path=PackedInt32Array(1213099812, 2026364346) index="0" unique_id=241739896]
+bones/0/position = Vector3(0.030298505, -2.2874733e-09, -6.4536457e-16)
+bones/0/rotation = Quaternion(8.0884476e-08, -0.11869676, -9.669076e-09, 0.9929306)
+bones/1/position = Vector3(-0.11149962, -2.5070958, -2.079661e-07)
+bones/3/position = Vector3(-0.30759764, -1.2023702, -1.3048731e-07)
+bones/4/rotation = Quaternion(-0.3313934, 0.34295425, -0.6320771, 0.6107695)
+bones/6/position = Vector3(0.24234267, -0.707065, -1.549558e-07)
+bones/11/rotation = Quaternion(0.47758847, 0.52145094, -0.477587, 0.5214489)
+bones/13/rotation = Quaternion(0.7025368, -0.080266304, -0.7025359, -0.0802664)
+bones/15/position = Vector3(6.3459954, -40.68992, -14.71986)
+bones/15/rotation = Quaternion(0.5311871, 0.4517542, -0.43387043, 0.5705391)
+
+[node name="body" parent="G3/Armature/Skeleton3D" index="0" unique_id=2080849329]
+transform = Transform3D(0.97182214, -5.3290705e-15, -0.23571528, -3.8402895e-08, 1, -1.5832997e-07, 0.23571528, 1.6292073e-07, 0.97182214, 0.030298505, -2.2874733e-09, -6.4536457e-16)
+
+[node name="scope_socket" type="Marker3D" parent="G3/Armature/Skeleton3D/body" index="0" unique_id=692444622]
+transform = Transform3D(0, -1, 0, -4.371139e-08, 0, -1, 1, 0, -4.371139e-08, -0.47392315, -1.8670506, -3.8335934e-08)
+
+[node name="Dummy" parent="G3/Armature/Skeleton3D" index="1" unique_id=154460127]
+transform = Transform3D(0.21534918, 0.975012, 0.054554135, -0.0151480725, 0.05919336, -0.99813163, -0.9764196, 0.21412043, 0.027516782, 6.3459954, -40.68992, -14.71986)
+
+[node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25368357, -5.513848)
+script = ExtResource("3_31vj4")
+particles = NodePath("GPUParticles3D")
+light = NodePath("OmniLight3D")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Muzzle" unique_id=25292793]
+emitting = false
+amount = 20
+lifetime = 0.01
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_6f8o3")
+draw_pass_1 = SubResource("QuadMesh_riqys")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Muzzle" unique_id=681250775]
+
+[node name="EjectionPort" type="Node3D" parent="." unique_id=1273286915]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.048390135, 0.3734172, -0.48958737)
+
+[node name="Magazine" type="Node3D" parent="." unique_id=2029134148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18483877, 0.083248034)
+
+[node name="AmmoCounterPosition" type="Node3D" parent="." unique_id=1112189428]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1508615, 0.027169734, -0.2633954)
+
+[node name="GUI" parent="AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("4_25e73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.044470966, -0.028495118, 0.10883766)
+
+[node name="GripHand" type="Marker3D" parent="." unique_id=1073744102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08545318, -1.7457464)
+
+[node name="SupportHand" type="Marker3D" parent="." unique_id=1630405924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4990441, 0.19553727)
+
+[node name="RecoilPivot" type="Marker3D" parent="." unique_id=1246342790]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.072385594, 1.533049)
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1277320455]
+root_node = NodePath("../mk57")
+tree_root = SubResource("AnimationNodeBlendTree_bhunq")
+anim_player = NodePath("../mk57/AnimationPlayer")
+parameters/BoltPosition/blend_amount = 0.0
+parameters/ActionSpeed/scale = 1.0
+parameters/ActionLayer/active = false
+parameters/ActionLayer/internal_active = false
+parameters/ActionLayer/request = 0
+
+[node name="WeaponAnimation" type="Node" parent="." unique_id=716296360 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
+script = ExtResource("5_1jtc1")
+weapon_animation_tree = NodePath("../AnimationTree")
+animation_player = NodePath("../G3/AnimationPlayer")
+actions = Array[ExtResource("7_def01")]([SubResource("ActionDef_rack_hold"), SubResource("ActionDef_rack_release"), SubResource("ActionDef_reload_empty"), SubResource("ActionDef_reload_loaded"), SubResource("ActionDef_quick_reload")])
+body_damping_blend_time = 0.22
+metadata/_custom_type_script = "uid://csp53xj462vmj"
+
+[editable path="G3"]

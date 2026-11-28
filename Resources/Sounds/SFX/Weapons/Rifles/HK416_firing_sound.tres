@@ -5,9 +5,16 @@
 [ext_resource type="AudioStream" uid="uid://cejynhgo4ko7l" path="res://Art/sounds/SFX/Audacity/Gunshot1/416_sfx_test_var3.wav" id="3_81ohf"]
 [ext_resource type="AudioStream" uid="uid://dcj7qf8iejade" path="res://Art/sounds/SFX/Audacity/Gunshot1/416_test_shoot_var2.wav" id="4_gfblc"]
 
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_egbc5"]
+random_pitch = 1.0266895
+random_volume_offset_db = 0.76
+streams_count = 2
+stream_0/stream = ExtResource("2_fcu1w")
+stream_1/stream = ExtResource("3_81ohf")
+
 [resource]
 script = ExtResource("1_lxtj2")
-streams = Array[AudioStream]([ExtResource("2_fcu1w"), ExtResource("3_81ohf"), ExtResource("4_gfblc")])
+streams = Array[AudioStream]([ExtResource("3_81ohf"), ExtResource("4_gfblc"), SubResource("AudioStreamRandomizer_egbc5"), ExtResource("2_fcu1w")])
 volume_db = -6.200000000000003
 volume_jitter_db = 1.1
 pitch_min = 0.99

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b7horvquu5pty"
+path="res://.godot/imported/01-Audio 2.wav-694c7e749ea65ccdab87b7b73055bf96.sample"
+
+[deps]
+
+source_file="res://Art/sounds/SFX/Audacity/ShotgunShell/01-Audio 2.wav"
+dest_files=["res://.godot/imported/01-Audio 2.wav-694c7e749ea65ccdab87b7b73055bf96.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

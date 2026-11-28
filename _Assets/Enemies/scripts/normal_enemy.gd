@@ -153,12 +153,23 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 		return
 	if active_ragdoll_controller == null or health_component.current_health <= 0.0:
 		return
-	if info.raw_damage < stumble_threshold:
+	var impact_damage: float = info.raw_damage * maxf(info.impact_multiplier, 0.0)
+	var attacker_stats := _get_attacker_stats(info)
+	var threshold_scale: float = (
+		0.8 if attacker_stats != null and attacker_stats.has_flag("lower_fall_threshold") else 1.0
+	)
+	var effective_stumble_threshold: float = stumble_threshold * threshold_scale
+	var effective_heavy_threshold: float = stumble_heavy_threshold * threshold_scale
+	if impact_damage < effective_stumble_threshold:
 		_try_flinch(info)
 		return
 
 	var intensity: float = clampf(
-		inverse_lerp(stumble_threshold, maxf(stumble_heavy_threshold, stumble_threshold + 0.01), info.raw_damage),
+		inverse_lerp(
+			effective_stumble_threshold,
+			maxf(effective_heavy_threshold, effective_stumble_threshold + 0.01),
+			impact_damage
+		),
 		0.0, 1.0
 	)
 	if info.is_headshot:
@@ -170,7 +181,24 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 
 	# Already reeling: feed the hit straight into the ragdoll (it may escalate to a full fall).
 	if is_stumbling:
-		active_ragdoll_controller.add_hit(direction, stumble_force, intensity, hit_position)
+		var was_fallen: bool = (
+			active_ragdoll_controller.phase == ActiveRagdollStumbleController.Phase.FALL
+		)
+		var impulse_scale: float = (
+			1.25
+			if attacker_stats != null and attacker_stats.has_flag("ragdoll_impulse_bonus")
+			else 1.0
+		)
+		active_ragdoll_controller.add_hit(
+			direction, stumble_force * impulse_scale, intensity, hit_position
+		)
+		if (
+			not was_fallen
+			and active_ragdoll_controller.phase == ActiveRagdollStumbleController.Phase.FALL
+		):
+			EventBus.on_enemy_fallen.emit(self, info.attacker)
+			EventBus.on_enemy_ragdolled.emit(self, info.attacker)
+			_apply_perk_fall_effects(attacker_stats)
 		return
 
 	if stumble_cooldown_left > 0.0:
@@ -197,7 +225,11 @@ func _inflate_hitboxes() -> void:
 func _try_flinch(info: DamageInfo) -> void:
 	if not flinch_enabled or active_ragdoll_controller == null or is_stumbling or is_dead:
 		return
-	var ratio: float = clampf(info.raw_damage / maxf(stumble_threshold, 1.0), 0.2, 1.0)
+	var ratio: float = clampf(
+		(info.raw_damage * maxf(info.impact_multiplier, 0.0)) / maxf(stumble_threshold, 1.0),
+		0.2,
+		1.0
+	)
 	var strength: float = flinch_force * (0.6 + 0.8 * ratio)
 	if info.is_headshot:
 		strength *= 1.4
@@ -244,16 +276,29 @@ func _on_stumble_state_entered() -> void:
 		state_chart.send_event("toFollow")
 		return
 
+	var attacker_stats := _get_attacker_stats(_last_hit_info) if _last_hit_info != null else null
+	var impulse_scale: float = (
+		1.25
+		if attacker_stats != null and attacker_stats.has_flag("ragdoll_impulse_bonus")
+		else 1.0
+	)
 	is_stumbling = true
 	_cancel_vault()
 	reset_navigation()
 	_play_stagger_legs()
 	active_ragdoll_controller.begin(
 		pending_stumble_direction,
-		stumble_force,
+		stumble_force * impulse_scale,
 		pending_stumble_intensity,
 		pending_stumble_hit_position
 	)
+	EventBus.on_enemy_stumbled.emit(self, _last_hit_info.attacker if _last_hit_info else null)
+	if active_ragdoll_controller.phase == ActiveRagdollStumbleController.Phase.FALL:
+		EventBus.on_enemy_fallen.emit(self, _last_hit_info.attacker if _last_hit_info else null)
+		EventBus.on_enemy_ragdolled.emit(self, _last_hit_info.attacker if _last_hit_info else null)
+		_apply_perk_fall_effects(
+			_get_attacker_stats(_last_hit_info) if _last_hit_info != null else null
+		)
 
 
 func _play_stagger_legs() -> void:
@@ -272,12 +317,32 @@ func _on_stumble_recovered() -> void:
 		return
 
 	is_stumbling = false
-	stumble_cooldown_left = stumble_cooldown
+	var attacker_stats := _get_attacker_stats(_last_hit_info) if _last_hit_info != null else null
+	stumble_cooldown_left = (
+		stumble_cooldown * 0.7
+		if attacker_stats != null and attacker_stats.has_flag("shorter_stumble_immunity")
+		else stumble_cooldown
+	)
 	# If we were mid-air/vaulting when hit, traversal_state would otherwise stay stuck and
 	# the follow state would early-out forever.
 	traversal_state = TraversalState.GROUND
 	order.clear()
 	reset_navigation()
 	state_chart.send_event("toFollow")
+
+
+func _get_attacker_stats(info: DamageInfo) -> PlayerStats:
+	if info != null and info.attacker is PlayerController:
+		return (info.attacker as PlayerController).player_stats
+	return null
+
+
+func _apply_perk_fall_effects(attacker_stats: PlayerStats) -> void:
+	if (
+		attacker_stats != null
+		and attacker_stats.has_flag("stumble_morale_fear")
+		and morale != null
+	):
+		morale.fear = clampf(morale.fear + 0.2, 0.0, 1.0)
 
 #endregion

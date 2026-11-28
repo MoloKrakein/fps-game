@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SoundEventDef" format=3 uid="uid://b4ayle1n0ryvf"]
+
+[ext_resource type="Script" uid="uid://c44ui3q546r65" path="res://_Assets/Audio/sound_event_def.gd" id="1_b7lps"]
+[ext_resource type="AudioStream" uid="uid://cir77wscjnp3i" path="res://Art/sounds/SFX/Audacity/Gunshot1/heavyrifle_caliber_shoot_sfx_var1.wav" id="2_as0ue"]
+[ext_resource type="AudioStream" uid="uid://clfv6oyu786ju" path="res://Art/sounds/SFX/Audacity/Gunshot1/heavyrifle_caliber_shoot_sfx_var2.wav" id="3_wsevx"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_stwc4"]
+random_pitch = 1.0088185
+random_volume_offset_db = 0.76
+streams_count = 2
+stream_0/stream = ExtResource("2_as0ue")
+stream_1/stream = ExtResource("3_wsevx")
+
+[resource]
+script = ExtResource("1_b7lps")
+streams = Array[AudioStream]([SubResource("AudioStreamRandomizer_stwc4")])
+volume_db = -6.200000000000003
+volume_jitter_db = 1.1
+pitch_min = 0.92
+pitch_max = 1.08
+metadata/_custom_type_script = "uid://c44ui3q546r65"

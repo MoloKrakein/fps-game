@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://_Assets/UI/BuildMenu.gd" id="1_build_menu"]
+[ext_resource type="Script" path="res://_Assets/Player/components/PlayerBuildResolver.gd" id="2_build_resolver"]
+
+[node name="BuildMenu" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_build_menu")
+
+[node name="BuildResolver" type="Node" parent="."]
+script = ExtResource("2_build_resolver")

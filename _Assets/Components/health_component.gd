@@ -6,6 +6,7 @@ signal damage_taken(damage_amount: float)
 signal damage_received(info: DamageInfo, applied_damage: float)
 signal armor_changed(new_armor: float, max_armor: float)
 signal on_armor_broken()
+signal armor_broken(info: DamageInfo)
 signal died()
 signal attack_dodged()
 
@@ -21,6 +22,7 @@ var current_health: float
 var current_armor: float = 0.0
 var is_alive: bool = true
 var _armor_regeneration_timer: float = 0.0
+var _armor_regen_event_sent: bool = false
 
 @onready var player_stats_component: PlayerStats = get_parent().get_node_or_null("PlayerStats")
 
@@ -28,45 +30,76 @@ var _armor_regeneration_timer: float = 0.0
 func take_damage_with_info(info: DamageInfo) -> void:
 	if not is_alive:
 		return
-	var final_damage: float = info.raw_damage
+	var final_damage: float = maxf(info.raw_damage, 0.0)
 	var armor_before_damage: float = current_armor
 
 	# player stats component can modify the damage based on player's stats
 	if player_stats_component:
 		if not info.bypass_evasion:
-			var evasion = player_stats_component.get_stat("evasion_chance", 0.0)
+			var evasion: float = clampf(maxf(
+				player_stats_component.get_stat("dodge_chance", 0.0),
+				player_stats_component.get_stat("evasion_chance", 0.0)
+			), 0.0, 1.0)
 			if evasion > 0.0 and randf() < evasion:
 				attack_dodged.emit()
-				print(get_parent().name, " dodged the attack!")
 				return # negate the damage if evasion is successful
 
-		var mitigation_percentage = player_stats_component.get_stat("damage_reduction", 0.0)
-		var flat_armor_reduction = player_stats_component.get_stat("flat_armor_reduction", 0.0)
+		var mitigation_percentage: float = clampf(
+			player_stats_component.get_stat("damage_mitigation", 0.0)
+			+ player_stats_component.get_stat("damage_reduction", 0.0),
+			0.0,
+			1.0
+		)
+		var flat_armor_reduction: float = maxf(
+			player_stats_component.get_stat("flat_armor_reduction", 0.0),
+			0.0
+		)
 		final_damage *= (1.0 - mitigation_percentage)
-		final_damage = max(final_damage - flat_armor_reduction,0.0)
+		final_damage = maxf(final_damage - flat_armor_reduction, 0.0)
 
-	var effective_absorption: float = maxf(0.0, armor_absorption - info.armor_penetration)
-
+	var health_damage: float = final_damage
 	if current_armor > 0.0 and not info.bypass_armor:
-		var armor_damage: float = final_damage * effective_absorption
-		var health_damage: float = final_damage * (1.0 - effective_absorption)
-
-		if current_armor >= armor_damage:
-			current_armor -= armor_damage
-			current_health -= health_damage
+		if player_stats_component:
+			var penetration: float = clampf(info.armor_penetration, 0.0, 1.0)
+			var armor_damage: float = final_damage * (1.0 - penetration)
+			health_damage = final_damage * penetration
+			if current_armor > armor_damage:
+				current_armor -= armor_damage
+			else:
+				var overflow_damage: float = maxf(0.0, armor_damage - armor_before_damage)
+				current_armor = 0.0
+				on_armor_broken.emit()
+				armor_broken.emit(info)
+				if info.bypass_armor_gating:
+					health_damage += overflow_damage
 		else:
-			var remaining_damage: float = armor_damage - current_armor
-			armor_damage = current_armor
-			health_damage += remaining_damage
-			
-			current_armor = 0.0
-			on_armor_broken.emit()
-			print(get_parent().name, " armor broken!")
+			var effective_absorption: float = maxf(0.0, armor_absorption - info.armor_penetration)
+			var armor_damage: float = final_damage * effective_absorption
+			health_damage = final_damage * (1.0 - effective_absorption)
+			if current_armor >= armor_damage:
+				current_armor -= armor_damage
+			else:
+				var remaining_damage: float = armor_damage - current_armor
+				current_armor = 0.0
+				health_damage += remaining_damage
+				on_armor_broken.emit()
+				armor_broken.emit(info)
 	else:
-		current_health -= final_damage
+		current_armor = maxf(0.0, current_armor)
 
+	current_health -= health_damage
 	damage_taken.emit(final_damage)
 	damage_received.emit(info, final_damage)
+	if final_damage > 0.0 and info.damage_type != "linked":
+		var damage_target: Node = get_parent()
+		EventBus.on_hit_dealt.emit(info.attacker, damage_target, final_damage)
+		if info.is_critical:
+			EventBus.on_crit_hit.emit(info.attacker, damage_target, final_damage)
+	if player_stats_component != null:
+		var armor_damage_taken: float = maxf(armor_before_damage - current_armor, 0.0)
+		EventBus.on_damage_taken.emit(get_parent(), final_damage, armor_damage_taken)
+		if armor_before_damage > 0.0 and current_armor <= 0.0:
+			EventBus.on_armor_depleted.emit(get_parent())
 	health_changed.emit(current_health, max_health)
 	_reset_armor_regeneration_timer()
 
@@ -101,6 +134,9 @@ func _process(delta: float) -> void:
 		_armor_regeneration_timer = maxf(0.0, _armor_regeneration_timer - delta)
 		return
 
+	if not _armor_regen_event_sent:
+		_armor_regen_event_sent = true
+		EventBus.on_armor_regen_started.emit(get_parent())
 	var armor_before_regeneration: float = current_armor
 	var regeneration_rate: float = _get_armor_regeneration_rate()
 	current_armor = minf(armor_value, current_armor + regeneration_rate * delta)
@@ -116,6 +152,7 @@ func _get_armor_regeneration_delay() -> float:
 func _reset_armor_regeneration_timer() -> void:
 	if regenerate_armor and player_stats_component != null:
 		_armor_regeneration_timer = _get_armor_regeneration_delay()
+		_armor_regen_event_sent = false
 
 func _handle_death() -> void:
 	if not is_alive:
@@ -126,7 +163,30 @@ func _handle_death() -> void:
 	# print(get_parent().name, " is Died")
 
 func _ready() -> void:
+	if player_stats_component:
+		player_stats_component.stats_changed.connect(_on_player_stats_changed)
+		_apply_player_stats()
 	if start_max_health:
 		current_health = max_health
 	if start_with_armor:
 		current_armor = armor_value
+
+
+func _on_player_stats_changed(_stats: Dictionary) -> void:
+	_apply_player_stats()
+
+
+func _apply_player_stats() -> void:
+	if player_stats_component == null:
+		return
+	var previous_max_health: float = max_health
+	var previous_max_armor: float = armor_value
+	max_health = maxf(0.0, player_stats_component.get_stat("max_health", max_health))
+	armor_value = maxf(0.0, player_stats_component.get_stat("max_armor", armor_value))
+	current_health = minf(current_health, max_health)
+	var old_armor: float = current_armor
+	current_armor = minf(current_armor, armor_value)
+	if previous_max_health != max_health:
+		health_changed.emit(current_health, max_health)
+	if old_armor != current_armor or previous_max_armor != armor_value:
+		armor_changed.emit(current_armor, armor_value)

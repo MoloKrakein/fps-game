@@ -48,6 +48,7 @@ uniform float shadow_fade_factor = 0.2;
 Changes how sensitive the scope-shadow is to movement */
 uniform float shadow_movement_factor: hint_range(0.5, 1.0, 0.01) = 1.0;
 
+uniform float z_clip_scale : hint_range(0.0, 1.0) = 1.0;
 
 varying vec3 view;
 
@@ -115,6 +116,7 @@ float get_lens_mask(vec2 uv) {
 
 void vertex() {
 	view = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz - (MODELVIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+	Z_CLIP_SCALE = z_clip_scale;
 }
 
 

@@ -13,6 +13,9 @@ class_name ExplosionData extends Resource
 ## near the edge, below 1 = drops fast close to the centre.
 @export var falloff_curve: float = 1.0
 @export_range(0.0, 1.0) var armor_penetration: float = 0.0
+@export var bypass_armor_gating: bool = false
+var is_critical: bool = false
+var impact_multiplier: float = 1.0
 ## Applied to anything that is not an enemy or the player (crates, barrels, props).
 @export var object_damage_multiplier: float = 1.0
 ## 1 = the attacker is hurt fully by their own blast, 0 = immune (rocket jumping).

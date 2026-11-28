@@ -22,17 +22,15 @@ func fire_hitscan() -> void:
 	var space_state: PhysicsDirectSpaceState3D = muzzle.get_world_3d().direct_space_state
 	var muzzle_basis: Basis = muzzle.global_transform.basis
 	var from: Vector3 = muzzle.global_transform.origin + ctrl.shoot_position_offset
-	var forward: Vector3 = -muzzle_basis.z
-	var accuracy_spread: float = get_effective_spread()
+	var accuracy_spread_degrees: float = get_effective_spread_degrees()
 
 	for i in range(weapon.pellet_count):
-		var acc_x: float = randf_range(-accuracy_spread, accuracy_spread)
-		var acc_y: float = randf_range(-accuracy_spread, accuracy_spread)
-		var direction: Vector3 = (forward + Vector3(acc_x, acc_y, 0)).normalized()
+		var direction: Vector3 = Weapon.sample_accuracy_direction(muzzle_basis, accuracy_spread_degrees)
 		var damage: float = weapon.get_calculated_damage()
+		var is_critical: bool = randf() < weapon.get_calculated_crit_chance()
 
 		if weapon.pellet_count > 1:
-			direction += _pellet_spread(muzzle_basis)
+			direction = (direction + _pellet_spread(muzzle_basis)).normalized()
 			damage = _damage_per_pellet()
 
 		var to: Vector3 = from + direction * weapon.shoot_range
@@ -40,7 +38,7 @@ func fire_hitscan() -> void:
 		var result: Dictionary = space_state.intersect_ray(query)
 
 		if result:
-			_resolve_hit(result, direction, damage, weapon)
+			_resolve_hit(result, direction, damage, weapon, is_critical)
 
 
 func fire_projectile() -> void:
@@ -50,29 +48,21 @@ func fire_projectile() -> void:
 		return
 
 	var muzzle_basis: Basis = muzzle.global_transform.basis
-	var forward: Vector3 = -muzzle_basis.z
-	var accuracy_spread: float = (100.0 - weapon.accuracy) / 1000.0
-
-	# TODO(check): this compounds into accuracy_modifier on every projectile shot,
-	# and while dynamic_accuracy_spread is 0 it sets accuracy_modifier to 0 until
-	# the next aim_hipfire()/aim_ads(). Hitscan weapons read it via get_effective_spread().
-	ctrl.accuracy_modifier = ctrl.stance_accuracy_modifier * ctrl.accuracy_modifier * ctrl.dynamic_accuracy_spread * weapon.aim_accuracy_modifier
+	var accuracy_spread_degrees: float = get_effective_spread_degrees()
 
 	for i in range(weapon.pellet_count):
 		var projectile: Projectile = weapon.projectile_scene.instantiate() as Projectile
 		ctrl.get_tree().current_scene.add_child(projectile)
 		projectile.global_position = muzzle.global_position + ctrl.shoot_position_offset
 
-		var pellet_forward: Vector3 = forward
+		var direction: Vector3 = Weapon.sample_accuracy_direction(muzzle_basis, accuracy_spread_degrees)
 		var damage: float = weapon.get_calculated_damage()
+		var is_critical: bool = randf() < weapon.get_calculated_crit_chance()
 
 		if weapon.pellet_count > 1:
-			pellet_forward += _pellet_spread(muzzle_basis)
+			direction = (direction + _pellet_spread(muzzle_basis)).normalized()
 			damage = _damage_per_pellet()
 
-		var acc_x: float = randf_range(-accuracy_spread, accuracy_spread)
-		var acc_y: float = randf_range(-accuracy_spread, accuracy_spread)
-		var direction: Vector3 = pellet_forward + Vector3(acc_x, acc_y, 0) * muzzle_basis
 		var projectile_velocity: Vector3 = direction * weapon.get_muzzle_velocity_mps()
 
 		projectile.look_at(projectile.global_position + direction, Vector3.UP)
@@ -82,11 +72,17 @@ func fire_projectile() -> void:
 			ctrl.player,
 			weapon.ammo_type == Weapon.WeaponAmmoType.EXPLOSIVE,
 			weapon.explosion_radius,
-			weapon.explosion_damage,
+			weapon.get_calculated_damage_for(weapon.explosion_damage),
 			weapon.explosion_falloff,
 			weapon.explosion_force,
-			weapon.armor_penetration,
+			_get_armor_penetration(weapon),
 			weapon.headshot_multiplier
+		)
+		projectile.set_combat_modifiers(
+			is_critical,
+			weapon.get_calculated_crit_multiplier(),
+			weapon.get_calculated_impact_multiplier() * (1.5 if is_critical else 1.0),
+			weapon.bypass_armor_gating
 		)
 
 
@@ -105,15 +101,13 @@ func _damage_per_pellet() -> float:
 
 
 #region Accuracy
-func get_effective_spread() -> float:
+func get_effective_spread_degrees() -> float:
 	var weapon: Weapon = ctrl.current_weapon
 	if weapon == null:
 		return 0.0
 
-	# 1. Base spread from weapon (and attachments)
-	var base_spread: float = (100.0 - weapon.get_calculated_accuracy()) / 1000.0
+	var base_spread_degrees: float = weapon.get_accuracy_spread_degrees()
 
-	# 2. Movement penalty
 	var move_penalty: float = 1.0
 	var player: PlayerController = ctrl.player
 	if player != null:
@@ -127,29 +121,59 @@ func get_effective_spread() -> float:
 	if ctrl.is_aiming:
 		move_penalty *= 0.5 # Aiming reduces movement penalty
 
-	# 3. Combine base, stance, skills, movement, and bloom
-	var total_spread: float = (base_spread * ctrl.stance_accuracy_modifier * ctrl.accuracy_modifier * move_penalty) + ctrl.dynamic_accuracy_spread
-	return maxf(0.0, total_spread * ctrl.spread_multiplier)
+	var total_spread_degrees: float = (
+		base_spread_degrees
+		* ctrl.stance_accuracy_modifier
+		* ctrl.accuracy_modifier
+		* move_penalty
+		+ ctrl.dynamic_accuracy_spread
+	)
+	if ctrl.player != null and ctrl.player.player_stats != null:
+		var stats: PlayerStats = ctrl.player.player_stats
+		total_spread_degrees *= stats.get_stat("spread_multiplier", 1.0)
+		if ctrl.is_aiming and stats.has_flag("aim_steadiness"):
+			total_spread_degrees *= 0.8
+	return maxf(0.0, total_spread_degrees * ctrl.spread_multiplier)
+
+func get_effective_spread() -> float:
+	return deg_to_rad(get_effective_spread_degrees())
 #endregion
 
 
 #region Impact & damage
 ## One hitscan hit: damage (with enemy hitboxes / headshots) and the matching effect.
-func _resolve_hit(result: Dictionary, direction: Vector3, damage: float, weapon: Weapon) -> void:
+func _resolve_hit(
+		result: Dictionary,
+		direction: Vector3,
+		damage: float,
+		weapon: Weapon,
+		is_critical: bool
+) -> void:
 	var hit: Dictionary = HitResolver.apply_hit(
 		result.collider,
 		result.position,
 		result.normal,
 		direction,
 		damage,
-		ctrl.owner as Node3D,
+		ctrl.player,
 		weapon.headshot_multiplier,
-		weapon.armor_penetration
+		_get_armor_penetration(weapon),
+		is_critical,
+		weapon.get_calculated_crit_multiplier(),
+		weapon.get_calculated_impact_multiplier() * (1.5 if is_critical else 1.0),
+		weapon.bypass_armor_gating
 	)
 	if hit.flesh:
 		HitEffects.spawn_flesh_hit(ctrl.get_tree().current_scene, hit.position, result.normal, direction, hit.headshot)
 	else:
 		_spawn_impact_effect(result.position)
+
+
+func _get_armor_penetration(weapon: Weapon) -> float:
+	var bonus: float = 0.0
+	if ctrl.player != null and ctrl.player.player_stats != null:
+		bonus = ctrl.player.player_stats.get_stat("armor_penetration_bonus", 0.0)
+	return clampf(weapon.armor_penetration + bonus, 0.0, 1.0)
 
 
 func _spawn_impact_effect(hit_position: Vector3) -> void:

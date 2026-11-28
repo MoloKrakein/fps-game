@@ -2,6 +2,7 @@ class_name WeaponManager extends Node
 
 @export var weapons: Dictionary[int, WeaponData] = {}
 @export var player: PlayerController
+@export var loadout_weapon_slots: PackedInt32Array = PackedInt32Array([1, 3])
 
 var current_weap_slot: int = 1
 
@@ -20,6 +21,7 @@ func _ready() -> void:
 	# call_deferred("initialize_starting_weapon",1)
 
 	player.weapon_controller.initialize_weapon_data(weapons.get(current_weap_slot))
+	_sync_player_stats_loadout()
 
 func _make_weapon_data_instances_unique() -> void:
 	for slot: int in weapons:
@@ -30,6 +32,20 @@ func _make_weapon_data_instances_unique() -> void:
 		# The weapon definition is immutable shared configuration. Only the
 		# per-slot runtime state needs to be a unique resource instance.
 		weapons[slot] = weapon_data.duplicate(false) as WeaponData
+
+
+func _sync_player_stats_loadout() -> void:
+	if player == null:
+		return
+	var player_stats: PlayerStats = player.get_node_or_null("PlayerStats") as PlayerStats
+	if player_stats == null:
+		return
+	var loadout: Array[WeaponData] = []
+	for slot: int in loadout_weapon_slots:
+		var weapon_data: WeaponData = weapons.get(slot)
+		if weapon_data and weapon_data.is_unlocked:
+			loadout.append(weapon_data)
+	player_stats.set_loadout_weapons(loadout)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -77,6 +93,7 @@ func unlock_weapon(slot: int, weapon_resource: Weapon) -> void:
 		weapons[slot].is_unlocked = true
 		weapons[slot].fire_mode = weapon_resource.fire_mode
 		weapons[slot].reserve_ammo = weapon_resource.max_ammo
+		_sync_player_stats_loadout()
 		EventBus.weapon_ammo_changed.emit(weapons[slot].ammo_in_magazine, weapons[slot].reserve_ammo)
 
 # func initialize_starting_weapon(weapon_data: WeaponData) -> void:

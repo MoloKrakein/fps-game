@@ -1,10 +1,10 @@
 class_name AmmoUI extends Node
 
-@onready var reload_timer_bar: ProgressBar = %AmmoBar
+@onready var reload_timer_bar: ProgressBar = %AmmoBars
 @onready var chamber_indicator: ColorRect = %ChamberIndicator
 @onready var current_ammo_label: Label = %CurrentAmmoLabel
 @onready var reserved_ammo_label: Label = %ReservedAmmoLabel
-@onready var bullet_bar: ProgressBar = %Bulletbar
+@onready var bullet_bar: ProgressBar = %Bulletbars
 @export var hud_mesh: MeshInstance3D
 
 var reload_tween: Tween

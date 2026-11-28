@@ -20,7 +20,7 @@ class_name PlayerController extends CharacterBody3D
 @export_category("Movement")
 # @export var speed: float = 0.1
 @export var default_speed: float = 0.1
-@export var sprint_speed: float = 0.5
+@export_range(0.0, 2.0, 0.01) var sprint_speed: float = 0.45
 @export var crouch_speed: float = -5.0
 @export var acceleration: float = 10.0
 @export var deceleration: float = 10.0
@@ -43,6 +43,7 @@ class_name PlayerController extends CharacterBody3D
 
 @onready var health_component: HealthComponent = get_node("HealthComponent")
 @onready var player_stats: PlayerStats = get_node_or_null("PlayerStats")
+@onready var weapon_mount: Node = get_node_or_null("Component/WeaponMount")
 
 var _input_dir: Vector2 = Vector2.ZERO
 var _movement_velocity: Vector3 = Vector3.ZERO
@@ -83,8 +84,20 @@ const THROW_HOLD_THRESHOLD: float = 0.5 # Time in seconds to hold the drop butto
 func _ready() -> void:
 	if prone_dive == null:
 		prone_dive = get_node_or_null("Component/ProneDive") as ProneDiveComponent
+	if player_stats:
+		player_stats.stats_changed.connect(_on_player_stats_changed)
+		_on_player_stats_changed(player_stats.stats)
 	health_component.damage_taken.connect(_on_damage_taken)
 	health_component.damage_received.connect(_on_damage_received)
+	health_component.armor_broken.connect(_on_armor_broken)
+	if prone_dive:
+		prone_dive.player = self
+		prone_dive.stats = player_stats
+		prone_dive.dive_started.connect(_on_dive_started)
+	var bullet_time := get_node_or_null("Component/BulletTime") as BulletTime
+	if bullet_time != null:
+		bullet_time.activated.connect(_on_bullet_time_activated)
+		bullet_time.deactivated.connect(_on_bullet_time_deactivated)
 	# if ammo_counter_ui:
 	# 	ammo_counter_ui.position = weapon_controller.get_weapon_position()
 	_initilize_ui()
@@ -101,10 +114,26 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 		var attacker: Node3D = info.attacker as Node3D
 		cam_effects.add_damage_impact(applied_damage, attacker)
 
+func _on_armor_broken(info: DamageInfo) -> void:
+	EventBus.on_armor_broken.emit(self, info.attacker)
+
+func _on_dive_started(_direction: Vector3) -> void:
+	EventBus.on_dive_or_slide.emit(self)
+
+func _on_bullet_time_activated() -> void:
+	EventBus.on_bullet_time_toggled.emit(self, true)
+
+func _on_bullet_time_deactivated() -> void:
+	EventBus.on_bullet_time_toggled.emit(self, false)
+
 
 func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
 	print("Armor changed: ", new_armor, " / ", max_armor)
 	EventBus.player_armor_changed.emit(new_armor, max_armor)
+
+func _on_player_stats_changed(stats: Dictionary) -> void:
+	_player_max_tiredness = maxf(0.0, float(stats.get("stamina_pool", 100.0)))
+	_player_current_tiredness = minf(_player_current_tiredness, _player_max_tiredness)
 
 func _initilize_ui() -> void:
 	# print("Initializing UI with current health and armor values")
@@ -160,12 +189,14 @@ func _physics_process(delta: float) -> void:
 			_hold_item_mass = 0.0
 
 
-	var speed_modifier: float = sprint_modifier + crouch_modifier + (_hold_item_mass * 0.5) # Adjust the multiplier as needed for balance
-	var raw_speed: float = default_speed + speed_modifier + slide_modifier
+	var carry_penalty_scale: float = 0.25 if player_stats and player_stats.has_flag("carry_swiftness") else 0.5
+	var speed_modifier: float = sprint_modifier + crouch_modifier + (_hold_item_mass * carry_penalty_scale)
+	var movement_multiplier: float = player_stats.get_stat("movement_speed", 1.0) if player_stats else 1.0
+	var raw_speed: float = (default_speed + speed_modifier + slide_modifier) * movement_multiplier
 	speed = maxf(0.5, raw_speed)
 	# prone crawls slower than the crouch floor above, so it gets its own value
 	if is_prone and prone_dive:
-		speed = prone_dive.get_prone_speed()
+		speed = prone_dive.get_prone_speed() * movement_multiplier
 
 	_input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var current_velocity = Vector2(_movement_velocity.x, _movement_velocity.z)
@@ -190,6 +221,19 @@ func _physics_process(delta: float) -> void:
 		current_velocity = current_velocity.move_toward(Vector2.ZERO, deceleration * delta)
 
 	var is_moving:bool = direction != Vector3.ZERO
+	if player_stats:
+		player_stats.set_action_state(is_sprinting, is_sliding, is_diving and not is_on_floor())
+		var bullet_time := get_node_or_null("Component/BulletTime") as BulletTime
+		var is_weapon_mounted: bool = (
+			bool(weapon_mount.call("is_mounted"))
+			if weapon_mount != null and weapon_mount.has_method("is_mounted")
+			else false
+		)
+		player_stats.set_combat_state(
+			weapon_controller != null and weapon_controller.is_aiming,
+			is_weapon_mounted,
+			bullet_time != null and bullet_time.is_active()
+		)
 	_handle_tiredness(delta, is_moving)
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
@@ -239,20 +283,28 @@ func _handle_tiredness(delta: float, is_moving: bool) -> void:
 
 	if is_moving:
 		if is_sprinting:
-			rate = 25.0 # Tires out very fast while sprinting
+			rate = 25.0 * _stamina_drain_multiplier() # Tires out very fast while sprinting
 		elif is_crouching:
-			rate = -5.0 # Slowly recovers while crouch-walking (tactical!)
+			rate = -5.0 * _stamina_recovery_multiplier() # Slowly recovers while crouch-walking (tactical!)
 		else:
-			rate = 5.0 # Normal walking slowly increases tiredness
+			rate = 5.0 * _stamina_drain_multiplier() # Normal walking slowly increases tiredness
 	else:
 		if is_crouching and not is_sprinting and not is_sliding:
-			rate = -20.0 # Rapid recovery while idle and crouched
+			rate = -20.0 * _stamina_recovery_multiplier() # Rapid recovery while idle and crouched
 		else:
-			rate = -10.0 # Normal recovery while idle and standing
-
+			rate = -10.0 * _stamina_recovery_multiplier() # Normal recovery while idle and standing
 	# Apply the rate and clamp it between 0 and Max
 	_player_current_tiredness += rate * delta
 	_player_current_tiredness = clamp(_player_current_tiredness, 0.0, _player_max_tiredness)
+
+func _stamina_drain_multiplier() -> float:
+	var multiplier: float = player_stats.get_stat("stamina_drain_multiplier", 1.0) if player_stats else 1.0
+	if is_sprinting and player_stats != null and player_stats.has_flag("agility_overdrive"):
+		multiplier *= 0.8
+	return multiplier
+
+func _stamina_recovery_multiplier() -> float:
+	return player_stats.get_stat("stamina_recovery_multiplier", 1.0) if player_stats else 1.0
 
 func increase_tiredness(amount: float) -> void:
 	_player_current_tiredness += amount
@@ -272,7 +324,7 @@ func sprint() -> void:
 	if not is_on_floor() or is_prone or is_diving:
 		walk()
 		return
-	sprint_modifier = sprint_speed
+	sprint_modifier = default_speed * sprint_speed
 	is_sprinting = true
 	if debug:
 		print("Changed sprint modifier to: ", sprint_modifier)
@@ -362,6 +414,7 @@ func can_stand_from_prone() -> bool:
 
 func start_slide() -> void:
 	is_sliding = true
+	EventBus.on_dive_or_slide.emit(self)
 	is_sprinting = false
 	_slide_direction = Vector3(velocity.x, 0, velocity.z).normalized()
 	standing_col.disabled = true
@@ -399,6 +452,8 @@ func can_slide() -> bool:
 
 func end_slide() -> void:
 	is_sliding = false
+	if player_stats:
+		player_stats.notify_slide_or_vault()
 	standing_col.disabled = false
 	crouching_col.disabled = true
 	_slide_direction = Vector3.ZERO
@@ -422,6 +477,8 @@ func calculate_fall_damage() -> float:
 	var damage: float = 0.0
 	if impact_velocity < fall_velocity_threshold:
 		damage = abs(impact_velocity) * fall_damage_multiplier
+		if player_stats:
+			damage *= player_stats.get_stat("fall_damage_scale", 1.0)
 		if prone_dive and _dive_fall_grace > 0.0:
 			damage *= prone_dive.get_fall_damage_scale()
 	return damage
@@ -460,6 +517,15 @@ func _on_player_dead() -> void:
 
 #region Debugging
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_G:
+		var build_resolver := get_tree().get_first_node_in_group(
+			&"player_build_resolver"
+		) as PlayerBuildResolver
+		if build_resolver != null:
+			build_resolver.activate_signature(self)
+			get_viewport().set_input_as_handled()
+		return
+
 	var _enable_input = true
 	# shoot ur self debug
 	# var health_component = get_node_or_null("HealthComponent")

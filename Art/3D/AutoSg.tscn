@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://csp53xj462vmj" path="res://_Assets/Weapon/Scripts/weapon_animation.gd" id="2_j04es"]
 [ext_resource type="Script" uid="uid://bnk6xtqvb0hqq" path="res://_Assets/Weapon/VFX/muzzle_flash.gd" id="2_s6qqo"]
 [ext_resource type="Texture2D" uid="uid://8swqti72lq06" path="res://Art/3D/Blender/muzzleflash.png" id="3_d1fxt"]
+[ext_resource type="PackedScene" uid="uid://c3l7qo7dkkxio" path="res://Art/Assets/Weapon/Animations/general_weapon_animation_tree.tscn" id="7_opw17"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o5dd6"]
 angle_min = -179.99998
@@ -91,34 +92,6 @@ distance_fade_mode = 1
 material = SubResource("StandardMaterial3D_4udhu")
 size = Vector2(0.5, 0.5)
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_s6qqo"]
-animation = &"Bolt_Open"
-
-[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_d1fxt"]
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_o5dd6"]
-animation = &"Bolt_Closed"
-
-[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_opw17"]
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_rto42"]
-animation = &"Bolt_Open"
-
-[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bhunq"]
-graph_offset = Vector2(73.653564, 101.35098)
-nodes/output/position = Vector2(1280, 120)
-nodes/CloseBolt/node = SubResource("AnimationNodeAnimation_o5dd6")
-nodes/CloseBolt/position = Vector2(280, 120)
-nodes/OpenBolt/node = SubResource("AnimationNodeAnimation_rto42")
-nodes/OpenBolt/position = Vector2(260, 360)
-nodes/BoltPosition/node = SubResource("AnimationNodeBlend2_d1fxt")
-nodes/BoltPosition/position = Vector2(560, 140)
-nodes/FireOneShot/node = SubResource("AnimationNodeOneShot_opw17")
-nodes/FireOneShot/position = Vector2(920, 160)
-nodes/Animation/node = SubResource("AnimationNodeAnimation_s6qqo")
-nodes/Animation/position = Vector2(580, 440)
-node_connections = [&"output", 0, &"FireOneShot", &"BoltPosition", 0, &"CloseBolt", &"BoltPosition", 1, &"OpenBolt", &"FireOneShot", 0, &"BoltPosition", &"FireOneShot", 1, &"Animation"]
-
 [node name="AutoSg" type="Node3D" unique_id=1588667708]
 script = ExtResource("1_o5dd6")
 
@@ -135,13 +108,12 @@ transform = Transform3D(0, -1, -3.5527137e-15, 1, 0, 7.549791e-08, -7.549791e-08
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.22268897, 0.18301556, -0.11893777)
 
 [node name="EjectionPort" type="Node3D" parent="." unique_id=462009279]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22620049, -0.1264405, -1.0135167)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.042126745, -0.3705003, -0.709033)
 
-[node name="Muzzle" type="Node3D" parent="." unique_id=528181029 node_paths=PackedStringArray("particles", "smoke_particles", "light")]
+[node name="Muzzle" type="Node3D" parent="." unique_id=528181029 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.38372204, -1.7819787)
 script = ExtResource("2_s6qqo")
 particles = NodePath("GPUParticles3D")
-smoke_particles = NodePath("Smoke")
 light = NodePath("OmniLight3D")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="Muzzle" unique_id=841261694]
@@ -166,19 +138,12 @@ local_coords = true
 process_material = SubResource("ParticleProcessMaterial_i5ycf")
 draw_pass_1 = SubResource("QuadMesh_xraxb")
 
-[node name="WeaponAnimation" type="Node" parent="." unique_id=1300042056 node_paths=PackedStringArray("weapon_animation_tree")]
+[node name="WeaponAnimation" type="Node" parent="." unique_id=1300042056 node_paths=PackedStringArray("weapon_animation_tree", "animation_player")]
 script = ExtResource("2_j04es")
-weapon_animation_tree = NodePath("../AnimationTree")
-weapon_bolt_time = 0.2
+weapon_animation_tree = NodePath("AnimationTree")
+animation_player = NodePath("../auto-s12/AnimationPlayer")
 metadata/_custom_type_script = "uid://csp53xj462vmj"
 
-[node name="AnimationTree" type="AnimationTree" parent="." unique_id=766457758]
-root_node = NodePath("../auto-s12")
-tree_root = SubResource("AnimationNodeBlendTree_bhunq")
-anim_player = NodePath("../auto-s12/AnimationPlayer")
-parameters/BoltPosition/blend_amount = 0.0
-parameters/FireOneShot/active = false
-parameters/FireOneShot/internal_active = false
-parameters/FireOneShot/request = 0
+[node name="AnimationTree" parent="WeaponAnimation" unique_id=1277320455 instance=ExtResource("7_opw17")]
 
 [editable path="auto-s12"]

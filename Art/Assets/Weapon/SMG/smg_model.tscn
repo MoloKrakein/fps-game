@@ -229,7 +229,7 @@ transform = Transform3D(4.3711438e-08, -8.7422784e-08, -1, 6.2783283e-07, -0.999
 transform = Transform3D(4.9113922e-08, 2.927223e-07, 1.1235956, -1.1235956, -2.1877204e-07, 4.9113822e-08, 2.1877204e-07, -1.1235955, 2.9272195e-07, -1.9556919, -1.0440178, 0.4258166)
 
 [node name="AmmoCounterPosition" type="Node3D" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel" unique_id=1728137422]
-transform = Transform3D(-4.977033, -5.933655e-07, -0.07011775, 0.07011834, 1.5242101e-06, -4.977033, 6.147787e-07, -4.9775267, -1.5157018e-06, -1.5827388, -1.0957525, -1.6039273)
+transform = Transform3D(-4.371146e-08, 2.6871774e-07, -1, -2.6871757e-07, 0.9999997, 2.687177e-07, 1, 2.687176e-07, -4.3711378e-08, 0.3347934, -1.0957524, -1.2139671)
 
 [node name="GUI" parent="Btr_m10/Armature/Skeleton3D/UnderBarrel/AmmoCounterPosition" unique_id=1724784573 instance=ExtResource("5_mtaa1")]
 

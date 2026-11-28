@@ -22,6 +22,10 @@ const RELOAD_LOADED: StringName = &"loaded_reload"
 ## Double-tap reload: the magazine is dumped. Uses its own clip, or the empty reload clip.
 const RELOAD_QUICK: StringName = &"quick_reload"
 const RACK: StringName = &"rack"
+## Charging-handle guns (rack_holds_bolt_open): the first rack pulls the handle back and holds it, the
+## next one lets it go forward.
+const RACK_HOLD: StringName = &"rack_hold"
+const RACK_RELEASE: StringName = &"rack_release"
 const EQUIP: StringName = &"equip"
 
 # --- Slide tuning (move to the Weapon resource / debug menu later) ---
@@ -59,6 +63,7 @@ var _rack_chamber_was_loaded: bool = false
 var _rack_chamber_spent: bool = false
 var _rack_cocking: bool = false          # this rack cocks an open bolt (no round is fed or ejected)
 var _rack_hold: bool = false             # this rack pulls the bolt back and holds it there
+var _slide_by_clip: bool = false         # this action's clip animates the slide, the code only sets its final value
 var _reload_after_rack: bool = false     # AUTO_RACK: start the reload when the rack finishes
 var _quick_flag_left: float = 0.0        # seconds the quick reload request stays valid
 
@@ -105,7 +110,7 @@ func bind_animation(model_anim: WeaponAnimation) -> void:
 func on_weapon_switching() -> void:
 	# A rack that is cut off still completes logically, so the chamber never
 	# stays half-racked. Reloads cannot be switched out of (switch_weapon blocks them).
-	if timeline.running and timeline.action == RACK:
+	if timeline.running and _is_rack(timeline.action):
 		timeline.finish_now()
 
 
@@ -170,7 +175,7 @@ func on_shot_cycled() -> void:
 			data.bolt_open = false
 			slide.rest_value = 0.0
 			slide.move_to(0.0, ret, slide.return_curve, false)
-	else:
+	elif profile.slide_moves_when_firing:
 		slide.kick(fire_travel, back, ret, not data.is_loaded and profile.locks_open_when_empty())
 	_debug_slide("shot cycled")
 #endregion
@@ -187,6 +192,11 @@ func pick_reload_type() -> StringName:
 	_quick_flag_left = 0.0
 	if data == null:
 		return RELOAD_EMPTY
+	# Shell-by-shell guns (pump shotguns) load a shell the same way whatever the chamber holds,
+	# so they need only one reload clip and one card: the loaded reload.
+	var weapon: Weapon = ctrl.current_weapon
+	if weapon != null and weapon.is_reload_per_bullet:
+		return RELOAD_LOADED
 	if quick and data.is_loaded:
 		return RELOAD_QUICK # an empty chamber makes it an ordinary empty reload
 	return RELOAD_LOADED if data.is_loaded else RELOAD_EMPTY
@@ -222,7 +232,7 @@ func get_reload_duration(reload_type: StringName) -> float:
 
 func start_reload(reload_type: StringName, duration: float) -> void:
 	# A rack still in progress is completed first, so the chamber is consistent.
-	if timeline.running and timeline.action == RACK:
+	if timeline.running and _is_rack(timeline.action):
 		timeline.finish_now()
 
 	_reload_committed = false
@@ -272,12 +282,15 @@ func start_rack() -> void:
 	# For an open-bolt gun is_loaded only mirrors "has rounds": there is no chambered round to eject.
 	_rack_chamber_was_loaded = data.is_loaded and not _rack_cocking
 	_rack_chamber_spent = data.chamber_spent
-	_rack_hold = not _rack_cocking and profile.rack_holds_bolt_open and not profile.is_manual_cycle() and not data.bolt_held_open
+
+	var rack_id: StringName = _next_rack_id()
+	_rack_hold = rack_id == RACK_HOLD
 
 	var duration: float = get_rack_duration()
-	var def: ActionDef = _get_def(RACK)
+	var def: ActionDef = _get_def(rack_id)
+	_slide_by_clip = def.drives_slide
 	if anim != null:
-		anim.play_action(def, _clip_speed("Rack", duration), _body_motion(true))
+		anim.play_action(def, _clip_speed(String(rack_id), duration), _body_motion(true))
 	_apply_fov_blend(_fov_blend(true))
 	timeline.start(def, duration)
 
@@ -290,7 +303,7 @@ func _on_rack_event(event_name: StringName) -> void:
 	match event_name:
 		&"pull":
 			slide.release()
-			slide.move_to(1.0, _span(&"pull", &"peak"), rack_pull_curve)
+			_slide_to(1.0, _span(&"pull", &"peak"), rack_pull_curve)
 		&"peak":
 			# Slide fully back: this is the moment the live round (or the fired case of a
 			# pump / bolt-action gun) leaves the gun.
@@ -306,7 +319,8 @@ func _on_rack_event(event_name: StringName) -> void:
 			elif _rack_hold:
 				slide.lock(1.0) # held back until the player racks again
 			elif data.ammo_in_magazine > 0 or not profile.locks_open_when_empty():
-				slide.move_to(0.0, _span(&"release", &"closed"), rack_release_curve)
+				slide.release()
+				_slide_to(0.0, _span(&"release", &"closed"), rack_release_curve)
 			else:
 				slide.lock(1.0) # nothing to chamber: slide stays open (bolt-catch guns)
 		&"closed":
@@ -318,6 +332,7 @@ func _on_rack_event(event_name: StringName) -> void:
 				return
 			if _rack_hold:
 				data.bolt_held_open = true # no round is chambered: the bolt waits for the next rack
+				slide.lock(1.0)
 				ctrl.update_weapon_ui()
 				return
 			data.bolt_held_open = false
@@ -374,8 +389,40 @@ func can_rack() -> bool:
 	return data.ammo_in_magazine > 0 # chamber empty: feed one
 
 
+## Which rack the next press starts: a normal rack, or for charging-handle guns the pull-and-hold
+## (handle not held yet) or the release (handle held).
+func _next_rack_id() -> StringName:
+	var weapon: Weapon = ctrl.current_weapon
+	var data: WeaponData = ctrl.active_weapon_data
+	if weapon == null or data == null or weapon.is_open_bolt:
+		return RACK
+	if profile.rack_holds_bolt_open and not profile.is_manual_cycle():
+		return RACK_RELEASE if data.bolt_held_open else RACK_HOLD
+	return RACK
+
+
+## How long the next rack lasts (the controller uses it for the rack and fire lockout).
 func get_rack_duration() -> float:
-	return profile.rack_time if profile.rack_time > 0.0 else ctrl.rack_lockout_time
+	var base: float = profile.rack_time if profile.rack_time > 0.0 else ctrl.rack_lockout_time
+	match _next_rack_id():
+		RACK_HOLD:
+			return profile.rack_hold_time if profile.rack_hold_time > 0.0 else base
+		RACK_RELEASE:
+			return profile.rack_release_time if profile.rack_release_time > 0.0 else base * 0.5
+	return base
+
+
+func _is_rack(action: StringName) -> bool:
+	return action == RACK or action == RACK_HOLD or action == RACK_RELEASE
+
+
+## Moves the code-driven slide. When the action's clip animates the slide itself, the code only sets the
+## value the slide has once the clip is over.
+func _slide_to(target: float, duration: float, curve: float) -> void:
+	if _slide_by_clip:
+		slide.snap(target)
+	else:
+		slide.move_to(target, duration, curve)
 
 
 ## The fired case of a pump / bolt-action gun leaves the chamber.
@@ -411,7 +458,7 @@ func needs_rack_before_reload() -> bool:
 
 ## Is a rack playing right now?
 func is_racking() -> bool:
-	return timeline.running and timeline.action == RACK
+	return timeline.running and _is_rack(timeline.action)
 
 
 ## A reload was pressed during a rack: it starts the moment the rack ends, instead of cutting
@@ -425,7 +472,7 @@ func handle_reload_with_closed_bolt() -> void:
 	if profile.reload_with_closed_bolt == WeaponActionProfile.ReloadWithClosedBolt.AUTO_RACK:
 		_reload_after_rack = true
 		ctrl.rack_slide()
-		if not (timeline.running and timeline.action == RACK):
+		if not (timeline.running and _is_rack(timeline.action)):
 			_reload_after_rack = false # the rack could not start
 		return
 	hint.emit("Rack the bolt open before reloading")
@@ -556,6 +603,7 @@ func _fov_blend(is_rack: bool) -> float:
 	return profile.ads_fov_blend if _ads_enabled(is_rack) else 0.0
 
 
+## Needs set_reload_fov_blend() in cam_effects.gd (see weapon_controller_changes.md).
 func _apply_fov_blend(blend: float) -> void:
 	var player: Object = ctrl.player
 	if player == null:
@@ -589,7 +637,7 @@ func _on_event(action: StringName, event_name: StringName, source: ActionEvent) 
 	world_event.emit(action, event_name)
 	_apply_parts(source)
 	match action:
-		RACK:
+		RACK, RACK_HOLD, RACK_RELEASE:
 			_on_rack_event(event_name)
 		RELOAD_EMPTY, RELOAD_LOADED, RELOAD_QUICK:
 			_on_reload_event(event_name)
@@ -597,7 +645,7 @@ func _on_event(action: StringName, event_name: StringName, source: ActionEvent) 
 
 func _on_finished(action: StringName) -> void:
 	match action:
-		RACK:
+		RACK, RACK_HOLD, RACK_RELEASE:
 			_end_clip()
 			_restore_parts()
 			if _reload_after_rack:

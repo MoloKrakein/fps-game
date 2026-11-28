@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://ba73t3d6l2lhg" path="res://Art/Assets/Weapon/Projectile/Casing/bullet_casing_generic.tscn" id="2_1b4fu"]
 [ext_resource type="Resource" uid="uid://b4cku8crdkhvu" path="res://_Assets/Weapon/resources/generic_casing_prof.tres" id="3_1b4fu"]
 [ext_resource type="PackedScene" uid="uid://cxldhac5r7ynr" path="res://Art/Assets/Weapon/Projectile/bullet_22.tscn" id="3_27xgg"]
-[ext_resource type="PackedScene" uid="uid://cu06ajduxlmxo" path="res://Art/Assets/Weapon/Rifle/autosniper_model.tscn" id="5_px1me"]
+[ext_resource type="PackedScene" uid="uid://cu06ajduxlmxo" path="res://Art/Assets/Weapon/Rifle/g3_model.tscn" id="5_px1me"]
 
 [resource]
 script = ExtResource("1_dlgg1")

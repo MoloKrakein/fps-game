@@ -45,9 +45,13 @@ func apply_weapon_hit(
 		hit_position: Vector3,
 		hit_direction: Vector3,
 		headshot_multiplier: float = 1.0,
-		armor_penetration: float = 0.0
+		armor_penetration: float = 0.0,
+		is_critical: bool = false,
+		crit_multiplier: float = 1.0,
+		impact_multiplier: float = 1.0,
+		bypass_armor_gating: bool = false
 ) -> Dictionary:
-	var outcome: Dictionary = {"headshot": false, "damage": 0.0, "position": hit_position}
+	var outcome: Dictionary = {"headshot": false, "critical": is_critical, "damage": 0.0, "position": hit_position}
 	if _enemy == null or _is_friendly(attacker):
 		return outcome
 
@@ -58,9 +62,14 @@ func apply_weapon_hit(
 	var final_damage: float = damage_amount * damage_multiplier
 	if is_head:
 		final_damage *= maxf(headshot_multiplier, 1.0)
+	if is_critical:
+		final_damage *= maxf(crit_multiplier, 1.0)
 	outcome["headshot"] = is_head
 	outcome["damage"] = final_damage
-	_submit(final_damage, attacker, is_head, false, armor_penetration, hit_position, hit_direction)
+	_submit(
+		final_damage, attacker, is_head, is_critical, armor_penetration,
+		hit_position, hit_direction, impact_multiplier, bypass_armor_gating
+	)
 	return outcome
 
 
@@ -118,12 +127,16 @@ func _submit(
 		crit: bool,
 		armor_penetration: float,
 		hit_position: Vector3,
-		hit_direction: Vector3
+		hit_direction: Vector3,
+		impact_multiplier: float = 1.0,
+		bypass_armor_gating: bool = false
 ) -> void:
 	var info: DamageInfo = DamageInfo.new(final_damage, source, "bullet")
 	info.is_headshot = headshot
 	info.is_critical = crit
 	info.armor_penetration = armor_penetration
+	info.impact_multiplier = impact_multiplier
+	info.bypass_armor_gating = bypass_armor_gating
 	info.impact_direction = hit_direction if hit_direction != Vector3.ZERO else Vector3.FORWARD
 	info.impact_position = hit_position if hit_position.is_finite() else global_position
 	info.set_meta(&"hit_region", region)

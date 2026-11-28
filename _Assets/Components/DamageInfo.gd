@@ -20,12 +20,14 @@ var impact_position: Vector3 = Vector3.ZERO
 var is_headshot: bool = false
 # Whether the damage was a critical hit. This can be used to apply additional effects or multipliers for critical damage.
 var is_critical: bool = false
+var impact_multiplier: float = 1.0
 # The amount of armor penetration the damage has. This can be used to reduce the effectiveness of armor on the target, allowing more damage to be applied to health.
 var armor_penetration: float = 0.0
 # Whether the damage bypasses armor.
 var bypass_armor: bool = false
 # Whether the damage bypasses evasion.
 var bypass_evasion: bool = false
+var bypass_armor_gating: bool = false
 
 func _init(p_damage: float = 0.0, p_attacker: Node = null, p_type: String = "bullet") -> void:
 	raw_damage = p_damage

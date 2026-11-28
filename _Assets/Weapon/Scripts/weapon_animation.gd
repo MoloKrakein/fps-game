@@ -61,6 +61,8 @@ const NODE_ACTION_LAYER: StringName = &"ActionLayer"
 var _clips: Dictionary = {}
 var _warned_roles: Dictionary = {}
 var _skeleton: Skeleton3D
+var _slide_paths: Array[String] = []   # track paths of the slide bones, as written in the layer filter
+var _slide_driven: bool = false        # the current action's clip animates the slide bone
 var _body_bones: PackedStringArray = PackedStringArray()
 var _body_bone_idx: PackedInt32Array = PackedInt32Array()
 var _damp_pos: float = 1.0         # body movement kept while scaling is fully on (1 = no change)
@@ -97,6 +99,9 @@ func _process(delta: float) -> void:
 	var active: bool = bool(weapon_animation_tree.get(action_active_param))
 	_update_body_scaling(dt, active)
 	_update_physics_influence(dt, active)
+	# The slide bone goes back to the code only after the shot has fully ended.
+	if _slide_driven and not active:
+		set_slide_driven(false)
 
 
 #region Component wiring
@@ -281,6 +286,9 @@ func _apply_action_filter() -> PackedStringArray:
 	var explicit_body: PackedStringArray = clip_map.body_bones if clip_map != null else PackedStringArray()
 	_body_bones = ClipResolver.resolve_body_bones(bones, explicit_body, slide_bones, root_bones)
 	_skeleton = skeleton
+	_slide_paths.clear()
+	for bone: String in slide_bones:
+		_slide_paths.append("%s:%s" % [skeleton_path, bone])
 	_body_bone_idx.clear()
 	for bone: String in _body_bones:
 		var idx: int = skeleton.find_bone(bone)
@@ -346,8 +354,10 @@ func play_action(def: ActionDef, speed: float = 1.0, body_motion: Vector2 = Vect
 		return false
 
 	clip_node.animation = StringName(clip)
-	layer.fadein_time = def.fade_in
-	layer.fadeout_time = def.fade_out
+	# A clip that animates the slide itself has no fades: they would blend the handle with the code's pose.
+	layer.fadein_time = 0.0 if def.drives_slide else def.fade_in
+	layer.fadeout_time = 0.0 if def.drives_slide else def.fade_out
+	set_slide_driven(def.drives_slide)
 	_damp_pos = body_motion.x
 	_damp_rot = body_motion.y
 	_damp_requested = body_motion.x < 1.0 or body_motion.y < 1.0
@@ -395,6 +405,19 @@ func _update_physics_influence(dt: float, active: bool) -> void:
 	for node: SkeletonModifier3D in _physics_nodes:
 		if is_instance_valid(node):
 			node.influence = _physics_blend
+
+
+## Lets the action layer apply the slide / charging handle bone too (the clip animates it), or hands it back
+## to the code. Released automatically when the action has ended.
+func set_slide_driven(driven: bool) -> void:
+	if driven == _slide_driven:
+		return
+	var layer: AnimationNodeOneShot = _action_layer()
+	if layer == null or _slide_paths.is_empty():
+		return
+	for path: String in _slide_paths:
+		layer.set_filter_path(NodePath(path), driven)
+	_slide_driven = driven
 
 
 func set_action_speed(speed: float) -> void:
@@ -533,6 +556,10 @@ func get_animation_length(animation_name: String) -> float:
 			role = ClipResolver.ROLE_RELOAD_LOADED
 		"rack":
 			role = ClipResolver.ROLE_RACK
+		"rack_hold":
+			role = ClipResolver.ROLE_RACK_HOLD
+		"rack_release":
+			role = ClipResolver.ROLE_RACK_RELEASE
 		"equip":
 			role = ClipResolver.ROLE_EQUIP
 
