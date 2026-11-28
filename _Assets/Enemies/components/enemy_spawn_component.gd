@@ -5,6 +5,7 @@ class_name EnemySpawnComponent extends Node3D
 @export_range(0.01, 3600.0, 0.01, "or_greater", "suffix:s") var spawn_interval_seconds: float = 1.0
 @export_range(1, 100, 1) var enemies_per_spawn: int = 1
 @export_range(0, 1000, 1) var max_alive: int = 0
+@export_range(0.0, 50.0, 0.1, "suffix:m") var spawn_radius: float = 1.5
 @export var auto_spawn: bool = true
 
 var _elapsed_seconds: float = 0.0
@@ -23,10 +24,14 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not auto_spawn:
 		return
+	if spawn_interval_seconds <= 0.0:
+		push_error("EnemySpawnComponent spawn interval must be greater than zero.")
+		auto_spawn = false
+		return
 
 	_elapsed_seconds += delta
-	while _elapsed_seconds >= spawn_interval_seconds:
-		_elapsed_seconds -= spawn_interval_seconds
+	if _elapsed_seconds >= spawn_interval_seconds:
+		_elapsed_seconds = fmod(_elapsed_seconds, spawn_interval_seconds)
 		spawn_now()
 
 
@@ -52,9 +57,24 @@ func spawn_now() -> void:
 			return
 
 		var enemy := instance as Node3D
+		var spawn_transform := global_transform
+		spawn_transform.origin += _get_spawn_offset()
+		if scene_root is Node3D:
+			var scene_root_3d := scene_root as Node3D
+			enemy.transform = scene_root_3d.global_transform.affine_inverse() * spawn_transform
+		else:
+			enemy.transform = spawn_transform
 		scene_root.add_child(enemy)
-		enemy.global_position = global_position
 		_spawned_enemies.append(enemy)
+
+
+func _get_spawn_offset() -> Vector3:
+	if spawn_radius <= 0.0:
+		return Vector3.ZERO
+
+	var angle := randf() * TAU
+	var distance := sqrt(randf()) * spawn_radius
+	return Vector3(cos(angle) * distance, 0.0, sin(angle) * distance)
 
 
 func _prune_spawned_enemies() -> void:
