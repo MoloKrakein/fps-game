@@ -6,6 +6,7 @@ signal damage_taken(damage_amount: float)
 signal damage_received(info: DamageInfo, applied_damage: float)
 signal armor_changed(new_armor: float, max_armor: float)
 signal on_armor_broken()
+signal armor_broken(info: DamageInfo)
 signal died()
 signal attack_dodged()
 
@@ -21,6 +22,7 @@ var current_health: float
 var current_armor: float = 0.0
 var is_alive: bool = true
 var _armor_regeneration_timer: float = 0.0
+var _armor_regen_event_sent: bool = false
 
 @onready var player_stats_component: PlayerStats = get_parent().get_node_or_null("PlayerStats")
 
@@ -67,6 +69,7 @@ func take_damage_with_info(info: DamageInfo) -> void:
 				var overflow_damage: float = maxf(0.0, armor_damage - armor_before_damage)
 				current_armor = 0.0
 				on_armor_broken.emit()
+				armor_broken.emit(info)
 				if info.bypass_armor_gating:
 					health_damage += overflow_damage
 		else:
@@ -80,12 +83,23 @@ func take_damage_with_info(info: DamageInfo) -> void:
 				current_armor = 0.0
 				health_damage += remaining_damage
 				on_armor_broken.emit()
+				armor_broken.emit(info)
 	else:
 		current_armor = maxf(0.0, current_armor)
 
 	current_health -= health_damage
 	damage_taken.emit(final_damage)
 	damage_received.emit(info, final_damage)
+	if final_damage > 0.0 and info.damage_type != "linked":
+		var damage_target: Node = get_parent()
+		EventBus.on_hit_dealt.emit(info.attacker, damage_target, final_damage)
+		if info.is_critical:
+			EventBus.on_crit_hit.emit(info.attacker, damage_target, final_damage)
+	if player_stats_component != null:
+		var armor_damage_taken: float = maxf(armor_before_damage - current_armor, 0.0)
+		EventBus.on_damage_taken.emit(get_parent(), final_damage, armor_damage_taken)
+		if armor_before_damage > 0.0 and current_armor <= 0.0:
+			EventBus.on_armor_depleted.emit(get_parent())
 	health_changed.emit(current_health, max_health)
 	_reset_armor_regeneration_timer()
 
@@ -120,6 +134,9 @@ func _process(delta: float) -> void:
 		_armor_regeneration_timer = maxf(0.0, _armor_regeneration_timer - delta)
 		return
 
+	if not _armor_regen_event_sent:
+		_armor_regen_event_sent = true
+		EventBus.on_armor_regen_started.emit(get_parent())
 	var armor_before_regeneration: float = current_armor
 	var regeneration_rate: float = _get_armor_regeneration_rate()
 	current_armor = minf(armor_value, current_armor + regeneration_rate * delta)
@@ -135,6 +152,7 @@ func _get_armor_regeneration_delay() -> float:
 func _reset_armor_regeneration_timer() -> void:
 	if regenerate_armor and player_stats_component != null:
 		_armor_regeneration_timer = _get_armor_regeneration_delay()
+		_armor_regen_event_sent = false
 
 func _handle_death() -> void:
 	if not is_alive:

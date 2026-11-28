@@ -24,6 +24,17 @@ const BASE_STATS: Dictionary = {
 	"crit_multiplier": 2.0,
 	"impact_multiplier": 1.0,
 	"weapon_handling": 1.0,
+	"spread_multiplier": 1.0,
+	"armor_penetration_bonus": 0.0,
+	"fall_damage_scale": 1.0,
+	"objective_interaction_speed": 1.0,
+	"ammo_pickup_multiplier": 1.0,
+	"dive_speed": 1.0,
+	"dive_cooldown": 1.0,
+	"dive_land_slide": 1.0,
+	"dive_fall_damage": 1.0,
+	"bullet_time_drain_multiplier": 1.0,
+	"bullet_time_regen_multiplier": 1.0,
 }
 
 @export_category("Base Stats")
@@ -48,6 +59,9 @@ var _manual_flags: Dictionary = {}
 var _is_sprinting: bool = false
 var _is_sliding: bool = false
 var _is_vaulting: bool = false
+var _is_aiming: bool = false
+var _is_mounted: bool = false
+var _is_in_bullet_time: bool = false
 var _post_action_dodge_time: float = 0.0
 
 
@@ -124,6 +138,15 @@ func set_action_state(sprinting: bool, sliding: bool, vaulting: bool = false) ->
 	_is_sprinting = sprinting
 	_is_sliding = sliding
 	_is_vaulting = vaulting
+	recalculate_stats()
+
+
+func set_combat_state(aiming: bool, mounted: bool, in_bullet_time: bool) -> void:
+	if _is_aiming == aiming and _is_mounted == mounted and _is_in_bullet_time == in_bullet_time:
+		return
+	_is_aiming = aiming
+	_is_mounted = mounted
+	_is_in_bullet_time = in_bullet_time
 	recalculate_stats()
 
 
@@ -221,7 +244,17 @@ func recalculate_stats() -> void:
 	var crit_chance: float = float(resolved.get("crit_chance", 0.05))
 	if bool(flags.get("crit_swiftness_enabled", false)):
 		crit_chance += maxf(swiftness - 40.0, 0.0) * 0.005
+	if bool(flags.get("crit_while_aiming", false)) and (_is_aiming or _is_mounted):
+		crit_chance += 0.08
+	if bool(flags.get("crit_while_bullet_time", false)) and _is_in_bullet_time:
+		crit_chance += 0.08
 	resolved["crit_chance"] = clampf(crit_chance, 0.0, 0.45)
+	if _is_mounted and bool(flags.get("mounted_poise", false)):
+		resolved["damage_mitigation"] = float(resolved.get("damage_mitigation", 0.0)) + 0.05
+	if _is_mounted and bool(flags.get("anchored_poise", false)):
+		resolved["recoil_stability"] = float(resolved.get("recoil_stability", 1.0)) * 0.9
+	if bool(flags.get("mobile_crit", false)) and (_is_sprinting or _is_sliding):
+		resolved["crit_chance"] = minf(float(resolved["crit_chance"]) + 0.05, 0.45)
 
 	resolved["movement_speed"] = move_speed
 	resolved["reload_speed"] = maxf(
@@ -290,5 +323,8 @@ func reset_stats() -> void:
 	_is_sprinting = false
 	_is_sliding = false
 	_is_vaulting = false
+	_is_aiming = false
+	_is_mounted = false
+	_is_in_bullet_time = false
 	_post_action_dodge_time = 0.0
 	recalculate_stats()

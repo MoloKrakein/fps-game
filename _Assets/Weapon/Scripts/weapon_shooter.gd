@@ -75,7 +75,7 @@ func fire_projectile() -> void:
 			weapon.get_calculated_damage_for(weapon.explosion_damage),
 			weapon.explosion_falloff,
 			weapon.explosion_force,
-			weapon.armor_penetration,
+			_get_armor_penetration(weapon),
 			weapon.headshot_multiplier
 		)
 		projectile.set_combat_modifiers(
@@ -128,6 +128,11 @@ func get_effective_spread_degrees() -> float:
 		* move_penalty
 		+ ctrl.dynamic_accuracy_spread
 	)
+	if ctrl.player != null and ctrl.player.player_stats != null:
+		var stats: PlayerStats = ctrl.player.player_stats
+		total_spread_degrees *= stats.get_stat("spread_multiplier", 1.0)
+		if ctrl.is_aiming and stats.has_flag("aim_steadiness"):
+			total_spread_degrees *= 0.8
 	return maxf(0.0, total_spread_degrees * ctrl.spread_multiplier)
 
 func get_effective_spread() -> float:
@@ -150,9 +155,9 @@ func _resolve_hit(
 		result.normal,
 		direction,
 		damage,
-		ctrl.owner as Node3D,
+		ctrl.player,
 		weapon.headshot_multiplier,
-		weapon.armor_penetration,
+		_get_armor_penetration(weapon),
 		is_critical,
 		weapon.get_calculated_crit_multiplier(),
 		weapon.get_calculated_impact_multiplier() * (1.5 if is_critical else 1.0),
@@ -162,6 +167,13 @@ func _resolve_hit(
 		HitEffects.spawn_flesh_hit(ctrl.get_tree().current_scene, hit.position, result.normal, direction, hit.headshot)
 	else:
 		_spawn_impact_effect(result.position)
+
+
+func _get_armor_penetration(weapon: Weapon) -> float:
+	var bonus: float = 0.0
+	if ctrl.player != null and ctrl.player.player_stats != null:
+		bonus = ctrl.player.player_stats.get_stat("armor_penetration_bonus", 0.0)
+	return clampf(weapon.armor_penetration + bonus, 0.0, 1.0)
 
 
 func _spawn_impact_effect(hit_position: Vector3) -> void:

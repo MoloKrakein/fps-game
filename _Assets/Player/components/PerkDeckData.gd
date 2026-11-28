@@ -4,6 +4,9 @@ class_name PerkDeckData extends Resource
 @export var display_name: String = ""
 @export var archetype_tag: String = ""
 @export var signature_gadget_name: String = ""
+@export var signature_effect: StringName
+@export_range(0.0, 120.0, 0.1) var gadget_cooldown: float = 20.0
+@export_range(0.0, 30.0, 0.1) var gadget_radius: float = 6.0
 @export_multiline var role_summary: String = ""
 @export_multiline var tier_1_summary: String = ""
 @export_multiline var tier_2_summary: String = ""

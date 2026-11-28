@@ -3,10 +3,12 @@
 [ext_resource type="Resource" uid="uid://b7qioxe0j7hqo" path="res://Resources/Sounds/SFX/Weapons/Rifles/HK416_firing_sound.tres" id="1_gbosy"]
 [ext_resource type="Script" uid="uid://oiftbbq5bm00" path="res://_Assets/Audio/weapon_sound_profile.gd" id="1_xvier"]
 [ext_resource type="Script" uid="uid://c44ui3q546r65" path="res://_Assets/Audio/sound_event_def.gd" id="2_e71oi"]
+[ext_resource type="AudioStream" uid="uid://cen1mu4pdv2c8" path="res://Art/sounds/SFX/Audacity/ShotgunShell/416_test_fire_tail.wav" id="3_e71oi"]
 
 [sub_resource type="Resource" id="Resource_gbosy"]
 script = ExtResource("2_e71oi")
-volume_db = -5.0
+streams = Array[AudioStream]([ExtResource("3_e71oi")])
+volume_db = -13.3
 volume_jitter_db = 1.0
 pitch_min = 0.94
 pitch_max = 1.1700000000000002

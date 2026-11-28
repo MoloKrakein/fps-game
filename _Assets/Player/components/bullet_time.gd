@@ -117,6 +117,15 @@ func is_active() -> bool:
 	return _wants_active
 
 
+func add_focus(amount: float) -> void:
+	if not use_focus or amount <= 0.0:
+		return
+	var previous: float = focus
+	focus = minf(focus + amount, max_focus)
+	if not is_equal_approx(previous, focus):
+		focus_changed.emit(focus, max_focus)
+
+
 ## Eased 0..1.
 func get_intensity() -> float:
 	return smoothstep(0.0, 1.0, _intensity)
@@ -151,13 +160,20 @@ func _handle_input() -> void:
 func _update_focus(dt: float) -> void:
 	if not use_focus:
 		return
+	var stats := _get_player_stats()
+	var drain_multiplier: float = (
+		stats.get_stat("bullet_time_drain_multiplier", 1.0) if stats else 1.0
+	)
+	var regen_multiplier: float = (
+		stats.get_stat("bullet_time_regen_multiplier", 1.0) if stats else 1.0
+	)
 	var previous: float = focus
 	if _wants_active:
-		focus = maxf(focus - drain_per_second * dt, 0.0)
+		focus = maxf(focus - drain_per_second * drain_multiplier * dt, 0.0)
 		if focus <= 0.0:
 			deactivate()
 	else:
-		focus = minf(focus + regen_per_second * dt, max_focus)
+		focus = minf(focus + regen_per_second * regen_multiplier * dt, max_focus)
 	if not is_equal_approx(previous, focus):
 		focus_changed.emit(focus, max_focus)
 
@@ -177,6 +193,13 @@ func _register_input_action() -> void:
 	var event: InputEventKey = InputEventKey.new()
 	event.physical_keycode = default_key
 	InputMap.action_add_event(input_action, event)
+
+
+func _get_player_stats() -> PlayerStats:
+	var player_node: Node = get_parent().get_parent() if get_parent() != null else null
+	if player_node == null:
+		return null
+	return player_node.get_node_or_null("PlayerStats") as PlayerStats
 
 
 func _resolve_effect_material() -> void:

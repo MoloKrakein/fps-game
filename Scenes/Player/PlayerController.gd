@@ -43,6 +43,7 @@ class_name PlayerController extends CharacterBody3D
 
 @onready var health_component: HealthComponent = get_node("HealthComponent")
 @onready var player_stats: PlayerStats = get_node_or_null("PlayerStats")
+@onready var weapon_mount: Node = get_node_or_null("Component/WeaponMount")
 
 var _input_dir: Vector2 = Vector2.ZERO
 var _movement_velocity: Vector3 = Vector3.ZERO
@@ -88,6 +89,15 @@ func _ready() -> void:
 		_on_player_stats_changed(player_stats.stats)
 	health_component.damage_taken.connect(_on_damage_taken)
 	health_component.damage_received.connect(_on_damage_received)
+	health_component.armor_broken.connect(_on_armor_broken)
+	if prone_dive:
+		prone_dive.player = self
+		prone_dive.stats = player_stats
+		prone_dive.dive_started.connect(_on_dive_started)
+	var bullet_time := get_node_or_null("Component/BulletTime") as BulletTime
+	if bullet_time != null:
+		bullet_time.activated.connect(_on_bullet_time_activated)
+		bullet_time.deactivated.connect(_on_bullet_time_deactivated)
 	# if ammo_counter_ui:
 	# 	ammo_counter_ui.position = weapon_controller.get_weapon_position()
 	_initilize_ui()
@@ -103,6 +113,18 @@ func _on_damage_received(info: DamageInfo, applied_damage: float) -> void:
 	if cam_effects:
 		var attacker: Node3D = info.attacker as Node3D
 		cam_effects.add_damage_impact(applied_damage, attacker)
+
+func _on_armor_broken(info: DamageInfo) -> void:
+	EventBus.on_armor_broken.emit(self, info.attacker)
+
+func _on_dive_started(_direction: Vector3) -> void:
+	EventBus.on_dive_or_slide.emit(self)
+
+func _on_bullet_time_activated() -> void:
+	EventBus.on_bullet_time_toggled.emit(self, true)
+
+func _on_bullet_time_deactivated() -> void:
+	EventBus.on_bullet_time_toggled.emit(self, false)
 
 
 func _on_health_component_armor_changed(new_armor: float, max_armor: float) -> void:
@@ -167,7 +189,8 @@ func _physics_process(delta: float) -> void:
 			_hold_item_mass = 0.0
 
 
-	var speed_modifier: float = sprint_modifier + crouch_modifier + (_hold_item_mass * 0.5) # Adjust the multiplier as needed for balance
+	var carry_penalty_scale: float = 0.25 if player_stats and player_stats.has_flag("carry_swiftness") else 0.5
+	var speed_modifier: float = sprint_modifier + crouch_modifier + (_hold_item_mass * carry_penalty_scale)
 	var movement_multiplier: float = player_stats.get_stat("movement_speed", 1.0) if player_stats else 1.0
 	var raw_speed: float = (default_speed + speed_modifier + slide_modifier) * movement_multiplier
 	speed = maxf(0.5, raw_speed)
@@ -200,6 +223,17 @@ func _physics_process(delta: float) -> void:
 	var is_moving:bool = direction != Vector3.ZERO
 	if player_stats:
 		player_stats.set_action_state(is_sprinting, is_sliding, is_diving and not is_on_floor())
+		var bullet_time := get_node_or_null("Component/BulletTime") as BulletTime
+		var is_weapon_mounted: bool = (
+			bool(weapon_mount.call("is_mounted"))
+			if weapon_mount != null and weapon_mount.has_method("is_mounted")
+			else false
+		)
+		player_stats.set_combat_state(
+			weapon_controller != null and weapon_controller.is_aiming,
+			is_weapon_mounted,
+			bullet_time != null and bullet_time.is_active()
+		)
 	_handle_tiredness(delta, is_moving)
 
 	_movement_velocity = Vector3(current_velocity.x, velocity.y, current_velocity.y)
@@ -264,7 +298,10 @@ func _handle_tiredness(delta: float, is_moving: bool) -> void:
 	_player_current_tiredness = clamp(_player_current_tiredness, 0.0, _player_max_tiredness)
 
 func _stamina_drain_multiplier() -> float:
-	return player_stats.get_stat("stamina_drain_multiplier", 1.0) if player_stats else 1.0
+	var multiplier: float = player_stats.get_stat("stamina_drain_multiplier", 1.0) if player_stats else 1.0
+	if is_sprinting and player_stats != null and player_stats.has_flag("agility_overdrive"):
+		multiplier *= 0.8
+	return multiplier
 
 func _stamina_recovery_multiplier() -> float:
 	return player_stats.get_stat("stamina_recovery_multiplier", 1.0) if player_stats else 1.0
@@ -377,6 +414,7 @@ func can_stand_from_prone() -> bool:
 
 func start_slide() -> void:
 	is_sliding = true
+	EventBus.on_dive_or_slide.emit(self)
 	is_sprinting = false
 	_slide_direction = Vector3(velocity.x, 0, velocity.z).normalized()
 	standing_col.disabled = true
@@ -439,6 +477,8 @@ func calculate_fall_damage() -> float:
 	var damage: float = 0.0
 	if impact_velocity < fall_velocity_threshold:
 		damage = abs(impact_velocity) * fall_damage_multiplier
+		if player_stats:
+			damage *= player_stats.get_stat("fall_damage_scale", 1.0)
 		if prone_dive and _dive_fall_grace > 0.0:
 			damage *= prone_dive.get_fall_damage_scale()
 	return damage
@@ -477,6 +517,15 @@ func _on_player_dead() -> void:
 
 #region Debugging
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_G:
+		var build_resolver := get_tree().get_first_node_in_group(
+			&"player_build_resolver"
+		) as PlayerBuildResolver
+		if build_resolver != null:
+			build_resolver.activate_signature(self)
+			get_viewport().set_input_as_handled()
+		return
+
 	var _enable_input = true
 	# shoot ur self debug
 	# var health_component = get_node_or_null("HealthComponent")

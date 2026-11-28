@@ -31,6 +31,7 @@ func try_throw() -> void:
 		var obj_throw: BaseGrabProp = held_object
 		try_drop()
 		obj_throw.throw(throw_direction)
+		_emit_prop_thrown(obj_throw)
 
 func try_drop() -> void:
 	if held_object:
@@ -61,6 +62,7 @@ func _on_throwing_prop_state_entered() -> void:
 		if obj_throw.force_dropped.is_connected(_on_prop_force_dropped):
 			obj_throw.force_dropped.disconnect(_on_prop_force_dropped)
 		obj_throw.throw(throw_direction)
+		_emit_prop_thrown(obj_throw)
 		held_object = null
 		object_weight = 0.0
 	interaction_state_chart.send_event("onDrop")
@@ -79,3 +81,8 @@ func _on_holding_prop_state_entered() -> void:
 
 func _on_prop_force_dropped() -> void:
 	try_drop()
+
+
+func _emit_prop_thrown(prop: BaseGrabProp) -> void:
+	var player := get_parent().get_parent() as PlayerController
+	EventBus.on_prop_thrown.emit(player, prop)

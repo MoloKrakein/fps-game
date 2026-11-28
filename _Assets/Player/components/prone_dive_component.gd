@@ -189,7 +189,10 @@ func begin_dive() -> void:
 		dir_mult = lerpf(speed_strafe, speed_backward, -local.y)
 
 	var launch: float = dive_speed * _mult("dive_speed") * dir_mult
-	launch += maxf(0.0, flat_vel.dot(dir)) * momentum_inherit
+	var effective_momentum_inherit: float = momentum_inherit
+	if _flag("dive_momentum_extended"):
+		effective_momentum_inherit += 0.2
+	launch += maxf(0.0, flat_vel.dot(dir)) * effective_momentum_inherit
 	launch = minf(launch, max_dive_speed * _mult("dive_speed"))
 
 	dive_direction = dir
@@ -203,7 +206,8 @@ func begin_dive() -> void:
 	else:
 		player.velocity.y = maxf(player.velocity.y, h * air_dive_height_scale)
 
-	player.increase_tiredness(tiredness_cost)
+	if not _flag("dive_tiredness_free"):
+		player.increase_tiredness(tiredness_cost)
 	if player.cam_effects:
 		player.cam_effects.add_fov_punch(fov_punch)
 	dive_started.emit(dir)

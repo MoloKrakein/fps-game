@@ -109,6 +109,7 @@ var target: Node3D
 var squad_coordinator: EnemySquadCoordinator
 var order: SquadOrder = SquadOrder.new()
 var _debug_label: Label3D
+var _last_damage_attacker: Node
 
 var is_dead: bool = false
 ## True once the enemy noticed the player (or was alerted) and until it gives up.
@@ -153,6 +154,7 @@ func _ready() -> void:
 
 	health_component.died.connect(_on_died)
 	health_component.damage_received.connect(_on_damage_received)
+	health_component.armor_broken.connect(_on_armor_broken)
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
 	navigation_agent.target_desired_distance = arrive_tolerance * 0.8
 	_setup_morale()
@@ -963,6 +965,7 @@ func _update_debug_label() -> void:
 func _on_damage_received(info: DamageInfo, _applied_damage: float) -> void:
 	if is_dead:
 		return
+	_last_damage_attacker = _resolve_attacker(info.attacker)
 	_emit_sound_event(&"enemy_hit", global_position)
 	# Being shot reveals where the shot came from, and wakes the squad up.
 	var attacker: Node3D = _resolve_attacker(info.attacker)
@@ -975,11 +978,16 @@ func _on_damage_received(info: DamageInfo, _applied_damage: float) -> void:
 	engage()
 
 
+func _on_armor_broken(info: DamageInfo) -> void:
+	EventBus.on_armor_broken.emit(self, _resolve_attacker(info.attacker))
+
+
 func _on_died() -> void:
 	if is_dead:
 		return
 	# Set immediately so nothing (hit reactions, vaulting, damage) can start after this point.
 	is_dead = true
+	EventBus.on_enemy_killed.emit(self, _last_damage_attacker)
 	_emit_sound_event(&"enemy_death", global_position)
 	add_to_group("dead")
 	if is_instance_valid(squad_coordinator):
@@ -1021,6 +1029,7 @@ func _on_dead_state_entered() -> void:
 	_disable_root_collision()
 
 	_on_death_ragdoll()
+	EventBus.on_enemy_ragdolled.emit(self, _last_damage_attacker)
 
 	# Free the corpse after 5 seconds. Connecting (instead of awaiting) is safe if we're freed earlier.
 	get_tree().create_timer(5.0).timeout.connect(queue_free)

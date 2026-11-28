@@ -14,7 +14,7 @@ stream_1/stream = ExtResource("3_81ohf")
 
 [resource]
 script = ExtResource("1_lxtj2")
-streams = Array[AudioStream]([ExtResource("3_81ohf"), ExtResource("4_gfblc"), SubResource("AudioStreamRandomizer_egbc5")])
+streams = Array[AudioStream]([ExtResource("3_81ohf"), ExtResource("4_gfblc"), SubResource("AudioStreamRandomizer_egbc5"), ExtResource("2_fcu1w")])
 volume_db = -6.200000000000003
 volume_jitter_db = 1.1
 pitch_min = 0.99

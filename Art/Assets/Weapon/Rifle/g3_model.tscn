@@ -185,7 +185,7 @@ ammo_display = NodePath("AmmoCounterPosition")
 [node name="G3" parent="." unique_id=1213099812 instance=ExtResource("2_dk45d")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -0.0097254515, -0.265995, -0.6683363)
 
-[node name="Skeleton3D" parent="G3/Armature" parent_id_path=PackedInt32Array(1213099812, 907488312) index="0" unique_id=1742480468]
+[node name="Skeleton3D" parent="G3/Armature" parent_id_path=PackedInt32Array(1213099812, 2026364346) index="0" unique_id=241739896]
 bones/0/position = Vector3(0.030298505, -2.2874733e-09, -6.4536457e-16)
 bones/0/rotation = Quaternion(8.0884476e-08, -0.11869676, -9.669076e-09, 0.9929306)
 bones/1/position = Vector3(-0.11149962, -2.5070958, -2.079661e-07)
@@ -195,16 +195,16 @@ bones/6/position = Vector3(0.24234267, -0.707065, -1.549558e-07)
 bones/11/rotation = Quaternion(0.47758847, 0.52145094, -0.477587, 0.5214489)
 bones/13/rotation = Quaternion(0.7025368, -0.080266304, -0.7025359, -0.0802664)
 bones/15/position = Vector3(6.3459954, -40.68992, -14.71986)
-bones/15/rotation = Quaternion(0.69966125, 0.69966114, 0.1023439, 0.102343574)
+bones/15/rotation = Quaternion(0.5311871, 0.4517542, -0.43387043, 0.5705391)
 
-[node name="body" parent="G3/Armature/Skeleton3D" index="0" unique_id=1731032958]
+[node name="body" parent="G3/Armature/Skeleton3D" index="0" unique_id=2080849329]
 transform = Transform3D(0.97182214, -5.3290705e-15, -0.23571528, -3.8402895e-08, 1, -1.5832997e-07, 0.23571528, 1.6292073e-07, 0.97182214, 0.030298505, -2.2874733e-09, -6.4536457e-16)
 
 [node name="scope_socket" type="Marker3D" parent="G3/Armature/Skeleton3D/body" index="0" unique_id=692444622]
 transform = Transform3D(0, -1, 0, -4.371139e-08, 0, -1, 1, 0, -4.371139e-08, -0.47392315, -1.8670506, -3.8335934e-08)
 
-[node name="Dummy" parent="G3/Armature/Skeleton3D" index="1" unique_id=126395332]
-transform = Transform3D(1.1920928e-07, 0.9581028, 0.28642374, 0.9999999, -2.3841854e-07, 4.3213367e-07, 4.7683713e-07, 0.28642368, -0.95810294, 6.3459954, -40.68992, -14.71986)
+[node name="Dummy" parent="G3/Armature/Skeleton3D" index="1" unique_id=154460127]
+transform = Transform3D(0.21534918, 0.975012, 0.054554135, -0.0151480725, 0.05919336, -0.99813163, -0.9764196, 0.21412043, 0.027516782, 6.3459954, -40.68992, -14.71986)
 
 [node name="Muzzle" type="Node3D" parent="." unique_id=630187137 node_paths=PackedStringArray("particles", "light")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25368357, -5.513848)

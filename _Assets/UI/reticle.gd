@@ -11,6 +11,8 @@ class_name Reticle extends Control
 # @export var SEGMENT_RADIUS: float = 1.0 : set = set_segments_radius # Radius of each segment
 @export var CENTER_DOT_RADIUS: float = 3.0 : set = set_center_dot_radius # Radius of the center dot
 
+var bloom_radius: float = DOT_RADIUS * sin(GAP_ANGLE / 2.0) * DOT_SCALE
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# pass # Replace with function body.
@@ -49,7 +51,7 @@ func draw_circle_crosshair():
 
 		for i in range(SEGMENTS + 1):
 			var angle = start_angle + i * angle_step
-			var point = Vector2(cos(angle), sin(angle)) * DOT_RADIUS * sin(GAP_ANGLE / 2) * DOT_SCALE
+			var point = Vector2(cos(angle), sin(angle)) * bloom_radius
 			points.append(point)
 
 			if points.size() > 1:
@@ -62,8 +64,16 @@ func draw_circle_crosshair():
 func update_crosshair():
 	queue_redraw()
 
+func set_bloom_radius(radius: float) -> void:
+	var new_radius: float = maxf(radius, 0.0)
+	if is_equal_approx(bloom_radius, new_radius):
+		return
+	bloom_radius = new_radius
+	update_crosshair()
+
 func set_dot_radius(radius: float) -> void:
 	DOT_RADIUS = radius
+	bloom_radius = DOT_RADIUS * sin(GAP_ANGLE / 2.0) * DOT_SCALE
 	update_crosshair()
 
 func set_crosshair_color(color: Color) -> void:
@@ -76,10 +86,12 @@ func set_dot_opacity(opacity: float) -> void:
 
 func set_dot_scale(scale: float) -> void:
 	DOT_SCALE = scale
+	bloom_radius = DOT_RADIUS * sin(GAP_ANGLE / 2.0) * DOT_SCALE
 	update_crosshair()
 
 func set_gap_angle(angle: float) -> void:
 	GAP_ANGLE = angle
+	bloom_radius = DOT_RADIUS * sin(GAP_ANGLE / 2.0) * DOT_SCALE
 	update_crosshair()
 
 func set_segments(segments: int) -> void:

@@ -175,13 +175,22 @@ func _build_columns(parent: VBoxContainer) -> void:
 	deck_title.text = "SELECT A DECK FOR THE ACTIVE SLOT"
 	deck_title.add_theme_color_override("font_color", Color("#8ee0c1"))
 	perk_column.add_child(deck_title)
+	var deck_scroll := ScrollContainer.new()
+	deck_scroll.custom_minimum_size.y = 220.0
+	deck_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	perk_column.add_child(deck_scroll)
+	var deck_list := VBoxContainer.new()
+	deck_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	deck_list.add_theme_constant_override("separation", 6)
+	deck_scroll.add_child(deck_list)
 	for deck: PerkDeckData in resolver.perk_decks:
 		var deck_button := Button.new()
 		deck_button.custom_minimum_size.y = 48.0
 		deck_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		deck_button.tooltip_text = deck.role_summary
 		deck_button.pressed.connect(_on_deck_selected.bind(deck.deck_id))
 		_deck_buttons.append(deck_button)
-		perk_column.add_child(deck_button)
+		deck_list.add_child(deck_button)
 
 	var clear_slot_button := Button.new()
 	clear_slot_button.text = "CLEAR ACTIVE SLOT"
@@ -271,7 +280,7 @@ func _on_clear_slot_pressed() -> void:
 
 
 func _on_skill_pressed(node_id: StringName) -> void:
-	if not resolver.purchase_skill(node_id):
+	if not resolver.purchase_skill_rank(node_id):
 		_feedback.text = "This node is locked, already owned, or you need more skill points."
 	else:
 		_feedback.text = ""
@@ -318,14 +327,21 @@ func _refresh() -> void:
 		var deck_tier := resolver.get_deck_tier(deck.deck_id)
 		var suffix := "  |  ACTIVE T%d" % deck_tier if deck_tier > 0 else ""
 		_deck_buttons[index].text = (
-			"%s  [%s]%s"
+			"%s  |  %s  |  %s%s"
 			% [
+				deck.deck_id,
 				deck.display_name,
 				deck.signature_gadget_name,
 				suffix,
 			]
 		)
-	_gadget_summary.text = "ROLE GADGET  /  %s" % resolver.get_active_gadget_name()
+	if resolver.get_slot_deck(0) == null:
+		_gadget_summary.text = "ROLE GADGET  /  %s" % resolver.get_active_gadget_name()
+	else:
+		_gadget_summary.text = (
+			"ROLE GADGET  /  %s  |  PRESS G  |  COOLDOWN %.1fs"
+			% [resolver.get_active_gadget_name(), resolver.signature_cooldown_left]
+		)
 
 	_points_summary.text = (
 		"SKILL POINTS  %d / %d"
@@ -339,11 +355,27 @@ func _refresh() -> void:
 		if skill == null:
 			continue
 		var button: Button = _skill_buttons[skill_id]
-		var purchased := resolver.is_skill_purchased(skill_id)
-		var can_purchase := resolver.can_purchase_skill(skill_id)
-		var state := "OWNED" if purchased else "AVAILABLE" if can_purchase else "LOCKED"
-		button.text = "%s  |  %d SP  |  %s" % [skill.display_name, skill.point_cost, state]
-		button.disabled = purchased or not can_purchase
+		var rank := resolver.get_skill_rank(skill_id)
+		var next_cost := resolver.get_skill_point_cost_next_rank(skill_id)
+		var can_purchase := resolver.can_purchase_skill_rank(skill_id)
+		var state := (
+			"ACED"
+			if rank >= 2
+			else "BASIC"
+			if rank == 1
+			else "AVAILABLE"
+			if can_purchase
+			else "LOCKED"
+		)
+		var action := "MAX" if rank >= 2 else "ACE" if rank == 1 else "BASIC"
+		button.text = "T%d  |  %s  |  %s  |  %d SP  |  %s" % [
+			skill.tier,
+			skill.display_name,
+			state,
+			next_cost,
+			action if can_purchase else "LOCKED",
+		]
+		button.disabled = not can_purchase
 
 	if _player_stats != null:
 		_stats_summary.text = (
@@ -359,6 +391,6 @@ func _refresh() -> void:
 				_player_stats.get_stat("impact_multiplier", 1.0),
 				_player_stats.get_stat("reload_speed", 1.0),
 				_player_stats.get_stat("damage_modifier", 1.0),
-				resolver.purchased_skill_ids.size(),
+				resolver.purchased_skill_ranks.size(),
 			]
 		)
